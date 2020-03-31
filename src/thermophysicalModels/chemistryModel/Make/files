@@ -1,0 +1,9 @@
+chemistryModel/basicChemistryModel/basicChemistryModel.C
+chemistryModel/BasicChemistryModel/BasicChemistryModels.C
+
+chemistryModel/TDACChemistryModel/reduction/makeChemistryReductionMethods.C
+chemistryModel/TDACChemistryModel/tabulation/makeChemistryTabulationMethods.C
+
+chemistrySolver/chemistrySolver/makeChemistrySolvers.C
+
+LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_Aalto
