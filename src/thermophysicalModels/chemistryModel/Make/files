@@ -1,8 +1,4 @@
-chemistryModel/basicChemistryModel/basicChemistryModel.C
-chemistryModel/BasicChemistryModel/BasicChemistryModels.C
-
-chemistryModel/TDACChemistryModel/reduction/makeChemistryReductionMethods.C
-chemistryModel/TDACChemistryModel/tabulation/makeChemistryTabulationMethods.C
+chemistryModel/BasicChemistryModels.C
 
 chemistrySolver/chemistrySolver/makeChemistrySolvers.C
 
