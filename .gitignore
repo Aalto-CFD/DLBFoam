@@ -1,0 +1,50 @@
+# OpenFOAM related:
+src/**/lnInclude
+src/**/Make/linux64*
+
+src/**/*/lnInclude
+src/**/*/Make/linux64*
+
+applications/solvers/**/*/Make/linux64*
+applications/utilities/**/Make/linux64*
+
+*.dep
+
+# Temporary files
+*~
+
+# General C++ related:
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
