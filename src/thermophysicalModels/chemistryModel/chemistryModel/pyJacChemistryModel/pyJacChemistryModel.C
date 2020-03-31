@@ -50,7 +50,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     ),
 
     nSpecie_(Y_.size()),
-    nReaction_(reactions_.size()),
+    nReaction_(FWD_RATES),  // read from pyJac library
     Treact_
     (
         BasicChemistryModel<ReactionThermo>::template lookupOrDefault<scalar>
@@ -61,7 +61,8 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     ),
     RR_(nSpecie_),
     c_(nSpecie_),
-    dcdt_(nSpecie_)
+    dcdt_(nSpecie_),
+    sp_enth_form(nSpecie_)
 {
     // Create the fields for the chemistry sources
     forAll(RR_, fieldi)
@@ -87,6 +88,32 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 
     Info<< "pyJacChemistryModel: Number of species = " << nSpecie_
         << " and reactions = " << nReaction_ << endl;
+
+    if (this->chemistry_)
+    {
+        //- Enthalpy of formation for all species
+        // sp_enth_form_ "note underscore" is a tmp variable to avoid problems
+        // in pyJac function call.
+        double sp_enth_form_[nSpecie_];
+        memset( sp_enth_form_, 0.0, nSpecie_*sizeof(double) );
+        //- Enthalpy of formation is taken from pyJac at T-standard
+        eval_h(298.15,sp_enth_form_);
+        for(int i=0; i<nSpecie_; i++)
+        {
+            sp_enth_form[i] = sp_enth_form_[i];
+        }
+    }
+    else
+    {
+        Info << "\n" << endl;
+        Info << "############################################" << endl;
+        Info << "#  NOTE : Using pyJac with chemistry off   #" << endl;
+        Info << "############################################" << endl;
+        Info << "#       -- solver still functional --      #" << endl;
+        Info << "############################################" << endl;
+        Info << "\n\n\n" << endl;
+    }
+       
 }
 
 

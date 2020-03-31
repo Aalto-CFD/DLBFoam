@@ -119,6 +119,8 @@ protected:
         //- Temporary rate-of-change of concentration field
         mutable scalarField dcdt_;
 
+        //- List of enthalpies of formation
+        scalarList sp_enth_form;
 
     // Protected Member Functions
 
