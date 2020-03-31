@@ -44,6 +44,15 @@ SourceFiles
 #include "volFields.H"
 #include "simpleMatrix.H"
 
+//pyJac dependencies
+extern "C" 
+{
+    #include "chem_utils.h"
+    #include "dydt.h"
+    #include "jacob.h"
+};
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
