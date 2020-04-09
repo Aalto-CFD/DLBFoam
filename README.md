@@ -12,10 +12,10 @@ We will generate the jacobian library for the GRI mechanism, using an OpenFOAM t
 
 ```
 cd $WM_PROJECT_USER_DIR
-mkdir pyJac_gri
-cp $FOAM_TUTORIALS/combustion/chemFoam/gri/chemkin/chem.inp pyJac_gri
-cp $FOAM_TUTORIALS/combustion/chemFoam/gri/chemkin/therm.dat pyJac_gri
-cd pyJac_gri
+mkdir pyJac
+cp $FOAM_TUTORIALS/combustion/chemFoam/gri/chemkin/chem.inp pyJac
+cp $FOAM_TUTORIALS/combustion/chemFoam/gri/chemkin/therm.dat pyJac
+cd pyJac
 python -m pyjac --lang c --last_species N2 --input chem.inp --thermo therm.dat
 ```
 
