@@ -6,7 +6,7 @@ An OpenFOAM chemistry model utilizing analytical Jacobian formulation, using [py
 
 install [pyJac](https://github.com/SLACKHA/pyJac).
 
-We will generate the jacobian library for the gri mechanism, using an OpenFOAM tutorial.
+We will generate the jacobian library for the GRI mechanism, using an OpenFOAM tutorial.
 
 ### In OpenFOAM-6 environment, do the following:
 
