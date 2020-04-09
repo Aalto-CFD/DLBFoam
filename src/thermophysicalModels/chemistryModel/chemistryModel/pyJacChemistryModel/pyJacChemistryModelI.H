@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,6 +21,9 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955 
+Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/StandardChemistryModel/StandardChemistryModelI.H
+
 \*---------------------------------------------------------------------------*/
 
 #include "volFields.H"
@@ -32,8 +35,8 @@ template<class ReactionThermo, class ThermoType>
 inline Foam::label
 Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::nEqns() const
 {
-    // nEqns = number of species + temperature + pressure
-    return nSpecie_ + 2;
+    // nEqns = number of species - 1(inert) + temperature + pressure
+    return nSpecie_ + 1;
 }
 
 

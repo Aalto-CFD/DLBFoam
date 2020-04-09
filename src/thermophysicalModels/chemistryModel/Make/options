@@ -4,21 +4,25 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/functions/Polynomial \
-    -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
     -I$(LIB_SRC)/ODE/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(WM_PROJECT_USER_DIR)/pyjac/currentPyJacLib/out \
-    -I$(WM_PROJECT_USER_DIR)/pyjac/currentPyJacLib/out/jacobs
+    -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
+    -I$(WM_PROJECT_USER_DIR)/pyJac/out \
+    -I$(WM_PROJECT_USER_DIR)/pyJac/out/jacobs
 
 
 LIB_LIBS = \
     -lcompressibleTransportModels \
+    -L$(FOAM_USER_LIBBIN) \
     -lfluidThermophysicalModels \
     -lreactionThermophysicalModels \
     -lspecie \
     -lODE \
     -lfiniteVolume \
     -lmeshTools \
-    -L$(WM_PROJECT_USER_DIR)/pyjac/currentPyJacLib/build \
+    -lchemistryModel \
     -lc_pyjac
+    
+    
+

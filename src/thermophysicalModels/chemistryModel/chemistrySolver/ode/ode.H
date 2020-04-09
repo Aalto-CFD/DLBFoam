@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -29,6 +29,9 @@ Description
 
 SourceFiles
     ode.C
+
+Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955 
+Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/ode/ode.H
 
 \*---------------------------------------------------------------------------*/
 

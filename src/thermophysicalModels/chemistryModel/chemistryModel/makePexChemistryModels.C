@@ -25,7 +25,10 @@ InClass
     Foam::psiChemistryModel
 
 Description
-    Creates chemistry model instances templated on the type of thermodynamics
+    Creates chemistry model instances templated on the type of thermodynamics. 
+
+    Solvers probably don't work with all combinations but might as well create them.
+    -Petteri
 
 \*---------------------------------------------------------------------------*/
 
@@ -35,12 +38,16 @@ Description
 #include "rhoReactionThermo.H"
 
 #include "pyJacChemistryModel.H"
+
+
 #include "thermoPhysicsTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
+
     // Make base types
     makeChemistryModel(psiReactionThermo);
     makeChemistryModel(rhoReactionThermo);
@@ -53,6 +60,8 @@ namespace Foam
         constGasHThermoPhysics
     );
 
+    
+    
     makeChemistryModelType
     (
         pyJacChemistryModel,
@@ -60,13 +69,14 @@ namespace Foam
         gasHThermoPhysics
     );
 
+    
     makeChemistryModelType
     (
         pyJacChemistryModel,
         psiReactionThermo,
         constIncompressibleGasHThermoPhysics
     );
-
+    
     makeChemistryModelType
     (
         pyJacChemistryModel,
@@ -102,7 +112,7 @@ namespace Foam
         constHThermoPhysics
     );
 
-
+    
     makeChemistryModelType
     (
         pyJacChemistryModel,
@@ -158,6 +168,9 @@ namespace Foam
         rhoReactionThermo,
         constHThermoPhysics
     );
+
+    
+    
 
 
     // Chemistry moldels based on sensibleInternalEnergy
@@ -275,6 +288,7 @@ namespace Foam
         constEThermoPhysics
     );
 
+    
 }
 
 // ************************************************************************* //

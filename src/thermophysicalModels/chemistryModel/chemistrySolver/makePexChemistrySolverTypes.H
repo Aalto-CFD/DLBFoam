@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,72 +21,59 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955 
+Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/chemistrySolver/makePexChemistrySolverTypes.H
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef makeChemistrySolverTypes_H
-#define makeChemistrySolverTypes_H
+#ifndef makePexChemistrySolverTypes_H
+#define makePexChemistrySolverTypes_H
 
-#include "chemistrySolver.H"
 
-#include "StandardChemistryModel.H"
-#include "TDACChemistryModel.H"
+
+
+#include "pyJacChemistryModel.H"
+//#include "TDAC_pyJacChemistryModel.H" #TODO: add TDAC
 
 #include "noChemistrySolver.H"
-#include "EulerImplicit.H"
-#include "ode.H"
+#include "./ode/ode.H" //important to not use the stock ode
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makeChemistrySolverType(SS, Comp, Thermo)                              \
+#define makePexChemistrySolverType(SS, Comp, Thermo)                              \
                                                                                \
-    typedef SS<StandardChemistryModel<Comp, Thermo>> SS##Comp##Thermo;         \
+                                                                               \
+    typedef SS<pyJacChemistryModel<Comp, Thermo>> pyJac##SS##Comp##Thermo;     \
                                                                                \
     defineTemplateTypeNameAndDebugWithName                                     \
     (                                                                          \
-        SS##Comp##Thermo,                                                      \
-        (#SS"<" + word(StandardChemistryModel<Comp, Thermo>::typeName_()) + "<"\
+        pyJac##SS##Comp##Thermo,                                               \
+        (#SS"<" + word(pyJacChemistryModel<Comp, Thermo>::typeName_()) + "<"   \
         + word(Comp::typeName_()) + "," + Thermo::typeName() + ">>").c_str(),  \
         0                                                                      \
     );                                                                         \
                                                                                \
     BasicChemistryModel<Comp>::                                                \
-        add##thermo##ConstructorToTable<SS##Comp##Thermo>                      \
-        add##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel##Comp\
-##Table_; \
+        add##thermo##ConstructorToTable<pyJac##SS##Comp##Thermo>               \
+        add##pyJac##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel\
+##Comp##Table_;                                                                \
                                                                                \
-    typedef SS<TDACChemistryModel<Comp, Thermo>> TDAC##SS##Comp##Thermo;       \
                                                                                \
-    defineTemplateTypeNameAndDebugWithName                                     \
-    (                                                                          \
-        TDAC##SS##Comp##Thermo,                                                \
-        (#SS"<" + word(TDACChemistryModel<Comp, Thermo>::typeName_()) + "<"    \
-        + word(Comp::typeName_()) + "," + Thermo::typeName() + ">>").c_str(),  \
-        0                                                                      \
-    );                                                                         \
-                                                                               \
-    BasicChemistryModel<Comp>::                                                \
-        add##thermo##ConstructorToTable<TDAC##SS##Comp##Thermo>                \
-        add##TDAC##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel\
-##Comp##Table_;
 
 
-#define makeChemistrySolverTypes(Comp, Thermo)                                 \
+//TODO: add TDAC
+
+
+#define makePexChemistrySolverTypes(Comp, Thermo)                                 \
                                                                                \
-    makeChemistrySolverType                                                    \
+    makePexChemistrySolverType                                                    \
     (                                                                          \
         noChemistrySolver,                                                     \
         Comp,                                                                  \
         Thermo                                                                 \
     );                                                                         \
                                                                                \
-    makeChemistrySolverType                                                    \
-    (                                                                          \
-        EulerImplicit,                                                         \
-        Comp,                                                                  \
-        Thermo                                                                 \
-    );                                                                         \
-                                                                               \
-    makeChemistrySolverType                                                    \
+    makePexChemistrySolverType                                                    \
     (                                                                          \
         ode,                                                                   \
         Comp,                                                                  \

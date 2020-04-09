@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,10 +33,20 @@ SourceFiles
     pyJacChemistryModelI.H
     pyJacChemistryModel.C
 
+Base OF-dev git commit : 09e6c93d4a7f2abb20243da013952c8a9369a9f2 
+Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/StandardChemistryModel/StandardChemistryModel.H
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef pyJacChemistryModel_H
 #define pyJacChemistryModel_H
+
+#ifdef DEBUG
+#define OWN_DEBUG_VAR 1
+#else
+#define OWN_DEBUG_VAR 0
+#endif
+
 
 #include "BasicChemistryModel.H"
 #include "Reaction.H"
@@ -45,13 +55,11 @@ SourceFiles
 #include "simpleMatrix.H"
 
 //pyJac dependencies
-extern "C" 
-{
+extern "C" {	
     #include "chem_utils.h"
     #include "dydt.h"
     #include "jacob.h"
 };
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -87,7 +95,7 @@ class pyJacChemistryModel
 
 protected:
 
-    typedef ThermoType thermoType;
+    typedef ThermoType thermoType; //what is this??
 
 
     // Protected data
@@ -119,14 +127,16 @@ protected:
         //- Temporary rate-of-change of concentration field
         mutable scalarField dcdt_;
 
-        //- List of enthalpies of formation
+        //- List of enthalpies of formation 
         scalarList sp_enth_form;
-
+        
     // Protected Member Functions
 
         //- Write access to chemical source terms
         //  (e.g. for multi-chemistry model)
         inline PtrList<volScalarField::Internal>& RR();
+
+
 
 
 public:
@@ -172,6 +182,22 @@ public:
             const scalar T,
             const scalar p,
             scalarField& dcdt
+        ) const;
+
+        //- Return the reaction rate for reaction r and the reference
+        //  species and charateristic times
+        virtual scalar omega
+        (
+            const Reaction<ThermoType>& r,
+            const scalarField& c,
+            const scalar T,
+            const scalar p,
+            scalar& pf,
+            scalar& cf,
+            label& lRef,
+            scalar& pr,
+            scalar& cr,
+            label& rRef
         ) const;
 
 
@@ -260,6 +286,12 @@ public:
                 scalar& deltaT,
                 scalar& subDeltaT
             ) const = 0;
+
+
+private:
+    void callODE(scalar timeLeft, scalarField& c, scalar& T, scalar& p, scalar& chemDt);
+
+
 };
 
 

@@ -1,5 +1,7 @@
-chemistryModel/BasicChemistryModels.C
 
-chemistrySolver/chemistrySolver/makeChemistrySolvers.C
+chemistryModel/makePexChemistryModels.C
+chemistrySolver/makePexChemistrySolvers.C
 
-LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_Aalto
+
+
+LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_pex

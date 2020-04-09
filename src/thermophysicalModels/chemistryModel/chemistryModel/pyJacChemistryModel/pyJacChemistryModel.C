@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
+   \\    /   O peration     |
     \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
@@ -20,6 +20,9 @@ License
 
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+Base OF-dev git commit : 09e6c93d4a7f2abb20243da013952c8a9369a9f2 
+Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/StandardChemistryModel/StandardChemistryModel.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -50,7 +53,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     ),
 
     nSpecie_(Y_.size()),
-    nReaction_(FWD_RATES),  // read from pyJac library
+    nReaction_(FWD_RATES), // reads from pyJac library
     Treact_
     (
         BasicChemistryModel<ReactionThermo>::template lookupOrDefault<scalar>
@@ -63,7 +66,10 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     c_(nSpecie_),
     dcdt_(nSpecie_),
     sp_enth_form(nSpecie_)
+
 {
+
+
     // Create the fields for the chemistry sources
     forAll(RR_, fieldi)
     {
@@ -85,35 +91,24 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
             )
         );
     }
-
-    Info<< "pyJacChemistryModel: Number of species = " << nSpecie_
-        << " and reactions = " << nReaction_ << endl;
+    
 
     if (this->chemistry_)
     {
         //- Enthalpy of formation for all species
-        // sp_enth_form_ "note underscore" is a tmp variable to avoid problems
+        // sp_enth_form_ "note underscore" is a tmp variable to avoid problems 
         // in pyJac function call.
-        double sp_enth_form_[nSpecie_];
+        double sp_enth_form_[nSpecie_]; 
         memset( sp_enth_form_, 0.0, nSpecie_*sizeof(double) );
-        //- Enthalpy of formation is taken from pyJac at T-standard
-        eval_h(298.15,sp_enth_form_);
+        //- Enthalpy of formation is taken from pyJac at T-standard     
+        eval_h(298.15,sp_enth_form_);         
         for(int i=0; i<nSpecie_; i++)
         {
             sp_enth_form[i] = sp_enth_form_[i];
         }
     }
-    else
-    {
-        Info << "\n" << endl;
-        Info << "############################################" << endl;
-        Info << "#  NOTE : Using pyJac with chemistry off   #" << endl;
-        Info << "############################################" << endl;
-        Info << "#       -- solver still functional --      #" << endl;
-        Info << "############################################" << endl;
-        Info << "\n\n\n" << endl;
-    }
-       
+   
+
 }
 
 
@@ -129,22 +124,23 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::
 
 template<class ReactionThermo, class ThermoType>
 void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omega
-(
+( 
     const scalarField& c,
     const scalar T,
     const scalar p,
     scalarField& dcdt
 ) const
 {
-
-    dcdt = Zero;
-
-    forAll(reactions_, i)
-    {
-        const Reaction<ThermoType>& R = reactions_[i];
-
-        R.omega(p, T, c, dcdt);
-    }
+    notImplemented
+    (
+        "pyJacChemistryModel::omega"
+        "("
+            "scalarField&, "
+            "scalar, "
+            "scalar, "
+            "scalarField& "
+        ") const"
+    );
 }
 
 
@@ -163,9 +159,60 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omegaI
     label& rRef
 ) const
 {
-    const Reaction<ThermoType>& R = reactions_[index];
-    scalar w = R.omega(p, T, c, pf, cf, lRef, pr, cr, rRef);
-    return(w);
+    notImplemented
+    (
+        "pyJacChemistryModel::omegaI"
+        "("
+            "label, "
+            "scalarField&, "
+            "scalar, "
+            "scalar, "
+            "scalar&, "
+            "scalar&, "
+            "label&, "
+            "scalar&, "
+            "scalar&, "
+            "label& "
+        ") const"
+    );
+
+    return(0);
+}
+
+
+template<class ReactionThermo, class ThermoType>
+Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omega
+(
+    const Reaction<ThermoType>& R,
+    const scalarField& c,
+    const scalar T,
+    const scalar p,
+    scalar& pf,
+    scalar& cf,
+    label& lRef,
+    scalar& pr,
+    scalar& cr,
+    label& rRef
+) const
+{
+    notImplemented
+    (
+        "pyJacChemistryModel::omega"
+        "("
+            "Reaction<ThermoType>&, "
+            "scalarField&, "
+            "scalar, "
+            "scalar, "
+            "scalar&, "
+            "scalar&, "
+            "label&, "
+            "scalar&, "
+            "scalar&, "
+            "label& "
+        ") const"
+    );
+
+    return(0);
 }
 
 
@@ -177,45 +224,45 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
     scalarField& dcdt
 ) const
 {
-    const scalar T = c[nSpecie_];
-    const scalar p = c[nSpecie_ + 1];
 
-    forAll(c_, i)
-    {
-        c_[i] = max(c[i], 0);
-    }
+    //TODO: pre-allocate me!
+    //the '()' operator at the end sets the chunk to zero
+    double* yToPyJac = new double[nSpecie_ + 1]();
+    double* dy = new double[nSpecie_]();
+   
 
-    omega(c_, T, p, dcdt);
+    const scalar T = c[0];
+    const scalar p = c[nSpecie_];
 
-    // Constant pressure
-    // dT/dt = ...
-    scalar rho = 0;
-    scalar cSum = 0;
-    for (label i = 0; i < nSpecie_; i++)
-    {
-        const scalar W = specieThermo_[i].W();
-        cSum += c_[i];
-        rho += W*c_[i];
-    }
-    scalar cp = 0;
+    scalar csum = 0.0;
     for (label i=0; i<nSpecie_; i++)
     {
-        cp += c_[i]*specieThermo_[i].cp(p, T);
+        c_[i] = max(c[i+1], 0.0);
+	    csum += c_[i];
     }
-    cp /= rho;
+    c_[nSpecie_-1] = 1.0 - csum; // The last specie
 
-    scalar dT = 0;
-    for (label i = 0; i < nSpecie_; i++)
+    yToPyJac[0] = T;
+    // i=1->nSpecie are mass fractions
+    for (label i=1; i<nSpecie_; i++)
     {
-        const scalar hi = specieThermo_[i].ha(p, T);
-        dT += hi*dcdt[i];
+   	    yToPyJac[i] = c_[i-1];
     }
-    dT /= rho*cp;
+    // The last specie
+    yToPyJac[nSpecie_] = c_[nSpecie_-1];    
 
-    dcdt[nSpecie_] = -dT;
+    // call pyJac RHS function
+    dydt(0,p,yToPyJac,dy);
+    for (label i=0; i<nSpecie_; i++)
+    {
+    	dcdt[i] = dy[i];
+    }
+    // dp/dt = 0
+    dcdt[nSpecie_] = 0.0;
 
-    // dp/dt = ...
-    dcdt[nSpecie_ + 1] = 0;
+    delete [] yToPyJac;
+    delete [] dy;
+
 }
 
 
@@ -228,72 +275,59 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
     scalarSquareMatrix& J
 ) const
 {
-    const scalar T = c[nSpecie_];
-    const scalar p = c[nSpecie_ + 1];
-
-    forAll(c_, i)
-    {
-        c_[i] = max(c[i], 0);
-    }
+    //TODO: pre-allocate me!
+    //the '()' operator at the end sets the chunk to zero
+    double* yToPyJac = new double[nSpecie_ + 1]();
+    double* jac = new double[nSpecie_ * nSpecie_]();
 
     J = Zero;
     dcdt = Zero;
+    const scalar T = c[0];
+    const scalar p = c[nSpecie_];
 
-    // To compute the species derivatives of the temperature term,
-    // the enthalpies of the individual species is needed
-    scalarField hi(nSpecie_);
-    scalarField cpi(nSpecie_);
-    for (label i = 0; i < nSpecie_; i++)
-    {
-        hi[i] = specieThermo_[i].ha(p, T);
-        cpi[i] = specieThermo_[i].cp(p, T);
-    }
-    scalar omegaI = 0;
-    List<label> dummy;
-    forAll(reactions_, ri)
-    {
-        const Reaction<ThermoType>& R = reactions_[ri];
-        scalar kfwd, kbwd;
-        R.dwdc(p, T, c_, J, dcdt, omegaI, kfwd, kbwd, false, dummy);
-        R.dwdT(p, T, c_, omegaI, kfwd, kbwd, J, false, dummy, nSpecie_);
-    }
+    scalar csum = 0.0;
 
-    // The species derivatives of the temperature term are partially computed
-    // while computing dwdc, they are completed hereunder:
-    scalar cpMean = 0;
-    scalar dcpdTMean = 0;
     for (label i=0; i<nSpecie_; i++)
     {
-        cpMean += c_[i]*cpi[i]; // J/(m3.K)
-        dcpdTMean += c_[i]*specieThermo_[i].dcpdT(p, T);
+        c_[i] = max(c[i+1], 0);
+	    csum += c_[i];
     }
-    scalar dTdt = 0.0;
-    for (label i=0; i<nSpecie_; i++)
-    {
-        dTdt += hi[i]*dcdt[i]; // J/(m3.s)
-    }
-    dTdt /= -cpMean; // K/s
+    c_[nSpecie_-1] = 1.0 - csum; // The last specie
 
-    for (label i = 0; i < nSpecie_; i++)
+    yToPyJac[0] = T;
+    // i=1->nSpecie are mass fractions
+    for (label i=1; i<nSpecie_; i++)
     {
-        J(nSpecie_, i) = 0;
-        for (label j = 0; j < nSpecie_; j++)
+   	    yToPyJac[i] = c_[i-1];
+    }
+    // The last specie
+    yToPyJac[nSpecie_] = c_[nSpecie_-1];
+    
+    // call pyJac Jacobian evaluation
+    eval_jacob (0, p, yToPyJac, jac);
+
+    int k=0;
+    for (label j=0; j<nSpecie_; j++)
+    {
+        for (label i=0; i<nSpecie_; i++)
         {
-            J(nSpecie_, i) += hi[j]*J(j, i);
+            J[i][j] = jac[k+i];
         }
-        J(nSpecie_, i) += cpi[i]*dTdt; // J/(mol.s)
-        J(nSpecie_, i) /= -cpMean;    // K/s / (mol/m3)
+        k += nSpecie_;
     }
 
-    // ddT of dTdt
-    J(nSpecie_, nSpecie_) = 0;
-    for (label i = 0; i < nSpecie_; i++)
+    // Last row and column to zero
+    for (label j=0; j<nSpecie_+1; j++)
     {
-        J(nSpecie_, nSpecie_) += cpi[i]*dcdt[i] + hi[i]*J(i, nSpecie_);
+        J[nSpecie_][j] = 0.0;
+        J[j][nSpecie_] = 0.0;
     }
-    J(nSpecie_, nSpecie_) += dTdt*dcpdTMean;
-    J(nSpecie_, nSpecie_) /= -cpMean;
-    J(nSpecie_, nSpecie_) += dTdt/T;
+
+
+    delete [] yToPyJac;
+    delete [] jac;
+
+
 }
 
 
@@ -301,6 +335,11 @@ template<class ReactionThermo, class ThermoType>
 Foam::tmp<Foam::volScalarField>
 Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::tc() const
 {
+    notImplemented
+    (
+        "pyJacChemistryModel::tc() const"
+    );
+    
     tmp<volScalarField> ttc
     (
         new volScalarField
@@ -319,53 +358,6 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::tc() const
             extrapolatedCalculatedFvPatchScalarField::typeName
         )
     );
-
-    scalarField& tc = ttc.ref();
-
-    tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField& rho = trho();
-
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-
-    const label nReaction = reactions_.size();
-
-    scalar pf, cf, pr, cr;
-    label lRef, rRef;
-
-    if (this->chemistry_)
-    {
-        forAll(rho, celli)
-        {
-            const scalar rhoi = rho[celli];
-            const scalar Ti = T[celli];
-            const scalar pi = p[celli];
-
-            scalar cSum = 0;
-
-            for (label i=0; i<nSpecie_; i++)
-            {
-                c_[i] = rhoi*Y_[i][celli]/specieThermo_[i].W();
-                cSum += c_[i];
-            }
-
-            forAll(reactions_, i)
-            {
-                const Reaction<ThermoType>& R = reactions_[i];
-
-                R.omega(pi, Ti, c_, pf, cf, lRef, pr, cr, rRef);
-
-                forAll(R.rhs(), s)
-                {
-                    tc[celli] += R.rhs()[s].stoichCoeff*pf*cf;
-                }
-            }
-
-            tc[celli] = nReaction*cSum/tc[celli];
-        }
-    }
-
-    ttc.ref().correctBoundaryConditions();
 
     return ttc;
 }
@@ -401,8 +393,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::Qdot() const
         {
             forAll(Qdot, celli)
             {
-                const scalar hi = specieThermo_[i].Hc();
-                Qdot[celli] -= hi*RR_[i][celli];
+                Qdot[celli] -= sp_enth_form[i]*RR_[i][celli];
             }
         }
     }
@@ -419,6 +410,16 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculateRR
     const label si
 ) const
 {
+
+    notImplemented
+    (
+        "pyJacChemistryModel::calculateRR"
+        "("
+            "label, "
+            "label "
+        ") const"
+    );
+    
     tmp<volScalarField::Internal> tRR
     (
         new volScalarField::Internal
@@ -436,51 +437,6 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculateRR
         )
     );
 
-    volScalarField::Internal& RR = tRR.ref();
-
-    tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField& rho = trho();
-
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-
-    scalar pf, cf, pr, cr;
-    label lRef, rRef;
-
-    forAll(rho, celli)
-    {
-        const scalar rhoi = rho[celli];
-        const scalar Ti = T[celli];
-        const scalar pi = p[celli];
-
-        for (label i=0; i<nSpecie_; i++)
-        {
-            const scalar Yi = Y_[i][celli];
-            c_[i] = rhoi*Yi/specieThermo_[i].W();
-        }
-
-        const Reaction<ThermoType>& R = reactions_[ri];
-        const scalar omegai = R.omega(pi, Ti, c_, pf, cf, lRef, pr, cr, rRef);
-
-        forAll(R.lhs(), s)
-        {
-            if (si == R.lhs()[s].index)
-            {
-                RR[celli] -= R.lhs()[s].stoichCoeff*omegai;
-            }
-        }
-
-        forAll(R.rhs(), s)
-        {
-            if (si == R.rhs()[s].index)
-            {
-                RR[celli] += R.rhs()[s].stoichCoeff*omegai;
-            }
-        }
-
-        RR[celli] *= specieThermo_[si].W();
-    }
-
     return tRR;
 }
 
@@ -493,32 +449,12 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculate()
         return;
     }
 
-    tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField& rho = trho();
-
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-
-    forAll(rho, celli)
-    {
-        const scalar rhoi = rho[celli];
-        const scalar Ti = T[celli];
-        const scalar pi = p[celli];
-
-        for (label i=0; i<nSpecie_; i++)
-        {
-            const scalar Yi = Y_[i][celli];
-            c_[i] = rhoi*Yi/specieThermo_[i].W();
-        }
-
-        omega(c_, Ti, pi, dcdt_);
-
-        for (label i=0; i<nSpecie_; i++)
-        {
-            RR_[i][celli] = dcdt_[i]*specieThermo_[i].W();
-        }
-    }
+    notImplemented
+    (
+        "pyJacChemistryModel::calculateRR() const"
+    );
 }
+
 
 
 template<class ReactionThermo, class ThermoType>
@@ -539,12 +475,13 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
     tmp<volScalarField> trho(this->thermo().rho());
     const scalarField& rho = trho();
-
     const scalarField& T = this->thermo().T();
     const scalarField& p = this->thermo().p();
 
-    scalarField c0(nSpecie_);
 
+
+    scalarField c0(nSpecie_);
+    
     forAll(rho, celli)
     {
         scalar Ti = T[celli];
@@ -556,31 +493,19 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
             for (label i=0; i<nSpecie_; i++)
             {
-                c_[i] = rhoi*Y_[i][celli]/specieThermo_[i].W();
+                c_[i] = Y_[i][celli];
                 c0[i] = c_[i];
             }
 
+            /////////////////////////
+            // ODE solution begins //
             // Initialise time progress
             scalar timeLeft = deltaT[celli];
-
             // Calculate the chemical source terms
-            while (timeLeft > small)
-            {
-                scalar dt = timeLeft;
-                this->solve(c_, Ti, pi, dt, this->deltaTChem_[celli]);
-                timeLeft -= dt;
-            }
-
+            #include "callODE.H"
+           
             deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
-
-            this->deltaTChem_[celli] =
-                min(this->deltaTChem_[celli], this->deltaTChemMax_);
-
-            for (label i=0; i<nSpecie_; i++)
-            {
-                RR_[i][celli] =
-                    (c_[i] - c0[i])*specieThermo_[i].W()/deltaT[celli];
-            }
+            this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
         }
         else
         {
@@ -589,10 +514,13 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 RR_[i][celli] = 0;
             }
         }
+       
+
     }
 
     return deltaTMin;
 }
+
 
 
 template<class ReactionThermo, class ThermoType>

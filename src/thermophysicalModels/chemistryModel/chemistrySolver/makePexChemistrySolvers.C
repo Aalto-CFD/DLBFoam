@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,27 +21,29 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Base OF-dev git commit : 4bd59d64db473a4f2a3654dc93081d958559dcad 
+Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/chemistrySolver/makePexChemistrySolvers.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "chemistrySolver.H"
+#include "makePexChemistrySolverTypes.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+#include "thermoPhysicsTypes.H"
+#include "psiReactionThermo.H"
+#include "rhoReactionThermo.H"
 
-template<class ChemistryModel>
-Foam::chemistrySolver<ChemistryModel>::chemistrySolver
-(
-    typename ChemistryModel::reactionThermo& thermo
-)
-:
-    ChemistryModel(thermo)
-{}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    // Chemistry solvers based on sensibleEnthalpy
+    makePexChemistrySolverTypes(psiReactionThermo, constGasHThermoPhysics);
+    makePexChemistrySolverTypes(psiReactionThermo, gasHThermoPhysics);
+
+    makePexChemistrySolverTypes(rhoReactionThermo, constGasHThermoPhysics);
+    makePexChemistrySolverTypes(rhoReactionThermo, gasHThermoPhysics);
+
+}
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-template<class ChemistryModel>
-Foam::chemistrySolver<ChemistryModel>::~chemistrySolver()
-{}
-
-
-// ************************************************************************* //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
