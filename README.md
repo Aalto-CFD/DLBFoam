@@ -22,7 +22,7 @@ python -m pyjac --lang c --last_species N2 --input chem.inp --thermo therm.dat
 ### Generate the library
 
 ```
-python -m pyjac.libgen --lang c -out $FOAM_USER_LIBBIN
+python -m pyjac.libgen --source_dir ./out --lang c -out $FOAM_USER_LIBBIN
 ```
 
 ### Compile the pyJac chemistry model inside src/thermophysicalModels/chemistryModel
