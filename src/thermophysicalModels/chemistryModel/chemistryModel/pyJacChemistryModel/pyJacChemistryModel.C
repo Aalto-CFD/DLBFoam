@@ -92,28 +92,24 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         );
     }
     
-    /*
+    //TODO: this is probobably not correct
     const IOdictionary SOMEDICT_DIDNT_CHECK_IF_CORRECT
-    (
-        IOobject
         (
-            thermo.phasePropertyName("chemistryProperties"),
-            thermo.db().time().constant(),
-            thermo.db(),
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE,
-            false
-        )
-    );
+            IOobject
+            (
+                thermo.phasePropertyName("chemistryProperties"),
+                thermo.db().time().constant(),
+                thermo.db(),
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE,
+                false
+            )
+        );
+    
 
-    refcell_mapper_ = new chemistryRefMappingMethod<ReactionThermo, ThermoType>(SOMEDICT_DIDNT_CHECK_IF_CORRECT)
-    */
+    refcell_mapper_ = new simpleRefMapping<ReactionThermo, ThermoType>(SOMEDICT_DIDNT_CHECK_IF_CORRECT);
 
-    /*tabulation_ = chemistryRefMappingMethod<ReactionThermo, ThermoType>::New
-    (
-        *this,
-        *this
-    );*/
+
 
 
     if (this->chemistry_)
@@ -134,6 +130,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     if (refcell_mapper_->active())
     {
         Info<<"REFMAPPING IS ACTIVE!!!"<<endl;
+        refcell_mapper_->some_base_class_function();
     }
    
 

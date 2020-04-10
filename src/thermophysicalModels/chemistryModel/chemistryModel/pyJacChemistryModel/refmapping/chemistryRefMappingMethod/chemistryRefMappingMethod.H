@@ -84,6 +84,7 @@ public:
 
     ///
     ///@brief THIS IS THE BREAD AND BUTTER WHICH SHOULD BE DEFINED IN ALL CLASSES!
+    ///       THIS IS NOT PURE AT THIS POINT 
     ///
     // TODO add params
     virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const = 0;
@@ -107,17 +108,14 @@ public:
         return active_ && log_;
     }
 
-    inline bool variableTimeStep()
-    {
-        return chemistry_.variableTimeStep();
-    }
+    
 
     inline scalar tolerance() const
     {
         return tolerance_;
     }
 
-        
+    int some_base_class_function() {return 43;}
 
 
 protected:
@@ -129,12 +127,12 @@ protected:
     //- Is tabulation active?
     Switch active_;
 
+
+    bool aactive_;
+
     //- Switch to select performance logging
     Switch log_;
 
-    //TODO I dont think this should have a chemistryModel member variable,
-    //certainly not a specific pyJacModel
-    pyJacChemistryModel<CompType, ThermoType>& chemistry_;
 
     scalar tolerance_;
 

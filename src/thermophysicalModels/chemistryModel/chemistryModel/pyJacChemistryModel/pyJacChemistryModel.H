@@ -53,8 +53,10 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "ODESystem.H"
 #include "volFields.H"
 #include "simpleMatrix.H"
+#include <memory> //std::unique_ptr
 
-#include "chemistryRefMappingMethod.H"
+#include "simpleRefMapping.H" //TODO: create a factory class that returns the correct ref cell mapper
+
 
 //pyJac dependencies
 extern "C" {	
@@ -100,10 +102,13 @@ protected:
     typedef ThermoType thermoType; //what is this??
 
       // Ref cell mapper
-    autoPtr<chemistryRefMappingMethod<ReactionThermo, ThermoType>> refcell_mapper_;
-             
+    //autoPtr<chemistryRefMappingMethod<ReactionThermo, ThermoType>> refcell_mapper_;
 
 
+    //TODO: DO NOT USE A RAW POINTER        
+    chemistryRefMappingMethod<ReactionThermo, ThermoType>* refcell_mapper_;
+
+    //make_unique<Vec3>
 
     // Protected data
 
@@ -297,6 +302,12 @@ public:
 
 private:
     void callODE(scalar timeLeft, scalarField& c, scalar& T, scalar& p, scalar& chemDt);
+
+
+
+
+
+    
 
 
 };
