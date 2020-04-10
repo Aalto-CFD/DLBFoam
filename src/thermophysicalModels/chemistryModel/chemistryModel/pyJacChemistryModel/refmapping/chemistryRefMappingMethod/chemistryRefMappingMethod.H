@@ -90,7 +90,11 @@ public:
     virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const = 0;
 
 
-
+    ///
+    ///@brief This is just an example
+    ///
+    ///
+    virtual void derived_hello() = 0;
 
     //- Destructor
     virtual ~chemistryRefMappingMethod();

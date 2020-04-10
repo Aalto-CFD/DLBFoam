@@ -131,6 +131,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     {
         Info<<"REFMAPPING IS ACTIVE!!!"<<endl;
         refcell_mapper_->base_hello();
+        refcell_mapper_->derived_hello();
     }
    
 
