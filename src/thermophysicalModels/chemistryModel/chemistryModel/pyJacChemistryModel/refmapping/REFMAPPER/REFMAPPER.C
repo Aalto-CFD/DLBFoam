@@ -39,7 +39,7 @@ Foam::chemistryRefMappingMethods::REFMAPPER<CompType, ThermoType>::REFMAPPER
     (
         chemistryProperties,
         chemistry
-    ),
+    )
     //chemisTree_(chemistry, this->coeffsDict_),
     //scaleFactor_(chemistry.nEqns() + ((this->variableTimeStep()) ? 1 : 0), 1),
     //runTime_(chemistry.time()),
