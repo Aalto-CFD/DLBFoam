@@ -142,7 +142,10 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 template<class ReactionThermo, class ThermoType>
 Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::
 ~pyJacChemistryModel()
-{}
+{
+    //TODO: use a smart pointer so this can be removed!
+    delete refcell_mapper_;
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
