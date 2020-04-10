@@ -92,6 +92,23 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         );
     }
     
+    /*
+    const IOdictionary SOMEDICT_DIDNT_CHECK_IF_CORRECT
+    (
+        IOobject
+        (
+            thermo.phasePropertyName("chemistryProperties"),
+            thermo.db().time().constant(),
+            thermo.db(),
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE,
+            false
+        )
+    );
+
+    refcell_mapper_ = new chemistryRefMappingMethod<ReactionThermo, ThermoType>(SOMEDICT_DIDNT_CHECK_IF_CORRECT)
+    */
+
     /*tabulation_ = chemistryRefMappingMethod<ReactionThermo, ThermoType>::New
     (
         *this,

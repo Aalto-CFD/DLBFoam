@@ -37,8 +37,6 @@ Description
 
 namespace Foam
 {
-namespace chemistryRefMappingMethods
-{
 
 /*---------------------------------------------------------------------------*\
                            Class none Declaration
@@ -57,7 +55,8 @@ class noChemistryRefMapping : public chemistryRefMappingMethod<CompType, ThermoT
 
 public:
 
-    virtual void applyMapping();
+    //Note this is defined here empty.
+    virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const {};
 
 protected:
 
@@ -76,7 +75,6 @@ private:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace chemistryRefMappingMethods
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

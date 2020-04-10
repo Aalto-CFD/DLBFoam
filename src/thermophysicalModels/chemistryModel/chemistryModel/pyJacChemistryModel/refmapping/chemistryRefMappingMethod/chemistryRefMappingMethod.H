@@ -45,6 +45,7 @@ SourceFiles
 namespace Foam
 {
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CompType, class ThermoType>
@@ -77,16 +78,15 @@ public:
     //- Construct from components
     chemistryRefMappingMethod
     (
-        const dictionary& dict,
-        pyJacChemistryModel<CompType, ThermoType>& chemistry //TODO: consider if this is really necessary
+        const dictionary& dict
     );
 
 
     ///
-    ///@brief THIS IS THE BREAD AND BUTTER WHICH SOULD BE DEFINED IN ALL CLASSES!
+    ///@brief THIS IS THE BREAD AND BUTTER WHICH SHOULD BE DEFINED IN ALL CLASSES!
     ///
     // TODO add params
-    virtual void applyMapping() const = 0;
+    virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const = 0;
 
 
 
@@ -145,7 +145,9 @@ protected:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+
+
+} //namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

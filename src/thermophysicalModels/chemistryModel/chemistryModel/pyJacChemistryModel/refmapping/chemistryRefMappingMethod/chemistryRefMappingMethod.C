@@ -28,18 +28,20 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+namespace Foam
+{
+
+
 template<class CompType, class ThermoType>
-Foam::chemistryRefMappingMethod<CompType, ThermoType>::chemistryRefMappingMethod
+chemistryRefMappingMethod<CompType, ThermoType>::chemistryRefMappingMethod
 (
-    const dictionary& dict,
-    pyJacChemistryModel<CompType, ThermoType>& chemistry
+    const dictionary& dict
 )
 :
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),
     active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
     log_(coeffsDict_.lookupOrDefault<Switch>("log", false)),
-    chemistry_(chemistry),
     tolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance", 1e-4))
 {}
 
@@ -47,9 +49,12 @@ Foam::chemistryRefMappingMethod<CompType, ThermoType>::chemistryRefMappingMethod
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class CompType, class ThermoType>
-Foam::chemistryRefMappingMethod<CompType, ThermoType>::
-~chemistryRefMappingMethod()
-{}
+chemistryRefMappingMethod<CompType, ThermoType>::~chemistryRefMappingMethod(){}
 
+
+
+
+
+}//namespace Foam
 
 // ************************************************************************* //
