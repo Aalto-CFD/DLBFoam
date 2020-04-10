@@ -54,6 +54,8 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "volFields.H"
 #include "simpleMatrix.H"
 
+#include "chemistryRefMappingMethod.H"
+
 //pyJac dependencies
 extern "C" {	
     #include "chem_utils.h"
@@ -97,7 +99,9 @@ protected:
 
     typedef ThermoType thermoType; //what is this??
 
-
+      // Tabulation
+        autoPtr<chemistryRefMappingMethod<ReactionThermo, ThermoType>>
+            tabulation_;
     // Protected data
 
         //- Reference to the field of specie mass fractions

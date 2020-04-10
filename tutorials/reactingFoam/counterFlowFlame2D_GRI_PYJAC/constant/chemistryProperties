@@ -93,7 +93,7 @@ tabulation
     tolerance   1e-4;
 
     // ISAT is the only method currently available
-    method   ISAT_pyJac;
+    method   test;
 
     // Scale factors used in the definition of the ellipsoid of accuracy
     scaleFactor
