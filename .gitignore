@@ -8,6 +8,9 @@ src/**/*/Make/linux64*
 applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
 
+#Visual studio code configs
+.vscode
+
 *.dep
 
 # Temporary files
