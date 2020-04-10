@@ -44,84 +44,34 @@ namespace chemistryRefMappingMethods
                            Class none Declaration
 \*---------------------------------------------------------------------------*/
 
+
+///
+///@brief Not sure if this class is necessary because theres the switch "active" on/off in the base class.
+///       Maybe this can be used for debugging at some point
+///
+///@tparam CompType NO IDEA
+///@tparam ThermoType NO IDEA
+///
 template<class CompType, class ThermoType>
-class none
-:
-    public chemistryRefMappingMethod<CompType, ThermoType>
-{
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        none(const none&);
-
+class noChemistryRefMapping : public chemistryRefMappingMethod<CompType, ThermoType>{
 
 public:
 
-    //- Runtime type information
-    TypeName("none");
+    virtual void applyMapping();
 
-    // Constructors
+protected:
 
-        //- Construct from dictionary
-        none
-        (
-            const dictionary& chemistryProperties,
-            pyJacChemistryModel<CompType, ThermoType>& chemistry
-        );
+    // None
+
+private:
+
+    // None
 
 
-    // Destructor
-    virtual ~none();
-
-
-    // Member Functions
-
-        //- Return the size of the binary tree
-        virtual label size()
-        {
-            NotImplemented;
-            return 0;
-        }
-
-        virtual void writePerformance()
-        {
-            NotImplemented;
-        }
-
-        //- Find the closest stored leaf of phiQ and store the result in
-        //  RphiQ or return false.
-        virtual bool retrieve
-        (
-            const Foam::scalarField& phiq,
-            scalarField& Rphiq
-        )
-        {
-            NotImplemented;
-            return false;
-        }
-
-        // Add information to the RefMapping.This function can grow an
-        // existing point or add a new leaf to the binary tree Input : phiq
-        // the new composition to store Rphiq the mapping of the new
-        // composition point
-        virtual label add
-        (
-            const scalarField& phiq,
-            const scalarField& Rphiq,
-            const scalar rho,
-            const scalar deltaT
-        )
-        {
-            NotImplemented;
-            return false;
-        }
-
-        virtual bool update()
-        {
-            NotImplemented;
-            return false;
-        }
 };
+
+
+    
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -131,9 +81,10 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef NoRepository
+//No idea what this means so always include
+//#ifdef NoRepository
     #include "noChemistryRefMapping.C"
-#endif
+//#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

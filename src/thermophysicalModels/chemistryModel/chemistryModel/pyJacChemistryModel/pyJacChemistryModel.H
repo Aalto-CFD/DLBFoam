@@ -99,9 +99,12 @@ protected:
 
     typedef ThermoType thermoType; //what is this??
 
-      // Tabulation
-        autoPtr<chemistryRefMappingMethod<ReactionThermo, ThermoType>>
-            tabulation_;
+      // Ref cell mapper
+    autoPtr<chemistryRefMappingMethod<ReactionThermo, ThermoType>> refcell_mapper_;
+             
+
+
+
     // Protected data
 
         //- Reference to the field of specie mass fractions

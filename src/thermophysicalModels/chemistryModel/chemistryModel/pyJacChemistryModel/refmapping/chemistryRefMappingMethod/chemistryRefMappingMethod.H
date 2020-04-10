@@ -57,8 +57,8 @@ class pyJacChemistryModel;
 ///
 ///@brief A base class for chemistry reference cell mappings
 ///
-///@tparam CompType 
-///@tparam ThermoType 
+///@tparam CompType NO IDEA
+///@tparam ThermoType NO IDEA
 ///
 template<class CompType, class ThermoType>
 class chemistryRefMappingMethod
@@ -69,6 +69,8 @@ public:
     //- Runtime type information
     //TypeName("chemistryRefMappingMethod");
 
+
+    
 
     // Constructors
 
@@ -151,7 +153,6 @@ protected:
 //TODO: find out when NoRepositiory is turned off
 //#ifdef NoRepository
     #include "chemistryRefMappingMethod.C"
-    #include "chemistryRefMappingMethodNew.C"
 //#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

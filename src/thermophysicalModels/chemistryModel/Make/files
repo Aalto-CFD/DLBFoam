@@ -1,4 +1,3 @@
-chemistryModel/pyJacChemistryModel/refmapping/makeChemistryRefMappingMethods.C
 chemistryModel/makePexChemistryModels.C
 chemistrySolver/makePexChemistrySolvers.C
 

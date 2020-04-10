@@ -92,11 +92,11 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         );
     }
     
-    tabulation_ = chemistryRefMappingMethod<ReactionThermo, ThermoType>::New
+    /*tabulation_ = chemistryRefMappingMethod<ReactionThermo, ThermoType>::New
     (
         *this,
         *this
-    );
+    );*/
 
 
     if (this->chemistry_)
@@ -114,7 +114,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         }
     }
 
-    if (tabulation_->active())
+    if (refcell_mapper_->active())
     {
         Info<<"REFMAPPING IS ACTIVE!!!"<<endl;
     }
