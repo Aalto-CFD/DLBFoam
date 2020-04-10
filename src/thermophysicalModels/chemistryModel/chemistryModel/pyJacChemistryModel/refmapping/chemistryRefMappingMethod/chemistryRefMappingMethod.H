@@ -54,6 +54,12 @@ class pyJacChemistryModel;
                            Class chemistryRefMappingMethod Declaration
 \*---------------------------------------------------------------------------*/
 
+///
+///@brief A base class for chemistry reference cell mappings
+///
+///@tparam CompType 
+///@tparam ThermoType 
+///
 template<class CompType, class ThermoType>
 class chemistryRefMappingMethod
 {
@@ -70,6 +76,8 @@ protected:
     //- Switch to select performance logging
     Switch log_;
 
+    //TODO I dont think this should have a chemistryModel member variable,
+    //certainly not a specific pyJacModel
     pyJacChemistryModel<CompType, ThermoType>& chemistry_;
 
     scalar tolerance_;
@@ -178,10 +186,12 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef NoRepository
+
+//TODO: find out when NoRepositiory is turned off
+//#ifdef NoRepository
     #include "chemistryRefMappingMethod.C"
     #include "chemistryRefMappingMethodNew.C"
-#endif
+//#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
