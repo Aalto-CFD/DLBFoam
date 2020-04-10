@@ -40,9 +40,7 @@ chemistryRefMappingMethod<CompType, ThermoType>::chemistryRefMappingMethod
 :
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),
-    active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
-    log_(coeffsDict_.lookupOrDefault<Switch>("log", false)),
-    tolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance", 1e-4))
+    active_(coeffsDict_.lookupOrDefault<Switch>("active", false))
 {}
 
 

@@ -103,19 +103,9 @@ public:
         return active_;
     }
 
-    inline bool log()
-    {
-        return active_ && log_;
+    void base_hello() {
+        std::cout << "Hello from a baseclass function" << std::endl;    
     }
-
-    
-
-    inline scalar tolerance() const
-    {
-        return tolerance_;
-    }
-
-    int some_base_class_function() {return 43;}
 
 
 protected:
@@ -127,14 +117,6 @@ protected:
     //- Is tabulation active?
     Switch active_;
 
-
-    bool aactive_;
-
-    //- Switch to select performance logging
-    Switch log_;
-
-
-    scalar tolerance_;
 
 
 
