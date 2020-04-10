@@ -64,6 +64,60 @@ template<class CompType, class ThermoType>
 class chemistryRefMappingMethod
 {
 
+public:
+
+    //- Runtime type information
+    //TypeName("chemistryRefMappingMethod");
+
+
+    // Constructors
+
+    //- Construct from components
+    chemistryRefMappingMethod
+    (
+        const dictionary& dict,
+        pyJacChemistryModel<CompType, ThermoType>& chemistry //TODO: consider if this is really necessary
+    );
+
+
+    ///
+    ///@brief THIS IS THE BREAD AND BUTTER WHICH SOULD BE DEFINED IN ALL CLASSES!
+    ///
+    // TODO add params
+    virtual void applyMapping() const = 0;
+
+
+
+
+    //- Destructor
+    virtual ~chemistryRefMappingMethod();
+
+
+    // Member Functions
+
+    inline bool active()
+    {
+        return active_;
+    }
+
+    inline bool log()
+    {
+        return active_ && log_;
+    }
+
+    inline bool variableTimeStep()
+    {
+        return chemistry_.variableTimeStep();
+    }
+
+    inline scalar tolerance() const
+    {
+        return tolerance_;
+    }
+
+        
+
+
 protected:
 
     const dictionary& dict_;
@@ -83,100 +137,7 @@ protected:
     scalar tolerance_;
 
 
-public:
 
-    //- Runtime type information
-    TypeName("chemistryRefMappingMethod");
-
-
-    // Declare runtime constructor selection table
-    declareRunTimeSelectionTable
-    (
-        autoPtr,
-        chemistryRefMappingMethod,
-        dictionary,
-        (
-            const dictionary& dict,
-            pyJacChemistryModel<CompType, ThermoType>& chemistry
-        ),
-        (dict, chemistry)
-    );
-
-
-    // Constructors
-
-        //- Construct from components
-        chemistryRefMappingMethod
-        (
-            const dictionary& dict,
-            pyJacChemistryModel<CompType, ThermoType>& chemistry
-        );
-
-
-    // Selectors
-
-        static autoPtr<chemistryRefMappingMethod> New
-        (
-            const IOdictionary& dict,
-            pyJacChemistryModel<CompType, ThermoType>& chemistry
-        );
-
-
-    //- Destructor
-    virtual ~chemistryRefMappingMethod();
-
-
-    // Member Functions
-
-        inline bool active()
-        {
-            return active_;
-        }
-
-        inline bool log()
-        {
-            return active_ && log_;
-        }
-
-        inline bool variableTimeStep()
-        {
-            return chemistry_.variableTimeStep();
-        }
-
-        inline scalar tolerance() const
-        {
-            return tolerance_;
-        }
-
-        virtual label size() = 0;
-
-        virtual void writePerformance() = 0;
-
-        // Retrieve function: (only virtual here)
-        // Try to retrieve a stored point close enough (according to tolerance)
-        // to a stored point. If successful, it returns true and store the
-        // results in RphiQ, i.e. the result of the integration of phiQ
-        virtual bool retrieve
-        (
-             const scalarField& phiQ,
-             scalarField& RphiQ
-        ) = 0;
-
-        // Add function: (only virtual here)
-        // Add information to the tabulation algorithm. Give the reference for
-        // future retrieve (phiQ) and the corresponding result (RphiQ).
-        virtual label add
-        (
-            const scalarField& phiQ,
-            const scalarField& RphiQ,
-            const scalar rho,
-            const scalar deltaT
-        ) = 0;
-
-        // Update function: (only virtual here)
-        // The underlying structure of the tabulation is updated/cleaned
-        // to increase the performance of the retrieve
-        virtual bool update() = 0;
 };
 
 
