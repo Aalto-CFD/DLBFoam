@@ -106,7 +106,7 @@ protected:
 
 
     //TODO: DO NOT USE A RAW POINTER        
-    chemistryRefMappingMethod<ReactionThermo, ThermoType>* refcell_mapper_;
+    chemistryRefMappingMethod* refcell_mapper_;
 
     //make_unique<Vec3>
 

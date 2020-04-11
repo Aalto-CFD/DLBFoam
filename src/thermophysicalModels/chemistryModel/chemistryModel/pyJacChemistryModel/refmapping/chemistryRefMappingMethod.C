@@ -24,16 +24,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "chemistryRefMappingMethod.H"
-#include "pyJacChemistryModel.H"
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-
-template<class CompType, class ThermoType>
-chemistryRefMappingMethod<CompType, ThermoType>::chemistryRefMappingMethod
+/*
+chemistryRefMappingMethod::chemistryRefMappingMethod
 (
     const dictionary& dict
 )
@@ -49,12 +45,12 @@ chemistryRefMappingMethod<CompType, ThermoType>::chemistryRefMappingMethod
        // scalar test = readScalar(mixFracDict.lookup("test"));
     }
 }
+*/
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template<class CompType, class ThermoType>
-chemistryRefMappingMethod<CompType, ThermoType>::~chemistryRefMappingMethod(){}
+//chemistryRefMappingMethod::~chemistryRefMappingMethod(){}
 
 
 

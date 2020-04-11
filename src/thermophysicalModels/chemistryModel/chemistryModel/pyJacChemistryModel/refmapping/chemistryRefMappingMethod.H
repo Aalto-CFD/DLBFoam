@@ -45,7 +45,7 @@ SourceFiles
 // Mixture fraction headers
 #include "atomicWeights.H"
 #include "psiReactionThermo.H"
-#include "BasicChemistryModel.H"
+//#include "BasicChemistryModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,20 +55,10 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class CompType, class ThermoType>
-class pyJacChemistryModel;
-
 /*---------------------------------------------------------------------------*\
                            Class chemistryRefMappingMethod Declaration
 \*---------------------------------------------------------------------------*/
 
-///
-///@brief A base class for chemistry reference cell mappings
-///
-///@tparam CompType NO IDEA
-///@tparam ThermoType NO IDEA
-///
-template<class CompType, class ThermoType>
 class chemistryRefMappingMethod
 {
 
@@ -91,7 +81,19 @@ public:
     chemistryRefMappingMethod
     (
         const dictionary& dict
-    );
+    )
+    :
+    dict_(dict),
+    coeffsDict_(dict.subDict("refmapping")),
+    active_(coeffsDict_.lookupOrDefault<Switch>("active", false))
+    {
+
+
+        if (this->active_)
+        {
+        // scalar test = readScalar(mixFracDict.lookup("test"));
+        }
+    }
 
 
     ///
@@ -99,7 +101,7 @@ public:
     ///       THIS IS NOT PURE AT THIS POINT 
     ///
     // TODO add params
-    virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const = 0;
+    virtual void applyMapping() const = 0;
 
 
     void init_mixture_fraction(basicSpecieMixture& composition){
@@ -280,7 +282,7 @@ public:
 
 
     //- Destructor
-    virtual ~chemistryRefMappingMethod();
+    virtual ~chemistryRefMappingMethod() {}
 
 
     // Member Functions
@@ -307,21 +309,9 @@ private:
 };
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-
 
 } //namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-
-//TODO: find out when NoRepositiory is turned off
-//#ifdef NoRepository
-    #include "chemistryRefMappingMethod.C"
-//#endif
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
 

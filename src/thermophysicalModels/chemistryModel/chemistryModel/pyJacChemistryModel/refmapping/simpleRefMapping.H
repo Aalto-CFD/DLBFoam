@@ -21,25 +21,23 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class CompType, class ThermoType>
-class pyJacChemistryModel;
 
 
-template<class CompType, class ThermoType>
-class simpleRefMapping : public chemistryRefMappingMethod<CompType, ThermoType>{
+
+class simpleRefMapping : public chemistryRefMappingMethod{
 
 public:
 
 
-    simpleRefMapping(const dictionary& dict) : chemistryRefMappingMethod<CompType, ThermoType>(dict) {
+    simpleRefMapping(const dictionary& dict) : chemistryRefMappingMethod(dict) {
         
     }
     
 
     //Note this is defined here empty.
-    virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const {
+    virtual void applyMapping() const {
 
-    };
+    }
 
 protected:
 
