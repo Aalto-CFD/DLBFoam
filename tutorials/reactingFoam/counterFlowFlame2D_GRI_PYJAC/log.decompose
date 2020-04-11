@@ -8,9 +8,9 @@
 Build  : 6-fa1285188035
 Exec   : decomposePar
 Date   : Apr 11 2020
-Time   : 19:29:47
+Time   : 19:41:49
 Host   : "peltonp1-All-Series"
-PID    : 9407
+PID    : 12426
 I/O    : uncollated
 Case   : /home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_PYJAC
 nProcs : 1
@@ -30,7 +30,7 @@ Create mesh
 Calculating distribution of cells
 Selecting decompositionMethod hierarchical
 
-Finished decomposition in 0 s
+Finished decomposition in 0.01 s
 
 Calculating original mesh data
 

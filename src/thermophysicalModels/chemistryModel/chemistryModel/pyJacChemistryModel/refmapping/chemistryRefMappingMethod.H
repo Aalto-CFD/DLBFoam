@@ -65,27 +65,11 @@ public:
 
 
     // Constructors
-
-    //- Construct from components
     chemistryRefMappingMethod
     (
         const dictionary& dict,
         const wordList& species
-    )
-    :
-    dict_(dict),
-    coeffsDict_(dict.subDict("refmapping")),
-    active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
-    mixture_fraction_(coeffsDict_.subDict("mixtureFractionProperties"), species)
-    {
-
-
-        if (this->active_)
-        {
-        // scalar test = readScalar(mixFracDict.lookup("test"));
-        }
-    }
-
+    );
 
     ///
     ///@brief THIS IS THE BREAD AND BUTTER WHICH SHOULD BE DEFINED IN ALL CLASSES!
@@ -95,40 +79,27 @@ public:
     virtual void applyMapping() const = 0;
 
 
+    ///
+    ///@brief Dont know.
+    ///
+    ///@param composition 
+    ///
+    //this is a bit useless and should be moved to constructor
+    void init_mixture_fraction(basicSpecieMixture& composition);
     
 
-    //this is a bit useless and should be moved to constructor
-    void init_mixture_fraction(basicSpecieMixture& composition){
-      
-        mixture_fraction_.update(composition);
+    ///
+    ///@brief Checks if a reference cell or not
+    ///
+    ///@param Y 
+    ///@param celli 
+    ///@return true 
+    ///@return false 
+    ///
+    bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
 
-    };
-
-
-    bool check_if_refcell(PtrList<volScalarField>& Y, const label celli)
-    {
-
-        auto beta_of = mixture_fraction_.get_beta();
-        auto alpha = mixture_fraction_.get_alpha();
-
-        scalar beta = 0.0; //TODO: rename!
-        scalar Z;
-        forAll(Y, iField)
-        {
-            const scalarField& Yi = Y[iField];
-            beta += alpha[iField]*Yi[celli];
-        }
-        Z = (beta - beta_of[0])/(beta_of[1] - beta_of[0]);
-        if (Z>1e-5)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-
-    }
+    
+    
 
 
     //- Destructor
