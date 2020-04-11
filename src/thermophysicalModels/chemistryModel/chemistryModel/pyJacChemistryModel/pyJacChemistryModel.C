@@ -119,7 +119,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         // sp_enth_form_ "note underscore" is a tmp variable to avoid problems 
         // in pyJac function call.
         double sp_enth_form_[nSpecie_]; 
-        memset( sp_enth_form_, 0.0, nSpecie_*sizeof(double) );
+        memset( sp_enth_form_, 0.0, nSpecie_*sizeof(double));
         //- Enthalpy of formation is taken from pyJac at T-standard     
         eval_h(298.15,sp_enth_form_);         
         for(int i=0; i<nSpecie_; i++)
@@ -520,19 +520,6 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
     forAll(rho, celli)
     {
 
-        /*
-        if (refcell_mapper_->active())
-        {
-            if(refcell_mapper_->calc_mixture_fraction(Y_,celli))
-            {
-                Info<<"THIS IS A REFCELL"<<endl;
-            }
-            else
-            {
-                Info<<"THIS IS NOT A REFCELL"<<endl;
-            }
-        }
-        */
         scalar Ti = T[celli];
 
         if (Ti > Treact_)
@@ -558,6 +545,8 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                     if(refCellFound)
                     {
                         #include "callODE.H"
+                        deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
+                        this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
                         for (label i=0; i<nSpecie_; i++)
                         {
                             RR_ref[i] = this->RR_[i][celli];
@@ -580,6 +569,12 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                     this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
                     nActiveCells++;
                 }
+            }
+            else
+            {
+                #include "callODE.H"
+                deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
+                this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
             }
         }
         else
