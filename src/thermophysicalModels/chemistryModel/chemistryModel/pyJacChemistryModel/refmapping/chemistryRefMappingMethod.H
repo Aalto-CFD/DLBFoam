@@ -120,7 +120,7 @@ public:
         List<scalar> Zox = compute_Zox(a, Yconst, species_);
         List<scalar> Zfu = compute_Zfu(a, Yconst, species_);
          
-        //print_information(Zox, Zfu, Yconst, beta_of, species_);
+        print_information(Zox, Zfu, Yconst, beta_of, species_);
 
     };
 
