@@ -21,15 +21,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-
-
 class simpleRefMapping : public chemistryRefMappingMethod{
 
 public:
 
 
-    simpleRefMapping(const dictionary& dict) : chemistryRefMappingMethod(dict) {
+    simpleRefMapping(const dictionary& dict, const wordList& species) : chemistryRefMappingMethod(dict, species) {
         
     }
     

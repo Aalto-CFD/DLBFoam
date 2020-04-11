@@ -45,284 +45,13 @@ SourceFiles
 // Mixture fraction headers
 #include "atomicWeights.H"
 #include "psiReactionThermo.H"
-//#include "BasicChemistryModel.H"
+#include "mixtureFraction.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-
-class mixtureFraction{
-
-public:
-
-    mixtureFraction(const dictionary& mixFracDict, const wordList& species) : 
-        mixFracDict_(mixFracDict), 
-        species_(species), 
-        alpha_(species.size(), 0.0),
-        beta_(2, 0.0)
-        {}
-
-
-
-    const List<scalar>& get_alpha() const {return alpha_;}
-    const List<scalar>& get_beta()  const {return alpha_;}
-
-
-    ///
-    ///@brief Updates the alpha and beta parameters based on the input composition
-    ///
-    ///@param composition NO IDEA
-    ///
-    void update(basicSpecieMixture& composition){
-
-        update_alpha(composition);
-
-        auto Yconst = compute_yconst(composition);
-        update_beta(Yconst, alpha_);
-
-        print_information(composition, Yconst);
-
-    }
-
-
-    void print_information(basicSpecieMixture& composition, const List<List<scalar>>& Yconst) const{
-
-        auto a = compute_a(composition);
-        auto Zox = compute_Zox(a, Yconst);
-        auto Zfu = compute_Zfu(a, Yconst);
-
-        //- stoichiometric mixture fraction
-        scalar Z_st =  (0.0 - beta_[0])/(beta_[1] - beta_[0]);
-
-        // Print out some information
-        Info<< "    Oxidizer:" << nl
-            << "    speciesMassFractions:" << nl;
-        forAll(species_, i)
-        {
-            if (Yconst[0][i] != 0.0)
-            {
-                Info<< "        Y("<<species_[i]<<") = " << Yconst[0][i] << nl;
-            }
-        }
-        Info<< "    elementMassFractions:" << nl
-            << "        Z(C) = " << Zox[0] << nl
-            << "        Z(H) = " << Zox[1] << nl
-            << "        Z(O) = " << Zox[2] << nl
-            << endl;
-
-        Info<< "    Fuel:" << nl
-            << "    speciesMassFractions:" << nl;
-        forAll(species_, i)
-        {
-            if (Yconst[1][i] != 0.0)
-            {
-                Info<< "        Y("<<species_[i]<<") = " << Yconst[1][i] << nl;
-            }
-        }
-        Info<< "    elementMassFractions:" << nl
-            << "        Z(C) = " << Zfu[0] << nl
-            << "        Z(H) = " << Zfu[1] << nl
-            << "        Z(O) = " << Zfu[2] << nl
-            << endl;
-
-        // Stoichiometric mixture fraction
-        Info<<"    Stoichiomentric mixture fraction Zst = " << Z_st << endl;
-    
-
-    }
-
-
-
-protected:
-
-private:
-
-    dictionary mixFracDict_;
-    wordList species_;
-    List<scalar> alpha_;
-    List<scalar> beta_;
-
-    ///
-    ///@brief NO IDEA WHAT THIS DOES
-    ///
-    ///@param composition 
-    ///
-    void update_alpha(basicSpecieMixture& composition){
-
-        forAll(alpha_, i)
-        {
-            const dictionary& dict = mixFracDict_.subDict(species_[i]).subDict("elements");
-            scalar a0
-            (
-                2.0
-            *dict.lookupOrDefault<label>("C",0)
-            /composition.W(i)
-            );
-            scalar a1
-            (
-                0.5
-            *dict.lookupOrDefault<label>("H",0)
-            /composition.W(i)
-            );
-            scalar a2
-            (
-            -1.0
-            *dict.lookupOrDefault<label>("O",0)
-            /composition.W(i)
-            );
-            alpha_[i] = a0 + a1 + a2;
-        }
-
-
-    }
-
-    ///
-    ///@brief NO IDEA WHAT THIS DOES
-    ///
-    ///@param Yconst
-    ///@param alpha 
-    ///
-    void update_beta(const List<List<scalar>>& Yconst, const List<scalar>& alpha){
-
-        
-        
-        scalar YoxTot = 0.0;
-        scalar YfuTot = 0.0;
-        forAll(species_, i)
-        {
-            YoxTot += Yconst[0][i];
-            YfuTot += Yconst[1][i];
-        }
-
-        if (mag(1.0 - YoxTot) > SMALL || mag(1.0 - YfuTot) > SMALL)
-        {
-            FatalErrorIn
-            (
-                "createMixtureFraction.H :"
-            )
-            << "oxidizerMassFractions or fuelMassFractions do not sum up to 1.0"
-            << abort(FatalError);
-        }
-
-        
-        forAll(species_, i)
-        {
-            beta_[0] += alpha[i]*Yconst[0][i];  // oxidizer
-            beta_[1] += alpha[i]*Yconst[1][i];   // fuel
-        }
-        
-    }
-
-
-    ///
-    ///@brief NO IDEA WHAT THIS DOES
-    ///
-    ///@param composition 
-    ///@return List<List<scalar>> 
-    ///
-    List<List<scalar>> compute_yconst(basicSpecieMixture& composition) const {
-
-        
-        List<List<scalar> > Yconst( 2, List<scalar>(species_.size(),0.0) );
-        forAll(species_, i)
-        {
-            Yconst[0][i] =
-                mixFracDict_.subDict
-                (
-                    "oxidizerMassFractions"
-                ).lookupOrDefault<scalar>(species_[i], 0.0);
-            Yconst[1][i] =
-                mixFracDict_.subDict
-                (
-                    "fuelMassFractions"
-                ).lookupOrDefault<scalar>(species_[i], 0.0);
-        }
-        return Yconst;
-
-    }
-
-    ///
-    ///@brief NO IDEA WHAT THIS DOES
-    ///
-    ///@param composition 
-    ///@return List<List<scalar>> 
-    ///
-    //TODO: RENAME!
-    List<List<scalar>> compute_a(basicSpecieMixture& composition) const{
-
-    
-        List<List<scalar> > a(species_.size(), List<scalar>(3,0.0));
-        forAll(species_, i)
-        {
-            const dictionary& dict = mixFracDict_.subDict(species_[i]).subDict("elements");
-            a[i][0] =
-                dict.lookupOrDefault<label>("C",0)
-            *atomicWeights["C"]
-            /composition.W(i) ;
-            a[i][1] =
-                dict.lookupOrDefault<label>("H",0)
-            *atomicWeights["H"]
-            /composition.W(i) ;
-            a[i][2] =
-                dict.lookupOrDefault<label>("O",0)
-            *atomicWeights["O"]
-            /composition.W(i) ;
-        }
-        return a;
-    }
-    
-    ///
-    ///@brief NO IDEA WHAT THIS DOES
-    ///
-    ///@param a 
-    ///@param Yconst 
-    ///@return List<scalar> 
-    ///
-    List<scalar> compute_Zox(const List<List<scalar>>& a, const List<List<scalar>>& Yconst ) const{
-    
-        // Compute element mass fractions (only for printing)
-        List<scalar> Zox(species_.size(),0.0);
-        
-        forAll(Zox, j)
-        {
-            forAll(species_, i)
-            {
-                Zox[j] += a[i][j]*Yconst[0][i];
-            }
-        }
-        return Zox;
-    }
-
-    ///
-    ///@brief NO IDEA WHAT THIS DOES
-    ///
-    ///@param a 
-    ///@param Yconst 
-    ///@return List<scalar> 
-    ///
-    List<scalar> compute_Zfu(const List<List<scalar>>& a, const List<List<scalar>>& Yconst ) const{
-
-        List<scalar> Zfu(species_.size(),0.0);
-         
-        forAll(Zfu, j)
-        {
-            forAll(species_, i)
-            {
-                Zfu[j] += a[i][j]*Yconst[1][i];
-            }
-        }
-        return Zfu;
-    }
-
-
-};
-
-
-
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /*---------------------------------------------------------------------------*\
@@ -335,21 +64,19 @@ class chemistryRefMappingMethod
 public:
 
 
-    
-
-    
-
     // Constructors
 
     //- Construct from components
     chemistryRefMappingMethod
     (
-        const dictionary& dict
+        const dictionary& dict,
+        const wordList& species
     )
     :
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),
-    active_(coeffsDict_.lookupOrDefault<Switch>("active", false))
+    active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
+    mixture_fraction_(coeffsDict_.subDict("mixtureFractionProperties"), species)
     {
 
 
@@ -370,43 +97,21 @@ public:
 
     
 
-
+    //this is a bit useless and should be moved to constructor
     void init_mixture_fraction(basicSpecieMixture& composition){
       
-        
-
-
-        dictionary mixFracDict(this->coeffsDict_.subDict("mixtureFractionProperties"));
-
-        const wordList& species = composition.species();
-
-
-        //const dictionary& mixFracDict, const wordList& species
-        mixtureFraction mf(mixFracDict, species);
-        mf.update(composition);
-
-
-        alpha = compute_alpha(composition);
-        List<List<scalar>> Yconst = compute_yconst(composition);
-        beta_of = compute_beta_of(species, Yconst, alpha);
-        
-
-        // Compute element mass fraction coefficients (only for printing information)
-        List<List<scalar> > a = compute_a(composition);
-        
-
-        // Compute element mass fractions (only for printing)
-        List<scalar> Zox = compute_Zox(a, Yconst, species);
-        List<scalar> Zfu = compute_Zfu(a, Yconst, species);
-         
-        print_information(Zox, Zfu, Yconst, beta_of, species);
+        mixture_fraction_.update(composition);
 
     };
 
 
     bool check_if_refcell(PtrList<volScalarField>& Y, const label celli)
     {
-        scalar beta = 0.0;
+
+        auto beta_of = mixture_fraction_.get_beta();
+        auto alpha = mixture_fraction_.get_alpha();
+
+        scalar beta = 0.0; //TODO: rename!
         scalar Z;
         forAll(Y, iField)
         {
@@ -448,229 +153,11 @@ protected:
     //- Is tabulation active?
     Switch active_;
 
-
     int mytest;
-    List<scalar> alpha; //what is this?
-    List<scalar> beta_of; //what is this?
+    mixtureFraction mixture_fraction_;
 
 
 private:
-
-    ///
-    ///@brief Computes alpha. What is alpha?
-    ///
-    ///@param composition 
-    ///@return List<scalar> 
-    ///
-    List<scalar> compute_alpha(basicSpecieMixture& composition) const{
-
-        dictionary mixFracDict(this->coeffsDict_.subDict("mixtureFractionProperties"));
-        const wordList& species = composition.species();
-        List<scalar> ret(species.size(), 0.0);
-        forAll(ret, i)
-        {
-            const dictionary& dict = mixFracDict.subDict(species[i]).subDict("elements");
-            scalar a0
-            (
-                2.0
-            *dict.lookupOrDefault<label>("C",0)
-            /composition.W(i)
-            );
-            scalar a1
-            (
-                0.5
-            *dict.lookupOrDefault<label>("H",0)
-            /composition.W(i)
-            );
-            scalar a2
-            (
-            -1.0
-            *dict.lookupOrDefault<label>("O",0)
-            /composition.W(i)
-            );
-            ret[i] = a0 + a1 + a2;
-        }
-        return ret;
-
-    }
-
-    ///
-    ///@brief Computes yconst. What is yconst?
-    ///
-    ///@param composition 
-    ///@return List<List<scalar>> 
-    ///
-    List<List<scalar>> compute_yconst(basicSpecieMixture& composition) const {
-
-        dictionary mixFracDict(this->coeffsDict_.subDict("mixtureFractionProperties"));
-        const wordList& species = composition.species();
-        List<List<scalar> > Yconst( 2, List<scalar>(species.size(),0.0) );
-        forAll(species, i)
-        {
-            Yconst[0][i] =
-                mixFracDict.subDict
-                (
-                    "oxidizerMassFractions"
-                ).lookupOrDefault<scalar>(species[i], 0.0);
-            Yconst[1][i] =
-                mixFracDict.subDict
-                (
-                    "fuelMassFractions"
-                ).lookupOrDefault<scalar>(species[i], 0.0);
-        }
-        return Yconst;
-
-    }
-
-
-    List<scalar> compute_beta_of(const wordList& species, const List<List<scalar>>& Yconst, const List<scalar>& alphaparam) const {
-
-
-        scalar YoxTot = 0.0;
-        scalar YfuTot = 0.0;
-        forAll(species, i)
-        {
-            YoxTot += Yconst[0][i];
-            YfuTot += Yconst[1][i];
-        }
-
-        if (mag(1.0 - YoxTot) > SMALL || mag(1.0 - YfuTot) > SMALL)
-        {
-            FatalErrorIn
-            (
-                "createMixtureFraction.H :"
-            )
-            << "oxidizerMassFractions or fuelMassFractions do not sum up to 1.0"
-            << abort(FatalError);
-        }
-
-        // constructing the beta function at the oxidizer and fuel streams
-        List<scalar> beta_of_(2, 0.0);
-        forAll(species, i)
-        {
-            beta_of_[0] += alphaparam[i]*Yconst[0][i]; // oxidizer
-            beta_of_[1] += alphaparam[i]*Yconst[1][i]; // fuel
-        }
-
-        return beta_of_;
-
-    }
-
-    ///
-    ///@brief Computes a
-    ///
-    ///@param composition 
-    ///@return List<List<scalar>> 
-    ///
-    List<List<scalar>> compute_a(basicSpecieMixture& composition) const{
-
-        dictionary mixFracDict(this->coeffsDict_.subDict("mixtureFractionProperties"));
-        const wordList& species = composition.species();
-
-        List<List<scalar> > a(species.size(), List<scalar>(3,0.0));
-        forAll(species, i)
-        {
-            const dictionary& dict = mixFracDict.subDict(species[i]).subDict("elements");
-            a[i][0] =
-                dict.lookupOrDefault<label>("C",0)
-            *atomicWeights["C"]
-            /composition.W(i) ;
-            a[i][1] =
-                dict.lookupOrDefault<label>("H",0)
-            *atomicWeights["H"]
-            /composition.W(i) ;
-            a[i][2] =
-                dict.lookupOrDefault<label>("O",0)
-            *atomicWeights["O"]
-            /composition.W(i) ;
-        }
-        return a;
-    }
-    
-    ///
-    ///@brief Computes Zox
-    ///
-    ///
-    List<scalar> compute_Zox(const List<List<scalar>>& a, const List<List<scalar>>& Yconst, const wordList& species ) const{
-    
-        // Compute element mass fractions (only for printing)
-        List<scalar> Zox(species.size(),0.0);
-        
-        forAll(Zox, j)
-        {
-            forAll(species, i)
-            {
-                Zox[j] += a[i][j]*Yconst[0][i];
-            }
-        }
-        return Zox;
-    }
-
-    List<scalar> compute_Zfu(const List<List<scalar>>& a, const List<List<scalar>>& Yconst, const wordList& species ) const{
-
-        List<scalar> Zfu(species.size(),0.0);
-         
-        forAll(Zfu, j)
-        {
-            forAll(species, i)
-            {
-                Zfu[j] += a[i][j]*Yconst[1][i];
-            }
-        }
-        return Zfu;
-    }
-
-
-    void print_information(const List<scalar>& Zox, 
-                           const List<scalar>& Zfu, 
-                           const List<List<scalar>>& Yconst, 
-                           const List<scalar>& beta_of_,
-                           const wordList& species ) const{
-                           
-
-        //- stoichiometric mixture fraction
-        scalar Z_st =  (0.0 - beta_of_[0])/(beta_of_[1] - beta_of_[0]);
-
-        // Print out some information
-        Info<< "    Oxidizer:" << nl
-            << "    speciesMassFractions:" << nl;
-        forAll(species, i)
-        {
-            if (Yconst[0][i] != 0.0)
-            {
-                Info<< "        Y("<<species[i]<<") = " << Yconst[0][i] << nl;
-            }
-        }
-        Info<< "    elementMassFractions:" << nl
-            << "        Z(C) = " << Zox[0] << nl
-            << "        Z(H) = " << Zox[1] << nl
-            << "        Z(O) = " << Zox[2] << nl
-            << endl;
-
-        Info<< "    Fuel:" << nl
-            << "    speciesMassFractions:" << nl;
-        forAll(species, i)
-        {
-            if (Yconst[1][i] != 0.0)
-            {
-                Info<< "        Y("<<species[i]<<") = " << Yconst[1][i] << nl;
-            }
-        }
-        Info<< "    elementMassFractions:" << nl
-            << "        Z(C) = " << Zfu[0] << nl
-            << "        Z(H) = " << Zfu[1] << nl
-            << "        Z(O) = " << Zfu[2] << nl
-            << endl;
-
-        // Stoichiometric mixture fraction
-        Info<<"    Stoichiomentric mixture fraction Zst = " << Z_st << endl;
-
-
-    }    
-
-        
-
-
 
 
 };
