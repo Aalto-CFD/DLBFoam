@@ -35,13 +35,6 @@ public:
         
     }
     
-    void derived_hello() {
-        std::cout << "Hello from a derived simpleRefMapping::function" << std::endl;    
-    }
-
-
-    int some_function() {return 32;}
-
 
     //Note this is defined here empty.
     virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const {

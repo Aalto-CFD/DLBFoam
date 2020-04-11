@@ -40,6 +40,13 @@ SourceFiles
 #include "Switch.H"
 #include "runTimeSelectionTables.H"
 
+
+
+// Mixture fraction headers
+#include "atomicWeights.H"
+#include "psiReactionThermo.H"
+#include "BasicChemistryModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -70,6 +77,11 @@ public:
     //- Runtime type information
     //TypeName("chemistryRefMappingMethod");
 
+    // Member variables
+
+    int mytest;
+    List<scalar> alpha;
+    List<scalar> beta_of;
 
     
 
@@ -90,11 +102,182 @@ public:
     virtual void applyMapping(pyJacChemistryModel<CompType, ThermoType>& chemistry) const = 0;
 
 
-    ///
-    ///@brief This is just an example
-    ///
-    ///
-    virtual void derived_hello() = 0;
+    void init_mixture_fraction(basicSpecieMixture& composition){
+      
+        dictionary mixFracDict(this->coeffsDict_.subDict("mixtureFractionProperties"));
+
+        const wordList& species_ = composition.species();
+
+        List<scalar> alpha_(species_.size(), 0.0);
+
+        forAll(alpha_, i)
+        {
+            const dictionary& dict = mixFracDict.subDict(species_[i]).subDict("elements");
+            scalar a0
+            (
+                2.0
+            *dict.lookupOrDefault<label>("C",0)
+            /composition.W(i)
+            );
+            scalar a1
+            (
+                0.5
+            *dict.lookupOrDefault<label>("H",0)
+            /composition.W(i)
+            );
+            scalar a2
+            (
+            -1.0
+            *dict.lookupOrDefault<label>("O",0)
+            /composition.W(i)
+            );
+            alpha_[i] = a0 + a1 + a2;
+        }
+        alpha = alpha_;
+
+        //Constant oxidizer and fuel stream variables 
+        List<List<scalar> > Yconst( 2, List<scalar>(species_.size(),0.0) );
+        forAll(species_, i)
+        {
+            Yconst[0][i] =
+                mixFracDict.subDict
+                (
+                    "oxidizerMassFractions"
+                ).lookupOrDefault<scalar>(species_[i], 0.0);
+            Yconst[1][i] =
+                mixFracDict.subDict
+                (
+                    "fuelMassFractions"
+                ).lookupOrDefault<scalar>(species_[i], 0.0);
+        }
+
+        scalar YoxTot = 0.0;
+        scalar YfuTot = 0.0;
+        forAll(species_, i)
+        {
+            YoxTot += Yconst[0][i];
+            YfuTot += Yconst[1][i];
+        }
+
+        if (mag(1.0 - YoxTot) > SMALL || mag(1.0 - YfuTot) > SMALL)
+        {
+            FatalErrorIn
+            (
+                "createMixtureFraction.H :"
+            )
+            << "oxidizerMassFractions or fuelMassFractions do not sum up to 1.0"
+            << abort(FatalError);
+        }
+
+        // constructing the beta function at the oxidizer and fuel streams
+        List<scalar> beta_of_(2, 0.0);
+        forAll(species_, i)
+        {
+            beta_of_[0] += alpha[i]*Yconst[0][i]; // oxidizer
+            beta_of_[1] += alpha[i]*Yconst[1][i]; // fuel
+        }
+        beta_of = beta_of_;
+        // Compute element mass fraction coefficients (only for printing information)
+        List<List<scalar> > a(species_.size(), List<scalar>(3,0.0));
+        forAll(species_, i)
+        {
+            const dictionary& dict = mixFracDict.subDict(species_[i]).subDict("elements");
+            a[i][0] =
+                dict.lookupOrDefault<label>("C",0)
+            *atomicWeights["C"]
+            /composition.W(i) ;
+            a[i][1] =
+                dict.lookupOrDefault<label>("H",0)
+            *atomicWeights["H"]
+            /composition.W(i) ;
+            a[i][2] =
+                dict.lookupOrDefault<label>("O",0)
+            *atomicWeights["O"]
+            /composition.W(i) ;
+        }
+
+        // Compute element mass fractions (only for printing)
+        List<scalar> Zox(species_.size(),0.0);
+        List<scalar> Zfu(species_.size(),0.0);
+        forAll(Zox, j)
+        {
+            forAll(species_, i)
+            {
+                Zox[j] += a[i][j]*Yconst[0][i];
+            }
+        }
+        forAll(Zfu, j)
+        {
+            forAll(species_, i)
+            {
+                Zfu[j] += a[i][j]*Yconst[1][i];
+            }
+        }
+
+
+        //- stoichiometric mixture fraction
+        scalar Z_st =  (0.0 - beta_of_[0])/(beta_of_[1] - beta_of_[0]);
+
+
+
+
+        // Print out some information
+        Info<< "    Oxidizer:" << nl
+            << "    speciesMassFractions:" << nl;
+        forAll(species_, i)
+        {
+            if (Yconst[0][i] != 0.0)
+            {
+                Info<< "        Y("<<species_[i]<<") = " << Yconst[0][i] << nl;
+            }
+        }
+        Info<< "    elementMassFractions:" << nl
+            << "        Z(C) = " << Zox[0] << nl
+            << "        Z(H) = " << Zox[1] << nl
+            << "        Z(O) = " << Zox[2] << nl
+            << endl;
+
+        Info<< "    Fuel:" << nl
+            << "    speciesMassFractions:" << nl;
+        forAll(species_, i)
+        {
+            if (Yconst[1][i] != 0.0)
+            {
+                Info<< "        Y("<<species_[i]<<") = " << Yconst[1][i] << nl;
+            }
+        }
+        Info<< "    elementMassFractions:" << nl
+            << "        Z(C) = " << Zfu[0] << nl
+            << "        Z(H) = " << Zfu[1] << nl
+            << "        Z(O) = " << Zfu[2] << nl
+            << endl;
+
+        // Stoichiometric mixture fraction
+        Info<<"    Stoichiomentric mixture fraction Zst = " << Z_st << endl;
+    };
+
+
+    bool check_if_refcell(PtrList<volScalarField>& Y, const label celli)
+    {
+        scalar beta = 0.0;
+        scalar Z;
+        forAll(Y, iField)
+        {
+            const scalarField& Yi = Y[iField];
+            beta += alpha[iField]*Yi[celli];
+        }
+        Z = (beta - beta_of[0])/(beta_of[1] - beta_of[0]);
+        if (Z>1e-5)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+
+    }
+
 
     //- Destructor
     virtual ~chemistryRefMappingMethod();
@@ -106,10 +289,7 @@ public:
     {
         return active_;
     }
-
-    void base_hello() {
-        std::cout << "Hello from a baseclass function" << std::endl;    
-    }
+    
 
 
 protected:
@@ -121,7 +301,7 @@ protected:
     //- Is tabulation active?
     Switch active_;
 
-
+private:
 
 
 };

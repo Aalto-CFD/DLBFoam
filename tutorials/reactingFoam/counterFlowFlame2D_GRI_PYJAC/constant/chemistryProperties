@@ -37,5 +37,21 @@ odeCoeffs
 refmapping
 {
     active  true;
+    
+    mixtureFractionProperties
+    {
+        oxidizerMassFractions
+        {
+            N2       0.77;
+            O2       0.23;
+        }
+
+        fuelMassFractions
+        {
+            CH4       1.0;
+        }
+
+        #include "$FOAM_CASE/constant/specieElements_GRI.foam"
+    }
 }
 // ************************************************************************* //

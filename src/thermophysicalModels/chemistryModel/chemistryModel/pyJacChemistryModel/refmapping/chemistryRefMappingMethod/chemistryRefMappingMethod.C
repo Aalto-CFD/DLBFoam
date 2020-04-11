@@ -41,7 +41,14 @@ chemistryRefMappingMethod<CompType, ThermoType>::chemistryRefMappingMethod
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),
     active_(coeffsDict_.lookupOrDefault<Switch>("active", false))
-{}
+{
+
+
+    if (this->active_)
+    {
+       // scalar test = readScalar(mixFracDict.lookup("test"));
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

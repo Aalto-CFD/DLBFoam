@@ -31,6 +31,7 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "UniformField.H"
 #include "extrapolatedCalculatedFvPatchFields.H"
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ReactionThermo, class ThermoType>
@@ -129,9 +130,8 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 
     if (refcell_mapper_->active())
     {
-        Info<<"REFMAPPING IS ACTIVE!!!"<<endl;
-        refcell_mapper_->base_hello();
-        refcell_mapper_->derived_hello();
+        Info<<"Reference cell mapping is active!"<<endl;
+        refcell_mapper_->init_mixture_fraction(thermo.composition());
     }
    
 
@@ -510,13 +510,34 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
 
     scalarField c0(nSpecie_);
-    
+
+    //- Create the reference solutions
+    scalarList c_ref(nSpecie_,0.0);
+    scalarList RR_ref(nSpecie_,0.0);
+
+    bool refCellFound = false;
+    int nActiveCells = 0;
     forAll(rho, celli)
     {
+
+        /*
+        if (refcell_mapper_->active())
+        {
+            if(refcell_mapper_->calc_mixture_fraction(Y_,celli))
+            {
+                Info<<"THIS IS A REFCELL"<<endl;
+            }
+            else
+            {
+                Info<<"THIS IS NOT A REFCELL"<<endl;
+            }
+        }
+        */
         scalar Ti = T[celli];
 
         if (Ti > Treact_)
         {
+
             const scalar rhoi = rho[celli];
             scalar pi = p[celli];
 
@@ -526,15 +547,40 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 c0[i] = c_[i];
             }
 
-            /////////////////////////
-            // ODE solution begins //
-            // Initialise time progress
-            scalar timeLeft = deltaT[celli];
-            // Calculate the chemical source terms
-            #include "callODE.H"
-           
-            deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
-            this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+            //- Refcell implementation
+            if (refcell_mapper_->active())
+            {
+                //- First, try to find the first cell that can be calculated as a reference cell
+                //- and map the solution to RR_ref and c_ref 
+                if(!refCellFound)
+                {
+                    refCellFound = refcell_mapper_-> check_if_refcell(Y_,celli); 
+                    if(refCellFound)
+                    {
+                        #include "callODE.H"
+                        for (label i=0; i<nSpecie_; i++)
+                        {
+                            RR_ref[i] = this->RR_[i][celli];
+                            c_ref[i] = this->c_[i];
+                        }
+                    }
+                }
+                else if(refCellFound && refcell_mapper_-> check_if_refcell(Y_,celli))
+                {
+                    for (label i=0; i<nSpecie_; i++)
+                    {
+                        RR_[i][celli] = RR_ref[i];
+                        c_[i] = c_ref[i];
+                    }
+                }
+                else
+                {
+                    #include "callODE.H"
+                    deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
+                    this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+                    nActiveCells++;
+                }
+            }
         }
         else
         {
@@ -546,6 +592,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
        
 
     }
+    Info<<"Number of active cells is : "<<nActiveCells<<endl;
 
     return deltaTMin;
 }
