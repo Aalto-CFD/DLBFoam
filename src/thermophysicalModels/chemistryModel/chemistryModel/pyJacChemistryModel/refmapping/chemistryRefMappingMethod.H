@@ -106,8 +106,13 @@ public:
     virtual ~chemistryRefMappingMethod() {}
 
 
-    // Member Functions
-
+    
+    ///
+    ///@brief Is the reference cell mapping active or not
+    ///
+    ///@return true 
+    ///@return false 
+    ///
     inline bool active()
     {
         return active_;
