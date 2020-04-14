@@ -19,7 +19,7 @@ mixture_fraction_(coeffsDict_.subDict("mixtureFractionProperties"), species)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 //updates the mixture fraction based on the given composition
 void chemistryRefMappingMethod::init_mixture_fraction(basicSpecieMixture& composition){
     mixture_fraction_.update(composition);
@@ -52,6 +52,7 @@ bool chemistryRefMappingMethod::check_if_refcell(PtrList<volScalarField>& Y, con
     }
 
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

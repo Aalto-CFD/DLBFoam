@@ -76,9 +76,9 @@ public:
     ///       THIS IS NOT PURE AT THIS POINT 
     ///
     // TODO add params
-    virtual void applyMapping() const = 0;
-
-
+    virtual bool applyMapping() = 0;
+    virtual void init_mixture_fraction(basicSpecieMixture& composition) = 0;
+/*
     ///
     ///@brief Dont know.
     ///
@@ -99,7 +99,7 @@ public:
     bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
 
     
-    
+  */  
 
 
     //- Destructor

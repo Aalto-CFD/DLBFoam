@@ -517,6 +517,29 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
     bool refCellFound = false;
     int nActiveCells = 0;
+
+
+   tmp<volScalarField> tActive
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "Active",
+                this->mesh_.time().timeName(),
+                this->mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE,
+                false
+            ),
+            this->mesh_,
+            dimensionedScalar("Active",dimless, 0.0)
+        )
+    );
+
+
+    volScalarField& active_ = tActive.ref();
+    
     forAll(rho, celli)
     {
 
@@ -541,7 +564,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 //- and map the solution to RR_ref and c_ref 
                 if(!refCellFound)
                 {
-                    refCellFound = refcell_mapper_-> check_if_refcell(Y_,celli); 
+                    //refCellFound = refcell_mapper_-> check_if_refcell(Y_,celli); 
                     if(refCellFound)
                     {
                         #include "callODE.H"
@@ -552,15 +575,17 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                             RR_ref[i] = this->RR_[i][celli];
                             c_ref[i] = this->c_[i];
                         }
+                        active_[celli] = 1;
                     }
                 }
-                else if(refCellFound && refcell_mapper_-> check_if_refcell(Y_,celli))
+                else if(refCellFound && )//refcell_mapper_-> check_if_refcell(Y_,celli))
                 {
                     for (label i=0; i<nSpecie_; i++)
                     {
                         RR_[i][celli] = RR_ref[i];
                         c_[i] = c_ref[i];
                     }
+                    active_[celli] = 0;
                 }
                 else
                 {
@@ -568,6 +593,8 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                     deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
                     this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
                     nActiveCells++;
+                    active_[celli] = -1;
+
                 }
             }
             else
@@ -587,6 +614,11 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
        
 
     }
+    if(this->mesh().time().outputTime())
+    {
+     active_.write();
+    }
+
     Info<<"Number of active cells is : "<<nActiveCells<<endl;
 
     return deltaTMin;

@@ -32,9 +32,28 @@ public:
     
 
     //Note this is defined here empty.
-    virtual void applyMapping() const {
+    bool applyMapping();
 
-    }
+        ///
+    ///@brief Dont know.
+    ///
+    ///@param composition 
+    ///
+    //this is a bit useless and should be moved to constructor
+    void init_mixture_fraction(basicSpecieMixture& composition);
+    
+
+    ///
+    ///@brief Checks if a reference cell or not
+    ///
+    ///@param Y 
+    ///@param celli 
+    ///@return true 
+    ///@return false 
+    ///
+    bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
+
+    
 
 protected:
 
