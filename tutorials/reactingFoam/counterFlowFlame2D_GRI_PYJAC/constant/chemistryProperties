@@ -53,5 +53,6 @@ refmapping
 
         #include "$FOAM_CASE/constant/specieElements_GRI.foam"
     }
+    tolerance	1e-4;
 }
 // ************************************************************************* //

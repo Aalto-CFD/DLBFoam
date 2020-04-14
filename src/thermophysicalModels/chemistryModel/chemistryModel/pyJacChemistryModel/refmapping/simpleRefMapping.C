@@ -17,7 +17,7 @@ bool simpleRefMapping::check_if_refcell(PtrList<volScalarField>& Y, const label 
         beta += alpha[iField]*Yi[celli];
     }
     Z = (beta - beta_of[0])/(beta_of[1] - beta_of[0]);
-    if (Z>1e-5)
+    if (Z>tolerance_)
     {
         return false;
     }

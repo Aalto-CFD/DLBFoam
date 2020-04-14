@@ -32,6 +32,7 @@ public:
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),
     active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
+    tolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance",1e-4)),
     mixture_fraction_(coeffsDict_.subDict("mixtureFractionProperties"), composition.species())
     {
         //TODO: move to the mixture fraction constructor and dont call anything here
@@ -56,8 +57,11 @@ private:
 
     const dictionary coeffsDict_;
 
-    //- Is tabulation active?
+    //- Is reference mapping active?
     Switch active_;
+
+    //- Tolerance for reference mapping
+    scalar tolerance_;
 
 
     mixtureFraction mixture_fraction_;
