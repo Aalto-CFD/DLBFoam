@@ -27,12 +27,12 @@ class simpleRefMapping : public chemistryRefMappingMethod
 public:
 
 
-    simpleRefMapping(const dictionary& dict, const wordList& species, basicSpecieMixture& composition) :
+    simpleRefMapping(const dictionary& dict, basicSpecieMixture& composition) :
     chemistryRefMappingMethod(),
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),
     active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
-    mixture_fraction_(coeffsDict_.subDict("mixtureFractionProperties"), species)
+    mixture_fraction_(coeffsDict_.subDict("mixtureFractionProperties"), composition.species())
     {
         //TODO: move to the mixture fraction constructor and dont call anything here
         mixture_fraction_.update(composition);

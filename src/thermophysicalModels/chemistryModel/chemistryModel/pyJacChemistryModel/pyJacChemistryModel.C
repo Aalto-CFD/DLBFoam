@@ -108,7 +108,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         );
     
 
-    refcell_mapper_ = new simpleRefMapping(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition().species(), thermo.composition());
+    refcell_mapper_ = new simpleRefMapping(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition());
 
 
 
