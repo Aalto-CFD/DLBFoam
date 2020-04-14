@@ -133,7 +133,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         Info<<"Reference cell mapping is active!"<<endl;
         refcell_mapper_->init_mixture_fraction(thermo.composition());
     }
-   
+  
 
 }
 
@@ -564,7 +564,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 //- and map the solution to RR_ref and c_ref 
                 if(!refCellFound)
                 {
-                    //refCellFound = refcell_mapper_-> check_if_refcell(Y_,celli); 
+                    refCellFound = refcell_mapper_-> applyMapping(Y_,celli); 
                     if(refCellFound)
                     {
                         #include "callODE.H"
@@ -578,7 +578,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                         active_[celli] = 1;
                     }
                 }
-                else if(refCellFound && )//refcell_mapper_-> check_if_refcell(Y_,celli))
+                else if(refCellFound && refcell_mapper_-> applyMapping(Y_,celli))
                 {
                     for (label i=0; i<nSpecie_; i++)
                     {

@@ -76,30 +76,17 @@ public:
     ///       THIS IS NOT PURE AT THIS POINT 
     ///
     // TODO add params
-    virtual bool applyMapping() = 0;
-    virtual void init_mixture_fraction(basicSpecieMixture& composition) = 0;
-/*
+    virtual bool applyMapping(PtrList<volScalarField>& Y, const label celli) = 0;
+
+
     ///
     ///@brief Dont know.
     ///
     ///@param composition 
     ///
     //this is a bit useless and should be moved to constructor
-    void init_mixture_fraction(basicSpecieMixture& composition);
-    
-
-    ///
-    ///@brief Checks if a reference cell or not
-    ///
-    ///@param Y 
-    ///@param celli 
-    ///@return true 
-    ///@return false 
-    ///
-    bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
-
-    
-  */  
+    //void init_mixture_fraction(basicSpecieMixture& composition);
+    virtual void init_mixture_fraction(basicSpecieMixture& composition) = 0;
 
 
     //- Destructor
@@ -128,8 +115,6 @@ protected:
 
     //- Is tabulation active?
     Switch active_;
-
-    int mytest;
     mixtureFraction mixture_fraction_;
 
 
