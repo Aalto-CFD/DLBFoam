@@ -65,46 +65,21 @@ public:
 
 
     // Constructors
-    chemistryRefMappingMethod
-    (
-        const dictionary& dict,
-        const wordList& species
-    );
+    chemistryRefMappingMethod() = default;
 
-    ///
-    ///@brief THIS IS THE BREAD AND BUTTER WHICH SHOULD BE DEFINED IN ALL CLASSES!
-    ///       THIS IS NOT PURE AT THIS POINT 
-    ///
-    // TODO add params
+
     virtual bool applyMapping(PtrList<volScalarField>& Y, const label celli) = 0;
 
 
-    ///
-    ///@brief Dont know.
-    ///
-    ///@param composition 
-    ///
-    //this is a bit useless and should be moved to constructor
-    //void init_mixture_fraction(basicSpecieMixture& composition);
-    virtual void init_mixture_fraction(basicSpecieMixture& composition) = 0;
+ 
+
 
 
     //- Destructor
     virtual ~chemistryRefMappingMethod() {}
-
-
-    
-    ///
-    ///@brief Is the reference cell mapping active or not
-    ///
-    ///@return true 
-    ///@return false 
-    ///
-    inline bool active()
-    {
-        return active_;
-    }
-    
+};
+/*
+  
 
 
 protected:
@@ -115,7 +90,7 @@ protected:
 
     //- Is tabulation active?
     Switch active_;
-    mixtureFraction mixture_fraction_;
+    //mixtureFraction mixture_fraction_;
 
 
 private:
@@ -123,7 +98,7 @@ private:
 
 };
 
-
+*/
 
 } //namespace Foam
 
