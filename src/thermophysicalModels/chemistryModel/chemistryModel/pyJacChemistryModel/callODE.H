@@ -1,3 +1,6 @@
+    //- Initialize the time progress    
+    scalar timeLeft = deltaT[celli];
+
     // Calculate the chemical source terms
     while (timeLeft > small)
     {

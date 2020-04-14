@@ -31,6 +31,7 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "UniformField.H"
 #include "extrapolatedCalculatedFvPatchFields.H"
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ReactionThermo, class ThermoType>
@@ -92,6 +93,25 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         );
     }
     
+    //TODO: this is probobably not correct
+    const IOdictionary SOMEDICT_DIDNT_CHECK_IF_CORRECT
+        (
+            IOobject
+            (
+                thermo.phasePropertyName("chemistryProperties"),
+                thermo.db().time().constant(),
+                thermo.db(),
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE,
+                false
+            )
+        );
+    
+
+    refcell_mapper_ = new simpleRefMapping(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition());
+
+
+
 
     if (this->chemistry_)
     {
@@ -99,7 +119,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         // sp_enth_form_ "note underscore" is a tmp variable to avoid problems 
         // in pyJac function call.
         double sp_enth_form_[nSpecie_]; 
-        memset( sp_enth_form_, 0.0, nSpecie_*sizeof(double) );
+        memset( sp_enth_form_, 0.0, nSpecie_*sizeof(double));
         //- Enthalpy of formation is taken from pyJac at T-standard     
         eval_h(298.15,sp_enth_form_);         
         for(int i=0; i<nSpecie_; i++)
@@ -107,7 +127,13 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
             sp_enth_form[i] = sp_enth_form_[i];
         }
     }
-   
+
+    if (refcell_mapper_->active())
+    {
+        Info<<"Reference cell mapping is active!"<<endl;
+        //refcell_mapper_->init_mixture_fraction(thermo.composition());
+    }
+  
 
 }
 
@@ -117,7 +143,10 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 template<class ReactionThermo, class ThermoType>
 Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::
 ~pyJacChemistryModel()
-{}
+{
+    //TODO: use a smart pointer so this can be removed!
+    delete refcell_mapper_;
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -481,13 +510,44 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
 
     scalarField c0(nSpecie_);
+
+    //- Create the reference solutions
+    scalarList c_ref(nSpecie_,0.0);
+    scalarList RR_ref(nSpecie_,0.0);
+
+    bool refCellFound = false;
+    int nActiveCells = 0;
+
+
+   tmp<volScalarField> tActive
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "Active",
+                this->mesh_.time().timeName(),
+                this->mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE,
+                false
+            ),
+            this->mesh_,
+            dimensionedScalar("Active",dimless, 0.0)
+        )
+    );
+
+
+    volScalarField& active_ = tActive.ref();
     
     forAll(rho, celli)
     {
+
         scalar Ti = T[celli];
 
         if (Ti > Treact_)
         {
+
             const scalar rhoi = rho[celli];
             scalar pi = p[celli];
 
@@ -497,15 +557,52 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 c0[i] = c_[i];
             }
 
-            /////////////////////////
-            // ODE solution begins //
-            // Initialise time progress
-            scalar timeLeft = deltaT[celli];
-            // Calculate the chemical source terms
-            #include "callODE.H"
-           
-            deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
-            this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+            //- Refcell implementation
+            if (refcell_mapper_->active())
+            {
+                //- First, try to find the first cell that can be calculated as a reference cell
+                //- and map the solution to RR_ref and c_ref 
+                if(!refCellFound)
+                {
+                    refCellFound = refcell_mapper_-> applyMapping(Y_,celli); 
+                    if(refCellFound)
+                    {
+                        #include "callODE.H"
+                        deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
+                        this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+                        for (label i=0; i<nSpecie_; i++)
+                        {
+                            RR_ref[i] = this->RR_[i][celli];
+                            c_ref[i] = this->c_[i];
+                        }
+                        active_[celli] = 1;
+                    }
+                }
+                else if(refCellFound && refcell_mapper_-> applyMapping(Y_,celli))
+                {
+                    for (label i=0; i<nSpecie_; i++)
+                    {
+                        RR_[i][celli] = RR_ref[i];
+                        c_[i] = c_ref[i];
+                    }
+                    active_[celli] = 0;
+                }
+                else
+                {
+                    #include "callODE.H"
+                    deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
+                    this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+                    nActiveCells++;
+                    active_[celli] = -1;
+
+                }
+            }
+            else
+            {
+                #include "callODE.H"
+                deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
+                this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+            }
         }
         else
         {
@@ -517,6 +614,12 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
        
 
     }
+    if(this->mesh().time().outputTime())
+    {
+     active_.write();
+    }
+
+    Info<<"Number of active cells is : "<<nActiveCells<<endl;
 
     return deltaTMin;
 }

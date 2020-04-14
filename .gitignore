@@ -13,6 +13,9 @@ applications/utilities/**/Make/linux64*
 
 *.dep
 
+# Visual studio configs
+.vscode
+
 # Temporary files
 *~
 
