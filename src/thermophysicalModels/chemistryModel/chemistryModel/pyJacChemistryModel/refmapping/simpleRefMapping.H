@@ -27,23 +27,23 @@ class simpleRefMapping : public chemistryRefMappingMethod
 public:
 
 
-    simpleRefMapping(const dictionary& dict, const wordList& species) :
+    simpleRefMapping(const dictionary& dict, const wordList& species, basicSpecieMixture& composition) :
     chemistryRefMappingMethod(),
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),
     active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
     mixture_fraction_(coeffsDict_.subDict("mixtureFractionProperties"), species)
-    {}
+    {
+        //TODO: move to the mixture fraction constructor and dont call anything here
+        mixture_fraction_.update(composition);
+    }
     
 
     bool applyMapping(PtrList<volScalarField>& Y, const label celli);
-    void init_mixture_fraction(basicSpecieMixture& composition);
+    
     bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
 
-    inline bool active()
-    {
-        return active_;
-    }
+    bool active() const {return active_;}
     
 protected:
 

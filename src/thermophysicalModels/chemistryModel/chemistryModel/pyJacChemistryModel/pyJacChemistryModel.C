@@ -108,7 +108,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         );
     
 
-    refcell_mapper_ = new simpleRefMapping(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition().species());
+    refcell_mapper_ = new simpleRefMapping(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition().species(), thermo.composition());
 
 
 
@@ -131,7 +131,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     if (refcell_mapper_->active())
     {
         Info<<"Reference cell mapping is active!"<<endl;
-        refcell_mapper_->init_mixture_fraction(thermo.composition());
+        //refcell_mapper_->init_mixture_fraction(thermo.composition());
     }
   
 

@@ -2,9 +2,6 @@
 
 namespace Foam{
 
-void simpleRefMapping::init_mixture_fraction(basicSpecieMixture& composition){
-    mixture_fraction_.update(composition);
-};
 
 bool simpleRefMapping::check_if_refcell(PtrList<volScalarField>& Y, const label celli)
 {

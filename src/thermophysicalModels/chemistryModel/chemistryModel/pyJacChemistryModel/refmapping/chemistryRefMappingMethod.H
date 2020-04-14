@@ -71,34 +71,18 @@ public:
     virtual bool applyMapping(PtrList<volScalarField>& Y, const label celli) = 0;
 
 
- 
-
+    virtual bool active() const = 0;
 
 
     //- Destructor
     virtual ~chemistryRefMappingMethod() {}
+
+
+
 };
-/*
+
   
 
-
-protected:
-
-    const dictionary& dict_;
-
-    const dictionary coeffsDict_;
-
-    //- Is tabulation active?
-    Switch active_;
-    //mixtureFraction mixture_fraction_;
-
-
-private:
-
-
-};
-
-*/
 
 } //namespace Foam
 
