@@ -56,7 +56,7 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include <memory> //std::unique_ptr
 
 #include "simpleRefMapping.H" //TODO: create a factory class that returns the correct ref cell mapper
-
+#include "simpleLoadBalancing.H" 
 
 //pyJac dependencies
 extern "C" {	
@@ -107,6 +107,7 @@ protected:
 
     //TODO: DO NOT USE A RAW POINTER        
     chemistryRefMappingMethod* refcell_mapper_;
+    chemistryLoadBalancingMethod* load_balancer_;
 
     //make_unique<Vec3>
 
