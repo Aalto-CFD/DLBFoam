@@ -536,10 +536,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
     scalarField c0(nSpecie_);
 
-    //- CPU time analysis
-    const clockTime clockTime_ = clockTime();
-    clockTime_.timeIncrement();
-    chemCPUT = 0.0;
+
 
     //- Create the reference solutions
     scalarList c_ref(nSpecie_,0.0);
@@ -548,9 +545,92 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
     bool refCellFound = false;
 
     //- Load Balancing
+    if(load_balancer_->active())
+    {
+        #include "calcActiveCells.H"
 
-    #include "calcActiveCells.H"
+        label nPs = Pstream::nProcs();
+        scalarField t_cpu_list(nPs,-SMALL);
+        labelField ncells_list(nPs,0.0);
+        labelField nActiveCells_list(nPs,0.0);
+
+        t_cpu_list[Pstream::myProcNo()] = chemCPUT;
+        ncells_list[Pstream::myProcNo()] = nActiveCells;
+        nActiveCells_list[Pstream::myProcNo()] = nActiveCellsTot;
+
+        // gather cpu time, number of cells and active cells to master
+        reduce(t_cpu_list, sumOp<scalarField>());
+        reduce(ncells_list, sumOp<labelField>());
+        reduce(nActiveCells_list, sumOp<labelField>());
+
+        // prepare slaves to receive balancing information on master core 
+
+        labelList receiverInfo(5000,0.0);
+        labelList senderInfo(5000,0.0);
+        
+        if((Pstream::myProcNo() != Pstream::masterNo()) && min(t_cpu_list)>=0)
+        {
+            IPstream fromMaster(Pstream::commsTypes::blocking, Pstream::masterNo());
+            fromMaster >> receiverInfo;
+            fromMaster >> senderInfo;
+        }
+
+        else if((Pstream::myProcNo() == Pstream::masterNo()) && min(t_cpu_list)>=0)
+        {
+            List<scalarList> overhead = load_balancer_->compute_overhead(t_cpu_list, ncells_list, nActiveCells_list);
+            List<labelListList> global_stats = load_balancer_->compute_global_stats(t_cpu_list,nActiveCells_list, overhead);
+            
+            //- Distibute the needed send/receive information to all processors
+            labelListList receiverInfo_all = global_stats[0];
+            labelListList senderInfo_all = global_stats[1];
+
+
+            for(int slave=Pstream::firstSlave(); slave<=Pstream::lastSlave(); slave++)        
+            { 
+                for (int j=0; j<5000; j++)
+                {
+                    receiverInfo[j] = receiverInfo_all[slave][j];
+                    senderInfo[j] = senderInfo_all[slave][j];
+                } 
+                OPstream toSlave(Pstream::commsTypes::blocking, slave);
+                toSlave << receiverInfo;
+                toSlave << senderInfo;
+            }
+            
+            //Then the master itself
+            int p_i_m = Pstream::masterNo();
+            for (int j=0; j<5000; j++)
+            {
+                receiverInfo[j] = receiverInfo_all[p_i_m][j];
+                senderInfo[j] = senderInfo_all[p_i_m][j];
+            }
+                
+        }
+
+        /*
+        if (load_balancer_->active() && (Pstream::myProcNo() != Pstream::masterNo()) )
+        { 
+            IPstream fromMaster(Pstream::commsTypes::blocking, Pstream::masterNo());
+            fromMaster >> receiverInfo;
+            fromMaster >> senderInfo;
+        }
+        else if (load_balancer_->active())
+        {
+            labelListListList test = load_balancer_->compute_stats();
+        }
+        */
+
+
+
+    }
+    //- CPU time analysis
+    const clockTime clockTime_ = clockTime();
+    clockTime_.timeIncrement();
+    chemCPUT = 0.0;
+
+
     nActiveCells = 0;
+
 
     //- TODO: Call the loadcomputestats from load_balancer_
     forAll(rho, celli)
@@ -630,8 +710,6 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
     }
 
 
-
-    Info<<"CHEMISTRY CPU TIME IS : "<<chemCPUT<<endl;
     Info<<"Number of active cells is : "<<nActiveCells<<endl;
 
     return deltaTMin;

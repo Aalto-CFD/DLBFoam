@@ -44,11 +44,9 @@ public:
 
     bool applyLoadBalancing();
     
-    bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
+    List<scalarList> compute_overhead(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list);
 
-    labelListList compute_stats();
-    //labelListList compute_stats();
-
+    List<labelListList> compute_global_stats(scalarField& t_cpu_list,labelField& nActiveCells_list, List<scalarList>& overhead);
     bool active() const {return active_;}
 
     void print_parameters() 

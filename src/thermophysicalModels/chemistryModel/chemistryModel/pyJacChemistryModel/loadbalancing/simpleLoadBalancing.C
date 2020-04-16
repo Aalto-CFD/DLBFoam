@@ -3,42 +3,13 @@
 namespace Foam{
 
 
-bool simpleLoadBalancing::check_if_refcell(PtrList<volScalarField>& Y, const label celli)
-{
-  
-  /*
-    //Note this assumes that mixture_fraction.update() has been called!
-    auto beta_of = mixture_fraction_.get_beta();
-    auto alpha = mixture_fraction_.get_alpha();
-
-    scalar beta = 0.0; //TODO: rename!
-    scalar Z;
-    forAll(Y, iField)
-    {
-        const scalarField& Yi = Y[iField];
-        beta += alpha[iField]*Yi[celli];
-    }
-    Z = (beta - beta_of[0])/(beta_of[1] - beta_of[0]);
-    if (Z>tolerance_)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-
-*/
-    return true;
-}
-
 bool simpleLoadBalancing::applyLoadBalancing() {
     //return check_if_refcell(Y,celli);
     return true;
 }
 
 
-labelListList simpleLoadBalancing::compute_stats()
+List<scalarList> simpleLoadBalancing::compute_overhead(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list)
 {
 
     
@@ -46,27 +17,6 @@ labelListList simpleLoadBalancing::compute_stats()
     label nPs = Pstream::nProcs();
     label nVar = 5;
 
-    //- TODO: Make these arrays varying length not fixed
-    labelList receiverInfo_mpi(mpiInfoTableSize_,0);
-    labelListList receiverInfo_all(nPs);
-    labelList senderInfo_mpi(mpiInfoTableSize_,0);
-    labelListList senderInfo_all(nPs);
-
-    labelList receiverInfo(mpiInfoTableSize_,0.0);
-    labelList senderInfo(mpiInfoTableSize_,0.0);
-
-
-
-    //- TODO: pass these as input
-    scalarField t_cpu_list(nPs,10.0);
-    labelField ncells_list(nPs,100);
-    labelField nActiveCells_list(nPs,100);
-
-    for(int p_i=0; p_i<nPs; p_i++)
-    {
-        receiverInfo_all[p_i] = receiverInfo_mpi;
-        senderInfo_all[p_i] = receiverInfo_mpi;
-    } 
     
     // TODO: Check if these max, min, avg functions are accurate, if not revert to original implementation
     scalar maxCPUt = max(t_cpu_list);
@@ -78,7 +28,7 @@ labelListList simpleLoadBalancing::compute_stats()
 
     overheadT = t_cpu_list/meanCPUt;  //- TODO: Check if this makes sense, different from original
 
-    Info << "Maximum and Mean CPU use: "<< maxCPUt << ", " << meanCPUt << endl;
+    Info << "Maximum, Minimum and Mean CPU use: "<< maxCPUt << ", " << minCPUt << ", " << meanCPUt << endl;
 
 
     //- If the mean CPU time is very low (e.g. too many cores), the minimal cpu times are
@@ -96,15 +46,41 @@ labelListList simpleLoadBalancing::compute_stats()
             overheadT[p_i] = 1.0; // not within tolerance --> not activated
         }    
         
-        nc_rm[p_i] = ncells_list[p_i] * (1.0/max(overheadT[p_i],1e-12));         
+        nc_rm[p_i] = ncells_list[p_i] * (1.0/max(overheadT[p_i],VSMALL));         
     }
+
+    List<scalarList> overhead(2);
+    overhead[0] = overheadT;
+    overhead[1] = nc_rm;
+    return overhead;
+}
+
+List<labelListList> simpleLoadBalancing::compute_global_stats(scalarField& t_cpu_list, labelField& nActiveCells_list, List<scalarList>& overhead)
+{
+    label nPs = Pstream::nProcs(); // TODO: Initialize these two in the constructor  
+    label nVar = 5;
+    scalarList overheadT = overhead[0];
+    scalarList nc_rm = overhead[1];
+
+    //- TODO: Make these arrays varying length not fixed
+    labelList receiverInfo_mpi(mpiInfoTableSize_,0);
+    labelListList receiverInfo_all(nPs);
+    labelList senderInfo_mpi(mpiInfoTableSize_,0);
+    labelListList senderInfo_all(nPs);
+
+
+    for(int p_i=0; p_i<nPs; p_i++)
+    {
+        receiverInfo_all[p_i] = receiverInfo_mpi;
+        senderInfo_all[p_i] = receiverInfo_mpi;
+    } 
 
     int mpiBufferLim = mpiBufferLimit_; //- Mpi communication has an upper limit for data transfer. TODO: CHECK WITH HEIKKI
     scalar tol2bal = 0.02; //- Tolerance limit whether overhead is considered worth to balance or not
+    scalar maxCPUt = max(t_cpu_list);
 
     //- If maxCPUt long enough, do balancing:
-
-    if(maxCPUt<chemCPUTimeLimit_)
+    if (maxCPUt > chemCPUTimeLimit_)
     {
         labelList order;
         sortedOrder(overheadT, order);
@@ -179,7 +155,7 @@ labelListList simpleLoadBalancing::compute_stats()
                                     senderInfo_all[  pid_s][nLtmp_s+2] = nctmp;
 
                                     receiverInfo_all[pid_r][0] += 2;               // update table size
-                                    senderInfo_all[  pid_s][0] += 2;
+                                    senderInfo_all[pid_s][0] += 2;
 
                                 }
                                 mpiMessageSize -= mpiMessageSize_tmp; 
@@ -199,9 +175,13 @@ labelListList simpleLoadBalancing::compute_stats()
             }
         }
     }
+    List<labelListList> global_stats(2);
+    global_stats[0] = receiverInfo_all;
+    global_stats[1] = senderInfo_all;
+    return global_stats;
 
     //- Distibute the needed send/receive information to all processors
-
+    /*
     for(int slave=Pstream::firstSlave(); slave<=Pstream::lastSlave(); slave++)        
     { 
         for (int j=0; j<mpiInfoTableSize_; j++)
@@ -213,6 +193,7 @@ labelListList simpleLoadBalancing::compute_stats()
         toSlave << receiverInfo;
         toSlave << senderInfo;
     }
+    
     //Then the master itself
     int p_i_m = Pstream::masterNo();
     for (int j=0; j<mpiInfoTableSize_; j++)
@@ -220,13 +201,9 @@ labelListList simpleLoadBalancing::compute_stats()
         receiverInfo[j] = receiverInfo_all[p_i_m][j];
         senderInfo[j] = senderInfo_all[p_i_m][j];
     }
-
-
-    
-    labelListList statInfo(2);
-    statInfo[0] = receiverInfo;
-    statInfo[1] = senderInfo;
-    return statInfo;
+    */    
 }
+
+
 
 } //namespace Foam
