@@ -107,8 +107,16 @@ protected:
 
     //TODO: DO NOT USE A RAW POINTER        
     chemistryRefMappingMethod* refcell_mapper_;
+
+    ///// Load balancing /////
     chemistryLoadBalancingMethod* load_balancer_;
 
+    //- Number of active cells for load balance statistics
+    label nActiveCells;
+
+    //- Time consumed in chemistry evaluation
+    scalar chemCPUT;
+    
     //make_unique<Vec3>
 
     // Protected data

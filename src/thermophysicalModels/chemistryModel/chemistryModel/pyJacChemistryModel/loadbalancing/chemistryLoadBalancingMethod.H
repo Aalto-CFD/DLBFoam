@@ -67,6 +67,7 @@ public:
 
 
     virtual bool active() const = 0;
+    virtual void print_parameters() = 0;
 
     virtual labelListList compute_stats() = 0;
 

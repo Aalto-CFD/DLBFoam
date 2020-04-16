@@ -32,7 +32,10 @@ public:
     dict_(dict),
     coeffsDict_(dict.subDict("loadbalancing")),
     active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
-    tolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance",1e-4))
+    mpiInfoTableSize_(coeffsDict_.lookupOrDefault<scalar>("mpiInfoTableSize",5000)),
+    mpiBufferLimit_(coeffsDict_.lookupOrDefault<scalar>("mpiBufferLimit",50000)),
+    chemCPUTimeLimit_(coeffsDict_.lookupOrDefault<scalar>("chemCPUTimeLimit",5))
+    
     {
         //TODO: move to the mixture fraction constructor and dont call anything here
         //mixture_fraction_.update(composition);
@@ -44,8 +47,17 @@ public:
     bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
 
     labelListList compute_stats();
+    //labelListList compute_stats();
 
     bool active() const {return active_;}
+
+    void print_parameters() 
+    {
+        Info<<"Load balancing is initialized with:\n "<<
+        "\t mpiInfoTableSize: "<<mpiInfoTableSize_<<
+        "\n\t mpiBufferLimit: "<<mpiBufferLimit_<<
+        "\n\t chemCPUTimeLimit: "<<chemCPUTimeLimit_<<" seconds."<<endl;
+    }
     
 protected:
 
@@ -63,6 +75,10 @@ private:
 
     //- Tolerance for reference mapping
     scalar tolerance_;
+
+    label mpiInfoTableSize_;
+    label mpiBufferLimit_;
+    scalar chemCPUTimeLimit_;
 
 
 };

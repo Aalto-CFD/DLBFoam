@@ -37,31 +37,30 @@ bool simpleLoadBalancing::applyLoadBalancing() {
     return true;
 }
 
-labelListList compute_stats()
+
+labelListList simpleLoadBalancing::compute_stats()
 {
+
+    
     Info << "--Starting load balancing--" << endl;
     label nPs = Pstream::nProcs();
-    label nVar = 60;
-    // TODO: Read these from dictionary
-    label mpiInfoTableSize = 5000;
-    label mpiBufferLimit = 50000;
-    scalar chemCPUTimeLimit = 5;
+    label nVar = 5;
 
-
-    labelList receiverInfo_mpi(mpiInfoTableSize,0);
+    //- TODO: Make these arrays varying length not fixed
+    labelList receiverInfo_mpi(mpiInfoTableSize_,0);
     labelListList receiverInfo_all(nPs);
-    labelList senderInfo_mpi(mpiInfoTableSize,0);
+    labelList senderInfo_mpi(mpiInfoTableSize_,0);
     labelListList senderInfo_all(nPs);
 
-    labelList receiverInfo(mpiInfoTableSize,0.0);
-    labelList senderInfo(mpiInfoTableSize,0.0);
+    labelList receiverInfo(mpiInfoTableSize_,0.0);
+    labelList senderInfo(mpiInfoTableSize_,0.0);
 
 
 
     //- TODO: pass these as input
-    scalarField t_cpu_list(nPs,0.0);
-    labelField ncells_list(nPs,0);
-    labelField nActiveCells_list(nPs,0);
+    scalarField t_cpu_list(nPs,10.0);
+    labelField ncells_list(nPs,100);
+    labelField nActiveCells_list(nPs,100);
 
     for(int p_i=0; p_i<nPs; p_i++)
     {
@@ -69,14 +68,10 @@ labelListList compute_stats()
         senderInfo_all[p_i] = receiverInfo_mpi;
     } 
     
-    scalar meanCPUt = 0.0;
-    scalar maxCPUt = 0.0;
-    scalar minCPUt = 1e10;
-
-    // TODO: Check if these max, min, avg functions are accurate
-    maxCPUt = max(t_cpu_list);
-    minCPUt = min(t_cpu_list);
-    meanCPUt = average(t_cpu_list);  
+    // TODO: Check if these max, min, avg functions are accurate, if not revert to original implementation
+    scalar maxCPUt = max(t_cpu_list);
+    scalar minCPUt = min(t_cpu_list);
+    scalar meanCPUt = average(t_cpu_list);  
 
     scalarList overheadT(nPs,0.0);
     scalarList nc_rm(nPs,0.0);  //- Relative cell count wrt. the average processor
@@ -89,8 +84,6 @@ labelListList compute_stats()
     //- If the mean CPU time is very low (e.g. too many cores), the minimal cpu times are
     //- large wrt. mean --> overhead vector is not realistic.
     //- Therefore we force the minimum element of the overhead vector to zero.
-
-
     forAll(overheadT, p_i)
     {
         if( (t_cpu_list[p_i] < 5*minCPUt) && (overheadT[p_i] < 0.9) )
@@ -106,12 +99,12 @@ labelListList compute_stats()
         nc_rm[p_i] = ncells_list[p_i] * (1.0/max(overheadT[p_i],1e-12));         
     }
 
-    int mpiBufferLim = mpiBufferLimit; //- Mpi communication has an upper limit for data transfer. TODO: CHECK WITH HEIKKI
+    int mpiBufferLim = mpiBufferLimit_; //- Mpi communication has an upper limit for data transfer. TODO: CHECK WITH HEIKKI
     scalar tol2bal = 0.02; //- Tolerance limit whether overhead is considered worth to balance or not
 
     //- If maxCPUt long enough, do balancing:
 
-    if(maxCPUt<chemCPUTimeLimit)
+    if(maxCPUt<chemCPUTimeLimit_)
     {
         labelList order;
         sortedOrder(overheadT, order);
@@ -211,7 +204,7 @@ labelListList compute_stats()
 
     for(int slave=Pstream::firstSlave(); slave<=Pstream::lastSlave(); slave++)        
     { 
-        for (int j=0; j<mpiInfoTableSize; j++)
+        for (int j=0; j<mpiInfoTableSize_; j++)
         {
             receiverInfo[j] = receiverInfo_all[slave][j];
             senderInfo[j] = senderInfo_all[slave][j];
@@ -222,13 +215,14 @@ labelListList compute_stats()
     }
     //Then the master itself
     int p_i_m = Pstream::masterNo();
-    for (int j=0; j<mpiInfoTableSize; j++)
+    for (int j=0; j<mpiInfoTableSize_; j++)
     {
         receiverInfo[j] = receiverInfo_all[p_i_m][j];
         senderInfo[j] = senderInfo_all[p_i_m][j];
     }
 
 
+    
     labelListList statInfo(2);
     statInfo[0] = receiverInfo;
     statInfo[1] = senderInfo;

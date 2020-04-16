@@ -31,6 +31,9 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "UniformField.H"
 #include "extrapolatedCalculatedFvPatchFields.H"
 
+#include "clockTime.H"
+
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -66,8 +69,9 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
     RR_(nSpecie_),
     c_(nSpecie_),
     dcdt_(nSpecie_),
-    sp_enth_form(nSpecie_)
-
+    sp_enth_form(nSpecie_),
+    nActiveCells(0),
+    chemCPUT(0.0)
 {
 
 
@@ -110,11 +114,14 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 
     refcell_mapper_ = new simpleRefMapping(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition());
 
+    load_balancer_ = new simpleLoadBalancing(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition());
 
 
 
     if (this->chemistry_)
     {
+
+
         //- Enthalpy of formation for all species
         // sp_enth_form_ "note underscore" is a tmp variable to avoid problems 
         // in pyJac function call.
@@ -130,8 +137,25 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 
     if (refcell_mapper_->active())
     {
-        Info<<"Reference cell mapping is active!"<<endl;
-        //refcell_mapper_->init_mixture_fraction(thermo.composition());
+        Info<<"Reference cell mapping is active."<<endl;
+    }
+
+    if (load_balancer_->active())
+    {
+        load_balancer_->print_parameters();
+        if(Pstream::parRun())
+        {
+            Info<<"Load balancing is active and running on "<<Pstream::nProcs()<<" cores."<<endl;
+        }
+        else
+        {
+            FatalErrorIn
+            (
+                "chemistryModel::New"
+                "(const fvMesh& mesh)"
+            )   << "You are trying to do load balancing on a single core."
+                << exit(FatalError);
+        }
     }
   
 
@@ -146,6 +170,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::
 {
     //TODO: use a smart pointer so this can be removed!
     delete refcell_mapper_;
+    delete load_balancer_;
 }
 
 
@@ -511,37 +536,26 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
     scalarField c0(nSpecie_);
 
+    //- CPU time analysis
+    const clockTime clockTime_ = clockTime();
+    clockTime_.timeIncrement();
+    chemCPUT = 0.0;
+
     //- Create the reference solutions
     scalarList c_ref(nSpecie_,0.0);
     scalarList RR_ref(nSpecie_,0.0);
 
     bool refCellFound = false;
-    int nActiveCells = 0;
 
+    //- Load Balancing
 
-   tmp<volScalarField> tActive
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "Active",
-                this->mesh_.time().timeName(),
-                this->mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE,
-                false
-            ),
-            this->mesh_,
-            dimensionedScalar("Active",dimless, 0.0)
-        )
-    );
+    #include "calcActiveCells.H"
+    nActiveCells = 0;
 
-
-    volScalarField& active_ = tActive.ref();
-    
+    //- TODO: Call the loadcomputestats from load_balancer_
     forAll(rho, celli)
     {
+        clockTime_.timeIncrement();
 
         scalar Ti = T[celli];
 
@@ -556,6 +570,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 c_[i] = Y_[i][celli];
                 c0[i] = c_[i];
             }
+
 
             //- Refcell implementation
             if (refcell_mapper_->active())
@@ -575,7 +590,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                             RR_ref[i] = this->RR_[i][celli];
                             c_ref[i] = this->c_[i];
                         }
-                        active_[celli] = 1;
+                        nActiveCells++;   
                     }
                 }
                 else if(refCellFound && refcell_mapper_-> applyMapping(Y_,celli))
@@ -585,7 +600,6 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                         RR_[i][celli] = RR_ref[i];
                         c_[i] = c_ref[i];
                     }
-                    active_[celli] = 0;
                 }
                 else
                 {
@@ -593,8 +607,6 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                     deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
                     this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
                     nActiveCells++;
-                    active_[celli] = -1;
-
                 }
             }
             else
@@ -611,14 +623,15 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 RR_[i][celli] = 0;
             }
         }
-       
+
+        //- Update the CPU time spent on chemistry in the cell
+        chemCPUT += clockTime_.timeIncrement();
 
     }
-    if(this->mesh().time().outputTime())
-    {
-     active_.write();
-    }
 
+
+
+    Info<<"CHEMISTRY CPU TIME IS : "<<chemCPUT<<endl;
     Info<<"Number of active cells is : "<<nActiveCells<<endl;
 
     return deltaTMin;
