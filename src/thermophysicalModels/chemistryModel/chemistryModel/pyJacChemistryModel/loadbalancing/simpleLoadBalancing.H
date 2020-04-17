@@ -44,7 +44,11 @@ public:
     nc_rm(nPs_, 0.0),
     t_cpu_list(nPs_,-SMALL),
     ncells_list(nPs_,0.0),
-    nActiveCells_list(nPs_,0.0)
+    nActiveCells_list(nPs_,0.0),
+    receiverInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) ),
+    senderInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) ),
+    receiverInfo(mpiInfoTableSize_,0.0),
+    senderInfo(mpiInfoTableSize_,0.0)
     {
         //TODO: move to the mixture fraction constructor and dont call anything here
         //mixture_fraction_.update(composition);
@@ -53,12 +57,14 @@ public:
 
     bool applyLoadBalancing();
 
-    List<labelListList> getLoadBalStats(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list);
+    labelList getLoadBalStats(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list);
 
     
-    List<labelListList> compute_global_stats();
+    void compute_global_stats();
 
     void get_overhead();
+    void do_balancing_calc();
+    void get_balancing_info();
 
     bool active() const {return active_;}
 
@@ -103,6 +109,10 @@ private:
     scalarField t_cpu_list;
     labelField ncells_list;
     labelField nActiveCells_list;
+    List<List<label>> receiverInfo_all;
+    List<List<label>> senderInfo_all;
+    labelList senderInfo;
+    labelList receiverInfo;
 
     
 

@@ -562,49 +562,9 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
         reduce(t_cpu_list, sumOp<scalarField>());
         reduce(ncells_list, sumOp<labelField>());
         reduce(nActiveCells_list, sumOp<labelField>());
-
-        // prepare slaves to receive balancing information on master core 
-
-        labelList receiverInfo(5000,0.0);
-        labelList senderInfo(5000,0.0);
-        
-        if((Pstream::myProcNo() != Pstream::masterNo()) && min(t_cpu_list)>=0)
+        if(min(t_cpu_list)>=0)  //- TODO: Change this condition so we go to load balancing after 2nd CFD timestep
         {
-            IPstream fromMaster(Pstream::commsTypes::blocking, Pstream::masterNo());
-            fromMaster >> receiverInfo;
-            fromMaster >> senderInfo;
-        }
-
-        else if((Pstream::myProcNo() == Pstream::masterNo()) && min(t_cpu_list)>=0)
-        {
-            List<labelListList>  global_stats = load_balancer_->getLoadBalStats(t_cpu_list, ncells_list, nActiveCells_list);
-
-            //- Distibute the needed send/receive information to all processors
-            labelListList receiverInfo_all = global_stats[0];
-            labelListList senderInfo_all = global_stats[1];
-
-
-            for(int slave=Pstream::firstSlave(); slave<=Pstream::lastSlave(); slave++)        
-            { 
-                for (int j=0; j<5000; j++)
-                {
-                    receiverInfo[j] = receiverInfo_all[slave][j];
-                    senderInfo[j] = senderInfo_all[slave][j];
-                } 
-                OPstream toSlave(Pstream::commsTypes::blocking, slave);
-                toSlave << receiverInfo;
-                toSlave << senderInfo;
-            }
-            
-            //Then the master itself
-            int p_i_m = Pstream::masterNo();
-            for (int j=0; j<5000; j++)
-            {
-                receiverInfo[j] = receiverInfo_all[p_i_m][j];
-                senderInfo[j] = senderInfo_all[p_i_m][j];
-            }
-
-                
+            labelList  receiverInfo = load_balancer_->getLoadBalStats(t_cpu_list, ncells_list, nActiveCells_list);
         }
     }
     //- CPU time analysis

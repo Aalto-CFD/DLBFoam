@@ -65,7 +65,7 @@ public:
 
     virtual bool applyLoadBalancing() = 0;
 
-    virtual List<labelListList> getLoadBalStats(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list) = 0;
+    virtual labelList getLoadBalStats(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list) = 0;
 
 
     virtual bool active() const = 0;

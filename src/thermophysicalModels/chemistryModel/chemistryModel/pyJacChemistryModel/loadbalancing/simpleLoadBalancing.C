@@ -4,17 +4,14 @@ namespace Foam{
 
 
 bool simpleLoadBalancing::applyLoadBalancing() {
-    //return check_if_refcell(Y,celli);
     return true;
 }
 
 
-List<List<List<label>>> simpleLoadBalancing::compute_global_stats()
+void simpleLoadBalancing::compute_global_stats()
 {
-    //- TODO: Make these arrays varying length not fixed
-
-    List<List<label>> receiverInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) );
-    List<List<label>> senderInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) );
+    //List<List<label>> receiverInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) );
+    //List<List<label>> senderInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) );
 
     int mpiBufferLim = mpiBufferLimit_; //- Mpi communication has an upper limit for data transfer. TODO: CHECK WITH HEIKKI
     scalar tol2bal = 0.02; //- Tolerance limit whether overhead is considered worth to balance or not
@@ -116,13 +113,6 @@ List<List<List<label>>> simpleLoadBalancing::compute_global_stats()
             }
         }
     }
-
-
-
-    List<List<List<label>>> global_stats(2);
-    global_stats[0] = receiverInfo_all;
-    global_stats[1] = senderInfo_all;
-    return global_stats;
 }
 
 void simpleLoadBalancing::get_overhead()
@@ -154,16 +144,56 @@ void simpleLoadBalancing::get_overhead()
     }
 }
 
-List<labelListList> simpleLoadBalancing::getLoadBalStats(scalarField& t_cpu_list_, labelField& ncells_list_, labelField& nActiveCells_list_)
+void simpleLoadBalancing::get_balancing_info()
+{
+    IPstream fromMaster(Pstream::commsTypes::blocking, Pstream::masterNo());
+    fromMaster >> receiverInfo;
+    fromMaster >> senderInfo;
+}
+
+void simpleLoadBalancing::do_balancing_calc()
+{
+    get_overhead();
+    compute_global_stats();
+    for(int slave=Pstream::firstSlave(); slave<=Pstream::lastSlave(); slave++)        
+    { 
+        for (int j=0; j<mpiInfoTableSize_; j++)
+        {
+            receiverInfo[j] = receiverInfo_all[slave][j];
+            senderInfo[j] = senderInfo_all[slave][j];
+        } 
+        OPstream toSlave(Pstream::commsTypes::blocking, slave);
+        toSlave << receiverInfo;
+        toSlave << senderInfo;
+    }
+        
+    //Then the master itself
+    int p_i_m = Pstream::masterNo();
+    for (int j=0; j<mpiInfoTableSize_; j++)
+    {
+        receiverInfo[j] = receiverInfo_all[p_i_m][j];
+        senderInfo[j] = senderInfo_all[p_i_m][j];
+    }
+
+}
+
+labelList simpleLoadBalancing::getLoadBalStats(scalarField& t_cpu_list_, labelField& ncells_list_, labelField& nActiveCells_list_)
 {
     t_cpu_list = t_cpu_list_;
     ncells_list = ncells_list_;
     nActiveCells_list = nActiveCells_list_;
-    
-    Info << "--Starting load balancing--" << endl;
-    get_overhead();
-    return compute_global_stats();
- 
+
+    // If slave
+    if((Pstream::myProcNo() != Pstream::masterNo()))
+    {
+        get_balancing_info();
+    }
+    else if((Pstream::myProcNo() == Pstream::masterNo()))
+    {
+        Info << "--Starting load balancing--" << endl;
+        do_balancing_calc();
+    }    
+    return receiverInfo;
 }
 
 
