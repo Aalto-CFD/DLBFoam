@@ -20,9 +20,9 @@ struct chemistryLoad{
 
     int rank;     //rank of the process 
     double value; //an indicator how busy the processor is
+    int    number_of_active_cells; //number of chemically active cells
 
-
-    //overchemistryLoad comparisons for sorting
+    //overload comparisons for sorting
     bool operator==(const chemistryLoad& rhs) const {return value == rhs.value;}
     bool operator!=(const chemistryLoad& rhs) const {return !(value == rhs.value);}
     bool operator<=(const chemistryLoad& rhs) const {return value <= rhs.value;}

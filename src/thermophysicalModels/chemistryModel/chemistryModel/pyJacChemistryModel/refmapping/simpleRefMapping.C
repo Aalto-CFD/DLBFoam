@@ -2,6 +2,15 @@
 
 namespace Foam{
 
+int simpleRefMapping::compute_active_cells(PtrList<volScalarField>& Y) const{
+
+    /* please someone implement, I have no idea what the other functions do */
+
+    return 54;
+}
+
+
+
 
 bool simpleRefMapping::check_if_refcell(PtrList<volScalarField>& Y, const label celli)
 {

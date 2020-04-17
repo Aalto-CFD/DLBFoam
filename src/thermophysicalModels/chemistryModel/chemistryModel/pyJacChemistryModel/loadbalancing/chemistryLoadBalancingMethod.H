@@ -35,6 +35,10 @@ SourceFiles
 #ifndef chemistryLoadBalancingMethod_H
 #define chemistryLoadBalancingMethod_H
 
+
+#include <vector> //std::vector
+
+
 #include "IOdictionary.H"
 #include "scalarField.H"
 #include "Switch.H"
@@ -43,6 +47,7 @@ SourceFiles
 #include "psiReactionThermo.H"
 
 #include "chemistryLoad.H"
+#include "chemistryRefMappingMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -63,6 +68,10 @@ public:
     // Constructors
     chemistryLoadBalancingMethod() = default;
 
+    
+
+
+    virtual void apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const = 0;
 
 
     virtual bool active()           const = 0;
@@ -70,6 +79,11 @@ public:
 
     //- Destructor
     virtual ~chemistryLoadBalancingMethod() {}
+
+
+
+    
+
 
 
 

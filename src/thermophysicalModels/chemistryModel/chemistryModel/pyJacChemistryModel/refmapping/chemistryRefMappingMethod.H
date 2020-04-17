@@ -67,6 +67,16 @@ public:
     chemistryRefMappingMethod() = default;
 
 
+
+    ///
+    ///@brief Given a list of scalar fields, returns the number of active cells
+    ///
+    ///@param Y list of scalar fields
+    ///@return int number of active cells
+    ///
+    virtual int compute_active_cells(PtrList<volScalarField>& Y) const = 0;
+
+
     virtual bool applyMapping(PtrList<volScalarField>& Y, const label celli) = 0;
 
 
