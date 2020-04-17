@@ -42,6 +42,7 @@ SourceFiles
 
 #include "psiReactionThermo.H"
 
+#include "chemistryLoad.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

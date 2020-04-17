@@ -12,7 +12,7 @@
 
 
 #include "chemistryLoadBalancingMethod.H"
-#include "load.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -44,7 +44,7 @@ protected:
 private:
 
     
-    Load get_load() const;
+    chemistryLoad get_load() const;
 
 
 

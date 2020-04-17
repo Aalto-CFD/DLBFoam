@@ -4,9 +4,9 @@ namespace Foam{
 
 
 
-Load simpleLoadBalancing::get_load() const{
+chemistryLoad simpleLoadBalancing::get_load() const{
 
-    return Load();
+    return chemistryLoad();
 
 }
 
