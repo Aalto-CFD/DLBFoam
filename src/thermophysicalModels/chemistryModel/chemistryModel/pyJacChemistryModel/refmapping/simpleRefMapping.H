@@ -27,6 +27,8 @@ class simpleRefMapping : public chemistryRefMappingMethod
 public:
 
 
+    simpleRefMapping() = default;
+
     simpleRefMapping(const dictionary& dict, basicSpecieMixture& composition) :
     chemistryRefMappingMethod(),
     dict_(dict),
@@ -52,9 +54,8 @@ protected:
 
 private:
 
-    // None
-    const dictionary& dict_;
-
+    //TODO: for runtime switching, these need to be references
+    const dictionary dict_;
     const dictionary coeffsDict_;
 
     //- Is reference mapping active?

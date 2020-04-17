@@ -19,6 +19,8 @@ class mixtureFraction{
 
 public:
 
+    mixtureFraction() = default;
+
     mixtureFraction(const dictionary& mixFracDict, const wordList& species);
 
 

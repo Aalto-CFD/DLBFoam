@@ -63,7 +63,6 @@ class chemistryRefMappingMethod
 
 public:
 
-
     // Constructors
     chemistryRefMappingMethod() = default;
 
