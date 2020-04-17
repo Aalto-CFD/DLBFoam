@@ -114,9 +114,9 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 
     refcell_mapper_ = new simpleRefMapping(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition());
 
-    load_balancer_ = new simpleLoadBalancing(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition());
+    //load_balancer_ = new simpleLoadBalancing(SOMEDICT_DIDNT_CHECK_IF_CORRECT, thermo.composition());
 
-
+    load_balancer_ = new simpleLoadBalancing();
 
     if (this->chemistry_)
     {
@@ -547,25 +547,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
     //- Load Balancing
     if(load_balancer_->active())
     {
-        #include "calcActiveCells.H"
-
-        label nPs = Pstream::nProcs();
-        scalarField t_cpu_list(nPs,-SMALL);
-        labelField ncells_list(nPs,0.0);
-        labelField nActiveCells_list(nPs,0.0);
-
-        t_cpu_list[Pstream::myProcNo()] = chemCPUT;
-        ncells_list[Pstream::myProcNo()] = nActiveCells;
-        nActiveCells_list[Pstream::myProcNo()] = nActiveCellsTot;
-
-        // gather cpu time, number of cells and active cells to master
-        reduce(t_cpu_list, sumOp<scalarField>());
-        reduce(ncells_list, sumOp<labelField>());
-        reduce(nActiveCells_list, sumOp<labelField>());
-        if(min(t_cpu_list)>=0)  //- TODO: Change this condition so we go to load balancing after 2nd CFD timestep
-        {
-            labelList  receiverInfo = load_balancer_->getLoadBalStats(t_cpu_list, ncells_list, nActiveCells_list);
-        }
+        //do stuff
     }
     //- CPU time analysis
     const clockTime clockTime_ = clockTime();

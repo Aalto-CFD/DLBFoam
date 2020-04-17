@@ -63,13 +63,9 @@ public:
     chemistryLoadBalancingMethod() = default;
 
 
-    virtual bool applyLoadBalancing() = 0;
 
-    virtual labelList getLoadBalStats(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list) = 0;
-
-
-    virtual bool active() const = 0;
-    virtual void print_parameters() = 0;
+    virtual bool active()           const = 0;
+    virtual void print_parameters() const = 0;
 
     //- Destructor
     virtual ~chemistryLoadBalancingMethod() {}
