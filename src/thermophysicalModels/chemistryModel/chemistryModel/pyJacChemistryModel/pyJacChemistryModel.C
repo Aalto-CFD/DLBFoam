@@ -577,9 +577,8 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
         else if((Pstream::myProcNo() == Pstream::masterNo()) && min(t_cpu_list)>=0)
         {
-            List<scalarList> overhead = load_balancer_->compute_overhead(t_cpu_list, ncells_list, nActiveCells_list);
-            List<labelListList> global_stats = load_balancer_->compute_global_stats(t_cpu_list,nActiveCells_list, overhead);
-            
+            List<labelListList>  global_stats = load_balancer_->getLoadBalStats(t_cpu_list, ncells_list, nActiveCells_list);
+
             //- Distibute the needed send/receive information to all processors
             labelListList receiverInfo_all = global_stats[0];
             labelListList senderInfo_all = global_stats[1];
@@ -604,24 +603,9 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 receiverInfo[j] = receiverInfo_all[p_i_m][j];
                 senderInfo[j] = senderInfo_all[p_i_m][j];
             }
+
                 
         }
-
-        /*
-        if (load_balancer_->active() && (Pstream::myProcNo() != Pstream::masterNo()) )
-        { 
-            IPstream fromMaster(Pstream::commsTypes::blocking, Pstream::masterNo());
-            fromMaster >> receiverInfo;
-            fromMaster >> senderInfo;
-        }
-        else if (load_balancer_->active())
-        {
-            labelListListList test = load_balancer_->compute_stats();
-        }
-        */
-
-
-
     }
     //- CPU time analysis
     const clockTime clockTime_ = clockTime();

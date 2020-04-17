@@ -34,8 +34,17 @@ public:
     active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
     mpiInfoTableSize_(coeffsDict_.lookupOrDefault<scalar>("mpiInfoTableSize",5000)),
     mpiBufferLimit_(coeffsDict_.lookupOrDefault<scalar>("mpiBufferLimit",50000)),
-    chemCPUTimeLimit_(coeffsDict_.lookupOrDefault<scalar>("chemCPUTimeLimit",5))
-    
+    chemCPUTimeLimit_(coeffsDict_.lookupOrDefault<scalar>("chemCPUTimeLimit",5)),
+    nPs_(Pstream::nProcs()),
+    nVar_(5),
+    maxCPUt(0),
+    minCPUt(0),
+    meanCPUt(0),  
+    overheadT(nPs_, 0.0),
+    nc_rm(nPs_, 0.0),
+    t_cpu_list(nPs_,-SMALL),
+    ncells_list(nPs_,0.0),
+    nActiveCells_list(nPs_,0.0)
     {
         //TODO: move to the mixture fraction constructor and dont call anything here
         //mixture_fraction_.update(composition);
@@ -43,10 +52,14 @@ public:
     
 
     bool applyLoadBalancing();
-    
-    List<scalarList> compute_overhead(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list);
 
-    List<labelListList> compute_global_stats(scalarField& t_cpu_list,labelField& nActiveCells_list, List<scalarList>& overhead);
+    List<labelListList> getLoadBalStats(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list);
+
+    
+    List<labelListList> compute_global_stats();
+
+    void get_overhead();
+
     bool active() const {return active_;}
 
     void print_parameters() 
@@ -78,6 +91,20 @@ private:
     label mpiBufferLimit_;
     scalar chemCPUTimeLimit_;
 
+    label nPs_;
+    label nVar_;
+
+    scalar maxCPUt;
+    scalar minCPUt;
+    scalar meanCPUt; 
+    scalarList overheadT;
+    scalarList nc_rm;
+
+    scalarField t_cpu_list;
+    labelField ncells_list;
+    labelField nActiveCells_list;
+
+    
 
 };
 

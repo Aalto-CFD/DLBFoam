@@ -9,71 +9,12 @@ bool simpleLoadBalancing::applyLoadBalancing() {
 }
 
 
-List<scalarList> simpleLoadBalancing::compute_overhead(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list)
+List<List<List<label>>> simpleLoadBalancing::compute_global_stats()
 {
-
-    
-    Info << "--Starting load balancing--" << endl;
-    label nPs = Pstream::nProcs();
-    label nVar = 5;
-
-    
-    // TODO: Check if these max, min, avg functions are accurate, if not revert to original implementation
-    scalar maxCPUt = max(t_cpu_list);
-    scalar minCPUt = min(t_cpu_list);
-    scalar meanCPUt = average(t_cpu_list);  
-
-    scalarList overheadT(nPs,0.0);
-    scalarList nc_rm(nPs,0.0);  //- Relative cell count wrt. the average processor
-
-    overheadT = t_cpu_list/meanCPUt;  //- TODO: Check if this makes sense, different from original
-
-    Info << "Maximum, Minimum and Mean CPU use: "<< maxCPUt << ", " << minCPUt << ", " << meanCPUt << endl;
-
-
-    //- If the mean CPU time is very low (e.g. too many cores), the minimal cpu times are
-    //- large wrt. mean --> overhead vector is not realistic.
-    //- Therefore we force the minimum element of the overhead vector to zero.
-    forAll(overheadT, p_i)
-    {
-        if( (t_cpu_list[p_i] < 5*minCPUt) && (overheadT[p_i] < 0.9) )
-        {
-            overheadT[p_i] = 0.0;
-        }
-        // If the core has only a few chemically active cells, we don't want to include them into balancing
-        if( (overheadT[p_i] >= 1.0) && (nActiveCells_list[p_i] < 50) )
-        {
-            overheadT[p_i] = 1.0; // not within tolerance --> not activated
-        }    
-        
-        nc_rm[p_i] = ncells_list[p_i] * (1.0/max(overheadT[p_i],VSMALL));         
-    }
-
-    List<scalarList> overhead(2);
-    overhead[0] = overheadT;
-    overhead[1] = nc_rm;
-    return overhead;
-}
-
-List<labelListList> simpleLoadBalancing::compute_global_stats(scalarField& t_cpu_list, labelField& nActiveCells_list, List<scalarList>& overhead)
-{
-    label nPs = Pstream::nProcs(); // TODO: Initialize these two in the constructor  
-    label nVar = 5;
-    scalarList overheadT = overhead[0];
-    scalarList nc_rm = overhead[1];
-
     //- TODO: Make these arrays varying length not fixed
-    labelList receiverInfo_mpi(mpiInfoTableSize_,0);
-    labelListList receiverInfo_all(nPs);
-    labelList senderInfo_mpi(mpiInfoTableSize_,0);
-    labelListList senderInfo_all(nPs);
 
-
-    for(int p_i=0; p_i<nPs; p_i++)
-    {
-        receiverInfo_all[p_i] = receiverInfo_mpi;
-        senderInfo_all[p_i] = receiverInfo_mpi;
-    } 
+    List<List<label>> receiverInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) );
+    List<List<label>> senderInfo_all(nPs_, List<label>(mpiInfoTableSize_,0.0) );
 
     int mpiBufferLim = mpiBufferLimit_; //- Mpi communication has an upper limit for data transfer. TODO: CHECK WITH HEIKKI
     scalar tol2bal = 0.02; //- Tolerance limit whether overhead is considered worth to balance or not
@@ -86,12 +27,12 @@ List<labelListList> simpleLoadBalancing::compute_global_stats(scalarField& t_cpu
         sortedOrder(overheadT, order);
         sort(overheadT);
 
-        for(int p_i = nPs-1; p_i>=0; p_i--) //- Iterate from largest to smallest to account for efficient filling of sent data
+        for(int p_i = nPs_-1; p_i>=0; p_i--) //- Iterate from largest to smallest to account for efficient filling of sent data
         {
             if(overheadT[p_i] >= (1.0+tol2bal))
             {
                 int nCellsSentTot = 0;  //- Check that this does not go over nActiveCellsTot
-                for(int s_i = 0; s_i<nPs; s_i++)  //- Iterate over all processors which we can send data
+                for(int s_i = 0; s_i<nPs_; s_i++)  //- Iterate over all processors which we can send data
                 {
                     scalar relFreeSpace = 1.0-overheadT[s_i];
                     scalar relData2Send = min(relFreeSpace,(overheadT[p_i]-1.0));  //- Amount of data between [0 1] to send
@@ -112,7 +53,7 @@ List<labelListList> simpleLoadBalancing::compute_global_stats(scalarField& t_cpu
                         overheadT[p_i] -= relData2Send;
                         overheadT[s_i] += relData2Send;
 
-                        scalar mpiMessageSize = nVar*nCells2Send;
+                        scalar mpiMessageSize = nVar_*nCells2Send;
                         scalar mpiMessageSize_orig = mpiMessageSize;
 
                         //- Processor numbers and current list size for e.g. receiverInfo_all variable
@@ -175,33 +116,54 @@ List<labelListList> simpleLoadBalancing::compute_global_stats(scalarField& t_cpu
             }
         }
     }
-    List<labelListList> global_stats(2);
+
+
+
+    List<List<List<label>>> global_stats(2);
     global_stats[0] = receiverInfo_all;
     global_stats[1] = senderInfo_all;
     return global_stats;
+}
 
-    //- Distibute the needed send/receive information to all processors
-    /*
-    for(int slave=Pstream::firstSlave(); slave<=Pstream::lastSlave(); slave++)        
-    { 
-        for (int j=0; j<mpiInfoTableSize_; j++)
-        {
-            receiverInfo[j] = receiverInfo_all[slave][j];
-            senderInfo[j] = senderInfo_all[slave][j];
-        } 
-        OPstream toSlave(Pstream::commsTypes::blocking, slave);
-        toSlave << receiverInfo;
-        toSlave << senderInfo;
-    }
-    
-    //Then the master itself
-    int p_i_m = Pstream::masterNo();
-    for (int j=0; j<mpiInfoTableSize_; j++)
+void simpleLoadBalancing::get_overhead()
+{
+    //scalarList overheadT(nPs_,0.0);
+    maxCPUt = max(t_cpu_list);
+    minCPUt = min(t_cpu_list);
+    meanCPUt = average(t_cpu_list);  
+    overheadT = t_cpu_list/meanCPUt;  //- TODO: Check if this makes sense, different from original
+
+    Info << "Maximum, Minimum and Mean CPU use: "<< maxCPUt << ", " << minCPUt << ", " << meanCPUt << endl;
+ 
+    //- If the mean CPU time is very low (e.g. too many cores), the minimal cpu times are
+    //- large wrt. mean --> overhead vector is not realistic.
+    //- Therefore we force the minimum element of the overhead vector to zero.
+    forAll(overheadT, p_i)
     {
-        receiverInfo[j] = receiverInfo_all[p_i_m][j];
-        senderInfo[j] = senderInfo_all[p_i_m][j];
+        if( (t_cpu_list[p_i] < 5*minCPUt) && (overheadT[p_i] < 0.9) )
+        {
+            overheadT[p_i] = 0.0;
+        }
+        // If the core has only a few chemically active cells, we don't want to include them into balancing
+        if( (overheadT[p_i] >= 1.0) && (nActiveCells_list[p_i] < 50) )
+        {
+            overheadT[p_i] = 1.0; // not within tolerance --> not activated
+        } 
+        nc_rm[p_i] = ncells_list[p_i] * (1.0/max(overheadT[p_i],VSMALL));         
+    
     }
-    */    
+}
+
+List<labelListList> simpleLoadBalancing::getLoadBalStats(scalarField& t_cpu_list_, labelField& ncells_list_, labelField& nActiveCells_list_)
+{
+    t_cpu_list = t_cpu_list_;
+    ncells_list = ncells_list_;
+    nActiveCells_list = nActiveCells_list_;
+    
+    Info << "--Starting load balancing--" << endl;
+    get_overhead();
+    return compute_global_stats();
+ 
 }
 
 

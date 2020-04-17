@@ -65,13 +65,12 @@ public:
 
     virtual bool applyLoadBalancing() = 0;
 
+    virtual List<labelListList> getLoadBalStats(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list) = 0;
+
 
     virtual bool active() const = 0;
     virtual void print_parameters() = 0;
 
-    virtual List<scalarList> compute_overhead(scalarField& t_cpu_list, labelField& ncells_list, labelField& nActiveCells_list) = 0;
-
-    virtual List<labelListList> compute_global_stats(scalarField& t_cpu_list, labelField& nActiveCells_list, List<scalarList>& overhead) = 0;
     //- Destructor
     virtual ~chemistryLoadBalancingMethod() {}
 

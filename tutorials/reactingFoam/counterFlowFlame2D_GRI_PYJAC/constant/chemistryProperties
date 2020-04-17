@@ -58,6 +58,7 @@ refmapping
 
 loadbalancing
 {
-    active   false;
+    active   true;
+    chemCPUTimeLimit	2;
 }
 // ************************************************************************* //
