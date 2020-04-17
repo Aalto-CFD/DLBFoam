@@ -6,6 +6,24 @@ void simpleLoadBalancing::apply_balancing(const chemistryRefMappingMethod* mappe
 
     auto loads = get_loads(mapper, Y);
 
+    WHATTODO state = determine_state(loads);
+
+    //move to a function
+    switch(state) {
+        case WHATTODO::e_SENDER:
+            auto asd = get_send_info();
+            //send_stuff(asd);
+            break;
+        case WHATTODO::e_RECEIVER:
+            auto asd = get_recv_info();
+            //receive_stuff(asd);
+            break;
+
+        default: //This is the DONOTHING
+            break;
+    }
+    
+
 
 }
 
@@ -50,6 +68,32 @@ std::vector<chemistryLoad> simpleLoadBalancing::get_loads(const chemistryRefMapp
     }
 
     return ret;
+}
+
+
+
+WHATTODO simpleLoadBalancing::determine_state(const std::vector<chemistryLoad>& loads) const{
+
+    size_t n = loads.size();
+
+    
+    int my_order = 0;
+    for (int i = 0; i < n; ++i){
+        if (loads[i].rank == Pstream::Pstream::myProcNo()){
+            my_order = i;
+            break;
+        }
+
+    }
+
+    //TODO:: make do nothing possible
+    if (my_order < 0.5 * n){
+        return WHATTODO::e_SENDER;
+    }
+
+    else {
+        WHATTODO::e_RECEIVER;
+    }
 
 
 }

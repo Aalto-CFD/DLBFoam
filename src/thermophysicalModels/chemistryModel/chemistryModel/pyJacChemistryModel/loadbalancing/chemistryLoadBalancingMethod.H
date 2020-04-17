@@ -55,6 +55,15 @@ namespace Foam
 {
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+//TODO: rename to something better
+     enum WHATTODO {    e_SENDER = 0, 
+                        e_RECEIVER = 1,
+                        e_NEITHER = 2 
+                    }; 
+  
+
+
+
 /*---------------------------------------------------------------------------*\
                            Class chemistryLoadBalancingMethod Declaration
 \*---------------------------------------------------------------------------*/
@@ -63,6 +72,9 @@ class chemistryLoadBalancingMethod
 {
 
 public:
+
+     
+
 
 
     // Constructors

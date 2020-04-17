@@ -66,6 +66,23 @@ private:
     std::vector<chemistryLoad> get_loads(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
 
 
+
+    ///
+    ///@brief Determines if a process is a sender receiver or do-nothinger
+    ///
+    ///@param loads a sorted array of loads 
+    ///@return WHATTODO state information on what the process should do
+    ///
+    WHATTODO determine_state(const std::vector<chemistryLoad>& loads) const;
+
+
+
+    //TODO: implement
+    int get_send_info() const {return 2;}
+    int get_recv_info() const {return 1;}
+
+
+
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
