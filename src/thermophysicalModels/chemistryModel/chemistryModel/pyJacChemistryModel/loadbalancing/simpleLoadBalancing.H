@@ -58,12 +58,12 @@ private:
     ///
     ///@brief Returns a sorted vector of loads such that the largest load is at index 0
     ///
+    ///@param a reference cell mapper that tells how many cells are active 
+    ///@param Y mass fractions
     ///@return std::vector<chemistryLoad> a sorted vector of loads in descending order. 
     ///        The size of the vector is N=number of processes.  
     ///
-    std::vector<chemistryLoad> get_loads() const;
-
-    //std::vector<chemistryLoad> get_loads() const;
+    std::vector<chemistryLoad> get_loads(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
 
 
 };
