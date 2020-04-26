@@ -2,4 +2,5 @@ SOURCE = \
 test.C \
 testChemistryLoad.C \
 testMixtureFraction.C \
-testRefMapper.C 
+testRefMapper.C \
+testSimpleLoadBalancing.C 

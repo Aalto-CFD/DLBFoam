@@ -1,0 +1,30 @@
+#include "../third_party/catch.hpp"
+#include "simpleLoadBalancing.H"
+
+
+TEST_CASE("simpleLoadBalancing constructors"){
+
+
+    using namespace Foam;
+
+    simpleLoadBalancing l;
+    
+
+}
+
+
+TEST_CASE("simpleLoadBalancing get_loads()"){
+
+
+    using namespace Foam;
+
+    simpleLoadBalancing l;
+
+    auto loads = l.get_loads();
+    CHECK(Pstream::nProcs() == loads.size());
+
+    for (auto load : loads){
+        Info << load.rank << " " << load.value << endl;
+    }
+
+}

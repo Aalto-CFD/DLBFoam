@@ -2,6 +2,7 @@ test.C
 testChemistryLoad.C
 testMixtureFraction.C
 testRefMapper.C
+testSimpleLoadBalancing.C
 
 EXE = ./test.bin
 

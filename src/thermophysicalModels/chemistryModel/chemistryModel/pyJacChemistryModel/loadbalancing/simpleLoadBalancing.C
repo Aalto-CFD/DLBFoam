@@ -4,10 +4,13 @@ namespace Foam{
 
 void simpleLoadBalancing::apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const{
 
+
+    /*
     auto loads = get_loads(mapper, Y);
 
     WHATTODO state = determine_state(loads);
 
+    
     //move to a function
     switch(state) {
         case WHATTODO::e_SENDER:
@@ -22,6 +25,7 @@ void simpleLoadBalancing::apply_balancing(const chemistryRefMappingMethod* mappe
         default: //This is the DONOTHING
             break;
     }
+    */
     
 
 
@@ -42,33 +46,47 @@ chemistryLoad simpleLoadBalancing::get_load(const chemistryRefMappingMethod* map
 }
 
 //TODO make work
-std::vector<chemistryLoad> simpleLoadBalancing::get_loads(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const{
+std::vector<chemistryLoad> simpleLoadBalancing::get_loads() const{
 
 
-    //auto my_load = get_load(mapper, Y);
-
-
-
-    //TODO replace with some
-    //int nprocs = get_world_size();
     int nprocs = Pstream::nProcs();
+
+    List<int>      ranks(nprocs);
+    List<int>      active_cells(nprocs);
+    List<double>   vals(nprocs);
+
+    ranks[Pstream::myProcNo()] = Pstream::myProcNo();
+    active_cells[Pstream::myProcNo()] = 2 * Pstream::myProcNo();
+    vals[Pstream::myProcNo()] = double(3.0 * Pstream::myProcNo());
+
+    
+    //This is now three calls to MPI_Allgather, if a List<chemistryLoads> was communicated it could be done with a single call
+    //That would require serialization of the chemistryLoad class
+    //TODO: serialize chemistryLoad and pass the objects directly
+    int tag = 1;
+    Pstream::gatherList(ranks, tag);
+    Pstream::gatherList(active_cells, tag);
+    Pstream::gatherList(vals, tag);
 
     std::vector<chemistryLoad> ret;
     ret.reserve(nprocs);
 
-    // CALL MPI_ALLGATHER-like function. The Pstream::gather seems to be templated to do all kinds of things and may be useful.
-
-
     for (int i = 0; i < nprocs; ++i){
-        chemistryLoad load;
-        load.rank = i;
-        load.number_of_active_cells = i * 42;
-        load.value = 321.0 * i;
-        ret.push_back(load);
-    }
 
+        chemistryLoad load;
+        load.rank = ranks[i];
+        load.number_of_active_cells = active_cells[i];
+        load.value = vals[i];
+
+        ret.emplace_back(load);
+    }    
+
+ 
     return ret;
 }
+
+
+
 
 
 
