@@ -23,8 +23,11 @@ TEST_CASE("simpleLoadBalancing get_loads()"){
     auto loads = l.get_loads();
     CHECK(Pstream::nProcs() == loads.size());
 
+    CHECK(std::is_sorted(loads.begin(), loads.end()));
+
+    /*
     for (auto load : loads){
         Info << load.rank << " " << load.value << endl;
     }
-
+    */
 }

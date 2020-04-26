@@ -31,32 +31,16 @@ public:
 
     simpleLoadBalancing() = default;
 
-    void apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
 
-    void print_parameters() const {
-        std::cout << "I am balancing load" << std::endl;
-    }
-
-    bool active() const{return true;}
-   
-    
-    std::vector<chemistryLoad> get_loads() const;
-
-protected:
-
-    // None
 
 private:
 
     ///
-    ///@brief Gets the chemistry load of this process
+    ///@brief Determines the load of this process
     ///
-    ///@param a reference cell mapper that tells how many cells are active 
-    ///@param Y mass fractions
-    ///@return chemistryLoad load information
+    ///@return chemistryLoad load of this process
     ///
-    chemistryLoad get_load(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
-    
+    chemistryLoad get_my_load() const;
 
     ///
     ///@brief Determines if a process is a sender receiver or do-nothinger
@@ -68,9 +52,6 @@ private:
 
 
 
-    //TODO: implement
-    int get_send_info() const {return 2;}
-    int get_recv_info() const {return 1;}
 
 
 

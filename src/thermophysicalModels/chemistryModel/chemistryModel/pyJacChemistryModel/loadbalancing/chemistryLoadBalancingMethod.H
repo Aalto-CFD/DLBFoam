@@ -37,7 +37,7 @@ SourceFiles
 
 
 #include <vector> //std::vector
-
+#include <algorithm> //std::sort
 
 #include "IOdictionary.H"
 #include "scalarField.H"
@@ -56,7 +56,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //TODO: rename to something better
-     enum WHATTODO {    e_SENDER = 0, 
+    enum WHATTODO {    e_SENDER = 0, 
                         e_RECEIVER = 1,
                         e_NEITHER = 2 
                     }; 
@@ -73,28 +73,49 @@ class chemistryLoadBalancingMethod
 
 public:
 
-     
-
-
-
+    
     // Constructors
     chemistryLoadBalancingMethod() = default;
 
-    
+    std::vector<chemistryLoad> get_loads() const;
 
 
-    virtual void apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const = 0;
+    void apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
 
 
-    virtual bool active()           const = 0;
-    virtual void print_parameters() const = 0;
+    void print_parameters() const {
+        std::cout << "I am balancing load" << std::endl;
+    }
+
+    bool active() const{return true;}
 
     //- Destructor
     virtual ~chemistryLoadBalancingMethod() {}
 
 
 
+protected:
+
+
+private:
+
+    ///
+    ///@brief Determines the load of this process
+    ///
+    ///@return chemistryLoad load of this process
+    ///
+    virtual chemistryLoad get_my_load() const = 0;
+
     
+    ///
+    ///@brief Determines if a process is a sender receiver or do-nothinger
+    ///
+    ///@param loads a sorted array of loads 
+    ///@return WHATTODO state information on what the process should do
+    ///
+    virtual WHATTODO determine_state(const std::vector<chemistryLoad>& loads) const = 0;
+
+
    
     
 
