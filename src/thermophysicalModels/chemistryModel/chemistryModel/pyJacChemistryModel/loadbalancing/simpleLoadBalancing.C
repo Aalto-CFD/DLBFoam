@@ -109,9 +109,8 @@ WHATTODO simpleLoadBalancing::determine_state(const std::vector<chemistryLoad>& 
         return WHATTODO::e_SENDER;
     }
 
-    else {
-        WHATTODO::e_RECEIVER;
-    }
+    return WHATTODO::e_RECEIVER;
+ 
 
 
 }
