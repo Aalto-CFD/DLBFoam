@@ -157,6 +157,24 @@ protected:
         //  (e.g. for multi-chemistry model)
         inline PtrList<volScalarField::Internal>& RR();
 
+        /*
+        struct Solution{
+          whatever
+        }
+        
+        struct Problem{
+          scalar mass_frac;
+          List<scalar> some;
+        }
+      */
+        //Implement this
+        //scalar    solve_single_cell(Problem p);
+
+        //List<Problem> collect_problems();
+         //void refmapper::filter_problems(List<Problem> all_problems);
+          // loadbalancer::communicate_problems(List<>)
+         //solve(Probmelms)
+        
 
 
 
