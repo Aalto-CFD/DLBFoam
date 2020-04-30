@@ -73,6 +73,22 @@ namespace Foam
 // Forward declaration of classes
 class fvMesh;
 
+  
+struct Problem{
+  
+    scalar val1;
+    scalar val2;
+    scalar
+    List<scalar> massfractions;
+    int cellid;
+};
+  
+struct Solution{
+    scalar val;
+    int cellid;
+};
+  
+  
 /*---------------------------------------------------------------------------*\
                       Class pyJacChemistryModel Declaration
 \*---------------------------------------------------------------------------*/
