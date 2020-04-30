@@ -556,7 +556,29 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
 
     nActiveCells = 0;
-
+  /*
+   std::vector<Problem> problems;
+   
+   
+    forAll(rho, celli){
+    	for (label i=0; i<nSpecie_; i++){
+	     Problem p;
+	     //p.value1 = 
+	     //if refmapper()
+	     	problems.push_back(p);
+	     else {pass;}
+	}
+    }
+   
+   
+   //load balancer
+   
+   forAll(problems){
+   	Soution = solve(all_problems[i]);
+   }
+   
+   */
+   //c
 
     //- TODO: Call the loadcomputestats from load_balancer_
     forAll(rho, celli)
