@@ -76,11 +76,11 @@ class fvMesh;
   
 struct Problem{
   
-    scalar val1;
-    scalar val2;
-    scalar
-    List<scalar> massfractions;
-    int cellid;
+    scalarField c;
+    scalar Ti;
+    scalar pi;
+    scalar deltaTChem;
+    label cellid;
 };
   
 struct Solution{

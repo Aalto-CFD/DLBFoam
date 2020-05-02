@@ -149,12 +149,14 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         }
         else
         {
+            /*
             FatalErrorIn
             (
                 "chemistryModel::New"
                 "(const fvMesh& mesh)"
             )   << "You are trying to do load balancing on a single core."
                 << exit(FatalError);
+            */
         }
     }
   
@@ -556,29 +558,14 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
 
     nActiveCells = 0;
-  /*
-   std::vector<Problem> problems;
-   
-   
-    forAll(rho, celli){
-    	for (label i=0; i<nSpecie_; i++){
-	     Problem p;
-	     //p.value1 = 
-	     //if refmapper()
-	     	problems.push_back(p);
-	     else {pass;}
-	}
-    }
-   
-   
+
    //load balancer
    
-   forAll(problems){
-   	Soution = solve(all_problems[i]);
-   }
+   //forAll(problems){
+   //	Soution = solve(all_problems[i]);
+   //}
    
-   */
-   //c
+    DynamicList<Problem> chem_problems;
 
     //- TODO: Call the loadcomputestats from load_balancer_
     forAll(rho, celli)
@@ -591,28 +578,33 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
         {
 
             const scalar rhoi = rho[celli];
-            scalar pi = p[celli];
 
             for (label i=0; i<nSpecie_; i++)
             {
                 c_[i] = Y_[i][celli];
                 c0[i] = c_[i];
             }
-
-
+            
+            // Fill in the chemistry problem struct
+            Problem prob;
+            prob.pi = p[celli];
+            prob.Ti = Ti;
+            prob.c = c_;
+            prob.deltaTChem = this->deltaTChem_[celli];
+            prob.cellid = celli;
             //- Refcell implementation
             if (refcell_mapper_->active())
             {
                 //- First, try to find the first cell that can be calculated as a reference cell
                 //- and map the solution to RR_ref and c_ref 
+
                 if(!refCellFound)
                 {
                     refCellFound = refcell_mapper_-> applyMapping(Y_,celli); 
                     if(refCellFound)
                     {
                         #include "callODE.H"
-                        deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
-                        this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+                        this->deltaTChem_[celli] = min(prob.deltaTChem, this->deltaTChemMax_);
                         for (label i=0; i<nSpecie_; i++)
                         {
                             RR_ref[i] = this->RR_[i][celli];
@@ -632,15 +624,17 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 else
                 {
                     #include "callODE.H"
-                    deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
-                    this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+                    //- chem_problems only include cells available for load balancing
+                    chem_problems.append(prob);
+                    this->deltaTChem_[celli] = min(prob.deltaTChem, this->deltaTChemMax_);
                     nActiveCells++;
                 }
             }
             else
             {
                 #include "callODE.H"
-                deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
+                //- chem_problems only include cells available for load balancing
+                chem_problems.append(prob);
                 this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
             }
         }
@@ -657,7 +651,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
     }
 
-
+    Info<<"chem_problems size : "<<chem_problems.size()<<endl;
     Info<<"Number of active cells is : "<<nActiveCells<<endl;
 
     return deltaTMin;
