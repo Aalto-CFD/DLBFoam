@@ -541,6 +541,7 @@ Foam::DynamicList<Foam::chemistryProblem> Foam::pyJacChemistryModel<ReactionTher
                 chem_problems.append(problem);
             }
         }
+        //Why should we want to append if the problem wont be solved?
         else
         {
             chem_problems.append(problem);

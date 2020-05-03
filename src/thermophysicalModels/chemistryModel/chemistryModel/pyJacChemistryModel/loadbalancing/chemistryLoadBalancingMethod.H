@@ -80,8 +80,34 @@ public:
 
     DynamicList<chemistryLoad> get_loads() const;
 
+    ///
+    ///@brief Similar to MPI_ISendrecv but for generic types with << and >> operators overloaded. 
+    ///       The communication is non-blocking.
+    ///
+    ///@tparam T Type with Ostream <<, Istream >> operators
+    ///@param send_buffer the send data
+    ///@param recv_buffer buffer to place the received data
+    ///@param source source rank
+    ///@param destination destination rank
+    ///
+    template<class T>
+    void Isend_recv(const T& send_buffer, T& recv_buffer, int source, int destination) const{
+        
+        PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
+        
+        if (Pstream::myProcNo() == source){
 
-    void send_recv(const DynamicList<chemistryProblem>& problems, int source, int destination);
+            UOPstream send(destination, pBufs);
+            send << send_buffer;           
+        }
+
+        pBufs.finishedSends();
+        
+        if (Pstream::myProcNo() == destination){
+            UIPstream recv(source, pBufs);
+            recv >> recv_buffer;
+        }
+    }
 
     
 

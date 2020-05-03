@@ -6,9 +6,10 @@ namespace Foam{
 Ostream& operator<<(Ostream& os, const chemistryProblem& p){
 
     
-    for (size_t i = 0; i < p.c.size(); ++i){
+    /*for (size_t i = 0; i < p.c.size(); ++i){
         os << p.c[i];
-    }
+    }*/
+    os << p.c;
     os << p.Ti;
     os << p.pi;
     os << p.deltaTChem;
@@ -21,9 +22,10 @@ Ostream& operator<<(Ostream& os, const chemistryProblem& p){
 
 Istream& operator>>(Istream& is, chemistryProblem& p){
 
-    for (size_t i = 0; i < p.c.size(); ++i){
+    /*for (size_t i = 0; i < p.c.size(); ++i){
         is >> p.c[i];
-    }
+    }*/
+    is >> p.c;
     is >> p.Ti;
     is >> p.pi;
     is >> p.deltaTChem;
