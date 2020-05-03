@@ -97,6 +97,8 @@ TEST_CASE("chemistryLoadBalancingMethod Isend_recv()"){
         p2.pi = 0.0;
         p2.deltaTChem = 0.0;
         p2.cellid = 0;
+
+        recv_buffer.append(p2);
     }
 
 
