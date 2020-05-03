@@ -55,6 +55,9 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "simpleMatrix.H"
 #include <memory> //std::unique_ptr
 
+
+#include "chemistryProblem.H"
+#include "chemistrySolution.H"
 #include "simpleRefMapping.H" //TODO: create a factory class that returns the correct ref cell mapper
 #include "simpleLoadBalancing.H" 
 
@@ -73,20 +76,8 @@ namespace Foam
 // Forward declaration of classes
 class fvMesh;
 
-  
-struct Problem{
-  
-    scalarField c;
-    scalar Ti;
-    scalar pi;
-    scalar deltaTChem;
-    label cellid;
-};
-  
-struct Solution{
-    scalar val;
-    int cellid;
-};
+
+
   
   
 /*---------------------------------------------------------------------------*\
