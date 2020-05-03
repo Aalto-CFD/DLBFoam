@@ -52,7 +52,7 @@ TEST_CASE("simpleLoadBalancing send()"){
     
     }
 
-    REQUIRE_NOTHROW(l.send(problems, 1));
+    REQUIRE_NOTHROW(l.send_recv(problems, 0, 1));
 
     //Problem p;
 

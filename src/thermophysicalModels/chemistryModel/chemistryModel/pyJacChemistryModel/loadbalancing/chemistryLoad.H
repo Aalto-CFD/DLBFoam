@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Ostream.H"
+
 namespace Foam{
 
 
@@ -30,5 +32,12 @@ struct chemistryLoad{
     bool operator< (const chemistryLoad& rhs) const {return value <  rhs.value;}
     bool operator> (const chemistryLoad& rhs) const {return value >  rhs.value;}
 };
+
+Ostream& operator<<(Ostream& os, const chemistryLoad& l);
+
+
+
+
+
 
 } //namespace Foam

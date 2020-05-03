@@ -78,7 +78,32 @@ std::vector<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const{
 
 
 
-void chemistryLoadBalancingMethod::send(const DynamicList<chemistryProblem>& problems, int target_rank){
+void chemistryLoadBalancingMethod::send_recv(const DynamicList<chemistryProblem>& problems, int source, int destination){
+
+
+
+    /*
+    PstreamBuffers pBufs(Pstream::commsTypes::blocking);
+    UOPstream toNbr(destination, pBufs);
+
+    toNbr  << problems;
+
+    pBufs.finishedSends();
+
+    UIPstream fromNeighb(source, pBufs);
+    */
+
+    //fromNeighb >> nbrdAlpha >> nbrpFaceCells >> nbrp_rghPross >> nbrCellC ;
+
+
+    /*
+    Pstream::exchange(
+        problems,
+
+    );
+    */
+
+
 
 }
 

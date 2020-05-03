@@ -4,6 +4,8 @@
 
 namespace Foam{
 
+
+
 struct chemistryProblem{
   
     scalarField c;
@@ -11,7 +13,20 @@ struct chemistryProblem{
     scalar pi;
     scalar deltaTChem;
     label cellid;
+
+    bool operator==(const chemistryProblem& rhs) const{
+        return false;
+    }
+
+    bool operator !=(const chemistryProblem& rhs) const{
+        return !(*this == rhs);
+    }
+
 };
+
+Ostream& operator<<(Ostream& os, const chemistryProblem& p);
+
+
 
 
 } //namespace Foam

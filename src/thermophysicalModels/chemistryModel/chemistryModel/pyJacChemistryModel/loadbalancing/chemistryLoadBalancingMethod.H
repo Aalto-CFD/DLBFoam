@@ -81,7 +81,7 @@ public:
     std::vector<chemistryLoad> get_loads() const;
 
 
-    void send(const DynamicList<chemistryProblem>& problems, int target_rank);
+    void send_recv(const DynamicList<chemistryProblem>& problems, int source, int destination);
 
     
 
