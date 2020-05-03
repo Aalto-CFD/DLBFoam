@@ -6,18 +6,9 @@ namespace Foam{
 
 chemistryLoad simpleLoadBalancing::get_my_load() const{
 
-    //This is currently arbitrary but defined such that testing is possible
+    throw "NOT IMPLEMENTED";
 
     chemistryLoad load;
-
-    
-    load.rank = Pstream::myProcNo();
-    load.number_of_active_cells = load.rank * 2;
-    load.value = double(3.0 * load.rank);
-
-    
-    
-
     return load;
 
 }
@@ -25,6 +16,9 @@ chemistryLoad simpleLoadBalancing::get_my_load() const{
 
 WHATTODO simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) const{
 
+    throw "NOT IMPLEMENTED";
+
+    /*
     size_t n = loads.size();
 
     
@@ -41,7 +35,7 @@ WHATTODO simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& 
     if (my_order < 0.5 * n){
         return WHATTODO::e_SENDER;
     }
-
+    */
     return WHATTODO::e_RECEIVER;
  
 
