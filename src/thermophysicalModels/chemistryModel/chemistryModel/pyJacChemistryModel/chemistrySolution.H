@@ -5,7 +5,7 @@
 namespace Foam{
 
   
-struct Solution{
+struct chemistrySolution{
     scalar val;
     int cellid;
 }; 

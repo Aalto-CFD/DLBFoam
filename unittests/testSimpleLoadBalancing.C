@@ -1,6 +1,7 @@
 #include "../third_party/catch.hpp"
-#include "simpleLoadBalancing.H"
 
+#include "simpleLoadBalancing.H"
+#include "chemistryProblem.H"
 
 TEST_CASE("simpleLoadBalancing constructors"){
 
@@ -30,4 +31,18 @@ TEST_CASE("simpleLoadBalancing get_loads()"){
         Info << load.rank << " " << load.value << endl;
     }
     */
+}
+
+
+TEST_CASE("simpleLoadBalancing send()"){
+
+
+    using namespace Foam;
+
+    simpleLoadBalancing l;
+
+    //Problem p;
+
+
+
 }

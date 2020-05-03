@@ -565,7 +565,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
    //	Soution = solve(all_problems[i]);
    //}
    
-    DynamicList<Problem> chem_problems;
+    DynamicList<chemistryProblem> chem_problems;
 
     //- TODO: Call the loadcomputestats from load_balancer_
     forAll(rho, celli)
@@ -586,7 +586,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
             }
             
             // Fill in the chemistry problem struct
-            Problem prob;
+            chemistryProblem prob;
             prob.pi = p[celli];
             prob.Ti = Ti;
             prob.c = c_;

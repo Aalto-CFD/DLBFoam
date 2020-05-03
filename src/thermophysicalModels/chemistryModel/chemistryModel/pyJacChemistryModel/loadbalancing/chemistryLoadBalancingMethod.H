@@ -46,6 +46,7 @@ SourceFiles
 
 #include "psiReactionThermo.H"
 
+#include "chemistryProblem.H"
 #include "chemistryLoad.H"
 #include "chemistryRefMappingMethod.H"
 
@@ -80,7 +81,7 @@ public:
     std::vector<chemistryLoad> get_loads() const;
 
 
-    void send(const DynamicList<Problem>& problems, int target_rank);
+    void send(const DynamicList<chemistryProblem>& problems, int target_rank);
 
     
 

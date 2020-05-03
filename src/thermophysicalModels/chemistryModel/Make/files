@@ -1,5 +1,5 @@
-chemistryModel/chemistryProblem.C
-chemistryModel/chemistrySolution.C
+chemistryModel/pyJacChemistryModel/chemistryProblem.C
+chemistryModel/pyJacChemistryModel/chemistrySolution.C
 
 chemistryModel/pyJacChemistryModel/refmapping/mixtureFraction.C
 chemistryModel/pyJacChemistryModel/refmapping/chemistryRefMappingMethod.C

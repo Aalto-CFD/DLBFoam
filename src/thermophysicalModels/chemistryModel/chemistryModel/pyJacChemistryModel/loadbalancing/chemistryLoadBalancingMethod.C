@@ -78,7 +78,7 @@ std::vector<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const{
 
 
 
-void chemistryLoadBalancingMethod::send(const DynamicList<Problem>& problems, int target_rank){
+void chemistryLoadBalancingMethod::send(const DynamicList<chemistryProblem>& problems, int target_rank){
 
 }
 

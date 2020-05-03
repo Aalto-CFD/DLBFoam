@@ -4,7 +4,7 @@
 
 namespace Foam{
 
-struct Problem{
+struct chemistryProblem{
   
     scalarField c;
     scalar Ti;
