@@ -70,7 +70,7 @@ TEST_CASE("chemistryLoadBalancingMethod Isend_recv()"){
     testableLoadBalancing l;
     
     int source = 0;
-    int destination = 0;
+    int destination = 1;
     DynamicList<chemistryProblem> send_buffer;
     DynamicList<chemistryProblem> recv_buffer;
 
