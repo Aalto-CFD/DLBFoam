@@ -10,21 +10,12 @@ chemistryLoad simpleLoadBalancing::get_my_load() const{
 
     chemistryLoad load;
 
-    if (Pstream::master()){
+    
+    load.rank = Pstream::myProcNo();
+    load.number_of_active_cells = load.rank * 2;
+    load.value = double(3.0 * load.rank);
 
-        load.rank = Pstream::myProcNo();
-        load.number_of_active_cells = 10000;
-        load.value = -32.0;
-
-    }
-
-    else{
-
-        load.rank = Pstream::myProcNo();
-        load.number_of_active_cells = load.rank * 2;
-        load.value = double(3.0 * load.rank);
-
-    }
+    
     
 
     return load;
@@ -32,7 +23,7 @@ chemistryLoad simpleLoadBalancing::get_my_load() const{
 }
 
 
-WHATTODO simpleLoadBalancing::determine_state(const std::vector<chemistryLoad>& loads) const{
+WHATTODO simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) const{
 
     size_t n = loads.size();
 

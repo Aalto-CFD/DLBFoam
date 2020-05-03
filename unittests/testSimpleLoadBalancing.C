@@ -26,11 +26,14 @@ TEST_CASE("simpleLoadBalancing get_loads()"){
 
     CHECK(std::is_sorted(loads.begin(), loads.end()));
 
-    /*
-    for (auto load : loads){
-        Info << load.rank << " " << load.value << endl;
+    for (const auto & load : loads){
+        
+        CHECK(load.value == double(3.0 * load.rank));
+        CHECK(load.number_of_active_cells == load.rank * 2);
+        
     }
-    */
+    
+    
 }
 
 

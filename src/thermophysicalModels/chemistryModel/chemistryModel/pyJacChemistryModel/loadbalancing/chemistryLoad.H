@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Ostream.H"
+#include "Istream.H"
 
 namespace Foam{
 
@@ -34,7 +35,7 @@ struct chemistryLoad{
 };
 
 Ostream& operator<<(Ostream& os, const chemistryLoad& l);
-
+Istream& operator>>(Istream& is, chemistryLoad& l);
 
 
 
