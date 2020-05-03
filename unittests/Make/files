@@ -3,6 +3,9 @@ testChemistryLoad.C
 testMixtureFraction.C
 testRefMapper.C
 testChemistryLoadBalancingMethod.C
+testChemistryProblem.C
+
+
 
 EXE = ./test.bin
 

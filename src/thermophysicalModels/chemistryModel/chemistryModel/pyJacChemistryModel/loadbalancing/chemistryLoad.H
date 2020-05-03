@@ -18,7 +18,11 @@ struct chemistryLoad{
 
     chemistryLoad() = default;
 
-    chemistryLoad(int rank_in, double val_in) : rank(rank_in), value(val_in) {} 
+    chemistryLoad(int rank_in, double val_in, int n_active_cells) : 
+    rank(rank_in), 
+    value(val_in), 
+    number_of_active_cells(n_active_cells) 
+    {} 
 
 
     int rank;     //rank of the process 

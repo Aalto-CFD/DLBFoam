@@ -5,13 +5,7 @@ namespace Foam{
 
 Ostream& operator<<(Ostream& os, const chemistryProblem& p){
 
-    /*
-    scalarField c;
-    scalar Ti;
-    scalar pi;
-    scalar deltaTChem;
-    label cellid;
-    */
+    
     for (size_t i = 0; i < p.c.size(); ++i){
         os << p.c[i];
     }
@@ -34,11 +28,6 @@ Istream& operator>>(Istream& is, chemistryProblem& p){
     is >> p.pi;
     is >> p.deltaTChem;
     is >> p.cellid;
-
-
-    return is;
-
-
 
     return is;
 

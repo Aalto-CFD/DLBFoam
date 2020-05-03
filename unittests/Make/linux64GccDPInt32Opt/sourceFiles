@@ -3,4 +3,5 @@ test.C \
 testChemistryLoad.C \
 testMixtureFraction.C \
 testRefMapper.C \
-testChemistryLoadBalancingMethod.C 
+testChemistryLoadBalancingMethod.C \
+testChemistryProblem.C 
