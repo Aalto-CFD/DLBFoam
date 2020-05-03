@@ -78,7 +78,7 @@ public:
     // Constructors
     chemistryLoadBalancingMethod() = default;
 
-    std::vector<chemistryLoad> get_loads() const;
+    DynamicList<chemistryLoad> get_loads() const;
 
 
     void send_recv(const DynamicList<chemistryProblem>& problems, int source, int destination);
@@ -122,7 +122,7 @@ private:
     ///@param loads a sorted array of loads 
     ///@return WHATTODO state information on what the process should do
     ///
-    virtual WHATTODO determine_state(const std::vector<chemistryLoad>& loads) const = 0;
+    virtual WHATTODO determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
 
 
    

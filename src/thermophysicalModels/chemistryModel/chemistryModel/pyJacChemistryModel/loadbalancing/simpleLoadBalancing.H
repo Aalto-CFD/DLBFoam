@@ -48,7 +48,7 @@ private:
     ///@param loads a sorted array of loads 
     ///@return WHATTODO state information on what the process should do
     ///
-    WHATTODO determine_state(const std::vector<chemistryLoad>& loads) const;
+    WHATTODO determine_state(const DynamicList<chemistryLoad>& loads) const;
 
 
 
