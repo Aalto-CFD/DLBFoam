@@ -41,6 +41,19 @@ TEST_CASE("simpleLoadBalancing send()"){
 
     simpleLoadBalancing l;
 
+    
+
+    DynamicList<chemistryProblem> problems;
+
+    for (size_t i = 0; i < 10; ++i){
+        chemistryProblem p;
+        
+        problems.append(p);
+    
+    }
+
+    REQUIRE_NOTHROW(l.send(problems, 1));
+
     //Problem p;
 
 
