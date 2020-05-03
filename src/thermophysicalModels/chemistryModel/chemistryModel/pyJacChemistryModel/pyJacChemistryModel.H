@@ -336,7 +336,7 @@ public:
 
 private:
     void callODE(scalar timeLeft, scalarField& c, scalar& T, scalar& p, scalar& chemDt);
-
+    Foam::DynamicList<Foam::chemistryProblem> get_problems(PtrList<volScalarField>& Y_);
 
 
 
