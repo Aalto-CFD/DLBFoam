@@ -1,9 +1,14 @@
+chemistryModel/chemistryProblem.C
+chemistryModel/chemistrySolution.C
+
 chemistryModel/pyJacChemistryModel/refmapping/mixtureFraction.C
 chemistryModel/pyJacChemistryModel/refmapping/chemistryRefMappingMethod.C
 chemistryModel/pyJacChemistryModel/refmapping/simpleRefMapping.C
 
 chemistryModel/pyJacChemistryModel/loadbalancing/chemistryLoadBalancingMethod.C
 chemistryModel/pyJacChemistryModel/loadbalancing/simpleLoadBalancing.C
+
+
 
 chemistryModel/makePexChemistryModels.C
 chemistrySolver/makePexChemistrySolvers.C

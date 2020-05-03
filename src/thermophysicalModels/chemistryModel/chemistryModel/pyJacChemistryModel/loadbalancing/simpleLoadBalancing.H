@@ -12,7 +12,7 @@
 #include "Switch.H"
 #include "runTimeSelectionTables.H"
 
-
+#include "chemistryProblem.H"
 #include "chemistryLoadBalancingMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

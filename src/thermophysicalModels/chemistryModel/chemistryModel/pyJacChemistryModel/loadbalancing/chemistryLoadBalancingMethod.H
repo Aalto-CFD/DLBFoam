@@ -80,6 +80,14 @@ public:
     std::vector<chemistryLoad> get_loads() const;
 
 
+    void send(const DynamicList<Problem>& problems, int target_rank);
+
+    
+
+
+
+
+
     void apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
 
 

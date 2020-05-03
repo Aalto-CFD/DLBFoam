@@ -78,6 +78,11 @@ std::vector<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const{
 
 
 
+void chemistryLoadBalancingMethod::send(const DynamicList<Problem>& problems, int target_rank){
+
+}
+
+
 } //namespace Foam
 
 
