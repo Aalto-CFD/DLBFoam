@@ -43,6 +43,8 @@ DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const{
     loads[Pstream::myProcNo()] = this->get_my_load();
     int tag = 1;
     Pstream::gatherList(loads, tag);
+//    Pstream::scatterList(loads, tag); //THIS MAYBE REQUIRED!
+
 
     std::sort(loads.begin(), loads.end());
 

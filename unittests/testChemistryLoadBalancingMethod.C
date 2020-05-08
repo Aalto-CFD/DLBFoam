@@ -13,8 +13,17 @@ private:
     chemistryLoad get_my_load() const {
         chemistryLoad load;    
         load.rank = Pstream::myProcNo();
-        load.number_of_active_cells = load.rank * 2;
-        load.value = double(3.0 * load.rank);
+
+        if (load.rank % 2 == 0){
+            load.number_of_active_cells = load.rank * 2;
+            load.value = double(3.0 * load.rank);
+        }
+
+        else{
+            load.number_of_active_cells = load.rank * 4;
+            load.value = double(3.65 * load.rank);
+        }
+        
         
         return load;
     }
@@ -53,10 +62,24 @@ TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 
     for (const auto & load : loads){
         
-        CHECK(load.value == double(3.0 * load.rank));
-        CHECK(load.number_of_active_cells == load.rank * 2);
+
+        if (load.rank % 2 == 0){
+
+            CHECK(load.value == double(3.0 * load.rank));
+            CHECK(load.number_of_active_cells == load.rank * 2);
         
+        }
+
+        else{
+            CHECK(load.value == double(3.65 * load.rank));
+            CHECK(load.number_of_active_cells == load.rank * 4);
+        
+        }
+
     }
+
+    CHECK(loads[0].value != double(23.0));
+
     
     
 }
