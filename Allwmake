@@ -1,12 +1,12 @@
 #!/bin/sh
 cd ${0%/*} || exit 1    # Run from this directory
 
-wclean all
+#wclean all
 
 # Compile OpenFOAM_Aalto libraries
 src/Allwmake $targetType $*
 
 cd unittests
-wclean
+#wclean
 wmake
 

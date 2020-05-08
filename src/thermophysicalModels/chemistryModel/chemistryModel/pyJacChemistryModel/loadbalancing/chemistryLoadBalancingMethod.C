@@ -32,8 +32,10 @@ void chemistryLoadBalancingMethod::apply_balancing(const chemistryRefMappingMeth
 
 
 
-//TODO: consider breaking to smaller functions
+
 DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const{
+
+    
 
 
     label nprocs = Pstream::nProcs();
@@ -42,8 +44,9 @@ DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const{
     
     loads[Pstream::myProcNo()] = this->get_my_load();
     int tag = 1;
+    //TODO: Call MPI_Allgather instead, these functions appear to be doing something crazy
     Pstream::gatherList(loads, tag);
-//    Pstream::scatterList(loads, tag); //THIS MAYBE REQUIRED!
+    Pstream::scatterList(loads, tag);
 
 
     std::sort(loads.begin(), loads.end());

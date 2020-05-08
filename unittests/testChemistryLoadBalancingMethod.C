@@ -15,13 +15,13 @@ private:
         load.rank = Pstream::myProcNo();
 
         if (load.rank % 2 == 0){
-            load.number_of_active_cells = load.rank * 2;
-            load.value = double(3.0 * load.rank);
+            load.number_of_active_cells = load.rank * 2 + 1;
+            load.value = double(3.0 * load.rank + 1);
         }
 
         else{
-            load.number_of_active_cells = load.rank * 4;
-            load.value = double(3.65 * load.rank);
+            load.number_of_active_cells = load.rank * 4 + 1;
+            load.value = double(3.65 * load.rank + 1);
         }
         
         
@@ -60,29 +60,28 @@ TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 
     CHECK(std::is_sorted(loads.begin(), loads.end()));
 
+
     for (const auto & load : loads){
         
 
         if (load.rank % 2 == 0){
 
-            CHECK(load.value == double(3.0 * load.rank));
-            CHECK(load.number_of_active_cells == load.rank * 2);
+            CHECK(load.value == double(3.0 * load.rank + 1));
+            CHECK(load.number_of_active_cells == load.rank * 2 + 1);
         
         }
 
         else{
-            CHECK(load.value == double(3.65 * load.rank));
-            CHECK(load.number_of_active_cells == load.rank * 4);
+            CHECK(load.value == double(3.65 * load.rank + 1));
+            CHECK(load.number_of_active_cells == load.rank * 4 + 1);
         
         }
 
     }
 
-    CHECK(loads[0].value != double(23.0));
-
-    
     
 }
+
 
 
 TEST_CASE("chemistryLoadBalancingMethod Isend_recv()"){
