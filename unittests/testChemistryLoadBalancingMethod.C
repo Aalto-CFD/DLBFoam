@@ -10,7 +10,7 @@ class testableLoadBalancing : public chemistryLoadBalancingMethod{
 
 private:
 
-    chemistryLoad get_my_load() const {
+    chemistryLoad get_my_load() const override{
         chemistryLoad load;    
         load.rank = Pstream::myProcNo();
 
@@ -28,8 +28,8 @@ private:
         return load;
     }
 
-    WHATTODO determine_state(const DynamicList<chemistryLoad>& loads) const {
-        return WHATTODO::e_SENDER;
+    sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const override{
+        return sendRecvInfo{};
     }
 };
 

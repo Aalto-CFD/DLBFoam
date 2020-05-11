@@ -50,6 +50,7 @@ SourceFiles
 #include "chemistryLoad.H"
 #include "chemistryRefMappingMethod.H"
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -71,6 +72,19 @@ namespace Foam
 
 class chemistryLoadBalancingMethod
 {
+
+public:
+
+    struct sendRecvInfo{
+    
+        int my_rank;
+        DynamicList<int>    source; //ranks which send to this process
+        DynamicList<int>    destinations; //ranks to which this process sends to
+        DynamicList<int>    number_of_problems; //number of problems which this rank sends/receivs
+
+    };
+
+
 
 public:
 
@@ -148,7 +162,7 @@ private:
     ///@param loads a sorted array of loads 
     ///@return WHATTODO state information on what the process should do
     ///
-    virtual WHATTODO determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
+    virtual sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
 
 
    

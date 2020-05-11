@@ -40,7 +40,7 @@ private:
     ///
     ///@return chemistryLoad load of this process
     ///
-    chemistryLoad get_my_load() const;
+    chemistryLoad get_my_load() const override;
 
     ///
     ///@brief Determines if a process is a sender receiver or do-nothinger
@@ -48,7 +48,7 @@ private:
     ///@param loads a sorted array of loads 
     ///@return WHATTODO state information on what the process should do
     ///
-    WHATTODO determine_state(const DynamicList<chemistryLoad>& loads) const;
+    sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const override;
 
 
 

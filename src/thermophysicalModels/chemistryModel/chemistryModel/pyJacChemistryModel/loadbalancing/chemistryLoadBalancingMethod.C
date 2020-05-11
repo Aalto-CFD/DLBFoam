@@ -7,8 +7,10 @@ void chemistryLoadBalancingMethod::apply_balancing(const chemistryRefMappingMeth
 
     auto loads = this->get_loads();
 
+
+    sendRecvInfo state = this->determine_state(loads);
     
-    WHATTODO state = this->determine_state(loads);
+    //WHATTODO state = this->determine_state(loads);
 
     /*
     //move to a function
