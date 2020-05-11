@@ -63,7 +63,7 @@ namespace Foam {
 class chemistryLoadBalancingMethod {
 
 private:
-    sendRecvInfo m_current_state;           //the current state of the object 
+    sendRecvInfo m_current_state; // the current state of the object
 
 public:
     template <class T> using buffer_t = DynamicList<DynamicList<T>>;
@@ -76,8 +76,18 @@ public:
     };
 
 public:
+
+
+
     // Constructors
     chemistryLoadBalancingMethod() = default;
+
+
+
+    //void update_state( SOMEPARAMETERS ) { CALL SET STATE }
+
+
+
 
     ///
     ///@brief Given a list of values splits them evenly between the mpi-processes.
@@ -125,10 +135,22 @@ public:
         return send_recv<T, Pstream::commsTypes::blocking>(values, destinations, sources);
     }
 
+
+
+    ///
+    ///@brief Check whether the load balancer is active or not.
+    ///
+    ///@return true 
+    ///@return false 
+    ///
     bool active() const { return true; }
 
     //- Destructor
     virtual ~chemistryLoadBalancingMethod() {}
+
+
+
+
 
 protected:
     ///
@@ -150,7 +172,7 @@ protected:
     ///
     ///@param all_problems list of problems that this rank has to solve
     ///@return DynamicList<DynamicList<chemistryProblem>> list of portions to be passed to other
-    ///ranks
+    /// ranks
     ///
     DynamicList<DynamicList<chemistryProblem>>
     get_send_buffer(const DynamicList<chemistryProblem>& all_problems) const;
@@ -205,8 +227,6 @@ private:
     ///@return WHATTODO state information on what the process should do
     ///
     virtual sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
-
-
 };
 
 } // namespace Foam
