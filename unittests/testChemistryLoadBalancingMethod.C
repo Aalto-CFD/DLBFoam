@@ -202,13 +202,22 @@ TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
     
     auto buffer = l.get_send_buffer(problems);
 
-    
+
     for (size_t i = 0; i < destinations.size(); ++i){
-        CHECK(buffer[i].size() == n_problems[i]);
-        
+        CHECK(buffer[i].size() == n_problems[i]);    
     }
     
+    //cellids 0,1,2 "remain" in problems the first problem to send contains
+    //cell id 2 
+    CHECK(buffer[0][0].cellid == 2);
+    CHECK(buffer[1][0].cellid == 2 + n_problems[0]);
+    CHECK(buffer[2][0].cellid == 2 + n_problems[0] + n_problems[1]);
 
+
+    n_problems = {4,4,4};
+    l.set_test_state(sources, destinations, n_problems);
+    
+    REQUIRE_THROWS(l.get_send_buffer(problems));
     
 
 }

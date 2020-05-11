@@ -1,0 +1,27 @@
+---
+# This is a very mimimal clang-format config file, based on the LLVM style
+#
+# For more options see the clang-format documentation, or try using the 
+# online clang-format generator:
+#     https://zed0.co.uk/clang-format-configurator/
+#
+
+AccessModifierOffset: '-4'
+AlignConsecutiveAssignments: 'true'
+AlignConsecutiveDeclarations: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'true'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortCaseLabelsOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: 'true'
+AllowShortLoopsOnASingleLine: 'true'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+ColumnLimit: '100'
+IndentWidth: '4'
+PointerAlignment: Left
+SortIncludes: 'true'
+TabWidth: '4'
+UseTab: Never
+BreakConstructorInitializers: BeforeComma
+...
