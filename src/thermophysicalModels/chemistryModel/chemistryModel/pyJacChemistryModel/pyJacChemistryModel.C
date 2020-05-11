@@ -142,7 +142,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 
     if (load_balancer_->active())
     {
-        load_balancer_->print_parameters();
+        //load_balancer_->print_parameters();
         if(Pstream::parRun())
         {
             Info<<"Load balancing is active and running on "<<Pstream::nProcs()<<" cores."<<endl;

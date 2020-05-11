@@ -87,78 +87,84 @@ public:
 
     
 
+    
 
+    ///
+    ///@brief Given a list of values splits them evenly between the mpi-processes.
+    ///
+    ///@tparam T type of value (typically a chemistryProblem)
+    ///@param values values to split
+    ///@return buffer_t<T> additional values coming to the current process
+    ///
     template<class T>
     buffer_t<T> balance(const DynamicList<T>& values) const{
 
+        auto sources      = m_current_state.sources;
+        auto destinations = m_current_state.destinations;
+ 
+        // TODO: Check only in debug mode
+        if (sources.size() != 0 && destinations.size() != 0) {
+            throw "A process can be either a source, destination or a do nothinger";
+        }
+
+        auto send_buffer = get_send_buffer(values);
+
+        //The unittests currently test such that everyone sends to master which requires a blocking commstype
+        //in reality we dont want to block at this phase
+        //TODO: change to nonBlocking
+        return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
+
     }
 
+    ///
+    ///@brief Given a buffer of values, sends the values back to their rightful owner processes.
+    ///
+    ///@tparam T type of value (typically a chemistrySolution)
+    ///@param values values to send back
+    ///@return buffer_t<T> values coming back to this process
+    ///
+    template<class T>
+    buffer_t<T> unbalance(const buffer_t<T>& values) const{
 
-    ///
-    ///@brief Given a list of problems splits them evenly between the mpi-processes.
-    ///
-    ///@param problems list of problems to split
-    ///@return buffer_t<chemistryProblem> additional problems to solve
-    ///
-    buffer_t<chemistryProblem>
-    get_problems(const DynamicList<chemistryProblem>& problems) const;
+        auto sources      = m_current_state.sources;
+        auto destinations = m_current_state.destinations;
+   
+        // TODO: Check only in debug mode
+        if (sources.size() != 0 && destinations.size() != 0) {
+            throw "A process can be either a source, destination or a do nothinger";
+        }
 
+        //It is probably impossible to avoid blocking in this phase
+        return send_recv<T, Pstream::commsTypes::blocking>(values, destinations, sources);
 
-    ///
-    ///@brief Returns the solutions back to the rightful owner processes.
-    ///
-    ///@param  solutions the solutions to send back to
-    ///@return DynamicList<chemistrySolution> the solutions coming back to this process.
-    ///
-    DynamicList<chemistrySolution>
-    get_solutions(const buffer_t<chemistrySolution>& solutions) const;
-
+    }
 
     
 
 
+
+    
+
+    
+    //TODO: make private
+    DynamicList<chemistryLoad> get_loads() const;
+    
+
+    bool active() const { return true; }
+
+    //- Destructor
+    virtual ~chemistryLoadBalancingMethod() {}
+
+protected:
+
     ///
-    ///@brief Sends the split send_buffer to sources and receives everything from destinations. Does not
-    ///       allow for overlapping sources or destinations.
+    ///@brief Sets the current state
     ///
-    ///@tparam ET element type of the send and receive buffers
-    ///@tparam CT mpi communication type blocking/nonBlocking
-    ///@param send_buffer the buffer to send
-    ///@param sources the ranks to receive from
-    ///@param destinations the ranks to send to
-    ///@return buffer_t<ET> the received buffer
+    ///@param state state to set to
     ///
-    template <class ET, Pstream::commsTypes CT>
-    buffer_t<ET> send_recv(const buffer_t<ET>&      send_buffer,
-                          const std::vector<int>& sources,
-                          const std::vector<int>& destinations
-                          ) const {
+    void set_state(const sendRecvInfo& state) { m_current_state = state; }
 
-        
-
-        PstreamBuffers pBufs(CT);
-
-        for (int i = 0; i < destinations.size(); ++i){
-            UOPstream send(destinations[i], pBufs);
-            send << send_buffer[i];
-            
-        }
-            
-        pBufs.finishedSends();
-
-        buffer_t<ET> recv_buffers;
-        recv_buffers.setSize(sources.size());
-
-        for (int i = 0; i < sources.size(); ++i){
-            
-            UIPstream recv(sources[i], pBufs);
-            recv >> recv_buffers[i];
-            
-        }
-        
-        return recv_buffers;
-        
-    }
+    
 
 
     ///
@@ -170,29 +176,44 @@ public:
     DynamicList<DynamicList<chemistryProblem>>
     get_send_buffer(const DynamicList<chemistryProblem>& all_problems) const;
 
-    
 
-    
-    //TODO: make private
-    DynamicList<chemistryLoad> get_loads() const;
-    
+    ///
+    ///@brief Sends the split send_buffer to sources and receives everything from destinations. Does
+    ///not
+    ///       allow for overlapping sources or destinations.
+    ///
+    ///@tparam ET element type of the send and receive buffers
+    ///@tparam CT mpi communication type blocking/nonBlocking
+    ///@param send_buffer the buffer to send
+    ///@param sources the ranks to receive from
+    ///@param destinations the ranks to send to
+    ///@return buffer_t<ET> the received buffer
+    ///
+    template <class ET, Pstream::commsTypes CT>
+    buffer_t<ET> send_recv(const buffer_t<ET>&     send_buffer,
+                           const std::vector<int>& sources,
+                           const std::vector<int>& destinations) const {
 
+        
+        PstreamBuffers pBufs(CT);
 
+        for (int i = 0; i < destinations.size(); ++i) {
+            UOPstream send(destinations[i], pBufs);
+            send << send_buffer[i];
+        }
+        pBufs.finishedSends();
 
+        buffer_t<ET> recv_buffers;
+        recv_buffers.setSize(sources.size());
+        for (int i = 0; i < sources.size(); ++i) {
+            UIPstream recv(sources[i], pBufs);
+            recv >> recv_buffers[i];
+        }
 
-    void apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
+        
+        return recv_buffers;
+    }
 
-    void print_parameters() const { std::cout << "I am balancing load" << std::endl; }
-
-    bool active() const { return true; }
-
-    //- Destructor
-    virtual ~chemistryLoadBalancingMethod() {}
-
-protected:
-    void set_state(const sendRecvInfo& state) { m_current_state = state; }
-
-    
 
 private:
     ///

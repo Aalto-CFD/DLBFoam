@@ -51,7 +51,17 @@ public:
         this->set_state(i);
   
     }
+    template<class ET>
+    buffer_t<ET> test_get_send_buffer(const DynamicList<ET>& params) const{
+        return this->get_send_buffer(params);
+    }
+    
 
+    template<class ET, Pstream::commsTypes CT>
+    buffer_t<ET> test_send_recv(const buffer_t<ET>& buffer, std::vector<int> sources, std::vector<int> dests) const{
+        return this->send_recv<ET, CT>(buffer, sources, dests);
+    }
+   
 
     void update() {
 
@@ -102,12 +112,6 @@ private:
 
         else {
 
-            /*for (const auto& load : loads){
-                if (load.rank != Pstream::myProcNo()){
-
-                    i.number_of_problems.emplace_back(10);
-                }
-            }*/
             i.number_of_problems = {10};
             i.destinations = {Pstream::master()};
             i.sources = {};
@@ -199,7 +203,7 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv()"){
     send_buffer.setSize(1);
     send_buffer[0] = create_problems(10);
 
-    auto recv_buffer = l.send_recv<chemistryProblem, Pstream::commsTypes::nonBlocking>(
+    auto recv_buffer = l.test_send_recv<chemistryProblem, Pstream::commsTypes::nonBlocking>(
         send_buffer, sources, destinations);
 
     if (Pstream::myProcNo() == 1) {
@@ -214,6 +218,8 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv()"){
     }
     
 }
+
+
 
 TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
 
@@ -240,7 +246,7 @@ TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
 
     l.set_test_state(sources, destinations, n_problems);
     
-    auto buffer = l.get_send_buffer(problems);
+    auto buffer = l.test_get_send_buffer(problems);
 
 
     for (size_t i = 0; i < destinations.size(); ++i){
@@ -257,14 +263,14 @@ TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
     n_problems = {4,4,4};
     l.set_test_state(sources, destinations, n_problems);
     
-    REQUIRE_THROWS(l.get_send_buffer(problems));
+    REQUIRE_THROWS(l.test_get_send_buffer(problems));
     
 
 }
 
 
-/*
-TEST_CASE("chemistryLoadBalancingMethod get_problems()"){
+
+TEST_CASE("chemistryLoadBalancingMethod balance() / unbalance()"){
 
     
 
@@ -279,10 +285,36 @@ TEST_CASE("chemistryLoadBalancingMethod get_problems()"){
     auto problems = create_problems(50);
 
 
+    for (const auto& p : problems ){
+
+    }
+
     //l.set_state(l.determine_state(loads));
 
-    auto buffer = l.get_problems(problems);
+    label startOfRequests = Pstream::nRequests();
+    auto buffer = l.balance(problems);
+
+    if (Pstream::myProcNo() == Pstream::master()){
+        CHECK(buffer.size() == Pstream::nProcs() - 1);
+    }
+
+    else{
+        CHECK(buffer.size() == 0);
+    }
+        
+    
+    //Pstream::waitRequests(startOfRequests);
+
+    if (buffer.size() > 0){
+        auto buffer2 = l.unbalance(buffer);
+    }
+
+    
+    
+
+    
+    
+
 
 
 }
-*/
