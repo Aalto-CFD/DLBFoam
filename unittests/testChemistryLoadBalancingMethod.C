@@ -53,6 +53,13 @@ public:
     }
 
 
+    void update() {
+
+        auto loads = get_loads();
+        auto state = determine_state(loads);
+        this->set_state(state);
+    }
+
 private:
 
     chemistryLoad get_my_load() const override{
@@ -60,13 +67,13 @@ private:
         load.rank = Pstream::myProcNo();
 
         if (load.rank % 2 == 0){
-            load.number_of_active_cells = load.rank * 2 + 1;
-            load.value = double(3.0 * load.rank + 1);
+            load.number_of_active_cells = load.rank * 2 + 50;
+            load.value = double(3.0 * load.rank + 50);
         }
 
         else{
-            load.number_of_active_cells = load.rank * 4 + 1;
-            load.value = double(3.65 * load.rank + 1);
+            load.number_of_active_cells = load.rank * 4 + 50;
+            load.value = double(3.65 * load.rank + 50);
         }
         
         
@@ -74,19 +81,40 @@ private:
     }
 
 
-    
-
-
 
     sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const override{
         
         
         sendRecvInfo i;
-        /*
-        i.sources{};
-        i.destinations{1,2,3}
-        i.number_of_problems{3,3,4};
-        */
+
+
+        if (Pstream::myProcNo() == Pstream::master()){
+
+            for (const auto& load : loads){
+                if (load.rank != Pstream::myProcNo()){
+
+                    i.sources.emplace_back(load.rank);
+                    i.number_of_problems.emplace_back(10);
+                }
+            }
+            i.destinations = {};
+        }
+
+        else {
+
+            /*for (const auto& load : loads){
+                if (load.rank != Pstream::myProcNo()){
+
+                    i.number_of_problems.emplace_back(10);
+                }
+            }*/
+            i.number_of_problems = {10};
+            i.destinations = {Pstream::master()};
+            i.sources = {};
+        }
+
+
+
         return i;
         
 
@@ -127,14 +155,14 @@ TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 
         if (load.rank % 2 == 0){
 
-            CHECK(load.value == double(3.0 * load.rank + 1));
-            CHECK(load.number_of_active_cells == load.rank * 2 + 1);
+            CHECK(load.value == double(3.0 * load.rank + 50));
+            CHECK(load.number_of_active_cells == load.rank * 2 + 50);
         
         }
 
         else{
-            CHECK(load.value == double(3.65 * load.rank + 1));
-            CHECK(load.number_of_active_cells == load.rank * 4 + 1);
+            CHECK(load.value == double(3.65 * load.rank + 50));
+            CHECK(load.number_of_active_cells == load.rank * 4 + 50);
         
         }
 
@@ -145,34 +173,46 @@ TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 
 
 
-TEST_CASE("chemistryLoadBalancingMethod Isend_recv()"){
+TEST_CASE("chemistryLoadBalancingMethod send_recv()"){
 
-
+    
     using namespace Foam;
 
     testableLoadBalancing l;
+    std::vector<int> sources = {};
+    std::vector<int> destinations = {};
+    std::vector<int> counts = {};
+
+    if (Pstream::myProcNo() == 0){
+        destinations = {1};
+        counts = {10};
+    }
     
-    int source = 0;
-    int destination = 1;
-    DynamicList<chemistryProblem> send_buffer = create_problems(10);
-    DynamicList<chemistryProblem> recv_buffer;
+    else if (Pstream::myProcNo() == 1){
+        sources = {0};
+        counts = {10};
+    }
 
+  
 
+    DynamicList<DynamicList<chemistryProblem>> send_buffer;
+    send_buffer.setSize(1);
+    send_buffer[0] = create_problems(10);
 
-    l.Isend_recv(send_buffer, recv_buffer, source, destination);
+    auto recv_buffer = l.send_recv<chemistryProblem, Pstream::commsTypes::nonBlocking>(
+        send_buffer, sources, destinations);
 
-    if (Pstream::myProcNo() == destination){
-        for (size_t i = 0; i < 10; ++i){
-            auto p = recv_buffer[i];
-            CHECK(p.c[0] == 32.04); //note only the first one checked
+    if (Pstream::myProcNo() == 1) {
+        for (size_t i = 0; i < 10; ++i) {
+            auto p = recv_buffer[0][i];
+            CHECK(p.c[0] == 32.04); // note only the first one checked
             CHECK(p.Ti == 13.0);
             CHECK(p.pi == 54.0);
             CHECK(p.deltaTChem == 0.3);
             CHECK(p.cellid == i);
         }
     }
-
-
+    
 }
 
 TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
@@ -221,3 +261,28 @@ TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
     
 
 }
+
+
+/*
+TEST_CASE("chemistryLoadBalancingMethod get_problems()"){
+
+    
+
+    using namespace Foam;
+
+    
+
+    testableLoadBalancing l;
+
+    l.update();
+
+    auto problems = create_problems(50);
+
+
+    //l.set_state(l.determine_state(loads));
+
+    auto buffer = l.get_problems(problems);
+
+
+}
+*/

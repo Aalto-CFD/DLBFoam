@@ -63,6 +63,12 @@ namespace Foam {
 class chemistryLoadBalancingMethod {
 
 public:
+
+
+
+    template<class T> using buffer_t = DynamicList<DynamicList<T>>;
+
+
     struct sendRecvInfo {
         // would like to use DynamicList here but it appears it sucks ass and
         // nothing works as expected when its used
@@ -79,67 +85,100 @@ public:
     // Constructors
     chemistryLoadBalancingMethod() = default;
 
-    DynamicList<chemistryLoad> get_loads() const;
+    
 
-    DynamicList<DynamicList<chemistryProblem>>
-    get_problems(const DynamicList<chemistryProblem>& all_problems) const {
 
-        auto sources      = m_current_state.sources;
-        auto destinations = m_current_state.destinations;
-        auto counts       = m_current_state.number_of_problems;
+    template<class T>
+    buffer_t<T> balance(const DynamicList<T>& values) const{
 
-        // TODO: Check only in debug mode
-        if (sources.size() != 0 && destinations.size() != 0) {
-            throw "A process can be either a source, destination or a do nothinger";
-        }
-
-        //TODO: replace with all to all
-        auto send_buffers = get_send_buffer(all_problems);
-
-        DynamicList<DynamicList<chemistryProblem>> recv_buffers;
-
-        for (size_t i = 0; i < sources.size(); ++i){
-            Isend_recv(send_buffers[i], recv_buffers[i], sources[i], counts[i]);
-        }
-        
-        
-        return recv_buffers;
     }
 
+
+    ///
+    ///@brief Given a list of problems splits them evenly between the mpi-processes.
+    ///
+    ///@param problems list of problems to split
+    ///@return buffer_t<chemistryProblem> additional problems to solve
+    ///
+    buffer_t<chemistryProblem>
+    get_problems(const DynamicList<chemistryProblem>& problems) const;
+
+
+    ///
+    ///@brief Returns the solutions back to the rightful owner processes.
+    ///
+    ///@param  solutions the solutions to send back to
+    ///@return DynamicList<chemistrySolution> the solutions coming back to this process.
+    ///
+    DynamicList<chemistrySolution>
+    get_solutions(const buffer_t<chemistrySolution>& solutions) const;
+
+
+    
+
+
+    ///
+    ///@brief Sends the split send_buffer to sources and receives everything from destinations. Does not
+    ///       allow for overlapping sources or destinations.
+    ///
+    ///@tparam ET element type of the send and receive buffers
+    ///@tparam CT mpi communication type blocking/nonBlocking
+    ///@param send_buffer the buffer to send
+    ///@param sources the ranks to receive from
+    ///@param destinations the ranks to send to
+    ///@return buffer_t<ET> the received buffer
+    ///
+    template <class ET, Pstream::commsTypes CT>
+    buffer_t<ET> send_recv(const buffer_t<ET>&      send_buffer,
+                          const std::vector<int>& sources,
+                          const std::vector<int>& destinations
+                          ) const {
+
+        
+
+        PstreamBuffers pBufs(CT);
+
+        for (int i = 0; i < destinations.size(); ++i){
+            UOPstream send(destinations[i], pBufs);
+            send << send_buffer[i];
+            
+        }
+            
+        pBufs.finishedSends();
+
+        buffer_t<ET> recv_buffers;
+        recv_buffers.setSize(sources.size());
+
+        for (int i = 0; i < sources.size(); ++i){
+            
+            UIPstream recv(sources[i], pBufs);
+            recv >> recv_buffers[i];
+            
+        }
+        
+        return recv_buffers;
+        
+    }
+
+
+    ///
+    ///@brief Given a list of problems splits the input list to sublists to be passed to other ranks
+    ///
+    ///@param all_problems list of problems that this rank has to solve
+    ///@return DynamicList<DynamicList<chemistryProblem>> list of portions to be passed to other ranks
+    ///
     DynamicList<DynamicList<chemistryProblem>>
     get_send_buffer(const DynamicList<chemistryProblem>& all_problems) const;
 
-    DynamicList<chemistrySolution>
-    get_solutions(const DynamicList<chemistrySolution>& current) const;
+    
 
-    ///
-    ///@brief Similar to MPI_ISendrecv but for generic types with << and >> operators overloaded.
-    ///       The communication is non-blocking.
-    ///
-    ///@tparam T Type with Ostream <<, Istream >> operators
-    ///@param send_buffer the send data
-    ///@param recv_buffer buffer to place the received data
-    ///@param source source rank
-    ///@param destination destination rank
-    ///
-    template <class T>
-    void Isend_recv(const T& send_buffer, T& recv_buffer, int source, int destination) const {
+    
+    //TODO: make private
+    DynamicList<chemistryLoad> get_loads() const;
+    
 
-        PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
 
-        if (Pstream::myProcNo() == source) {
 
-            UOPstream send(destination, pBufs);
-            send << send_buffer;
-        }
-
-        pBufs.finishedSends();
-
-        if (Pstream::myProcNo() == destination) {
-            UIPstream recv(source, pBufs);
-            recv >> recv_buffer;
-        }
-    }
 
     void apply_balancing(const chemistryRefMappingMethod* mapper, PtrList<volScalarField>& Y) const;
 
@@ -152,6 +191,8 @@ public:
 
 protected:
     void set_state(const sendRecvInfo& state) { m_current_state = state; }
+
+    
 
 private:
     ///

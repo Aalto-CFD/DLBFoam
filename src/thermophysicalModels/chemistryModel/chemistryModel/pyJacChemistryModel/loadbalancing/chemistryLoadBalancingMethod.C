@@ -75,4 +75,52 @@ DynamicList<DynamicList<chemistryProblem>> chemistryLoadBalancingMethod::get_sen
     return send_buffer;
 }
 
+
+chemistryLoadBalancingMethod::buffer_t<chemistryProblem>
+chemistryLoadBalancingMethod::get_problems(const DynamicList<chemistryProblem>& problems) const {
+
+    auto sources      = m_current_state.sources;
+    auto destinations = m_current_state.destinations;
+    auto counts       = m_current_state.number_of_problems;
+
+    // TODO: Check only in debug mode
+    if (sources.size() != 0 && destinations.size() != 0) {
+        throw "A process can be either a source, destination or a do nothinger";
+    }
+
+
+    auto send_buffer = get_send_buffer(problems);
+
+    //The unittests currently test such that everyone sends to master which requires a blocking commstype
+    //in reality we wont block at this phase
+    //TODO: change to nonBlocking
+    return send_recv<chemistryProblem, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
+
+
+}
+
+DynamicList<chemistrySolution>
+chemistryLoadBalancingMethod::get_solutions(const chemistryLoadBalancingMethod::buffer_t<chemistrySolution>& solutions) const{
+
+    auto sources      = m_current_state.sources;
+    auto destinations = m_current_state.destinations;
+    auto counts       = m_current_state.number_of_problems;
+
+    // TODO: Check only in debug mode
+    if (sources.size() != 0 && destinations.size() != 0) {
+        throw "A process can be either a source, destination or a do nothinger";
+    }
+
+
+    //this probably has to be always blocking
+    auto recv_buffer = send_recv<chemistrySolution, Pstream::commsTypes::blocking>(solutions, destinations, sources);
+
+
+    DynamicList<chemistrySolution> ret;
+    return ret;
+
+
+}
+
+
 } // namespace Foam

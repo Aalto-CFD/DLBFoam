@@ -8,6 +8,16 @@ namespace Foam{
 struct chemistrySolution{
     scalar val;
     int cellid;
+
+
+    //TODO: implement!
+    bool operator==(const chemistrySolution& rhs) const{
+        return false;
+    }
+
+    bool operator !=(const chemistrySolution& rhs) const{
+        return !(*this == rhs);
+    }
 }; 
 
 
