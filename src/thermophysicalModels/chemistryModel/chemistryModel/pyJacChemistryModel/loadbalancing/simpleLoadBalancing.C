@@ -14,7 +14,7 @@ chemistryLoad simpleLoadBalancing::get_my_load() const{
 }
 
 
-simpleLoadBalancing::sendRecvInfo simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) const{
+chemistryLoadBalancingMethod::sendRecvInfo simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) const{
 
     throw "NOT IMPLEMENTED";
 

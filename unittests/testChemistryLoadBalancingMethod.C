@@ -6,7 +6,52 @@
 
 namespace Foam{
 
+//create some arbitrary data
+DynamicList<chemistryProblem> create_problems(int count){
+
+
+
+    DynamicList<chemistryProblem> problems;
+    
+    for (int i = 0; i < count; ++i){
+        //send data
+        chemistryProblem p;
+        
+        scalarField s(10);
+        s = 32.04; 
+        p.c = s;
+        p.Ti = 13.0;
+        p.pi = 54.0;
+        p.deltaTChem = 0.3;
+        p.cellid = i;
+
+        problems.append(p);
+
+    }
+
+    return problems;
+
+}
+
+
 class testableLoadBalancing : public chemistryLoadBalancingMethod{
+
+public:
+
+
+    //handy for testing
+    void set_test_state(const std::vector<int>& sources, const std::vector<int>& destinations, const std::vector<int>& n_probs) {
+
+        sendRecvInfo i;
+
+        i.sources = sources;
+        i.destinations = destinations;
+        i.number_of_problems = n_probs;
+
+        this->set_state(i);
+  
+    }
+
 
 private:
 
@@ -28,12 +73,28 @@ private:
         return load;
     }
 
+
+    
+
+
+
     sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const override{
-        return sendRecvInfo{};
+        
+        
+        sendRecvInfo i;
+        /*
+        i.sources{};
+        i.destinations{1,2,3}
+        i.number_of_problems{3,3,4};
+        */
+        return i;
+        
+
+
     }
 };
 
-}
+} //namespace Foam
 
 
 
@@ -93,35 +154,9 @@ TEST_CASE("chemistryLoadBalancingMethod Isend_recv()"){
     
     int source = 0;
     int destination = 1;
-    DynamicList<chemistryProblem> send_buffer;
+    DynamicList<chemistryProblem> send_buffer = create_problems(10);
     DynamicList<chemistryProblem> recv_buffer;
 
-    //create some arbitrary data
-    for (size_t i = 0; i < 10; ++i){
-        //send data
-        chemistryProblem p;
-        
-        scalarField s(10);
-        s = 32.04; 
-        p.c = s;
-        p.Ti = 13.0;
-        p.pi = 54.0;
-        p.deltaTChem = 0.3;
-        p.cellid = i;
-
-        send_buffer.append(p);
-
-        //receive data, set to zero here so that checking can be done
-        chemistryProblem p2;
-        s = 0.0; 
-        p2.c = s;
-        p2.Ti = 0.0;
-        p2.pi = 0.0;
-        p2.deltaTChem = 0.0;
-        p2.cellid = 0;
-        
-        recv_buffer.append(p2);
-    }
 
 
     l.Isend_recv(send_buffer, recv_buffer, source, destination);
@@ -138,10 +173,42 @@ TEST_CASE("chemistryLoadBalancingMethod Isend_recv()"){
     }
 
 
-    //REQUIRE_NOTHROW(l.send_recv(problems, 0, 1));
+}
 
-    //Problem p;
+TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
 
+    
 
+    using namespace Foam;
+
+    testableLoadBalancing l;
+
+    std::vector<int> sources;
+    std::vector<int> destinations;
+    std::vector<int> n_problems;
+
+    
+
+    int n_total_problems = 10;
+
+    
+    auto problems = create_problems(n_total_problems);
+    
+    sources = {};
+    destinations = {1,2,3};
+    n_problems = {3,3,2};
+
+    l.set_test_state(sources, destinations, n_problems);
+    
+    auto buffer = l.get_send_buffer(problems);
+
+    
+    for (size_t i = 0; i < destinations.size(); ++i){
+        CHECK(buffer[i].size() == n_problems[i]);
+        
+    }
+    
+
+    
 
 }

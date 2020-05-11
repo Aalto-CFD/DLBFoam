@@ -66,12 +66,22 @@ class chemistryLoadBalancingMethod
 {
 
 public:
+
     struct sendRecvInfo
     {
-        DynamicList<int> sources;             //ranks which send to this process
-        DynamicList<int> destinations;       //ranks to which this process sends to
-        DynamicList<int> number_of_problems; //number of problems which this rank sends/receivs
+        //would like to use DynamicList here but it appears it sucks ass and
+        //nothing works as expected when its used
+        //DynamicList<int> sources;             //ranks which send to this process
+        //DynamicList<int> destinations;       //ranks to which this process sends to
+        //DynamicList<int> number_of_problems; //number of problems which this rank sends/receivs
+
+        std::vector<int> sources;             //ranks which send to this process
+        std::vector<int> destinations;       //ranks to which this process sends to
+        std::vector<int> number_of_problems; //number of problems which this rank sends/receivs
+
     };
+    
+
 
 public:
     // Constructors
@@ -123,11 +133,9 @@ public:
         int start = n_my_problems;
         for (const auto& n : m_current_state.number_of_problems){
 
-            
             int end   = start + n;
-            DynamicList<chemistryProblem> slice;
+            DynamicList<chemistryProblem> slice(n, chemistryProblem());
             std::copy(current.begin() + start, current.begin() + end, slice.begin());
-            //DynamicList<chemistryProblem> slice(current.begin() + start, current.begin() + end);
             send_buffer.append(slice);
             start     = end; 
             
@@ -184,7 +192,19 @@ public:
     //- Destructor
     virtual ~chemistryLoadBalancingMethod() {}
 
+
+
+    
+
 protected:
+
+
+    void set_state(const sendRecvInfo& state) {m_current_state = state; }
+
+
+
+
+
 private:
     ///
     ///@brief Determines the load of this process
