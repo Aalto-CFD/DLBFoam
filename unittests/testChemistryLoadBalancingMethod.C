@@ -62,6 +62,7 @@ public:
         return this->send_recv<ET, CT>(buffer, sources, dests);
     }
    
+    DynamicList<chemistryLoad> test_get_loads() const   {return this->get_loads();}
 
     void update() {
 
@@ -148,7 +149,7 @@ TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 
     testableLoadBalancing l;
 
-    auto loads = l.get_loads();
+    auto loads = l.test_get_loads();
     CHECK(Pstream::nProcs() == loads.size());
 
     CHECK(std::is_sorted(loads.begin(), loads.end()));

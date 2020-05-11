@@ -62,19 +62,13 @@ namespace Foam {
 
 class chemistryLoadBalancingMethod {
 
+private:
+    sendRecvInfo m_current_state;           //the current state of the object 
+
 public:
-
-
-
-    template<class T> using buffer_t = DynamicList<DynamicList<T>>;
-
+    template <class T> using buffer_t = DynamicList<DynamicList<T>>;
 
     struct sendRecvInfo {
-        // would like to use DynamicList here but it appears it sucks ass and
-        // nothing works as expected when its used
-        // DynamicList<int> sources;             //ranks which send to this process
-        // DynamicList<int> destinations;       //ranks to which this process sends to
-        // DynamicList<int> number_of_problems; //number of problems which this rank sends/receivs
 
         std::vector<int> sources;            // ranks which send to this process
         std::vector<int> destinations;       // ranks to which this process sends to
@@ -85,10 +79,6 @@ public:
     // Constructors
     chemistryLoadBalancingMethod() = default;
 
-    
-
-    
-
     ///
     ///@brief Given a list of values splits them evenly between the mpi-processes.
     ///
@@ -96,12 +86,11 @@ public:
     ///@param values values to split
     ///@return buffer_t<T> additional values coming to the current process
     ///
-    template<class T>
-    buffer_t<T> balance(const DynamicList<T>& values) const{
+    template <class T> buffer_t<T> balance(const DynamicList<T>& values) const {
 
         auto sources      = m_current_state.sources;
         auto destinations = m_current_state.destinations;
- 
+
         // TODO: Check only in debug mode
         if (sources.size() != 0 && destinations.size() != 0) {
             throw "A process can be either a source, destination or a do nothinger";
@@ -109,11 +98,10 @@ public:
 
         auto send_buffer = get_send_buffer(values);
 
-        //The unittests currently test such that everyone sends to master which requires a blocking commstype
-        //in reality we dont want to block at this phase
-        //TODO: change to nonBlocking
+        // The unittests currently test such that everyone sends to master which requires a blocking
+        // commstype in reality we dont want to block at this phase
+        // TODO: change to nonBlocking
         return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
-
     }
 
     ///
@@ -123,32 +111,19 @@ public:
     ///@param values values to send back
     ///@return buffer_t<T> values coming back to this process
     ///
-    template<class T>
-    buffer_t<T> unbalance(const buffer_t<T>& values) const{
+    template <class T> buffer_t<T> unbalance(const buffer_t<T>& values) const {
 
         auto sources      = m_current_state.sources;
         auto destinations = m_current_state.destinations;
-   
+
         // TODO: Check only in debug mode
         if (sources.size() != 0 && destinations.size() != 0) {
             throw "A process can be either a source, destination or a do nothinger";
         }
 
-        //It is probably impossible to avoid blocking in this phase
+        // It is probably impossible to avoid blocking in this phase
         return send_recv<T, Pstream::commsTypes::blocking>(values, destinations, sources);
-
     }
-
-    
-
-
-
-    
-
-    
-    //TODO: make private
-    DynamicList<chemistryLoad> get_loads() const;
-    
 
     bool active() const { return true; }
 
@@ -156,7 +131,6 @@ public:
     virtual ~chemistryLoadBalancingMethod() {}
 
 protected:
-
     ///
     ///@brief Sets the current state
     ///
@@ -164,22 +138,26 @@ protected:
     ///
     void set_state(const sendRecvInfo& state) { m_current_state = state; }
 
-    
-
+    ///
+    ///@brief Gathers the load information from all processes
+    ///
+    ///@return DynamicList<chemistryLoad> list size nprocesses of load objects
+    ///
+    DynamicList<chemistryLoad> get_loads() const;
 
     ///
     ///@brief Given a list of problems splits the input list to sublists to be passed to other ranks
     ///
     ///@param all_problems list of problems that this rank has to solve
-    ///@return DynamicList<DynamicList<chemistryProblem>> list of portions to be passed to other ranks
+    ///@return DynamicList<DynamicList<chemistryProblem>> list of portions to be passed to other
+    ///ranks
     ///
     DynamicList<DynamicList<chemistryProblem>>
     get_send_buffer(const DynamicList<chemistryProblem>& all_problems) const;
 
-
     ///
     ///@brief Sends the split send_buffer to sources and receives everything from destinations. Does
-    ///not
+    /// not
     ///       allow for overlapping sources or destinations.
     ///
     ///@tparam ET element type of the send and receive buffers
@@ -194,7 +172,6 @@ protected:
                            const std::vector<int>& sources,
                            const std::vector<int>& destinations) const {
 
-        
         PstreamBuffers pBufs(CT);
 
         for (int i = 0; i < destinations.size(); ++i) {
@@ -210,10 +187,8 @@ protected:
             recv >> recv_buffers[i];
         }
 
-        
         return recv_buffers;
     }
-
 
 private:
     ///
@@ -231,8 +206,7 @@ private:
     ///
     virtual sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
 
-private:
-    sendRecvInfo m_current_state;
+
 };
 
 } // namespace Foam

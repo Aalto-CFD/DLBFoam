@@ -1,30 +1,20 @@
 #include "chemistryProblem.H"
 
-namespace Foam{
+namespace Foam {
 
+Ostream& operator<<(Ostream& os, const chemistryProblem& p) {
 
-Ostream& operator<<(Ostream& os, const chemistryProblem& p){
-
-    
-    /*for (size_t i = 0; i < p.c.size(); ++i){
-        os << p.c[i];
-    }*/
     os << p.c;
     os << p.Ti;
     os << p.pi;
     os << p.deltaTChem;
     os << p.cellid;
 
-
     return os;
 }
 
-
-Istream& operator>>(Istream& is, chemistryProblem& p){
-
-    /*for (size_t i = 0; i < p.c.size(); ++i){
-        is >> p.c[i];
-    }*/
+Istream& operator>>(Istream& is, chemistryProblem& p) {
+    
     is >> p.c;
     is >> p.Ti;
     is >> p.pi;
@@ -32,8 +22,6 @@ Istream& operator>>(Istream& is, chemistryProblem& p){
     is >> p.cellid;
 
     return is;
-
 }
 
-
-}
+} // namespace Foam
