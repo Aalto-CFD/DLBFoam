@@ -2,8 +2,6 @@
 
 namespace Foam {
 
-
-
 DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const {
 
     label nprocs = Pstream::nProcs();
@@ -41,7 +39,7 @@ DynamicList<DynamicList<chemistryProblem>> chemistryLoadBalancingMethod::get_sen
     int start = n_my_problems;
     for (const auto& n : m_current_state.number_of_problems) {
 
-        int end = start + n;
+        int                           end = start + n;
         DynamicList<chemistryProblem> slice(n, chemistryProblem());
         std::copy(all_problems.begin() + start, all_problems.begin() + end, slice.begin());
         send_buffer.append(slice);
@@ -49,6 +47,5 @@ DynamicList<DynamicList<chemistryProblem>> chemistryLoadBalancingMethod::get_sen
     }
     return send_buffer;
 }
-
 
 } // namespace Foam
