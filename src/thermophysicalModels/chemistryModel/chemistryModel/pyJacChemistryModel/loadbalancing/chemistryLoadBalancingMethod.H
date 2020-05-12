@@ -86,7 +86,61 @@ public:
 
 
 
-    //void update_state( SOMEPARAMETERS ) { CALL SET STATE }
+    void update_state() {
+        //- Assumes load array in the shape loads[i] = chemCPUT[i]/meanCPUT
+        //- Assumes that corrections (e.g. too idle ranks) are already made        
+        // TODO: Implement a minCPUTime limit to start considering load balancing        
+        sendRecvInfo curr_state;
+        DynamicList<chemistryLoad> loads  = get_loads();
+        scalar tol2bal = 0.02;   // TODO: Make it user defined        // iterate from largest to smallest to account for efficient filling of the sent data
+        for(int p_i=Pstream::nProcs()-1; p_i>=0; p_i--) 
+        {
+            if(loads[p_i].value >= (1.0+tol2bal))
+            {
+                int nCellsSentTot = 0;
+                // iterate over all ranks which we can send data
+                for(int s_i=0; s_i<p_i; s_i++) 
+                {
+                    // check the relative free space in send rank
+
+                    // amount of data between [0 1] to send 
+                    scalar relFreeSpace = 1.0 - loads[s_i].value;      
+
+                    // relative cell count wrt. average rank             
+                    scalar relData2send = min(relFreeSpace,(loads[p_i].value-1.0));                  
+                    scalar nc_rm = loads[p_i].number_of_active_cells * (1.0/max(loads[p_i].value,1e-12));
+                    
+                    // Prevent sending more data then nActiveCells sender has                 
+                    int nCells2Send = floor(relData2send * nc_rm);                
+                    int nCellsSentTot_tmp = nCellsSentTot + nCells2Send;
+                    if( nCellsSentTot_tmp >= loads[p_i].number_of_active_cells) 
+                    {
+                        nCells2Send = nCells2Send - (nCellsSentTot_tmp - loads[p_i].number_of_active_cells) - 2;
+                    }
+                    nCellsSentTot += nCells2Send;                           
+                    if( (loads[p_i].value > (1.0+tol2bal))  && (relFreeSpace > tol2bal) && (nCells2Send>1) )
+                    {
+                        loads[p_i].value -= relData2send;
+                        loads[s_i].value += relData2send;                    
+                        int pid_s = loads[p_i].rank;   // Sender rank id
+                        int pid_r = loads[s_i].rank;   // Receiver rank id                    
+                        if(pid_s == Pstream::myProcNo())
+                        {
+                            curr_state.destinations.push_back(pid_r);
+                            curr_state.number_of_problems.push_back(nCells2Send);
+                        }
+                        else if(pid_r == Pstream::myProcNo())
+                        {
+                            curr_state.sources.push_back(pid_s);
+                            curr_state.number_of_problems.push_back(nCells2Send);
+                        }
+                    }           
+                }
+            }
+        }        
+        set_state(curr_state);
+    }
+
 
 
 
