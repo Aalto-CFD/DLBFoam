@@ -62,8 +62,7 @@ namespace Foam {
 
 class chemistryLoadBalancingMethod {
 
-private:
-    sendRecvInfo m_current_state; // the current state of the object
+
 
 public:
     template <class T> using buffer_t = DynamicList<DynamicList<T>>;
@@ -74,6 +73,9 @@ public:
         std::vector<int> destinations;       // ranks to which this process sends to
         std::vector<int> number_of_problems; // number of problems which this rank sends/receivs
     };
+
+private:
+    sendRecvInfo m_current_state; // the current state of the object
 
 public:
 
