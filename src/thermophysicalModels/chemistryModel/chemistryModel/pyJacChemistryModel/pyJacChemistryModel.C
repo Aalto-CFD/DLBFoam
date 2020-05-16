@@ -125,10 +125,9 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
         //- Enthalpy of formation for all species
         // sp_enth_form_ "note underscore" is a tmp variable to avoid problems 
         // in pyJac function call.
-        double sp_enth_form_[nSpecie_]; 
-        memset( sp_enth_form_, 0.0, nSpecie_*sizeof(double));
+        std::vector<double> sp_enth_form_(nSpecie_,0.0);
         //- Enthalpy of formation is taken from pyJac at T-standard     
-        eval_h(298.15,sp_enth_form_);         
+        eval_h(298.15,sp_enth_form_.data());         
         for(int i=0; i<nSpecie_; i++)
         {
             sp_enth_form[i] = sp_enth_form_[i];
@@ -283,8 +282,9 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
 
     //TODO: pre-allocate me!
     //the '()' operator at the end sets the chunk to zero
-    double* yToPyJac = new double[nSpecie_ + 1]();
-    double* dy = new double[nSpecie_]();
+    std::vector<double> yToPyJac(nSpecie_+1,0.0);
+    std::vector<double> dy(nSpecie_,0.0);
+
    
 
     const scalar T = c[0];
@@ -308,7 +308,7 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
     yToPyJac[nSpecie_] = c_[nSpecie_-1];    
 
     // call pyJac RHS function
-    dydt(0,p,yToPyJac,dy);
+    dydt(0,p,yToPyJac.data(),dy.data());
     for (label i=0; i<nSpecie_; i++)
     {
     	dcdt[i] = dy[i];
@@ -316,8 +316,6 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
     // dp/dt = 0
     dcdt[nSpecie_] = 0.0;
 
-    delete [] yToPyJac;
-    delete [] dy;
 
 }
 
@@ -331,10 +329,8 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
     scalarSquareMatrix& J
 ) const
 {
-    //TODO: pre-allocate me!
-    //the '()' operator at the end sets the chunk to zero
-    double* yToPyJac = new double[nSpecie_ + 1]();
-    double* jac = new double[nSpecie_ * nSpecie_]();
+    std::vector<double> yToPyJac(nSpecie_+1,0.0);
+    std::vector<double> jac(nSpecie_*nSpecie_,0.0);
 
     J = Zero;
     dcdt = Zero;
@@ -360,7 +356,7 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
     yToPyJac[nSpecie_] = c_[nSpecie_-1];
     
     // call pyJac Jacobian evaluation
-    eval_jacob (0, p, yToPyJac, jac);
+    eval_jacob (0, p, yToPyJac.data(), jac.data());
 
     int k=0;
     for (label j=0; j<nSpecie_; j++)
@@ -378,11 +374,6 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
         J[nSpecie_][j] = 0.0;
         J[j][nSpecie_] = 0.0;
     }
-
-
-    delete [] yToPyJac;
-    delete [] jac;
-
 
 }
 
@@ -511,14 +502,31 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculate()
     );
 }
 
+template<class ReactionThermo, class ThermoType>
+Foam::List<Foam::chemistrySolution> Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve_problems(Foam::DynamicList<Foam::chemistryProblem>& problems)
+{
+    List<chemistrySolution> chem_solns(problems.size());
+
+    for (int i = 0; i < chem_solns.size(); i++)
+    {
+        chem_solns[i] = callODE(problems[i]);
+    }
+    return chem_solns;
+
+}
+
 
 template<class ReactionThermo, class ThermoType>
-Foam::DynamicList<Foam::chemistryProblem> Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_)
+Foam::DynamicList<Foam::chemistryProblem> Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_,const scalar& deltaT)
 {
 
+    // TODO: Add refcell and Treact as conditions to get problems.
     DynamicList<chemistryProblem> chem_problems;
     const scalarField& T = this->thermo().T();
     const scalarField& p = this->thermo().p();
+    tmp<volScalarField> trho(this->thermo().rho());
+    const scalarField& rho = trho();
+   
     forAll(p,celli)
     {
 
@@ -527,13 +535,16 @@ Foam::DynamicList<Foam::chemistryProblem> Foam::pyJacChemistryModel<ReactionTher
             c_[i] = Y_[i][celli];
         }
 
+        // Create the problem
         chemistryProblem problem;
         problem.pi = p[celli];
         problem.Ti = T[celli];
         problem.c = c_;
+        problem.rhoi = rho[celli];
         problem.deltaTChem = this->deltaTChem_[celli];
         problem.cellid = celli;
-        
+        problem.deltaT = deltaT;
+      
         if (refcell_mapper_->active())
         {
             if(!refcell_mapper_-> applyMapping(Y_,celli))
@@ -541,13 +552,45 @@ Foam::DynamicList<Foam::chemistryProblem> Foam::pyJacChemistryModel<ReactionTher
                 chem_problems.append(problem);
             }
         }
-        //Why should we want to append if the problem wont be solved?
         else
         {
             chem_problems.append(problem);
         }
     }
     return chem_problems;
+}
+
+
+template<class ReactionThermo, class ThermoType>
+Foam::chemistrySolution Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::callODE(Foam::chemistryProblem& prob)
+{
+
+    chemistrySolution soln;
+    soln.cellid = prob.cellid;
+    //- Initialize the time progress    
+    scalar timeLeft = prob.deltaT;
+
+    scalarList c0 = prob.c;
+    // Calculate the chemical source terms
+    while (timeLeft > small)
+    {
+        scalar dt = timeLeft;
+       
+        this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        timeLeft -= dt;
+    }
+    scalarList RRtmp(this->nSpecie_,0.0);
+    soln.c = prob.c;
+    //RR_ should be weighted by density, due to NS formulation. rr = Y0-Y1 / dt, but RR_ = rho(Y0-Y1)/dt , the effect at Sh() function too!
+    for (label i=0; i<this->nSpecie_; i++)
+    {
+        RRtmp[i] = prob.rhoi*(soln.c[i] - c0[i])/prob.deltaT; 
+    }
+    soln.RR = RRtmp;
+
+    soln.deltaTChem = min(prob.deltaTChem, this->deltaTChemMax_);
+    
+    return soln;
 }
 
 
@@ -567,19 +610,27 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
     {
         return deltaTMin;
     }
+    const scalar deltaT_ = deltaT[0];  // TODO: Check if this is true (all cells have same deltaT)
 
-    tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField& rho = trho();
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-    get_problems(Y_);
+    // This assumes no refMapping, all the cells are in problems list
+    DynamicList<chemistryProblem> problems = get_problems(Y_,deltaT_);
+
+    List<chemistrySolution> solutions = solve_problems(problems);
+    for (int i = 0; i < solutions.size(); i++)
+    {
+        label celli = solutions[i].cellid;
+        for (label j=0; j<nSpecie_; j++)
+        {
+            RR_[j][celli] = solutions[i].RR[j];
+        }
+        deltaTMin = min(solutions[i].deltaTChem, deltaTMin);
+        this->deltaTChem_[celli] = min(solutions[i].deltaTChem, this->deltaTChemMax_);   
+    }
+
+    return deltaTMin;
 
 
-
-    scalarField c0(nSpecie_);
-
-
-
+/*
     //- Create the reference solutions
     scalarList c_ref(nSpecie_,0.0);
     scalarList RR_ref(nSpecie_,0.0);
@@ -622,8 +673,11 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
             prob.pi = p[celli];
             prob.Ti = Ti;
             prob.c = c_;
+            prob.rhoi = rhoi;
             prob.deltaTChem = this->deltaTChem_[celli];
             prob.cellid = celli;
+            prob.deltaT = deltaT[celli];
+            chemistrySolution soln;
             //- Refcell implementation
             if (refcell_mapper_->active())
             {
@@ -635,17 +689,14 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                     refCellFound = refcell_mapper_-> applyMapping(Y_,celli); 
                     if(refCellFound)
                     {
-                        #include "callODE.H"
-                        this->deltaTChem_[celli] = min(prob.deltaTChem, this->deltaTChemMax_);
+                        soln = callODE(prob);
                         for (label i=0; i<nSpecie_; i++)
                         {
-                            RR_ref[i] = this->RR_[i][celli];
-                            c_ref[i] = this->c_[i];
+                            RR_ref[i] = soln.RR[i];
+                            c_ref[i] = soln.c[i];
                         }
                     }
-                    #include "callODE.H"
-                    //- chem_problems only include cells available for load balancing
-                    this->deltaTChem_[celli] = min(prob.deltaTChem, this->deltaTChemMax_);
+                    soln = callODE(prob);
                     nActiveCells++;   
 
                 }
@@ -659,20 +710,24 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
                 }
                 else
                 {
-                    #include "callODE.H"
-                    //- chem_problems only include cells available for load balancing
-                    this->deltaTChem_[celli] = min(prob.deltaTChem, this->deltaTChemMax_);
+                    soln = callODE(prob);
                     nActiveCells++;
                 }
             }
             else
             {
-                #include "callODE.H"
-                //- chem_problems only include cells available for load balancing
-                this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
+                soln = callODE(prob);
                 nActiveCells++;
 
             }
+
+            for (label i=0; i<nSpecie_; i++)
+            {
+                RR_[i][celli] = soln.RR[i];
+                c_[i] = soln.c[i];
+            }
+            deltaTMin = min(soln.deltaTChem, deltaTMin);
+            this->deltaTChem_[celli] = min(soln.deltaTChem, this->deltaTChemMax_);
         }
         else
         {
@@ -687,8 +742,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
     }
     Info<<"Number of active cells is : "<<nActiveCells<<endl;
-
-    return deltaTMin;
+*/
 }
 
 

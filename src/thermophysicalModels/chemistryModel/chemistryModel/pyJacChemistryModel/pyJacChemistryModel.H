@@ -54,7 +54,7 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "volFields.H"
 #include "simpleMatrix.H"
 #include <memory> //std::unique_ptr
-
+#include <vector> //std::vector
 
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"
@@ -335,8 +335,9 @@ public:
 
 
 private:
-    void callODE(scalar timeLeft, scalarField& c, scalar& T, scalar& p, scalar& chemDt);
-    Foam::DynamicList<Foam::chemistryProblem> get_problems(PtrList<volScalarField>& Y_);
+    Foam::chemistrySolution callODE(chemistryProblem& problem);
+    Foam::DynamicList<Foam::chemistryProblem> get_problems(PtrList<volScalarField>& Y_,const scalar& deltaT);
+    Foam::List<Foam::chemistrySolution> solve_problems(Foam::DynamicList<Foam::chemistryProblem>& problems);
 
 
 

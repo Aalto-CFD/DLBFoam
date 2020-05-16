@@ -9,7 +9,9 @@ struct chemistryProblem {
     scalarField c;
     scalar      Ti;
     scalar      pi;
+    scalar      rhoi;
     scalar      deltaTChem;
+    scalar      deltaT;
     label       cellid;
 
     // TODO: implement!

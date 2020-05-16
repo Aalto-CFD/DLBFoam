@@ -5,8 +5,10 @@
 namespace Foam {
 
 struct chemistrySolution {
-    scalar val;
-    int    cellid;
+    scalarList c;
+    scalarList RR;
+    scalar deltaTChem;
+    label    cellid;
 
     // TODO: implement!
     bool operator==(const chemistrySolution& rhs) const { return false; }
