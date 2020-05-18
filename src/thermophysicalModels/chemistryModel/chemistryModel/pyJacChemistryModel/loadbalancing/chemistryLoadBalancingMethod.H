@@ -77,6 +77,10 @@ public:
 private:
     sendRecvInfo m_current_state; // the current state of the object
 
+    //TODO: make user input
+    static constexpr scalar m_tolerance_to_balance = 0.02;
+
+
 public:
 
 
@@ -92,11 +96,10 @@ public:
         // TODO: Implement a minCPUTime limit to start considering load balancing        
         sendRecvInfo curr_state;
         DynamicList<chemistryLoad> loads  = get_loads();
-        scalar tol2bal = 0.02;   // TODO: Make it user defined        
         // iterate from largest to smallest to account for efficient filling of the sent data
         for(int sender_idx=Pstream::nProcs()-1; sender_idx>=0; sender_idx--) 
         {
-            if(loads[sender_idx].value >= (1.0+tol2bal))
+            if(loads[sender_idx].value >= (1.0+m_tolerance_to_balance))
             {
                 int nCellsSentTot = 0;
                 // iterate over all ranks which we can send data
@@ -147,8 +150,7 @@ public:
 
     bool large_sender(const chemistryLoad& load) const
     {
-        int tol2bal = 0.02;  // TODO: Make it user defined and in constructor
-        if(load.value>1.0+tol2bal)
+        if(load.value>1.0+m_tolerance_to_balance)
         {
             return true;
         }
@@ -160,8 +162,7 @@ public:
 
     bool small_receiver(const chemistryLoad& load) const
     {
-        int tol2bal = 0.02;  // TODO: Make it user defined and in constructor
-        if(load.value < 1.0-tol2bal)
+        if(load.value < 1.0-m_tolerance_to_balance)
         {
             return true;
         }
