@@ -104,7 +104,7 @@ public:
                 {
                     int nCells2Send = ncells_to_send(loads, sender_idx, receiver_idx, nCellsSentTot);
                     nCellsSentTot +=  nCells2Send;                         
-                    if(large_sender(loads,sender_idx)  && small_receiver(loads,receiver_idx))
+                    if(large_sender(loads[sender_idx])  && small_receiver(loads[receiver_idx]))
                     {    
                         update_load(loads, sender_idx, receiver_idx);                
                         if(loads[sender_idx].rank  == Pstream::myProcNo())
@@ -145,10 +145,10 @@ public:
         return nCells2Send; 
     }
 
-    bool large_sender(const DynamicList<chemistryLoad>& loads, const int& idx)
+    bool large_sender(const chemistryLoad& load) const
     {
         int tol2bal = 0.02;  // TODO: Make it user defined and in constructor
-        if(loads[idx].value>1.0+tol2bal)
+        if(load.value>1.0+tol2bal)
         {
             return true;
         }
@@ -158,10 +158,10 @@ public:
         }
     }
 
-    bool small_receiver(const DynamicList<chemistryLoad>& loads, const int& idx)
+    bool small_receiver(const chemistryLoad& load) const
     {
         int tol2bal = 0.02;  // TODO: Make it user defined and in constructor
-        if(loads[idx].value < 1.0-tol2bal)
+        if(load.value < 1.0-tol2bal)
         {
             return true;
         }
