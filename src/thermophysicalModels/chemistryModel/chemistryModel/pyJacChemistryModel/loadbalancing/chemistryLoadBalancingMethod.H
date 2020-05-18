@@ -107,9 +107,10 @@ public:
                 {
                     int nCells2Send = ncells_to_send(loads, sender_idx, receiver_idx, nCellsSentTot);
                     nCellsSentTot +=  nCells2Send;                         
-                    if(large_sender(loads[sender_idx])  && small_receiver(loads[receiver_idx]))
+                    if( large_sender(loads[sender_idx])  && small_receiver(loads[receiver_idx]) )
                     {    
-                        update_load(loads, sender_idx, receiver_idx);                
+                        update_load( loads[sender_idx], loads[receiver_idx] );
+
                         if(loads[sender_idx].rank  == Pstream::myProcNo())
                         {
                             curr_state.destinations.push_back(loads[receiver_idx].rank);
@@ -127,10 +128,12 @@ public:
         set_state(curr_state);
     }
 
-    void update_load(DynamicList<chemistryLoad>& loads, const int& sender_idx, const int& receiver_idx)
-    {                       
-        loads[sender_idx].value -= min(1.0-loads[receiver_idx].value,loads[sender_idx].value-1.0); 
-        loads[receiver_idx].value += min(1.0-loads[receiver_idx].value,loads[sender_idx].value-1.0); 
+    
+
+    void update_load(chemistryLoad& sender_load, chemistryLoad& receiver_load) const
+    {
+        sender_load.value -= min(1.0 - receiver_load.value, sender_load.value - 1.0);
+        receiver_load.value += min(1.0 - receiver_load.value, sender_load.value - 1.0);
     }
 
     int ncells_to_send(const DynamicList<chemistryLoad>& loads, const int& sender_idx, const int& receiver_idx, const int& nCellsSentTot)
@@ -154,10 +157,7 @@ public:
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     bool small_receiver(const chemistryLoad& load) const
@@ -166,10 +166,7 @@ public:
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
 
