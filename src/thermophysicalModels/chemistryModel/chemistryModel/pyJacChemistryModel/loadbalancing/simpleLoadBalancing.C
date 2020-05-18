@@ -5,26 +5,14 @@ namespace Foam{
 
 chemistryLoadBalancingMethod::sendRecvInfo simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) const{
 
-    throw "NOT IMPLEMENTED";
+    //std::vector<int> sources;            // ranks which send to this process
+    //    std::vector<int> destinations;       // ranks to which this process sends to
+    //    std::vector<int> number_of_problems; // number of problems which this rank sends/receivs
+    sendRecvInfo ret;
+    ret.sources = {};
+    ret.destinations = {};
+    ret.number_of_problems = {};
 
-    /*
-    size_t n = loads.size();
-
-    
-    int my_order = 0;
-    for (int i = 0; i < n; ++i){
-        if (loads[i].rank == Pstream::Pstream::myProcNo()){
-            my_order = i;
-            break;
-        }
-
-    }
-
-    //TODO:: make do nothing possible
-    if (my_order < 0.5 * n){
-        return WHATTODO::e_SENDER;
-    }
-    */
     return sendRecvInfo{};
  
 

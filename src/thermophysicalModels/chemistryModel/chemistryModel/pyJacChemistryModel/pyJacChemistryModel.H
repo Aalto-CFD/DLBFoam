@@ -257,8 +257,15 @@ public:
     solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
 
 private:
-    chemistrySolution              solve(chemistryProblem& problem);
-    DynamicList<chemistrySolution> solve(DynamicList<chemistryProblem>& problems);
+    chemistrySolution              solve_single(chemistryProblem& problem) const;
+    DynamicList<chemistrySolution> solve_list(DynamicList<chemistryProblem>& problems) const;
+
+    chemistryLoadBalancingMethod::buffer_t<chemistrySolution> solve_buffer(chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const;
+
+
+
+
+
 
     DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const scalar& deltaT);
 

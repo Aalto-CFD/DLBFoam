@@ -343,15 +343,6 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::calculate() {
 }
 
 template <class ReactionThermo, class ThermoType>
-DynamicList<chemistrySolution> pyJacChemistryModel<ReactionThermo, ThermoType>::solve(
-    DynamicList<chemistryProblem>& problems) {
-    DynamicList<chemistrySolution> chem_solns(problems.size(), chemistrySolution());
-
-    for (int i = 0; i < chem_solns.size(); i++) { chem_solns[i] = solve(problems[i]); }
-    return chem_solns;
-}
-
-template <class ReactionThermo, class ThermoType>
 DynamicList<chemistryProblem>
 pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_,
                                                               const scalar&            deltaT) {
@@ -387,7 +378,8 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
 }
 
 template <class ReactionThermo, class ThermoType>
-chemistrySolution pyJacChemistryModel<ReactionThermo, ThermoType>::solve(chemistryProblem& prob) {
+chemistrySolution
+pyJacChemistryModel<ReactionThermo, ThermoType>::solve_single(chemistryProblem& prob) const {
 
     chemistrySolution soln;
     soln.cellid = prob.cellid;
@@ -417,27 +409,66 @@ chemistrySolution pyJacChemistryModel<ReactionThermo, ThermoType>::solve(chemist
 }
 
 template <class ReactionThermo, class ThermoType>
+DynamicList<chemistrySolution> pyJacChemistryModel<ReactionThermo, ThermoType>::solve_list(
+    DynamicList<chemistryProblem>& problems) const {
+
+    DynamicList<chemistrySolution> chem_solns(problems.size(), chemistrySolution());
+
+    for (size_t i = 0; i < chem_solns.size(); i++) { chem_solns[i] = solve_single(problems[i]); }
+    return chem_solns;
+}
+
+template <class ReactionThermo, class ThermoType>
+chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
+pyJacChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
+    chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const {
+
+    chemistryLoadBalancingMethod::buffer_t<chemistrySolution> ret;
+
+    for (size_t i = 0; i < problems.size(); ++i) { ret.append(solve_list(problems[i])); }
+    return ret;
+}
+
+template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
 scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& deltaT) {
+
+    using problem_buffer_t  = chemistryLoadBalancingMethod::buffer_t<chemistryProblem>;
+    using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
+
     BasicChemistryModel<ReactionThermo>::correct();
 
     if (!this->chemistry_) { return great; }
     const scalar deltaT_ = deltaT[0]; // TODO: Check if this is true (all cells have same deltaT)
 
     // This assumes no refMapping, all the cells are in problems list
-    DynamicList<chemistryProblem> problems = get_problems(Y_, deltaT_);
+    DynamicList<chemistryProblem> my_problems = get_problems(Y_, deltaT_);
 
-    DynamicList<chemistrySolution> solutions = solve(problems);
+    load_balancer_->update_state(my_problems);
 
-    scalar deltaTMin = update_reaction_rates(solutions);
+    problem_buffer_t additional_problems = load_balancer_->balance(my_problems);
+
+    //THIS IS CURRENTLY WRONG, 'my_problems are not shortened by load_balancer', meaning that 
+    //all problems of this process are currently solved even if sent to other process for solving
+    //TODO: make load_balancer_->balance put the remaining my_problems also to buffer
+    DynamicList<chemistrySolution> my_solutions = solve_list(my_problems);
+
+    solution_buffer_t additional_solutions = solve_buffer(additional_problems);
+
+    solution_buffer_t solutions_to_me = load_balancer_->unbalance(additional_solutions);
+
+    
+
+    solutions_to_me.append(my_solutions);
+    
+    scalar deltaTMin = great;
+    for (size_t i = 0; i < solutions_to_me.size(); ++i){
+
+        deltaTMin = update_reaction_rates(my_solutions);
+    }
 
     return deltaTMin;
 }
-
-
-
-
-
 
 template <class ReactionThermo, class ThermoType>
 scalar pyJacChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(
