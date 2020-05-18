@@ -84,6 +84,7 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel(ReactionThe
     // thermo.composition());
 
     load_balancer_ = new simpleLoadBalancing();
+    //load_balancer_ = new bulutLoadBalancing();
 
     if (this->chemistry_) {
 
@@ -368,11 +369,14 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
         problem.cellid     = celli;
         problem.deltaT     = deltaT;
 
-        if (refcell_mapper_->active()) {
+        chem_problems.append(problem);
+
+        //This was not working
+        /*if (refcell_mapper_->active()) {
             if (!refcell_mapper_->applyMapping(Y_, celli)) { chem_problems.append(problem); }
         } else {
             chem_problems.append(problem);
-        }
+        }*/
     }
     return chem_problems;
 }
@@ -444,10 +448,13 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
     // This assumes no refMapping, all the cells are in problems list
     DynamicList<chemistryProblem> my_problems = get_problems(Y_, deltaT_);
 
+
+
     load_balancer_->update_state(my_problems);
 
     problem_buffer_t additional_problems = load_balancer_->balance(my_problems);
 
+    
     //THIS IS CURRENTLY WRONG, 'my_problems are not shortened by load_balancer', meaning that 
     //all problems of this process are currently solved even if sent to other process for solving
     //TODO: make load_balancer_->balance put the remaining my_problems also to buffer
@@ -457,17 +464,20 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
 
     solution_buffer_t solutions_to_me = load_balancer_->unbalance(additional_solutions);
 
-    
-
     solutions_to_me.append(my_solutions);
-    
+
     scalar deltaTMin = great;
     for (size_t i = 0; i < solutions_to_me.size(); ++i){
 
-        deltaTMin = update_reaction_rates(my_solutions);
+        scalar temp = update_reaction_rates(my_solutions);
+        if (temp < deltaTMin) {
+            deltaTMin = temp;
+        } 
     }
 
     return deltaTMin;
+    
+   return 0;
 }
 
 template <class ReactionThermo, class ThermoType>

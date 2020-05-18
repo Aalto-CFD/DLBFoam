@@ -59,6 +59,7 @@ src/thermophysicalModels/chemistryModel/chemistryModel/StandardChemistryModel/St
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"
 #include "simpleLoadBalancing.H"
+#include "bulutLoadBalancing.H"
 #include "simpleRefMapping.H" //TODO: create a factory class that returns the correct ref cell mapper
 
 // pyJac dependencies

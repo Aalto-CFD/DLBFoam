@@ -106,6 +106,7 @@ public:
         auto sources      = m_current_state.sources;
         auto destinations = m_current_state.destinations;
 
+        
         // TODO: Check only in debug mode
         if (sources.size() != 0 && destinations.size() != 0) {
             throw "A process can be either a source, destination or a do nothinger";
@@ -116,7 +117,9 @@ public:
         // The unittests currently test such that everyone sends to master which requires a blocking
         // commstype in reality we dont want to block at this phase
         // TODO: change to nonBlocking
-        return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
+       return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
+        
+       
     }
 
 
@@ -177,6 +180,11 @@ public:
 
 
 protected:
+
+
+    size_t get_my_load_index(const DynamicList<chemistryLoad>& loads) const;
+
+
     ///
     ///@brief Sets the current state
     ///

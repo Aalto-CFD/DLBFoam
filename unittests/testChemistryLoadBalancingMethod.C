@@ -276,16 +276,17 @@ TEST_CASE("chemistryLoadBalancingMethod balance() / unbalance()"){
 
     
 
-    /*
+    
     using namespace Foam;
 
     
 
     testableLoadBalancing l;
 
-    l.update();
-
     auto problems = create_problems(50);
+    l.update_state(problems);
+
+    
 
 
     for (const auto& p : problems ){
@@ -314,7 +315,7 @@ TEST_CASE("chemistryLoadBalancingMethod balance() / unbalance()"){
 
     
     
-    */
+    
     
     
 

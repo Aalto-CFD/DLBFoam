@@ -11,6 +11,14 @@ chemistryLoad chemistryLoadBalancingMethod::get_my_load(const DynamicList<chemis
 }
 
 
+size_t chemistryLoadBalancingMethod::get_my_load_index(const DynamicList<chemistryLoad>& loads) const {
+
+    for (size_t i = 0; i < loads.size(); ++i){
+        if (loads[i].rank == Pstream::myProcNo()) return i;
+    }
+
+    throw "Could not find my rank from loads.";
+}
 
 
 
@@ -41,6 +49,8 @@ DynamicList<DynamicList<chemistryProblem>> chemistryLoadBalancingMethod::get_sen
 
     int total_send_count = std::accumulate(
         m_current_state.number_of_problems.begin(), m_current_state.number_of_problems.end(), 0);
+
+
     // TODO: only in debug mode
     if (n_problems < total_send_count) {
         throw "number of send problems more than the current problem count";
