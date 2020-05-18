@@ -34,11 +34,10 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #include "clockTime.H"
 
 
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+namespace Foam{
 
 template<class ReactionThermo, class ThermoType>
-Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
+ pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 (
     ReactionThermo& thermo
 )
@@ -166,7 +165,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class ReactionThermo, class ThermoType>
-Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::
+ pyJacChemistryModel<ReactionThermo, ThermoType>::
 ~pyJacChemistryModel()
 {
     //TODO: use a smart pointer so this can be removed!
@@ -178,7 +177,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ReactionThermo, class ThermoType>
-void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omega
+void  pyJacChemistryModel<ReactionThermo, ThermoType>::omega
 ( 
     const scalarField& c,
     const scalar T,
@@ -200,7 +199,7 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omega
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omegaI
+ scalar  pyJacChemistryModel<ReactionThermo, ThermoType>::omegaI
 (
     const label index,
     const scalarField& c,
@@ -236,7 +235,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omegaI
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omega
+ scalar  pyJacChemistryModel<ReactionThermo, ThermoType>::omega
 (
     const Reaction<ThermoType>& R,
     const scalarField& c,
@@ -272,7 +271,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::omega
 
 
 template<class ReactionThermo, class ThermoType>
-void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
+void  pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
 (
     const scalar time,
     const scalarField& c,
@@ -321,7 +320,7 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
 
 
 template<class ReactionThermo, class ThermoType>
-void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
+void  pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
 (
     const scalar t,
     const scalarField& c,
@@ -379,8 +378,8 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::tmp<Foam::volScalarField>
-Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::tc() const
+ tmp< volScalarField>
+ pyJacChemistryModel<ReactionThermo, ThermoType>::tc() const
 {
     notImplemented
     (
@@ -411,8 +410,8 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::tc() const
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::tmp<Foam::volScalarField>
-Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::Qdot() const
+ tmp< volScalarField>
+ pyJacChemistryModel<ReactionThermo, ThermoType>::Qdot() const
 {
     tmp<volScalarField> tQdot
     (
@@ -450,8 +449,8 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::Qdot() const
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::tmp<Foam::DimensionedField<Foam::scalar, Foam::volMesh>>
-Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculateRR
+ tmp< DimensionedField< scalar,  volMesh>>
+ pyJacChemistryModel<ReactionThermo, ThermoType>::calculateRR
 (
     const label ri,
     const label si
@@ -489,7 +488,7 @@ Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculateRR
 
 
 template<class ReactionThermo, class ThermoType>
-void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculate()
+void  pyJacChemistryModel<ReactionThermo, ThermoType>::calculate()
 {
     if (!this->chemistry_)
     {
@@ -503,7 +502,7 @@ void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::calculate()
 }
 
 template<class ReactionThermo, class ThermoType>
-Foam::List<Foam::chemistrySolution> Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve_problems(Foam::DynamicList<Foam::chemistryProblem>& problems)
+ List< chemistrySolution>  pyJacChemistryModel<ReactionThermo, ThermoType>::solve_problems( DynamicList< chemistryProblem>& problems)
 {
     List<chemistrySolution> chem_solns(problems.size());
 
@@ -517,7 +516,7 @@ Foam::List<Foam::chemistrySolution> Foam::pyJacChemistryModel<ReactionThermo, Th
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::DynamicList<Foam::chemistryProblem> Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_,const scalar& deltaT)
+ DynamicList< chemistryProblem>  pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_,const scalar& deltaT)
 {
 
     // TODO: Add refcell and Treact as conditions to get problems.
@@ -562,7 +561,7 @@ Foam::DynamicList<Foam::chemistryProblem> Foam::pyJacChemistryModel<ReactionTher
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::chemistrySolution Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::callODE(Foam::chemistryProblem& prob)
+ chemistrySolution  pyJacChemistryModel<ReactionThermo, ThermoType>::callODE( chemistryProblem& prob)
 {
 
     chemistrySolution soln;
@@ -597,7 +596,7 @@ Foam::chemistrySolution Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::c
 
 template<class ReactionThermo, class ThermoType>
 template<class DeltaTType>
-Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
+ scalar  pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 (
     const DeltaTType& deltaT
 )
@@ -748,7 +747,7 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
+ scalar  pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 (
     const scalar deltaT
 )
@@ -763,13 +762,17 @@ Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 
 
 template<class ReactionThermo, class ThermoType>
-Foam::scalar Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::solve
+ scalar  pyJacChemistryModel<ReactionThermo, ThermoType>::solve
 (
     const scalarField& deltaT
 )
 {
     return this->solve<scalarField>(deltaT);
 }
+
+
+
+} //namespace Foam
 
 
 // ************************************************************************* //

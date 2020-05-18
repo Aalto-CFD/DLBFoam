@@ -25,6 +25,11 @@ public:
     bulutLoadBalancing() = default;
 
 
+private:
+
+    sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const override;
+
+
 
 private:
 
@@ -33,7 +38,7 @@ private:
     static constexpr scalar m_tolerance_to_balance = 0.02;
 
 
-    sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const override;
+    
 
     
     void update_load(chemistryLoad& sender_load, chemistryLoad& receiver_load) const;
