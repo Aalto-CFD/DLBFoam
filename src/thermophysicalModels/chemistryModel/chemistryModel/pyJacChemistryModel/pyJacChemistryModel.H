@@ -33,8 +33,9 @@ SourceFiles
     pyJacChemistryModelI.H
     pyJacChemistryModel.C
 
-Base OF-dev git commit : 09e6c93d4a7f2abb20243da013952c8a9369a9f2 
-Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/StandardChemistryModel/StandardChemistryModel.H
+Base OF-dev git commit : 09e6c93d4a7f2abb20243da013952c8a9369a9f2
+Base OF-dev file path :
+src/thermophysicalModels/chemistryModel/chemistryModel/StandardChemistryModel/StandardChemistryModel.H
 
 \*---------------------------------------------------------------------------*/
 
@@ -47,72 +48,58 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistryModel/S
 #define OWN_DEBUG_VAR 0
 #endif
 
-
 #include "BasicChemistryModel.H"
-#include "Reaction.H"
 #include "ODESystem.H"
-#include "volFields.H"
+#include "Reaction.H"
 #include "simpleMatrix.H"
+#include "volFields.H"
 #include <memory> //std::unique_ptr
 #include <vector> //std::vector
 
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"
+#include "simpleLoadBalancing.H"
 #include "simpleRefMapping.H" //TODO: create a factory class that returns the correct ref cell mapper
-#include "simpleLoadBalancing.H" 
 
-//pyJac dependencies
-extern "C" {	
-    #include "chem_utils.h"
-    #include "dydt.h"
-    #include "jacob.h"
+// pyJac dependencies
+extern "C" {
+#include "chem_utils.h"
+#include "dydt.h"
+#include "jacob.h"
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
+namespace Foam {
 
 // Forward declaration of classes
 class fvMesh;
 
-
-
-  
-  
 /*---------------------------------------------------------------------------*\
                       Class pyJacChemistryModel Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class ReactionThermo, class ThermoType>
-class pyJacChemistryModel
-:
-    public BasicChemistryModel<ReactionThermo>,
-    public ODESystem
-{
+template <class ReactionThermo, class ThermoType>
+class pyJacChemistryModel : public BasicChemistryModel<ReactionThermo>, public ODESystem {
     // Private Member Functions
 
-        //- Solve the reaction system for the given time step
-        //  of given type and return the characteristic time
-        template<class DeltaTType>
-        scalar solve(const DeltaTType& deltaT);
+    //- Solve the reaction system for the given time step
+    //  of given type and return the characteristic time
+    template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
-        //- Disallow copy constructor
-        pyJacChemistryModel(const pyJacChemistryModel&);
+    //- Disallow copy constructor
+    pyJacChemistryModel(const pyJacChemistryModel&);
 
-        //- Disallow default bitwise assignment
-        void operator=(const pyJacChemistryModel&);
-
+    //- Disallow default bitwise assignment
+    void operator=(const pyJacChemistryModel&);
 
 protected:
+    typedef ThermoType thermoType; // what is this??
 
-    typedef ThermoType thermoType; //what is this??
+    // Ref cell mapper
+    // autoPtr<chemistryRefMappingMethod<ReactionThermo, ThermoType>> refcell_mapper_;
 
-      // Ref cell mapper
-    //autoPtr<chemistryRefMappingMethod<ReactionThermo, ThermoType>> refcell_mapper_;
-
-
-    //TODO: DO NOT USE A RAW POINTER        
+    // TODO: DO NOT USE A RAW POINTER
     chemistryRefMappingMethod* refcell_mapper_;
 
     ///// Load balancing /////
@@ -123,230 +110,167 @@ protected:
 
     //- Time consumed in chemistry evaluation
     scalar chemCPUT;
-    
-    //make_unique<Vec3>
+
+    // make_unique<Vec3>
 
     // Protected data
 
-        //- Reference to the field of specie mass fractions
-        PtrList<volScalarField>& Y_;
+    //- Reference to the field of specie mass fractions
+    PtrList<volScalarField>& Y_;
 
-        //- Reactions
-        const PtrList<Reaction<ThermoType>>& reactions_;
+    //- Reactions
+    const PtrList<Reaction<ThermoType>>& reactions_;
 
-        //- Thermodynamic data of the species
-        const PtrList<ThermoType>& specieThermo_;
+    //- Thermodynamic data of the species
+    const PtrList<ThermoType>& specieThermo_;
 
-        //- Number of species
-        label nSpecie_;
+    //- Number of species
+    label nSpecie_;
 
-        //- Number of reactions
-        label nReaction_;
+    //- Number of reactions
+    label nReaction_;
 
-        //- Temperature below which the reaction rates are assumed 0
-        scalar Treact_;
+    //- Temperature below which the reaction rates are assumed 0
+    scalar Treact_;
 
-        //- List of reaction rate per specie [kg/m3/s]
-        PtrList<volScalarField::Internal> RR_;
+    //- List of reaction rate per specie [kg/m3/s]
+    PtrList<volScalarField::Internal> RR_;
 
-        //- Temporary concentration field
-        mutable scalarField c_;
+    //- Temporary concentration field
+    mutable scalarField c_;
 
-        //- Temporary rate-of-change of concentration field
-        mutable scalarField dcdt_;
+    //- Temporary rate-of-change of concentration field
+    mutable scalarField dcdt_;
 
-        //- List of enthalpies of formation 
-        scalarList sp_enth_form;
-        
+    //- List of enthalpies of formation
+    scalarList sp_enth_form;
+
     // Protected Member Functions
 
-        //- Write access to chemical source terms
-        //  (e.g. for multi-chemistry model)
-        inline PtrList<volScalarField::Internal>& RR();
+    //- Write access to chemical source terms
+    //  (e.g. for multi-chemistry model)
+    inline PtrList<volScalarField::Internal>& RR();
 
-        /*
-        struct Solution{
-          whatever
-        }
-        
-        struct Problem{
-          scalar mass_frac;
-          List<scalar> some;
-        }
-      */
-        //Implement this
-        //scalar    solve_single_cell(Problem p);
-
-        //List<Problem> collect_problems();
-         //void refmapper::filter_problems(List<Problem> all_problems);
-          // loadbalancer::communicate_problems(List<>)
-         //solve(Probmelms)
-        
-
-
-
+    
 public:
-
     //- Runtime type information
     TypeName("pyJac");
 
-
     // Constructors
 
-        //- Construct from thermo
-        pyJacChemistryModel(ReactionThermo& thermo);
-
+    //- Construct from thermo
+    pyJacChemistryModel(ReactionThermo& thermo);
 
     //- Destructor
     virtual ~pyJacChemistryModel();
 
-
     // Member Functions
 
-        //- The reactions
-        inline const PtrList<Reaction<ThermoType>>& reactions() const;
+    //- The reactions
+    inline const PtrList<Reaction<ThermoType>>& reactions() const;
 
-        //- Thermodynamic data of the species
-        inline const PtrList<ThermoType>& specieThermo() const;
+    //- Thermodynamic data of the species
+    inline const PtrList<ThermoType>& specieThermo() const;
 
-        //- The number of species
-        virtual inline label nSpecie() const;
+    //- The number of species
+    virtual inline label nSpecie() const;
 
-        //- The number of reactions
-        virtual inline label nReaction() const;
+    //- The number of reactions
+    virtual inline label nReaction() const;
 
-        //- Temperature below which the reaction rates are assumed 0
-        inline scalar Treact() const;
+    //- Temperature below which the reaction rates are assumed 0
+    inline scalar Treact() const;
 
-        //- Temperature below which the reaction rates are assumed 0
-        inline scalar& Treact();
+    //- Temperature below which the reaction rates are assumed 0
+    inline scalar& Treact();
 
-        //- dc/dt = omega, rate of change in concentration, for each species
-        virtual void omega
-        (
-            const scalarField& c,
-            const scalar T,
-            const scalar p,
-            scalarField& dcdt
-        ) const;
+    //- dc/dt = omega, rate of change in concentration, for each species
+    virtual void
+    omega(const scalarField& c, const scalar T, const scalar p, scalarField& dcdt) const;
 
-        //- Return the reaction rate for reaction r and the reference
-        //  species and charateristic times
-        virtual scalar omega
-        (
-            const Reaction<ThermoType>& r,
-            const scalarField& c,
-            const scalar T,
-            const scalar p,
-            scalar& pf,
-            scalar& cf,
-            label& lRef,
-            scalar& pr,
-            scalar& cr,
-            label& rRef
-        ) const;
+    //- Return the reaction rate for reaction r and the reference
+    //  species and charateristic times
+    virtual scalar omega(const Reaction<ThermoType>& r,
+                         const scalarField&          c,
+                         const scalar                T,
+                         const scalar                p,
+                         scalar&                     pf,
+                         scalar&                     cf,
+                         label&                      lRef,
+                         scalar&                     pr,
+                         scalar&                     cr,
+                         label&                      rRef) const;
 
+    //- Return the reaction rate for iReaction and the reference
+    //  species and charateristic times
+    virtual scalar omegaI(label              iReaction,
+                          const scalarField& c,
+                          const scalar       T,
+                          const scalar       p,
+                          scalar&            pf,
+                          scalar&            cf,
+                          label&             lRef,
+                          scalar&            pr,
+                          scalar&            cr,
+                          label&             rRef) const;
 
-        //- Return the reaction rate for iReaction and the reference
-        //  species and charateristic times
-        virtual scalar omegaI
-        (
-            label iReaction,
-            const scalarField& c,
-            const scalar T,
-            const scalar p,
-            scalar& pf,
-            scalar& cf,
-            label& lRef,
-            scalar& pr,
-            scalar& cr,
-            label& rRef
-        ) const;
+    //- Calculates the reaction rates
+    virtual void calculate();
 
-        //- Calculates the reaction rates
-        virtual void calculate();
+    // Chemistry model functions (overriding abstract functions in
+    // basicChemistryModel.H)
 
+    //- Return const access to the chemical source terms for specie, i
+    inline const volScalarField::Internal& RR(const label i) const;
 
-        // Chemistry model functions (overriding abstract functions in
-        // basicChemistryModel.H)
+    //- Return non const access to chemical source terms [kg/m3/s]
+    virtual volScalarField::Internal& RR(const label i);
 
-            //- Return const access to the chemical source terms for specie, i
-            inline const volScalarField::Internal& RR
-            (
-                const label i
-            ) const;
+    //- Return reaction rate of the speciei in reactionI
+    virtual tmp<volScalarField::Internal> calculateRR(const label reactionI,
+                                                      const label speciei) const;
 
-            //- Return non const access to chemical source terms [kg/m3/s]
-            virtual volScalarField::Internal& RR
-            (
-                const label i
-            );
+    //- Solve the reaction system for the given time step
+    //  and return the characteristic time
+    virtual scalar solve(const scalar deltaT);
 
-            //- Return reaction rate of the speciei in reactionI
-            virtual tmp<volScalarField::Internal> calculateRR
-            (
-                const label reactionI,
-                const label speciei
-            ) const;
+    //- Solve the reaction system for the given time step
+    //  and return the characteristic time
+    virtual scalar solve(const scalarField& deltaT);
 
-            //- Solve the reaction system for the given time step
-            //  and return the characteristic time
-            virtual scalar solve(const scalar deltaT);
+    //- Return the chemical time scale
+    virtual tmp<volScalarField> tc() const;
 
-            //- Solve the reaction system for the given time step
-            //  and return the characteristic time
-            virtual scalar solve(const scalarField& deltaT);
+    //- Return the heat release rate [kg/m/s3]
+    virtual tmp<volScalarField> Qdot() const;
 
-            //- Return the chemical time scale
-            virtual tmp<volScalarField> tc() const;
+    // ODE functions (overriding abstract functions in ODE.H)
 
-            //- Return the heat release rate [kg/m/s3]
-            virtual tmp<volScalarField> Qdot() const;
+    //- Number of ODE's to solve
+    inline virtual label nEqns() const;
 
+    virtual void derivatives(const scalar t, const scalarField& c, scalarField& dcdt) const;
 
-        // ODE functions (overriding abstract functions in ODE.H)
+    virtual void
+    jacobian(const scalar t, const scalarField& c, scalarField& dcdt, scalarSquareMatrix& J) const;
 
-            //- Number of ODE's to solve
-            inline virtual label nEqns() const;
-
-            virtual void derivatives
-            (
-                const scalar t,
-                const scalarField& c,
-                scalarField& dcdt
-            ) const;
-
-            virtual void jacobian
-            (
-                const scalar t,
-                const scalarField& c,
-                scalarField& dcdt,
-                scalarSquareMatrix& J
-            ) const;
-
-            virtual void solve
-            (
-                scalarField &c,
-                scalar& T,
-                scalar& p,
-                scalar& deltaT,
-                scalar& subDeltaT
-            ) const = 0;
-
+    virtual void
+    solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
 
 private:
-    Foam::chemistrySolution callODE(chemistryProblem& problem);
-    Foam::DynamicList<Foam::chemistryProblem> get_problems(PtrList<volScalarField>& Y_,const scalar& deltaT);
-    Foam::List<Foam::chemistrySolution> solve_problems(Foam::DynamicList<Foam::chemistryProblem>& problems);
+    chemistrySolution                   callODE(chemistryProblem& problem);
+    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_,
+                                                     const scalar&            deltaT);
+    DynamicList<chemistrySolution>
+    solve_problems(DynamicList<chemistryProblem>& problems);
 
 
+    scalar update_reaction_rates(const DynamicList<chemistrySolution>& solutions);
 
 
-    
 
 
 };
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -359,7 +283,7 @@ private:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "pyJacChemistryModel.C"
+#include "pyJacChemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
