@@ -105,7 +105,7 @@ public:
                 // iterate over all ranks which we can send data
                 for(int receiver_idx=0; receiver_idx<sender_idx; receiver_idx++) 
                 {
-                    int nCells2Send = ncells_to_send(loads, sender_idx, receiver_idx, nCellsSentTot);
+                    int nCells2Send = ncells_to_send(loads[sender_idx], loads[receiver_idx], nCellsSentTot);
                     nCellsSentTot +=  nCells2Send;                         
                     if( large_sender(loads[sender_idx])  && small_receiver(loads[receiver_idx]) )
                     {    
@@ -136,20 +136,26 @@ public:
         receiver_load.value += min(1.0 - receiver_load.value, sender_load.value - 1.0);
     }
 
-    int ncells_to_send(const DynamicList<chemistryLoad>& loads, const int& sender_idx, const int& receiver_idx, const int& nCellsSentTot)
+    
+    
+    int ncells_to_send(chemistryLoad& sender_load, chemistryLoad& receiver_load, int nCellsSentTot)
     {
-        scalar relFreeSpace = 1.0 - loads[receiver_idx].value;
-        scalar relData2send = min(relFreeSpace,(loads[sender_idx].value-1.0));  
-        scalar nc_rm = loads[sender_idx].number_of_active_cells * (1.0/max(loads[sender_idx].value,1e-12));
+        scalar relFreeSpace = 1.0 - receiver_load.value;
+        scalar relData2send = min(relFreeSpace,(sender_load.value-1.0));  
+        scalar nc_rm = sender_load.number_of_active_cells * (1.0/max(sender_load.value,1e-12));
         int nCells2Send =  floor(relData2send * nc_rm);
 
         int nCellsSentTot_tmp = nCellsSentTot + nCells2Send;
-        if( nCellsSentTot_tmp >= loads[sender_idx].number_of_active_cells) 
+        if( nCellsSentTot_tmp >= sender_load.number_of_active_cells) 
         {
-            nCells2Send = nCells2Send - (nCellsSentTot_tmp - loads[sender_idx].number_of_active_cells) - 2;
+            nCells2Send = nCells2Send - (nCellsSentTot_tmp - sender_load.number_of_active_cells) - 2;
         }
         return nCells2Send; 
     }
+
+
+
+
 
     bool large_sender(const chemistryLoad& load) const
     {
