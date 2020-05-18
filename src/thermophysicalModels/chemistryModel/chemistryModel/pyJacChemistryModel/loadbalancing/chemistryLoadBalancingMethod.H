@@ -65,7 +65,6 @@ class chemistryLoadBalancingMethod {
 
 
 public:
-    template <class T> using buffer_t = DynamicList<DynamicList<T>>;
 
     struct sendRecvInfo {
 
@@ -74,106 +73,47 @@ public:
         std::vector<int> number_of_problems; // number of problems which this rank sends/receivs
     };
 
+    template <class T> using buffer_t = DynamicList<DynamicList<T>>;
+
 private:
     sendRecvInfo m_current_state; // the current state of the object
 
-    //TODO: make user input
-    static constexpr scalar m_tolerance_to_balance = 0.02;
+
+
+private:
+    
+
+    ///
+    ///@brief Given a list of problems belonging to this rank, determine the load of this process
+    ///
+    ///@param problems problems of this rank
+    ///@return chemistryLoad my load
+    ///
+    virtual chemistryLoad get_my_load(const DynamicList<chemistryProblem>& problems) const;
+
+    ///
+    ///@brief Determines if a process is a sender receiver or do-nothinger
+    ///
+    ///@param loads a sorted array of loads
+    ///@return WHATTODO state information on what the process should do
+    ///
+    virtual sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
 
 
 public:
 
 
+    void update_state(const DynamicList<chemistryProblem>& problems) {
 
-    // Constructors
-    chemistryLoadBalancingMethod() = default;
+        DynamicList<chemistryLoad> loads = get_loads(problems);
+        set_state(determine_state(loads));
 
-
-
-    void update_state() {
-        //- Assumes load array in the shape loads[i] = chemCPUT[i]/meanCPUT
-        //- Assumes that corrections (e.g. too idle ranks) are already made        
-        // TODO: Implement a minCPUTime limit to start considering load balancing        
-        sendRecvInfo curr_state;
-        DynamicList<chemistryLoad> loads  = get_loads();
-        // iterate from largest to smallest to account for efficient filling of the sent data
-        for(int sender_idx=Pstream::nProcs()-1; sender_idx>=0; sender_idx--) 
-        {
-            if(loads[sender_idx].value >= (1.0+m_tolerance_to_balance))
-            {
-                int nCellsSentTot = 0;
-                // iterate over all ranks which we can send data
-                for(int receiver_idx=0; receiver_idx<sender_idx; receiver_idx++) 
-                {
-                    int nCells2Send = ncells_to_send(loads[sender_idx], loads[receiver_idx], nCellsSentTot);
-                    nCellsSentTot +=  nCells2Send;                         
-                    if( large_sender(loads[sender_idx])  && small_receiver(loads[receiver_idx]) )
-                    {    
-                        update_load( loads[sender_idx], loads[receiver_idx] );
-
-                        if(loads[sender_idx].rank  == Pstream::myProcNo())
-                        {
-                            curr_state.destinations.push_back(loads[receiver_idx].rank);
-                            curr_state.number_of_problems.push_back(nCells2Send);
-                        }
-                        else if(loads[receiver_idx].rank == Pstream::myProcNo())
-                        {
-                            curr_state.sources.push_back(loads[sender_idx].rank);
-                            curr_state.number_of_problems.push_back(nCells2Send);
-                        }
-                    }           
-                }
-            }
-        }        
-        set_state(curr_state);
-    }
-
-    
-
-    void update_load(chemistryLoad& sender_load, chemistryLoad& receiver_load) const
-    {
-        sender_load.value -= min(1.0 - receiver_load.value, sender_load.value - 1.0);
-        receiver_load.value += min(1.0 - receiver_load.value, sender_load.value - 1.0);
-    }
-
-    
-    
-    int ncells_to_send(chemistryLoad& sender_load, chemistryLoad& receiver_load, int nCellsSentTot)
-    {
-        scalar relFreeSpace = 1.0 - receiver_load.value;
-        scalar relData2send = min(relFreeSpace,(sender_load.value-1.0));  
-        scalar nc_rm = sender_load.number_of_active_cells * (1.0/max(sender_load.value,1e-12));
-        int nCells2Send =  floor(relData2send * nc_rm);
-
-        int nCellsSentTot_tmp = nCellsSentTot + nCells2Send;
-        if( nCellsSentTot_tmp >= sender_load.number_of_active_cells) 
-        {
-            nCells2Send = nCells2Send - (nCellsSentTot_tmp - sender_load.number_of_active_cells) - 2;
-        }
-        return nCells2Send; 
     }
 
 
 
 
 
-    bool large_sender(const chemistryLoad& load) const
-    {
-        if(load.value>1.0+m_tolerance_to_balance)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    bool small_receiver(const chemistryLoad& load) const
-    {
-        if(load.value < 1.0-m_tolerance_to_balance)
-        {
-            return true;
-        }
-        return false;
-    }
 
 
     ///
@@ -201,6 +141,12 @@ public:
         return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
     }
 
+
+
+
+
+
+
     ///
     ///@brief Given a buffer of values, sends the values back to their rightful owner processes.
     ///
@@ -221,6 +167,19 @@ public:
         // It is probably impossible to avoid blocking in this phase
         return send_recv<T, Pstream::commsTypes::blocking>(values, destinations, sources);
     }
+
+
+
+
+
+
+    // Constructors
+    chemistryLoadBalancingMethod() = default;
+
+
+
+
+
 
 
 
@@ -247,12 +206,7 @@ protected:
     ///
     void set_state(const sendRecvInfo& state) { m_current_state = state; }
 
-    ///
-    ///@brief Gathers the load information from all processes
-    ///
-    ///@return DynamicList<chemistryLoad> list size nprocesses of load objects
-    ///
-    DynamicList<chemistryLoad> get_loads() const;
+    DynamicList<chemistryLoad> get_loads(const DynamicList<chemistryProblem>& problems) const;
 
     ///
     ///@brief Given a list of problems splits the input list to sublists to be passed to other ranks
@@ -263,6 +217,7 @@ protected:
     ///
     DynamicList<DynamicList<chemistryProblem>>
     get_send_buffer(const DynamicList<chemistryProblem>& all_problems) const;
+
 
     ///
     ///@brief Sends the split send_buffer to sources and receives everything from destinations. Does
@@ -299,21 +254,35 @@ protected:
         return recv_buffers;
     }
 
-private:
-    ///
-    ///@brief Determines the load of this process
-    ///
-    ///@return chemistryLoad load of this process
-    ///
-    virtual chemistryLoad get_my_load() const = 0;
 
-    ///
-    ///@brief Determines if a process is a sender receiver or do-nothinger
-    ///
-    ///@param loads a sorted array of loads
-    ///@return WHATTODO state information on what the process should do
-    ///
-    virtual sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 };
 
 } // namespace Foam

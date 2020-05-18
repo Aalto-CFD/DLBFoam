@@ -2,13 +2,28 @@
 
 namespace Foam {
 
-DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads() const {
+
+chemistryLoad chemistryLoadBalancingMethod::get_my_load(const DynamicList<chemistryProblem>& problems) const{
+
+    //this sets value = n_active cells
+    return chemistryLoad(Pstream::myProcNo(), double(problems.size()), problems.size());
+
+}
+
+
+
+
+
+DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads(const DynamicList<chemistryProblem>& problems) const {
 
     label nprocs = Pstream::nProcs();
 
     DynamicList<chemistryLoad> loads(nprocs, chemistryLoad());
 
-    loads[Pstream::myProcNo()] = this->get_my_load();
+    loads[Pstream::myProcNo()] = this->get_my_load(problems);
+
+
+
     int tag                    = 1;
     // TODO: Call MPI_Allgather instead, these functions appear to be doing something crazy
     Pstream::gatherList(loads, tag);

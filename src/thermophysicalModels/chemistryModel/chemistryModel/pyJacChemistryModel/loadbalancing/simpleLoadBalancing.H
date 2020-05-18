@@ -1,10 +1,4 @@
-/*
-    Write header
-*/
-
-#ifndef simpleLoadBalancing_H
-#define simpleLoadBalancing_H
-
+#pragma once
 
 
 #include "IOdictionary.H"
@@ -36,13 +30,6 @@ public:
 private:
 
     ///
-    ///@brief Determines the load of this process
-    ///
-    ///@return chemistryLoad load of this process
-    ///
-    chemistryLoad get_my_load() const override;
-
-    ///
     ///@brief Determines if a process is a sender receiver or do-nothinger
     ///
     ///@param loads a sorted array of loads 
@@ -63,9 +50,3 @@ private:
 
 } //namespace Foam
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
-
-// ************************************************************************* //

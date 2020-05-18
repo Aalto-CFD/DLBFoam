@@ -3,17 +3,6 @@
 namespace Foam{
 
 
-
-chemistryLoad simpleLoadBalancing::get_my_load() const{
-
-    throw "NOT IMPLEMENTED";
-
-    chemistryLoad load;
-    return load;
-
-}
-
-
 chemistryLoadBalancingMethod::sendRecvInfo simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) const{
 
     throw "NOT IMPLEMENTED";

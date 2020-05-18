@@ -9,7 +9,7 @@ chemistryModel/pyJacChemistryModel/refmapping/simpleRefMapping.C
 chemistryModel/pyJacChemistryModel/loadbalancing/chemistryLoad.C
 chemistryModel/pyJacChemistryModel/loadbalancing/chemistryLoadBalancingMethod.C
 chemistryModel/pyJacChemistryModel/loadbalancing/simpleLoadBalancing.C
-
+chemistryModel/pyJacChemistryModel/loadbalancing/bulutLoadBalancing.C
 
 
 chemistryModel/makePexChemistryModels.C
