@@ -343,16 +343,13 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::calculate() {
 }
 
 template <class ReactionThermo, class ThermoType>
-DynamicList<chemistrySolution> pyJacChemistryModel<ReactionThermo, ThermoType>::solve_problems(
-    DynamicList<chemistryProblem>& problems)     
-{
+DynamicList<chemistrySolution> pyJacChemistryModel<ReactionThermo, ThermoType>::solve(
+    DynamicList<chemistryProblem>& problems) {
     DynamicList<chemistrySolution> chem_solns(problems.size(), chemistrySolution());
 
-    for (int i = 0; i < chem_solns.size(); i++) { chem_solns[i] = callODE(problems[i]); }
+    for (int i = 0; i < chem_solns.size(); i++) { chem_solns[i] = solve(problems[i]); }
     return chem_solns;
 }
-
-
 
 template <class ReactionThermo, class ThermoType>
 DynamicList<chemistryProblem>
@@ -390,7 +387,7 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
 }
 
 template <class ReactionThermo, class ThermoType>
-chemistrySolution pyJacChemistryModel<ReactionThermo, ThermoType>::callODE(chemistryProblem& prob) {
+chemistrySolution pyJacChemistryModel<ReactionThermo, ThermoType>::solve(chemistryProblem& prob) {
 
     chemistrySolution soln;
     soln.cellid = prob.cellid;
@@ -424,40 +421,27 @@ template <class DeltaTType>
 scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& deltaT) {
     BasicChemistryModel<ReactionThermo>::correct();
 
-    
-
     if (!this->chemistry_) { return great; }
     const scalar deltaT_ = deltaT[0]; // TODO: Check if this is true (all cells have same deltaT)
 
     // This assumes no refMapping, all the cells are in problems list
     DynamicList<chemistryProblem> problems = get_problems(Y_, deltaT_);
 
-    DynamicList<chemistrySolution> solutions = solve_problems(problems);
-
+    DynamicList<chemistrySolution> solutions = solve(problems);
 
     scalar deltaTMin = update_reaction_rates(solutions);
-    
-    return deltaTMin;
-
-
-    /*
-
-    for (int i = 0; i < solutions.size(); i++) {
-        label celli = solutions[i].cellid;
-        for (label j = 0; j < nSpecie_; j++) { RR_[j][celli] = solutions[i].RR[j]; }
-        deltaTMin                = min(solutions[i].deltaTChem, deltaTMin);
-        this->deltaTChem_[celli] = min(solutions[i].deltaTChem, this->deltaTChemMax_);
-    }
 
     return deltaTMin;
-    */
-   
 }
 
 
 
+
+
+
 template <class ReactionThermo, class ThermoType>
-scalar pyJacChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(const DynamicList<chemistrySolution>& solutions){
+scalar pyJacChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(
+    const DynamicList<chemistrySolution>& solutions) {
 
     scalar deltaTMin = great;
 
@@ -469,14 +453,7 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(co
     }
 
     return deltaTMin;
-
-
 }
-
-
-
-
-
 
 template <class ReactionThermo, class ThermoType>
 scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const scalar deltaT) {

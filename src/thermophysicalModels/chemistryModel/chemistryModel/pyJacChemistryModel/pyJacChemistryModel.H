@@ -151,7 +151,6 @@ protected:
     //  (e.g. for multi-chemistry model)
     inline PtrList<volScalarField::Internal>& RR();
 
-    
 public:
     //- Runtime type information
     TypeName("pyJac");
@@ -258,18 +257,12 @@ public:
     solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
 
 private:
-    chemistrySolution                   callODE(chemistryProblem& problem);
-    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_,
-                                                     const scalar&            deltaT);
-    DynamicList<chemistrySolution>
-    solve_problems(DynamicList<chemistryProblem>& problems);
+    chemistrySolution              solve(chemistryProblem& problem);
+    DynamicList<chemistrySolution> solve(DynamicList<chemistryProblem>& problems);
 
+    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const scalar& deltaT);
 
     scalar update_reaction_rates(const DynamicList<chemistrySolution>& solutions);
-
-
-
-
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
