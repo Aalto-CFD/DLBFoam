@@ -9,8 +9,6 @@ namespace Foam{
 //create some arbitrary data
 DynamicList<chemistryProblem> create_problems(int count){
 
-
-
     DynamicList<chemistryProblem> problems;
     
     for (int i = 0; i < count; ++i){
@@ -50,10 +48,6 @@ public:
 
         this->set_state(i);
   
-    }
-    template<class ET>
-    buffer_t<ET> test_get_send_buffer(const DynamicList<ET>& params) const{
-        return this->get_send_buffer(params);
     }
     
 
@@ -177,7 +171,46 @@ TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
     
 }
 
+TEST_CASE("chemistryLoadBalancingMethod partition()"){
 
+
+    using namespace Foam;
+
+    DynamicList<int> arr(10, int());
+
+    for (int i = 0; i < 10; ++i){
+        arr[i] = i;
+    }
+    std::vector<int> subsizes{2, 2, 1, 5};
+ 
+    auto r = chemistryLoadBalancingMethod::partition(arr, subsizes);
+
+    CHECK(r[0][0] == 0);
+    CHECK(r[0][1] == 1);
+    CHECK(r[1][0] == 2);
+    CHECK(r[3][4] == 9);
+
+
+    auto problems = create_problems(10);
+
+    auto split = chemistryLoadBalancingMethod::partition(problems, subsizes);
+
+    CHECK(split[0][0].cellid == 0);
+    CHECK(split[0][1].cellid == 1);
+    CHECK(split[1][0].cellid == 2);
+    CHECK(split[3][4].cellid == 9);
+
+
+    REQUIRE_THROWS(chemistryLoadBalancingMethod::partition(problems, {3,3,3}));
+
+
+}
+
+
+
+
+
+/*
 
 TEST_CASE("chemistryLoadBalancingMethod send_recv()"){
 
@@ -322,3 +355,5 @@ TEST_CASE("chemistryLoadBalancingMethod balance() / unbalance()"){
 
 
 }
+
+*/

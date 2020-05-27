@@ -35,7 +35,7 @@ SourceFiles
 #ifndef chemistryLoadBalancingMethod_H
 #define chemistryLoadBalancingMethod_H
 
-#include <algorithm> //std::sort
+#include <algorithm> //std::sort / std::partition_copy
 #include <numeric>   //std::accumulate
 #include <vector>    //std::vector
 
@@ -50,6 +50,7 @@ SourceFiles
 #include "chemistryProblem.H"
 #include "chemistryRefMappingMethod.H"
 #include "chemistrySolution.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -112,7 +113,7 @@ public:
             throw "A process can be either a source, destination or a do nothinger";
         }
 
-        auto send_buffer = get_send_buffer(values);
+        auto send_buffer = partition(values, m_current_state.number_of_problems);
 
         // The unittests currently test such that everyone sends to master which requires a blocking
         // commstype in reality we dont want to block at this phase
@@ -176,14 +177,47 @@ public:
     virtual ~chemistryLoadBalancingMethod() {}
 
 
+    ///
+    ///@brief Splits the big_array to arrays of size subsizes.
+    ///
+    ///@tparam T element type
+    ///@param big_array the array to split
+    ///@param subsizes  vector of subarray sizes
+    ///@return DynamicList<DynamicList<T>> array of subarrays, if succesful
+    ///
+    template<class T>
+    static DynamicList<DynamicList<T>> partition(const DynamicList<T>& big_array, const std::vector<int>& subsizes){
+
+        // TODO: only in debug mode
+        if (std::accumulate(subsizes.begin(), subsizes.end(), 0) != big_array.size()) {
+            throw "Total send count not matching the problem count.";
+        }
+
+        //allocate storage based on the first element
+        T element_copy;
+        if (big_array.size() > 0) {
+            element_copy = big_array[0];
+        } 
+
+        DynamicList<DynamicList<T>> ret;
+
+        for (auto s : subsizes){
+            ret.append(DynamicList<T>(s, element_copy)); 
+        }
 
 
+        int start = 0;
+        for (size_t i = 0; i < subsizes.size(); ++i){
+            int end = start + subsizes[i];
+            std::copy(std::begin(big_array) + start, std::begin(big_array) + end, std::begin(ret[i]));
+            start = end;
+            
+        }
 
-protected:
 
+        return ret;
 
-    size_t get_my_load_index(const DynamicList<chemistryLoad>& loads) const;
-
+    }
 
     ///
     ///@brief Sets the current state
@@ -192,17 +226,17 @@ protected:
     ///
     void set_state(const sendRecvInfo& state) { m_current_state = state; }
 
+
+protected:
+
+
+    size_t get_my_load_index(const DynamicList<chemistryLoad>& loads) const;
+
+
+    
+
     DynamicList<chemistryLoad> get_loads(const DynamicList<chemistryProblem>& problems) const;
 
-    ///
-    ///@brief Given a list of problems splits the input list to sublists to be passed to other ranks
-    ///
-    ///@param all_problems list of problems that this rank has to solve
-    ///@return DynamicList<DynamicList<chemistryProblem>> list of portions to be passed to other
-    /// ranks
-    ///
-    DynamicList<DynamicList<chemistryProblem>>
-    get_send_buffer(const DynamicList<chemistryProblem>& all_problems) const;
 
 
     ///
