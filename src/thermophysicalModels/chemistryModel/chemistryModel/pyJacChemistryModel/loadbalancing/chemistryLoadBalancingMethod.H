@@ -35,7 +35,7 @@ SourceFiles
 #ifndef chemistryLoadBalancingMethod_H
 #define chemistryLoadBalancingMethod_H
 
-#include <algorithm> //std::sort
+#include <algorithm> //std::sort / std::partition_copy
 #include <numeric>   //std::accumulate
 #include <vector>    //std::vector
 
@@ -62,10 +62,7 @@ namespace Foam {
 
 class chemistryLoadBalancingMethod {
 
-
-
 public:
-
     struct sendRecvInfo {
 
         std::vector<int> sources;            // ranks which send to this process
@@ -78,21 +75,12 @@ public:
 private:
     sendRecvInfo m_current_state; // the current state of the object
 
-
-
-
-
-
 public:
-
-
     void update_state(const DynamicList<chemistryProblem>& problems) {
 
         DynamicList<chemistryLoad> loads = get_loads(problems);
         set_state(determine_state(loads));
-
     }
-
 
     ///
     ///@brief Given a list of values splits them evenly between the mpi-processes.
@@ -103,30 +91,10 @@ public:
     ///
     template <class T> buffer_t<T> balance(const DynamicList<T>& values) const {
 
-        auto sources      = m_current_state.sources;
-        auto destinations = m_current_state.destinations;
-
-        
-        // TODO: Check only in debug mode
-        if (sources.size() != 0 && destinations.size() != 0) {
-            throw "A process can be either a source, destination or a do nothinger";
-        }
-
-        auto send_buffer = get_send_buffer(values);
-
-        // The unittests currently test such that everyone sends to master which requires a blocking
-        // commstype in reality we dont want to block at this phase
-        // TODO: change to nonBlocking
-       return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
-        
-       
+        // auto send_buffer = get_send_buffer(values);
+        return send_recv<T, Pstream::commsTypes::blocking>(
+            get_send_buffer(values), m_current_state.sources, m_current_state.destinations);
     }
-
-
-
-
-
-
 
     ///
     ///@brief Given a buffer of values, sends the values back to their rightful owner processes.
@@ -137,73 +105,141 @@ public:
     ///
     template <class T> buffer_t<T> unbalance(const buffer_t<T>& values) const {
 
-        auto sources      = m_current_state.sources;
-        auto destinations = m_current_state.destinations;
-
-        // TODO: Check only in debug mode
-        if (sources.size() != 0 && destinations.size() != 0) {
-            throw "A process can be either a source, destination or a do nothinger";
-        }
-
+        
         // It is probably impossible to avoid blocking in this phase
-        return send_recv<T, Pstream::commsTypes::blocking>(values, destinations, sources);
+        return send_recv<T, Pstream::commsTypes::blocking>(
+            values, m_current_state.destinations, m_current_state.sources);
     }
 
 
+    
+    template <class T> buffer_t<T> get_send_buffer(const DynamicList<T>& values) const {
 
+        if (m_current_state.destinations.size() == 1) { return buffer_t<T>(1, values); }
 
+        return partition(values, m_current_state.number_of_problems);
+    }
 
+    
+
+    
 
     // Constructors
     chemistryLoadBalancingMethod() = default;
 
-
-
-
-
-
-
-
     ///
     ///@brief Check whether the load balancer is active or not.
     ///
-    ///@return true 
-    ///@return false 
+    ///@return true
+    ///@return false
     ///
     bool active() const { return true; }
 
     //- Destructor
     virtual ~chemistryLoadBalancingMethod() {}
 
+    ///
+    ///@brief Splits the big_array to arrays of size subsizes.
+    ///
+    ///@tparam T element type
+    ///@param big_array the array to split
+    ///@param subsizes  vector of subarray sizes
+    ///@return DynamicList<DynamicList<T>> array of subarrays, if succesful
+    ///
+    template <class T>
+    static DynamicList<DynamicList<T>> partition(const DynamicList<T>&   big_array,
+                                                 const std::vector<int>& subsizes) {
 
+        // TODO: only in debug mode
+        if (std::accumulate(subsizes.begin(), subsizes.end(), 0) != big_array.size()) {
 
+            int s_total = std::accumulate(subsizes.begin(), subsizes.end(), 0);
+            int a_total = big_array.size();
 
+            throw error(
+                std::string(
+                    "Total send count not matching the problem count for subsize total of: ") +
+                std::to_string(s_total) + std::string(" and array total of: ") +
+                std::to_string(a_total));
+        }
 
-protected:
+        // allocate storage based on the first element
+        T element_copy;
+        if (big_array.size() > 0) { element_copy = big_array[0]; }
 
+        DynamicList<DynamicList<T>> ret;
 
-    size_t get_my_load_index(const DynamicList<chemistryLoad>& loads) const;
+        for (auto s : subsizes) { ret.append(DynamicList<T>(s, element_copy)); }
 
+        int start = 0;
+        for (size_t i = 0; i < subsizes.size(); ++i) {
+            int end = start + subsizes[i];
+            std::copy(
+                std::begin(big_array) + start, std::begin(big_array) + end, std::begin(ret[i]));
+            start = end;
+        }
+
+        return ret;
+    }
 
     ///
     ///@brief Sets the current state
     ///
     ///@param state state to set to
     ///
-    void set_state(const sendRecvInfo& state) { m_current_state = state; }
+    void set_state(const sendRecvInfo& state) {
+
+        m_current_state = state;
+
+        if (!valid_state()) {
+
+            print_state();
+
+            throw error("Invalid balance state in chemistryLoadBalancing.");
+        }
+    }
+
+    ///
+    ///@brief Prints the current state information.
+    ///
+    ///
+    void print_state() const {
+
+        Pout << "Rank: " << Pstream::myProcNo()
+             << " sends to: " << vector_to_string(m_current_state.destinations)
+             << " receivs from: " << vector_to_string(m_current_state.sources)
+             << " counts: " << vector_to_string(m_current_state.number_of_problems) << endl;
+    }
+
+    template <class T> std::string vector_to_string(const std::vector<T>& vec) const {
+
+        std::string ret = "(";
+
+        for (const auto& v : vec) { ret += std::to_string(v) + ' '; }
+        ret += ")";
+        return ret;
+    }
+
+protected:
+    size_t get_my_load_index(const DynamicList<chemistryLoad>& loads) const;
+
+    bool valid_state() const {
+
+        auto sources      = m_current_state.sources;
+        auto destinations = m_current_state.destinations;
+
+        if (sources.size() < 1) return false;
+        if (destinations.size() < 1) return false;
+        if (sources.size() > Pstream::nProcs()) return false;
+        if (destinations.size() > Pstream::nProcs()) return false;
+        if (sources[0] != Pstream::myProcNo())
+            return false; // the first index must always be this process
+        if (sources[0] != destinations[0]) return false;
+
+        return true;
+    }
 
     DynamicList<chemistryLoad> get_loads(const DynamicList<chemistryProblem>& problems) const;
-
-    ///
-    ///@brief Given a list of problems splits the input list to sublists to be passed to other ranks
-    ///
-    ///@param all_problems list of problems that this rank has to solve
-    ///@return DynamicList<DynamicList<chemistryProblem>> list of portions to be passed to other
-    /// ranks
-    ///
-    DynamicList<DynamicList<chemistryProblem>>
-    get_send_buffer(const DynamicList<chemistryProblem>& all_problems) const;
-
 
     ///
     ///@brief Sends the split send_buffer to sources and receives everything from destinations. Does
@@ -218,35 +254,33 @@ protected:
     ///@return buffer_t<ET> the received buffer
     ///
     template <class ET, Pstream::commsTypes CT>
-    buffer_t<ET> send_recv(const buffer_t<ET>&     send_buffer,
-                           const std::vector<int>& sources,
-                           const std::vector<int>& destinations) const {
+    static buffer_t<ET> send_recv(const buffer_t<ET>&     send_buffer,
+                                  const std::vector<int>& sources,
+                                  const std::vector<int>& destinations) {
 
-        PstreamBuffers pBufs(CT);
+        if (Pstream::parRun()) {
+            PstreamBuffers pBufs(CT);
 
-        for (int i = 0; i < destinations.size(); ++i) {
-            UOPstream send(destinations[i], pBufs);
-            send << send_buffer[i];
+            for (int i = 0; i < destinations.size(); ++i) {
+                UOPstream send(destinations[i], pBufs);
+                send << send_buffer[i];
+            }
+            pBufs.finishedSends();
+
+            buffer_t<ET> recv_buffers;
+            recv_buffers.setSize(sources.size());
+            for (int i = 0; i < sources.size(); ++i) {
+                UIPstream recv(sources[i], pBufs);
+                recv >> recv_buffers[i];
+            }
+
+            return recv_buffers;
         }
-        pBufs.finishedSends();
 
-        buffer_t<ET> recv_buffers;
-        recv_buffers.setSize(sources.size());
-        for (int i = 0; i < sources.size(); ++i) {
-            UIPstream recv(sources[i], pBufs);
-            recv >> recv_buffers[i];
-        }
-
-        return recv_buffers;
+        return send_buffer;
     }
 
-
-
-
-
 private:
-    
-
     ///
     ///@brief Given a list of problems belonging to this rank, determine the load of this process
     ///
@@ -262,30 +296,6 @@ private:
     ///@return WHATTODO state information on what the process should do
     ///
     virtual sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
 };
 
 } // namespace Foam

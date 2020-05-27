@@ -83,8 +83,8 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel(ReactionThe
     // load_balancer_ = new simpleLoadBalancing(SOMEDICT_DIDNT_CHECK_IF_CORRECT,
     // thermo.composition());
 
-    //load_balancer_ = new simpleLoadBalancing();
-    load_balancer_ = new bulutLoadBalancing();
+    load_balancer_ = new simpleLoadBalancing();
+    //load_balancer_ = new bulutLoadBalancing();
 
     if (this->chemistry_) {
 
@@ -349,6 +349,7 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
                                                               const scalar&            deltaT) {
 
     // TODO: Add refcell and Treact as conditions to get problems.
+
     DynamicList<chemistryProblem> chem_problems;
     const scalarField&            T = this->thermo().T();
     const scalarField&            p = this->thermo().p();
@@ -371,12 +372,6 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
 
         chem_problems.append(problem);
 
-        //This was not working
-        /*if (refcell_mapper_->active()) {
-            if (!refcell_mapper_->applyMapping(Y_, celli)) { chem_problems.append(problem); }
-        } else {
-            chem_problems.append(problem);
-        }*/
     }
     return chem_problems;
 }
@@ -436,44 +431,74 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
 template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
 scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& deltaT) {
-
+    
     using problem_buffer_t  = chemistryLoadBalancingMethod::buffer_t<chemistryProblem>;
     using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
 
+    clockTime timer;
+
+    double interval = timer.timeIncrement();    
     BasicChemistryModel<ReactionThermo>::correct();
+    Info << "correct() took: " << timer.timeIncrement() << endl;
+
 
     if (!this->chemistry_) { return great; }
     const scalar deltaT_ = deltaT[0]; // TODO: Check if this is true (all cells have same deltaT)
 
-    // This assumes no refMapping, all the cells are in problems list
-    DynamicList<chemistryProblem> my_problems = get_problems(Y_, deltaT_);
-
-
-
-    load_balancer_->update_state(my_problems);
-
-    problem_buffer_t additional_problems = load_balancer_->balance(my_problems);
+    
 
     
-    //THIS IS CURRENTLY WRONG, 'my_problems are not shortened by load_balancer', meaning that 
-    //all problems of this process are currently solved even if sent to other process for solving
-    //TODO: make load_balancer_->balance put the remaining my_problems also to buffer
-    DynamicList<chemistrySolution> my_solutions = solve_list(my_problems);
+    timer.timeIncrement();
+    // This assumes no refMapping, all the cells are in problems list
+    DynamicList<chemistryProblem> all_problems = get_problems(Y_, deltaT_);
+    Info << "get_problems() took: " << timer.timeIncrement() << endl;
 
-    solution_buffer_t additional_solutions = solve_buffer(additional_problems);
 
-    solution_buffer_t solutions_to_me = load_balancer_->unbalance(additional_solutions);
+    int original_problem_count = all_problems.size();
 
-    solutions_to_me.append(my_solutions);
+    timer.timeIncrement();
+    load_balancer_->update_state(all_problems);
+    Info << "update_state() took: " << timer.timeIncrement() << endl;
+
+
+    load_balancer_->print_state();
+    
+    timer.timeIncrement();
+    problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
+    Info << "balance() took: " << timer.timeIncrement() << endl;
+
+
+    timer.timeIncrement();
+    solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
+    Info << "solve_buffer() took: " << timer.timeIncrement() << endl;
+
+    timer.timeIncrement();
+    solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
+    Info << "unbalance() took: " << timer.timeIncrement() << endl;
+
+
+
+    timer.timeIncrement();
+
+    int solution_count = 0;
 
     scalar deltaTMin = great;
-    for (size_t i = 0; i < solutions_to_me.size(); ++i){
+    for (size_t i = 0; i < my_solutions.size(); ++i){
 
-        scalar temp = update_reaction_rates(my_solutions);
+        scalar temp = update_reaction_rates(my_solutions[i]);
         if (temp < deltaTMin) {
             deltaTMin = temp;
-        } 
+        }
+        solution_count += my_solutions[i].size(); 
     }
+
+    Info << "update_reaction_rates() took: " << timer.timeIncrement() << endl;
+
+
+    if (solution_count != original_problem_count){
+        throw error("Solution count differs from problem count.");
+    }
+
 
     return deltaTMin;
     

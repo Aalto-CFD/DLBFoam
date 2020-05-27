@@ -48,13 +48,17 @@ src/thermophysicalModels/chemistryModel/chemistryModel/StandardChemistryModel/St
 #define OWN_DEBUG_VAR 0
 #endif
 
+
+#include <memory> //std::unique_ptr
+#include <vector> //std::vector
+
 #include "BasicChemistryModel.H"
 #include "ODESystem.H"
 #include "Reaction.H"
 #include "simpleMatrix.H"
 #include "volFields.H"
-#include <memory> //std::unique_ptr
-#include <vector> //std::vector
+
+
 
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"
