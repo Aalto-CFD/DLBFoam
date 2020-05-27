@@ -104,29 +104,20 @@ public:
     ///
     template <class T> buffer_t<T> balance(const DynamicList<T>& values) const {
 
-        auto sources      = m_current_state.sources;
-        auto destinations = m_current_state.destinations;
-
-        
-        // TODO: Check only in debug mode
-        if (sources.size() != 0 && destinations.size() != 0) {
-            throw "A process can be either a source, destination or a do nothinger";
+        if (!valid_state()) {
+            throw "Invalid balance state in chemistryLoadBalancing.";
         }
+        
 
         auto send_buffer = partition(values, m_current_state.number_of_problems);
 
         // The unittests currently test such that everyone sends to master which requires a blocking
         // commstype in reality we dont want to block at this phase
         // TODO: change to nonBlocking
-       return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, sources, destinations);
+       return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, m_current_state.sources, m_current_state.destinations);
         
        
     }
-
-
-
-
-
 
 
     ///
@@ -138,16 +129,13 @@ public:
     ///
     template <class T> buffer_t<T> unbalance(const buffer_t<T>& values) const {
 
-        auto sources      = m_current_state.sources;
-        auto destinations = m_current_state.destinations;
-
-        // TODO: Check only in debug mode
-        if (sources.size() != 0 && destinations.size() != 0) {
-            throw "A process can be either a source, destination or a do nothinger";
+        if (!valid_state()) {
+            throw "Invalid unbalance state in chemistryLoadBalancing.";
         }
+        
 
         // It is probably impossible to avoid blocking in this phase
-        return send_recv<T, Pstream::commsTypes::blocking>(values, destinations, sources);
+        return send_recv<T, Pstream::commsTypes::blocking>(values, m_current_state.destinations, m_current_state.sources);
     }
 
 
@@ -232,6 +220,22 @@ protected:
 
     size_t get_my_load_index(const DynamicList<chemistryLoad>& loads) const;
 
+
+    bool valid_state() const {
+
+        auto sources      = m_current_state.sources;
+        auto destinations = m_current_state.destinations;
+        
+        if (sources.size() < 1) return false;
+        if (destinations.size() < 1) return false;
+        if (sources[0] != Pstream::myProcNo()) return false; //the first index must always be this process
+        if (sources[0] != destinations[0]) return false; 
+        if (sources.size() > Pstream::nProcs()) return false;
+        if (destinations.size() > Pstream::nProcs()) return false;
+
+        return true;
+
+    }
 
     
 
