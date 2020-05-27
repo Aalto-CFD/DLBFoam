@@ -277,6 +277,33 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv() self send") {
 
 }
 
+TEST_CASE("chemistryLoadBalancingMethod send_recv() self send 2") {
+
+    using namespace Foam;
+
+    auto problems = create_problems(1);
+
+    std::vector<int> sources      = {Pstream::myProcNo()};
+    std::vector<int> destinations = {Pstream::myProcNo()};
+    std::vector<int> counts       = {1};
+
+    auto send_buffer = chemistryLoadBalancingMethod::partition(problems, counts);
+
+    auto recv_buffer = testableLoadBalancing::test_send_recv<chemistryProblem,
+         Pstream::commsTypes::nonBlocking>(send_buffer, sources, destinations);
+
+
+    CHECK(recv_buffer.size() == 1);
+    
+    auto recv_problems = recv_buffer[0];
+
+    for (size_t i = 0; i < 1; ++i){
+        CHECK(recv_problems[i].cellid == i);
+    }
+
+
+}
+
 /*
 
 

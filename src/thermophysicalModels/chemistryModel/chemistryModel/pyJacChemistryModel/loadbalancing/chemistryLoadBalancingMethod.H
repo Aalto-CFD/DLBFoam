@@ -105,19 +105,43 @@ public:
     template <class T> buffer_t<T> balance(const DynamicList<T>& values) const {
 
         if (!valid_state()) {
-            throw "Invalid balance state in chemistryLoadBalancing.";
+           throw "Invalid balance state in chemistryLoadBalancing.";
         }
         
+        //if (do_nothing()){
+        //    return buffer_t<T>(1, values);
+        //}
+
 
         auto send_buffer = partition(values, m_current_state.number_of_problems);
+        return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, m_current_state.sources, m_current_state.destinations);
+        
+
+        
+        /*return 
+
+        else {
+            auto send_buffer = partition
+        }
+        */
 
         // The unittests currently test such that everyone sends to master which requires a blocking
         // commstype in reality we dont want to block at this phase
         // TODO: change to nonBlocking
-       return send_recv<T, Pstream::commsTypes::blocking>(send_buffer, m_current_state.sources, m_current_state.destinations);
+       
         
        
     }
+
+    /*
+    bool do_nothing() const{
+        
+        if (m_current_state.destinations.size() == 1 && m_current_state.sources.size() == 1){
+            return true;
+        }
+        return false;
+    }
+    */
 
 
     ///
@@ -132,9 +156,17 @@ public:
         if (!valid_state()) {
             throw "Invalid unbalance state in chemistryLoadBalancing.";
         }
-        
+
+        /*
+        if (do_nothing()){
+            return values;
+        }
+        */
         // It is probably impossible to avoid blocking in this phase
         return send_recv<T, Pstream::commsTypes::blocking>(values, m_current_state.destinations, m_current_state.sources);
+        
+        
+        
     }
 
 
@@ -177,7 +209,13 @@ public:
 
         // TODO: only in debug mode
         if (std::accumulate(subsizes.begin(), subsizes.end(), 0) != big_array.size()) {
-            throw "Total send count not matching the problem count.";
+
+            int s_total = std::accumulate(subsizes.begin(), subsizes.end(), 0);
+            int a_total = big_array.size();  
+
+            throw std::string("Total send count not matching the problem count for subsize total of: ") 
+                   + std::to_string(s_total) + std::string(" and array total of: ") + std::to_string(a_total);
+
         }
 
         //allocate storage based on the first element

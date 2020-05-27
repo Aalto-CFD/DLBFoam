@@ -83,8 +83,8 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::pyJacChemistryModel(ReactionThe
     // load_balancer_ = new simpleLoadBalancing(SOMEDICT_DIDNT_CHECK_IF_CORRECT,
     // thermo.composition());
 
-    //load_balancer_ = new simpleLoadBalancing();
-    load_balancer_ = new bulutLoadBalancing();
+    load_balancer_ = new simpleLoadBalancing();
+    //load_balancer_ = new bulutLoadBalancing();
 
     if (this->chemistry_) {
 
