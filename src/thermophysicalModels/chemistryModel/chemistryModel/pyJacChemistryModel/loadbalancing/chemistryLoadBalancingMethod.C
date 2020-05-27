@@ -30,10 +30,7 @@ DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads(const Dynamic
 
     loads[Pstream::myProcNo()] = this->get_my_load(problems);
 
-
-
     int tag                    = 1;
-    // TODO: Call MPI_Allgather instead, these functions appear to be doing something crazy
     Pstream::gatherList(loads, tag);
     Pstream::scatterList(loads, tag);
 

@@ -54,7 +54,20 @@ bulutLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) con
                 }           
             }
         }
-    }        
+    }
+
+
+    size_t my_idx = get_my_load_index(loads);
+    auto my_load = loads[my_idx];
+
+    
+    int send_problems = std::accumulate(curr_state.number_of_problems.begin(), curr_state.number_of_problems.end(), 0);
+    int remaining_problems = my_load.number_of_active_cells - send_problems;
+
+
+    curr_state.destinations.insert(curr_state.destinations.begin(), Pstream::myProcNo());
+    curr_state.sources.insert(curr_state.sources.begin(), Pstream::myProcNo());
+    curr_state.number_of_problems.insert(curr_state.number_of_problems.begin(), remaining_problems);
     return curr_state;
 }
 

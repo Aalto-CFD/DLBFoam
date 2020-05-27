@@ -24,8 +24,13 @@ TEST_CASE("chemistryLoad comparisons"){
 
 TEST_CASE("chemistryLoad mpi send and receive"){
 
+    
 
     using namespace Foam;
+
+    if (Pstream::parRun()) {
+
+    
 
     chemistryLoad l1(43, 1.433531, 11330);
 
@@ -56,7 +61,7 @@ TEST_CASE("chemistryLoad mpi send and receive"){
     }
 
     
-
+    }
     
 
     //fromNeighb >> nbrdAlpha >> nbrpFaceCells >> nbrp_rghPross >> nbrCellC ;

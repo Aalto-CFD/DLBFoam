@@ -349,6 +349,7 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
                                                               const scalar&            deltaT) {
 
     // TODO: Add refcell and Treact as conditions to get problems.
+
     DynamicList<chemistryProblem> chem_problems;
     const scalarField&            T = this->thermo().T();
     const scalarField&            p = this->thermo().p();
@@ -371,12 +372,6 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
 
         chem_problems.append(problem);
 
-        //This was not working
-        /*if (refcell_mapper_->active()) {
-            if (!refcell_mapper_->applyMapping(Y_, celli)) { chem_problems.append(problem); }
-        } else {
-            chem_problems.append(problem);
-        }*/
     }
     return chem_problems;
 }
@@ -448,8 +443,11 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
     // This assumes no refMapping, all the cells are in problems list
     DynamicList<chemistryProblem> all_problems = get_problems(Y_, deltaT_);
 
-    load_balancer_->update_state(all_problems);
+    int original_problem_count = all_problems.size();
 
+
+    load_balancer_->update_state(all_problems);
+    load_balancer_->print_state();
     
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
 
@@ -458,14 +456,24 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
 
 
+
+    int solution_count = 0;
+
     scalar deltaTMin = great;
     for (size_t i = 0; i < my_solutions.size(); ++i){
 
         scalar temp = update_reaction_rates(my_solutions[i]);
         if (temp < deltaTMin) {
             deltaTMin = temp;
-        } 
+        }
+        solution_count += my_solutions[i].size(); 
     }
+
+
+    if (solution_count != original_problem_count){
+        throw error("Solution count differs from problem count.");
+    }
+
 
     return deltaTMin;
     
