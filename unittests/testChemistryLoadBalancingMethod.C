@@ -52,8 +52,8 @@ public:
     
 
     template<class ET, Pstream::commsTypes CT>
-    buffer_t<ET> test_send_recv(const buffer_t<ET>& buffer, std::vector<int> sources, std::vector<int> dests) const{
-        return this->send_recv<ET, CT>(buffer, sources, dests);
+    static buffer_t<ET> test_send_recv(const buffer_t<ET>& buffer, std::vector<int> sources, std::vector<int> dests){
+        return chemistryLoadBalancingMethod::send_recv<ET, CT>(buffer, sources, dests);
     }
    
     DynamicList<chemistryLoad> test_get_loads(const DynamicList<chemistryProblem>& problems) const   {return this->get_loads(problems);}
@@ -208,16 +208,12 @@ TEST_CASE("chemistryLoadBalancingMethod partition()"){
 
 
 
-
-
-/*
-
-TEST_CASE("chemistryLoadBalancingMethod send_recv()"){
+TEST_CASE("chemistryLoadBalancingMethod send_recv() swap test"){
 
     
     using namespace Foam;
 
-    testableLoadBalancing l;
+    
     std::vector<int> sources = {};
     std::vector<int> destinations = {};
     std::vector<int> counts = {};
@@ -238,7 +234,7 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv()"){
     send_buffer.setSize(1);
     send_buffer[0] = create_problems(10);
 
-    auto recv_buffer = l.test_send_recv<chemistryProblem, Pstream::commsTypes::nonBlocking>(
+    auto recv_buffer = testableLoadBalancing::test_send_recv<chemistryProblem, Pstream::commsTypes::nonBlocking>(
         send_buffer, sources, destinations);
 
     if (Pstream::myProcNo() == 1) {
@@ -254,54 +250,34 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv()"){
     
 }
 
-
-
-TEST_CASE("chemistryLoadBalancingMethod get_send_buffer()"){
-
-    
+TEST_CASE("chemistryLoadBalancingMethod send_recv() self send") {
 
     using namespace Foam;
 
-    testableLoadBalancing l;
+    auto problems = create_problems(10);
 
-    std::vector<int> sources;
-    std::vector<int> destinations;
-    std::vector<int> n_problems;
+    std::vector<int> sources      = {Pstream::myProcNo()};
+    std::vector<int> destinations = {Pstream::myProcNo()};
+    std::vector<int> counts       = {10};
 
+    auto send_buffer = chemistryLoadBalancingMethod::partition(problems, counts);
+
+    auto recv_buffer = testableLoadBalancing::test_send_recv<chemistryProblem,
+         Pstream::commsTypes::nonBlocking>(send_buffer, sources, destinations);
+
+
+    CHECK(recv_buffer.size() == 1);
     
+    auto recv_problems = recv_buffer[0];
 
-    int n_total_problems = 10;
-
-    
-    auto problems = create_problems(n_total_problems);
-    
-    sources = {};
-    destinations = {1,2,3};
-    n_problems = {3,3,2};
-
-    l.set_test_state(sources, destinations, n_problems);
-    
-    auto buffer = l.test_get_send_buffer(problems);
-
-
-    for (size_t i = 0; i < destinations.size(); ++i){
-        CHECK(buffer[i].size() == n_problems[i]);    
+    for (size_t i = 0; i < 10; ++i){
+        CHECK(recv_problems[i].cellid == i);
     }
-    
-    //cellids 0,1,2 "remain" in problems the first problem to send contains
-    //cell id 2 
-    CHECK(buffer[0][0].cellid == 2);
-    CHECK(buffer[1][0].cellid == 2 + n_problems[0]);
-    CHECK(buffer[2][0].cellid == 2 + n_problems[0] + n_problems[1]);
 
-
-    n_problems = {4,4,4};
-    l.set_test_state(sources, destinations, n_problems);
-    
-    REQUIRE_THROWS(l.test_get_send_buffer(problems));
-    
 
 }
+
+/*
 
 
 

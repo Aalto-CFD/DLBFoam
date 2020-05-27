@@ -252,9 +252,9 @@ protected:
     ///@return buffer_t<ET> the received buffer
     ///
     template <class ET, Pstream::commsTypes CT>
-    buffer_t<ET> send_recv(const buffer_t<ET>&     send_buffer,
+    static buffer_t<ET> send_recv(const buffer_t<ET>&     send_buffer,
                            const std::vector<int>& sources,
-                           const std::vector<int>& destinations) const {
+                           const std::vector<int>& destinations) {
 
         PstreamBuffers pBufs(CT);
 
