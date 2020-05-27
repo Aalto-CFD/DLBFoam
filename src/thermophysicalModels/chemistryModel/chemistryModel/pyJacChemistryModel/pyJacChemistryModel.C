@@ -431,31 +431,54 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
 template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
 scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& deltaT) {
-
+    
     using problem_buffer_t  = chemistryLoadBalancingMethod::buffer_t<chemistryProblem>;
     using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
 
+    clockTime timer;
+
+    double interval = timer.timeIncrement();    
     BasicChemistryModel<ReactionThermo>::correct();
+    Info << "correct() took: " << timer.timeIncrement() << endl;
+
 
     if (!this->chemistry_) { return great; }
     const scalar deltaT_ = deltaT[0]; // TODO: Check if this is true (all cells have same deltaT)
 
+    
+
+    
+    timer.timeIncrement();
     // This assumes no refMapping, all the cells are in problems list
     DynamicList<chemistryProblem> all_problems = get_problems(Y_, deltaT_);
+    Info << "get_problems() took: " << timer.timeIncrement() << endl;
+
 
     int original_problem_count = all_problems.size();
 
-
+    timer.timeIncrement();
     load_balancer_->update_state(all_problems);
+    Info << "update_state() took: " << timer.timeIncrement() << endl;
+
+
     load_balancer_->print_state();
     
+    timer.timeIncrement();
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
+    Info << "balance() took: " << timer.timeIncrement() << endl;
 
+
+    timer.timeIncrement();
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
+    Info << "solve_buffer() took: " << timer.timeIncrement() << endl;
 
+    timer.timeIncrement();
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
+    Info << "unbalance() took: " << timer.timeIncrement() << endl;
 
 
+
+    timer.timeIncrement();
 
     int solution_count = 0;
 
@@ -468,6 +491,8 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
         }
         solution_count += my_solutions[i].size(); 
     }
+
+    Info << "update_reaction_rates() took: " << timer.timeIncrement() << endl;
 
 
     if (solution_count != original_problem_count){
