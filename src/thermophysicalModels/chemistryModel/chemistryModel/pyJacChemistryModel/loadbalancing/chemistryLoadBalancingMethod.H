@@ -228,10 +228,11 @@ protected:
         
         if (sources.size() < 1) return false;
         if (destinations.size() < 1) return false;
-        if (sources[0] != Pstream::myProcNo()) return false; //the first index must always be this process
-        if (sources[0] != destinations[0]) return false; 
         if (sources.size() > Pstream::nProcs()) return false;
         if (destinations.size() > Pstream::nProcs()) return false;
+        if (sources[0] != Pstream::myProcNo()) return false; //the first index must always be this process
+        if (sources[0] != destinations[0]) return false; 
+        
 
         return true;
 
