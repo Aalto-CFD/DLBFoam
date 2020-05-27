@@ -34,7 +34,7 @@ DynamicList<chemistryProblem> create_problems2(int count){
 
 }
 
-/*
+
 
 TEST_CASE("simpleLoadBalancing balance() / unbalance()"){
 
@@ -53,7 +53,7 @@ TEST_CASE("simpleLoadBalancing balance() / unbalance()"){
 
 
 }
-*/
+
 
 
 }

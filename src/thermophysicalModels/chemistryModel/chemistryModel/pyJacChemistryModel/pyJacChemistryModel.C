@@ -446,30 +446,22 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
     const scalar deltaT_ = deltaT[0]; // TODO: Check if this is true (all cells have same deltaT)
 
     // This assumes no refMapping, all the cells are in problems list
-    DynamicList<chemistryProblem> my_problems = get_problems(Y_, deltaT_);
+    DynamicList<chemistryProblem> all_problems = get_problems(Y_, deltaT_);
 
-
-
-    load_balancer_->update_state(my_problems);
-
-    problem_buffer_t additional_problems = load_balancer_->balance(my_problems);
+    load_balancer_->update_state(all_problems);
 
     
-    //THIS IS CURRENTLY WRONG, 'my_problems are not shortened by load_balancer', meaning that 
-    //all problems of this process are currently solved even if sent to other process for solving
-    //TODO: make load_balancer_->balance put the remaining my_problems also to buffer
-    DynamicList<chemistrySolution> my_solutions = solve_list(my_problems);
+    problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
 
-    solution_buffer_t additional_solutions = solve_buffer(additional_problems);
+    solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
 
-    solution_buffer_t solutions_to_me = load_balancer_->unbalance(additional_solutions);
+    solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
 
-    solutions_to_me.append(my_solutions);
 
     scalar deltaTMin = great;
-    for (size_t i = 0; i < solutions_to_me.size(); ++i){
+    for (size_t i = 0; i < my_solutions.size(); ++i){
 
-        scalar temp = update_reaction_rates(my_solutions);
+        scalar temp = update_reaction_rates(my_solutions[i]);
         if (temp < deltaTMin) {
             deltaTMin = temp;
         } 

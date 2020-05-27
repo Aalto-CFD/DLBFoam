@@ -133,7 +133,6 @@ public:
             throw "Invalid unbalance state in chemistryLoadBalancing.";
         }
         
-
         // It is probably impossible to avoid blocking in this phase
         return send_recv<T, Pstream::commsTypes::blocking>(values, m_current_state.destinations, m_current_state.sources);
     }
