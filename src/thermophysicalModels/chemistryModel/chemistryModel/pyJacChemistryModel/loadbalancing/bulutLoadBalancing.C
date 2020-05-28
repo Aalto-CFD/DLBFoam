@@ -57,7 +57,8 @@ bulutLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) con
     }
 
 
-    size_t my_idx = get_my_load_index(loads);
+    
+    size_t my_idx = rank_to_load_idx(loads, Pstream::myProcNo());
     auto my_load = loads[my_idx];
 
     
