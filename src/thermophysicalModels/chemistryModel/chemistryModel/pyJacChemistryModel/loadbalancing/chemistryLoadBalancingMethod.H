@@ -111,8 +111,13 @@ public:
 
         
         // It is probably impossible to avoid blocking in this phase
-        return send_recv<T, Pstream::commsTypes::blocking>(
+        //return send_recv<T, Pstream::commsTypes::blocking>(
+        //    values, m_current_state.destinations, m_current_state.sources);
+
+        // It is probably impossible to avoid blocking in this phase
+        return send_recv<T, Pstream::commsTypes::nonBlocking>(
             values, m_current_state.destinations, m_current_state.sources);
+
     }
 
 
