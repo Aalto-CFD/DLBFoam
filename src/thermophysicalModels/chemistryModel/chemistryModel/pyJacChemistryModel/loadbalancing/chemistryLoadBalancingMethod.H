@@ -101,6 +101,10 @@ public:
         // auto send_buffer = get_send_buffer(values);
         return send_recv<T, Pstream::commsTypes::blocking>(
             get_send_buffer(values), m_current_state.sources, m_current_state.destinations);
+
+        // auto send_buffer = get_send_buffer(values);
+        //return send_recv<T, Pstream::commsTypes::nonBlocking>(
+        //    get_send_buffer(values), m_current_state.sources, m_current_state.destinations);    
     }
 
     ///
@@ -230,7 +234,7 @@ public:
 
         Pout << "Rank: " << Pstream::myProcNo()
              << " sends to: " << vector_to_string(m_current_state.destinations)
-             << " receivs from: " << vector_to_string(m_current_state.sources)
+             << " receives from: " << vector_to_string(m_current_state.sources)
              << " counts: " << vector_to_string(m_current_state.number_of_problems) << endl;
     }
 
@@ -244,7 +248,7 @@ public:
     }
 
 protected:
-    size_t get_my_load_index(const DynamicList<chemistryLoad>& loads) const;
+    size_t rank_to_load_idx(const DynamicList<chemistryLoad>& loads, int rank) const;
 
     bool valid_state() const {
 

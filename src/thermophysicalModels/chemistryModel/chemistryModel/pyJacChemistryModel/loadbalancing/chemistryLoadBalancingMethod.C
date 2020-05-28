@@ -11,10 +11,10 @@ chemistryLoad chemistryLoadBalancingMethod::get_my_load(const DynamicList<chemis
 }
 
 
-size_t chemistryLoadBalancingMethod::get_my_load_index(const DynamicList<chemistryLoad>& loads) const {
+size_t chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistryLoad>& loads, int rank) const {
 
     for (size_t i = 0; i < loads.size(); ++i){
-        if (loads[i].rank == Pstream::myProcNo()) return i;
+        if (loads[i].rank == rank) return i;
     }
 
     throw "Could not find my rank from loads.";
