@@ -77,8 +77,7 @@ public:
     virtual int compute_active_cells(PtrList<volScalarField>& Y) const = 0;
 
 
-    virtual bool applyMapping(PtrList<volScalarField>& Y, const label celli) = 0;
-
+    virtual bool shouldMap(chemistryProblem& problem) = 0;
 
     virtual bool active() const = 0;
 

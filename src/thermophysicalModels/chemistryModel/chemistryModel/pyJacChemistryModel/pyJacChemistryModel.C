@@ -373,16 +373,13 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
             problem.cellid     = celli;
             problem.deltaT     = deltaT;
          
-            if(!refcell_mapper_-> applyMapping(Y_,celli))
-            {    
-                chem_problems.append(problem);
-            }
-            else
-            {
-                // TODO: Also update deltaTmin from reference solution
+            if(refcell_mapper_-> shouldMap(problem))
+            {  
+                 // TODO: Also update deltaTmin from reference solution
                 if(!refCellFound)
                 {
                     ref_soln = solve_single(problem);
+                    refcell_mapper_->update_refCell(solve_single(problem));
                     for (label i = 0; i < nSpecie_; i++) { RR_[i][celli] = ref_soln.RR[i]; }
                     this->deltaTChem_[celli] = min(ref_soln.deltaTChem, this->deltaTChemMax_);
                     refCellFound = true;
@@ -392,6 +389,10 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
                     for (label i = 0; i < nSpecie_; i++) {RR_[i][celli] = ref_soln.RR[i]; }
                     this->deltaTChem_[celli] = min(ref_soln.deltaTChem, this->deltaTChemMax_);
                 }
+            }
+            else
+            {
+                chem_problems.append(problem);
             }
         }
         else

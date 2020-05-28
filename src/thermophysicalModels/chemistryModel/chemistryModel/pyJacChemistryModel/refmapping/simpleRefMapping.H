@@ -44,9 +44,9 @@ public:
 
     int compute_active_cells(PtrList<volScalarField>& Y) const;
 
-    bool applyMapping(PtrList<volScalarField>& Y, const label celli);
+    bool shouldMap(chemistryProblem& problem);
     
-    bool check_if_refcell(PtrList<volScalarField>& Y, const label celli);
+    bool check_if_refcell(chemistryProblem& problem);
 
     bool active() const {return active_;}
     
