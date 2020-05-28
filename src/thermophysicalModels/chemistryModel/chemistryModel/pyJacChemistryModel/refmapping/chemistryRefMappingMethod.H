@@ -41,6 +41,7 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 
 
+#include "chemistryProblem.H"
 
 // Mixture fraction headers
 #include "atomicWeights.H"
