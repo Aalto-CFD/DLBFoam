@@ -98,11 +98,11 @@ public:
     ///
     template <class T> buffer_t<T> balance(const DynamicList<T>& values) const {
 
-        // auto send_buffer = get_send_buffer(values);
+    
         return send_recv<T, Pstream::commsTypes::blocking>(
             get_send_buffer(values), m_current_state.sources, m_current_state.destinations);
 
-        // auto send_buffer = get_send_buffer(values);
+        
         //return send_recv<T, Pstream::commsTypes::nonBlocking>(
         //    get_send_buffer(values), m_current_state.sources, m_current_state.destinations);    
     }

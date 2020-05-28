@@ -8,9 +8,9 @@
 Build  : 6-fa1285188035
 Exec   : blockMesh
 Date   : May 29 2020
-Time   : 00:09:46
+Time   : 01:36:53
 Host   : "peltonp1-All-Series"
-PID    : 2375
+PID    : 24025
 I/O    : uncollated
 Case   : /home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_PYJAC
 nProcs : 1

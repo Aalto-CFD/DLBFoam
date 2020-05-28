@@ -6,6 +6,9 @@ namespace Foam {
 
 struct chemistryProblem {
 
+    chemistryProblem() = default;
+    chemistryProblem(int nSpecie) : c(nSpecie), Ti(0), pi(0), rhoi(0), deltaTChem(0), deltaT(0), cellid(0){}
+
     scalarField c;
     scalar      Ti;
     scalar      pi;

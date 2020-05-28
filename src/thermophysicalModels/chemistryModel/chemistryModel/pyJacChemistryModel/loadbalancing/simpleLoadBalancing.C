@@ -8,7 +8,7 @@ chemistryLoadBalancingMethod::sendRecvInfo simpleLoadBalancing::determine_state(
 
     // The ratio of (between 0, 1) original problems on a rank to swap between the neighbour.
     // zero means no problems are swapped and 1 means that all problems are swapped 
-    float mutliplier = 0.7;
+    float mutliplier = 0;
 
     size_t my_idx = rank_to_load_idx(loads, Pstream::myProcNo());
     auto my_load = loads[my_idx];

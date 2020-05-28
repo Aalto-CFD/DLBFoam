@@ -5,15 +5,23 @@
 namespace Foam {
 
 struct chemistrySolution {
-    scalarField c;
-    scalarField RR;
-    scalar deltaTChem;
-    label    cellid;
+
+    chemistrySolution() = default;
+
+    chemistrySolution(int nspecie) : c(nspecie, 0.0), RR(nspecie, 0.0), deltaTChem(0.0), cellid(0) {}
+
 
     // TODO: implement!
     bool operator==(const chemistrySolution& rhs) const { return false; }
 
     bool operator!=(const chemistrySolution& rhs) const { return !(*this == rhs); }
+
+    scalarField c;
+    scalarField RR;
+    scalar deltaTChem;
+    label    cellid;
+
+
 };
 
 // These are required for sending and receving using the OF MPI routines
