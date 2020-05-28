@@ -51,6 +51,13 @@ SourceFiles
 #include "chemistryRefMappingMethod.H"
 #include "chemistrySolution.H"
 
+#ifdef DEBUG
+static inline void runtime_assert(bool condition, const char* msg) {
+    if (!condition) throw std::runtime_error(msg);
+}
+#else
+static inline void runtime_assert([[maybe_unused]] bool condition, [[maybe_unused]] const char* msg) {}
+#endif
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam {
@@ -158,19 +165,8 @@ public:
     template <class T>
     static DynamicList<DynamicList<T>> partition(const DynamicList<T>&   big_array,
                                                  const std::vector<int>& subsizes) {
-
-        // TODO: only in debug mode
-        if (std::accumulate(subsizes.begin(), subsizes.end(), 0) != big_array.size()) {
-
-            int s_total = std::accumulate(subsizes.begin(), subsizes.end(), 0);
-            int a_total = big_array.size();
-
-            throw error(
-                std::string(
-                    "Total send count not matching the problem count for subsize total of: ") +
-                std::to_string(s_total) + std::string(" and array total of: ") +
-                std::to_string(a_total));
-        }
+        
+        runtime_assert(check_sendcount_size(big_array,subsizes), "Total send count not matching the problem count!");
 
         // allocate storage based on the first element
         T element_copy;
@@ -189,6 +185,33 @@ public:
         }
 
         return ret;
+    }
+
+    ///
+    ///@brief Checks if the total send count matches the problem count for subsizes
+    ///
+    ///@tparam T element type
+    ///@param big_array the array to split
+    ///@param subsizes  vector of subarray sizes
+    ///@return bool
+    ///
+    template <class T>
+    static bool check_sendcount_size(const DynamicList<T>&   big_array,
+                              const std::vector<int>& subsizes) {
+        if (std::accumulate(subsizes.begin(), subsizes.end(), 0) != big_array.size()) {
+            /*
+            int s_total = std::accumulate(subsizes.begin(), subsizes.end(), 0);
+            int a_total = big_array.size();
+
+            throw error(
+                std::string(
+                    "Total send count not matching the problem count for subsize total of: ") +
+                std::to_string(s_total) + std::string(" and array total of: ") +
+                std::to_string(a_total));
+            */
+            return false;
+        } 
+            return true;
     }
 
     ///
