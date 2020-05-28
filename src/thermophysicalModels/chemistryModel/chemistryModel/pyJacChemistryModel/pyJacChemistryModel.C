@@ -358,7 +358,7 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
 
     DynamicList<chemistryProblem> chem_problems;
     chem_problems.reserve(T.size());
-    
+
     chemistrySolution             ref_soln(this->nSpecie_);
 
     forAll(p, celli) {
@@ -374,6 +374,8 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
         problem.cellid     = celli;
         problem.deltaT     = deltaT;
 
+
+        
         if (refcell_mapper_->active()) {
 
             if (refcell_mapper_->shouldMap(problem)) {
