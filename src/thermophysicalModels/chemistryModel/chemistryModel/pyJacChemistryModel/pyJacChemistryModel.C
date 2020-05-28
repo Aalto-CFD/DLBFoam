@@ -379,7 +379,6 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
                 if(!refCellFound)
                 {
                     ref_soln = solve_single(problem);
-                    refcell_mapper_->update_refCell(solve_single(problem));
                     for (label i = 0; i < nSpecie_; i++) { RR_[i][celli] = ref_soln.RR[i]; }
                     this->deltaTChem_[celli] = min(ref_soln.deltaTChem, this->deltaTChemMax_);
                     refCellFound = true;
