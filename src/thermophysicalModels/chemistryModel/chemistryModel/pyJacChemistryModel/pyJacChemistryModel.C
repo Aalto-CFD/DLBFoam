@@ -537,8 +537,6 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
 
 
     return deltaTMin;
-    
-   return 0;
 }
 
 template <class ReactionThermo, class ThermoType>
