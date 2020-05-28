@@ -12,7 +12,7 @@ int simpleRefMapping::compute_active_cells(PtrList<volScalarField>& Y) const{
 
 
 
-bool simpleRefMapping::check_if_refcell(PtrList<volScalarField>& Y, const label celli)
+bool simpleRefMapping::check_if_refcell(chemistryProblem& problem)
 {
     //Note this assumes that mixture_fraction.update() has been called!
     auto beta_of = mixture_fraction_.get_beta();
@@ -20,10 +20,10 @@ bool simpleRefMapping::check_if_refcell(PtrList<volScalarField>& Y, const label 
 
     scalar beta = 0.0; //TODO: rename!
     scalar Z;
-    forAll(Y, iField)
+    forAll(problem.c, iField)
     {
-        const scalarField& Yi = Y[iField];
-        beta += alpha[iField]*Yi[celli];
+        const scalar& Yi = problem.c[iField];
+        beta += alpha[iField]*Yi;
     }
     Z = (beta - beta_of[0])/(beta_of[1] - beta_of[0]);
     if (Z>tolerance_)
@@ -37,8 +37,8 @@ bool simpleRefMapping::check_if_refcell(PtrList<volScalarField>& Y, const label 
 
 }
 
-bool simpleRefMapping::applyMapping(PtrList<volScalarField>& Y, const label celli) {
-    return check_if_refcell(Y,celli);
+bool simpleRefMapping::shouldMap(chemistryProblem& problem) {
+    return check_if_refcell(problem);
 }
 
 } //namespace Foam

@@ -7,7 +7,7 @@ src/**/*/Make/linux64*
 
 applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
-
+tutorials/
 #Visual studio code configs
 .vscode
 
@@ -53,3 +53,5 @@ applications/utilities/**/Make/linux64*
 *.exe
 *.app
 
+
+*.bin
