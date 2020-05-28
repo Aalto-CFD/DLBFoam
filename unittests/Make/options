@@ -12,6 +12,7 @@ EXE_INC = \
     -I$(WM_PROJECT_USER_DIR)/pyJac/out/jacobs \
     -I../src/thermophysicalModels/lnInclude \
     -I../src/thermophysicalModels/chemistryModel/lnInclude \
+    -DDEBUG
 
 
 EXE_LIBS = \

@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 6-fa1285188035
 Exec   : blockMesh
-Date   : May 18 2020
-Time   : 20:20:35
+Date   : May 29 2020
+Time   : 00:09:46
 Host   : "peltonp1-All-Series"
-PID    : 13688
+PID    : 2375
 I/O    : uncollated
 Case   : /home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_PYJAC
 nProcs : 1
@@ -49,8 +49,8 @@ Creating patches
 Creating cells
 Creating points with scale 1
     Block 0 cell size :
-        i : 0.0001 .. 0.0001
-        j : 0.00025 .. 0.00025
+        i : 0.0002 .. 0.0002
+        j : 0.0005 .. 0.0005
         k : 0.02 .. 0.02
 
 
@@ -59,17 +59,17 @@ Writing polyMesh
 Mesh Information
 ----------------
   boundingBox: (0 -0.01 -0.01) (0.02 0.01 0.01)
-  nPoints: 32562
-  nCells: 16000
-  nFaces: 64280
-  nInternalFaces: 31720
+  nPoints: 8282
+  nCells: 4000
+  nFaces: 16140
+  nInternalFaces: 7860
 ----------------
 Patches
 ----------------
-  patch 0 (start: 31720 size: 80) name: fuel
-  patch 1 (start: 31800 size: 80) name: air
-  patch 2 (start: 31880 size: 400) name: outlet
-  patch 3 (start: 32280 size: 32000) name: frontAndBack
+  patch 0 (start: 7860 size: 40) name: fuel
+  patch 1 (start: 7900 size: 40) name: air
+  patch 2 (start: 7940 size: 200) name: outlet
+  patch 3 (start: 8140 size: 8000) name: frontAndBack
 
 End
 

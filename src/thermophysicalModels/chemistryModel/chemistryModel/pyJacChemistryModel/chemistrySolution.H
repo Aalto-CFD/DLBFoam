@@ -5,8 +5,8 @@
 namespace Foam {
 
 struct chemistrySolution {
-    scalarList c;
-    scalarList RR;
+    scalarField c;
+    scalarField RR;
     scalar deltaTChem;
     label    cellid;
 

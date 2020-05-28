@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 6-fa1285188035
 Exec   : decomposePar
-Date   : May 18 2020
-Time   : 20:20:35
+Date   : May 29 2020
+Time   : 00:09:46
 Host   : "peltonp1-All-Series"
-PID    : 13689
+PID    : 2376
 I/O    : uncollated
 Case   : /home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_PYJAC
 nProcs : 1
@@ -43,77 +43,77 @@ Distributing points to processors
 Constructing processor meshes
 
 Processor 0
-    Number of cells = 2000
-    Number of faces shared with processor 1 = 20
-    Number of faces shared with processor 2 = 100
+    Number of cells = 500
+    Number of faces shared with processor 1 = 10
+    Number of faces shared with processor 2 = 50
     Number of processor patches = 2
-    Number of processor faces = 120
-    Number of boundary faces = 4120
+    Number of processor faces = 60
+    Number of boundary faces = 1060
 
 Processor 1
-    Number of cells = 2000
-    Number of faces shared with processor 0 = 20
-    Number of faces shared with processor 3 = 100
+    Number of cells = 500
+    Number of faces shared with processor 0 = 10
+    Number of faces shared with processor 3 = 50
     Number of processor patches = 2
-    Number of processor faces = 120
-    Number of boundary faces = 4120
+    Number of processor faces = 60
+    Number of boundary faces = 1060
 
 Processor 2
-    Number of cells = 2000
-    Number of faces shared with processor 0 = 100
-    Number of faces shared with processor 3 = 20
-    Number of faces shared with processor 4 = 100
+    Number of cells = 500
+    Number of faces shared with processor 0 = 50
+    Number of faces shared with processor 3 = 10
+    Number of faces shared with processor 4 = 50
     Number of processor patches = 3
-    Number of processor faces = 220
-    Number of boundary faces = 4020
+    Number of processor faces = 110
+    Number of boundary faces = 1010
 
 Processor 3
-    Number of cells = 2000
-    Number of faces shared with processor 1 = 100
-    Number of faces shared with processor 2 = 20
-    Number of faces shared with processor 5 = 100
+    Number of cells = 500
+    Number of faces shared with processor 1 = 50
+    Number of faces shared with processor 2 = 10
+    Number of faces shared with processor 5 = 50
     Number of processor patches = 3
-    Number of processor faces = 220
-    Number of boundary faces = 4020
+    Number of processor faces = 110
+    Number of boundary faces = 1010
 
 Processor 4
-    Number of cells = 2000
-    Number of faces shared with processor 2 = 100
-    Number of faces shared with processor 5 = 20
-    Number of faces shared with processor 6 = 100
+    Number of cells = 500
+    Number of faces shared with processor 2 = 50
+    Number of faces shared with processor 5 = 10
+    Number of faces shared with processor 6 = 50
     Number of processor patches = 3
-    Number of processor faces = 220
-    Number of boundary faces = 4020
+    Number of processor faces = 110
+    Number of boundary faces = 1010
 
 Processor 5
-    Number of cells = 2000
-    Number of faces shared with processor 3 = 100
-    Number of faces shared with processor 4 = 20
-    Number of faces shared with processor 7 = 100
+    Number of cells = 500
+    Number of faces shared with processor 3 = 50
+    Number of faces shared with processor 4 = 10
+    Number of faces shared with processor 7 = 50
     Number of processor patches = 3
-    Number of processor faces = 220
-    Number of boundary faces = 4020
+    Number of processor faces = 110
+    Number of boundary faces = 1010
 
 Processor 6
-    Number of cells = 2000
-    Number of faces shared with processor 4 = 100
-    Number of faces shared with processor 7 = 20
+    Number of cells = 500
+    Number of faces shared with processor 4 = 50
+    Number of faces shared with processor 7 = 10
     Number of processor patches = 2
-    Number of processor faces = 120
-    Number of boundary faces = 4120
+    Number of processor faces = 60
+    Number of boundary faces = 1060
 
 Processor 7
-    Number of cells = 2000
-    Number of faces shared with processor 5 = 100
-    Number of faces shared with processor 6 = 20
+    Number of cells = 500
+    Number of faces shared with processor 5 = 50
+    Number of faces shared with processor 6 = 10
     Number of processor patches = 2
-    Number of processor faces = 120
-    Number of boundary faces = 4120
+    Number of processor faces = 60
+    Number of boundary faces = 1060
 
-Number of processor faces = 680
-Max number of cells = 2000 (0% above average 2000)
+Number of processor faces = 340
+Max number of cells = 500 (0% above average 500)
 Max number of processor patches = 3 (20% above average 2.5)
-Max number of faces between processors = 220 (29.4118% above average 170)
+Max number of faces between processors = 110 (29.4118% above average 85)
 
 Time = 0
 

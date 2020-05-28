@@ -117,13 +117,12 @@ public:
     template <class T> buffer_t<T> unbalance(const buffer_t<T>& values) const {
 
         
-        // It is probably impossible to avoid blocking in this phase
-        //return send_recv<T, Pstream::commsTypes::blocking>(
-        //    values, m_current_state.destinations, m_current_state.sources);
+        return send_recv<T, Pstream::commsTypes::blocking>(
+            values, m_current_state.destinations, m_current_state.sources);
 
         // It is probably impossible to avoid blocking in this phase
-        return send_recv<T, Pstream::commsTypes::nonBlocking>(
-            values, m_current_state.destinations, m_current_state.sources);
+        //return send_recv<T, Pstream::commsTypes::nonBlocking>(
+        //    values, m_current_state.destinations, m_current_state.sources);
 
     }
 

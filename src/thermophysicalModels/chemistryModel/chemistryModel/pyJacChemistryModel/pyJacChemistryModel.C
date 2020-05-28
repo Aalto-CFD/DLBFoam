@@ -350,7 +350,13 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
 
     // TODO: Add refcell and Treact as conditions to get problems.
 
+
+
     DynamicList<chemistryProblem> chem_problems;
+
+
+
+
     const scalarField&            T = this->thermo().T();
     const scalarField&            p = this->thermo().p();
     tmp<volScalarField>           trho(this->thermo().rho());
@@ -446,12 +452,55 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::solve_single(chemistryProblem& 
 }
 
 template <class ReactionThermo, class ThermoType>
+void
+pyJacChemistryModel<ReactionThermo, ThermoType>::solve_single(chemistryProblem& prob, chemistrySolution& soln) const {
+
+    //chemistrySolution soln;
+    soln.cellid = prob.cellid;
+    //- Initialize the time progress
+    scalar timeLeft = prob.deltaT;
+
+    scalarList c0 = prob.c;
+    // Calculate the chemical source terms
+    while (timeLeft > small) {
+        scalar dt = timeLeft;
+
+        this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        timeLeft -= dt;
+    }
+    scalarList RRtmp(this->nSpecie_, 0.0);
+    soln.c = prob.c;
+    // RR_ should be weighted by density, due to NS formulation. rr = Y0-Y1 / dt, but RR_ =
+    // rho(Y0-Y1)/dt , the effect at Sh() function too!
+    for (label i = 0; i < this->nSpecie_; i++) {
+        RRtmp[i] = prob.rhoi * (soln.c[i] - c0[i]) / prob.deltaT;
+    }
+    soln.RR = RRtmp;
+
+    soln.deltaTChem = min(prob.deltaTChem, this->deltaTChemMax_);
+
+    //return soln;
+
+}
+
+
+
+
+template <class ReactionThermo, class ThermoType>
 DynamicList<chemistrySolution> pyJacChemistryModel<ReactionThermo, ThermoType>::solve_list(
     DynamicList<chemistryProblem>& problems) const {
 
-    DynamicList<chemistrySolution> chem_solns(problems.size(), chemistrySolution());
+    
 
-    for (size_t i = 0; i < chem_solns.size(); i++) { chem_solns[i] = solve_single(problems[i]); }
+    DynamicList<chemistrySolution> chem_solns(problems.size(), 
+                                              chemistrySolution{
+                                                scalarField(this->nSpecie_, 0.0),
+                                                scalarField(this->nSpecie_, 0.0),
+                                                0.0,
+                                                0
+                                              });
+
+    for (size_t i = 0; i < chem_solns.size(); i++) { solve_single(problems[i], chem_solns[i]); }
     return chem_solns;
 }
 
@@ -460,7 +509,15 @@ chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
 pyJacChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
     chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const {
 
+
+
+
     chemistryLoadBalancingMethod::buffer_t<chemistrySolution> ret;
+
+
+
+
+
 
     for (size_t i = 0; i < problems.size(); ++i) { ret.append(solve_list(problems[i])); }
     return ret;
