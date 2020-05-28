@@ -355,23 +355,61 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
     const scalarField&            p = this->thermo().p();
     tmp<volScalarField>           trho(this->thermo().rho());
     const scalarField&            rho = trho();
+    bool refCellFound = false;
+    chemistrySolution ref_soln;
 
-    forAll(p, celli) {
+    forAll(p, celli) {   
+        if (refcell_mapper_->active())
+        {
+            for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
 
-        for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
+            // Create the problem
+            chemistryProblem problem;
+            problem.pi         = p[celli];
+            problem.Ti         = T[celli];
+            problem.c          = c_;
+            problem.rhoi       = rho[celli];
+            problem.deltaTChem = this->deltaTChem_[celli];
+            problem.cellid     = celli;
+            problem.deltaT     = deltaT;
+         
+            if(!refcell_mapper_-> applyMapping(Y_,celli))
+            {    
+                chem_problems.append(problem);
+            }
+            else
+            {
+                // TODO: Also update deltaTmin from reference solution
+                if(!refCellFound)
+                {
+                    ref_soln = solve_single(problem);
+                    for (label i = 0; i < nSpecie_; i++) { RR_[i][celli] = ref_soln.RR[i]; }
+                    this->deltaTChem_[celli] = min(ref_soln.deltaTChem, this->deltaTChemMax_);
+                    refCellFound = true;
+                }
+                else
+                {
+                    for (label i = 0; i < nSpecie_; i++) {RR_[i][celli] = ref_soln.RR[i]; }
+                    this->deltaTChem_[celli] = min(ref_soln.deltaTChem, this->deltaTChemMax_);
+                }
+            }
+        }
+        else
+        {
+                for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
 
-        // Create the problem
-        chemistryProblem problem;
-        problem.pi         = p[celli];
-        problem.Ti         = T[celli];
-        problem.c          = c_;
-        problem.rhoi       = rho[celli];
-        problem.deltaTChem = this->deltaTChem_[celli];
-        problem.cellid     = celli;
-        problem.deltaT     = deltaT;
+                // Create the problem
+                chemistryProblem problem;
+                problem.pi         = p[celli];
+                problem.Ti         = T[celli];
+                problem.c          = c_;
+                problem.rhoi       = rho[celli];
+                problem.deltaTChem = this->deltaTChem_[celli];
+                problem.cellid     = celli;
+                problem.deltaT     = deltaT;
 
-        chem_problems.append(problem);
-
+                chem_problems.append(problem); 
+        }
     }
     return chem_problems;
 }
