@@ -275,6 +275,8 @@ private:
     DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const scalar& deltaT);
 
     scalar update_reaction_rates(const DynamicList<chemistrySolution>& solutions);
+    scalar update_reaction_rate(const chemistrySolution& solution, const label& cellid);
+
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

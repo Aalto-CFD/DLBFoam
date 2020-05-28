@@ -379,14 +379,12 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
                 if(!refCellFound)
                 {
                     ref_soln = solve_single(problem);
-                    for (label i = 0; i < nSpecie_; i++) { RR_[i][celli] = ref_soln.RR[i]; }
-                    this->deltaTChem_[celli] = min(ref_soln.deltaTChem, this->deltaTChemMax_);
+                    scalar tmp = update_reaction_rate(ref_soln,ref_soln.cellid);
                     refCellFound = true;
                 }
                 else
                 {
-                    for (label i = 0; i < nSpecie_; i++) {RR_[i][celli] = ref_soln.RR[i]; }
-                    this->deltaTChem_[celli] = min(ref_soln.deltaTChem, this->deltaTChemMax_);
+                    scalar tmp = update_reaction_rate(ref_soln,celli);
                 }
             }
             else
@@ -558,6 +556,21 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(
 
     return deltaTMin;
 }
+
+template <class ReactionThermo, class ThermoType>
+scalar pyJacChemistryModel<ReactionThermo, ThermoType>::update_reaction_rate(
+    const chemistrySolution& solution, const label& cellid){
+    scalar deltaTMin = great;
+
+        for (label j = 0; j < nSpecie_; j++) { RR_[j][cellid] = solution.RR[j]; }
+        deltaTMin                = min(solution.deltaTChem, deltaTMin);
+        this->deltaTChem_[cellid] = min(solution.deltaTChem, this->deltaTChemMax_);
+    
+    return deltaTMin;
+}
+
+
+
 
 template <class ReactionThermo, class ThermoType>
 scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const scalar deltaT) {
