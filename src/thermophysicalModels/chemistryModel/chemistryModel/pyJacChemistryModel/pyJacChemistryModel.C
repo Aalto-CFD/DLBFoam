@@ -353,28 +353,31 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
     // TODO: Add refcell and Treact as conditions to get problems.
 
 
- DynamicList<chemistryProblem> chem_problems;
+    DynamicList<chemistryProblem> chem_problems;
     const scalarField&            T = this->thermo().T();
     const scalarField&            p = this->thermo().p();
     tmp<volScalarField>           trho(this->thermo().rho());
     const scalarField&            rho = trho();
     bool refCellFound = false;
-    chemistrySolution ref_soln;
+    chemistrySolution ref_soln(this->nSpecie_);
 
-    forAll(p, celli) {   
+    forAll(p, celli) {
+
+        for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
+        // Create the problem
+        chemistryProblem problem;
+        problem.pi         = p[celli];
+        problem.Ti         = T[celli];
+        problem.c          = c_;
+        problem.rhoi       = rho[celli];
+        problem.deltaTChem = this->deltaTChem_[celli];
+        problem.cellid     = celli;
+        problem.deltaT     = deltaT;
+
+
         if (refcell_mapper_->active())
         {
-            for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
-
-            // Create the problem
-            chemistryProblem problem;
-            problem.pi         = p[celli];
-            problem.Ti         = T[celli];
-            problem.c          = c_;
-            problem.rhoi       = rho[celli];
-            problem.deltaTChem = this->deltaTChem_[celli];
-            problem.cellid     = celli;
-            problem.deltaT     = deltaT;
+            
          
             if(refcell_mapper_-> shouldMap(problem))
             {  
@@ -397,17 +400,7 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
         }
         else
         {
-                for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
-
-                // Create the problem
-                chemistryProblem problem;
-                problem.pi         = p[celli];
-                problem.Ti         = T[celli];
-                problem.c          = c_;
-                problem.rhoi       = rho[celli];
-                problem.deltaTChem = this->deltaTChem_[celli];
-                problem.cellid     = celli;
-                problem.deltaT     = deltaT;
+                
 
                 chem_problems.append(problem); 
         }
