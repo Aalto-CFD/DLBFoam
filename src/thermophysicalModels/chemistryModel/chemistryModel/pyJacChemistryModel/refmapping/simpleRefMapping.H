@@ -42,11 +42,9 @@ public:
     }
     
 
-    int compute_active_cells(PtrList<volScalarField>& Y) const;
 
-    bool shouldMap(chemistryProblem& problem);
+    bool shouldMap(const chemistryProblem& problem) const;
     
-    bool check_if_refcell(chemistryProblem& problem);
 
     bool active() const {return active_;}
     
@@ -68,6 +66,9 @@ private:
 
 
     mixtureFraction mixture_fraction_;
+
+    bool check_if_refcell(const chemistryProblem& problem) const;
+
 
 
 };
