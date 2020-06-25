@@ -258,8 +258,12 @@ public:
     virtual void
     jacobian(const scalar t, const scalarField& c, scalarField& dcdt, scalarSquareMatrix& J) const;
 
+
     virtual void
     solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
+
+       
+
 
 private:
     

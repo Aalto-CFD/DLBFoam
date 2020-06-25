@@ -1,0 +1,6 @@
+benchmark.C
+benchmark_chemistry.C
+
+
+EXE = $(FOAM_USER_APPBIN)/benchmarkChemistry
+

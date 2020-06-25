@@ -133,13 +133,25 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::omega(const scalarField& c
                                                             const scalar       T,
                                                             const scalar       p,
                                                             scalarField&       dcdt) const {
-    notImplemented("pyJacChemistryModel::omega"
+   /* 
+   notImplemented("pyJacChemistryModel::omega"
                    "("
                    "scalarField&, "
                    "scalar, "
                    "scalar, "
                    "scalarField& "
                    ") const");
+
+    */
+    dcdt = Zero;
+
+    forAll(reactions_, i)
+    {
+        const Reaction<ThermoType>& R = reactions_[i];
+
+        R.omega(p, T, c, dcdt);
+    }
+    
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -153,7 +165,7 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::omegaI(const label      
                                                                scalar&            pr,
                                                                scalar&            cr,
                                                                label&             rRef) const {
-    notImplemented("pyJacChemistryModel::omegaI"
+    /*notImplemented("pyJacChemistryModel::omegaI"
                    "("
                    "label, "
                    "scalarField&, "
@@ -168,6 +180,11 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::omegaI(const label      
                    ") const");
 
     return (0);
+    */
+   const Reaction<ThermoType>& R = reactions_[index];
+    scalar w = R.omega(p, T, c, pf, cf, lRef, pr, cr, rRef);
+    return(w);
+
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -198,10 +215,14 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::omega(const Reaction<The
     return (0);
 }
 
+
+/*
+
 template <class ReactionThermo, class ThermoType>
 void pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives(const scalar       time,
                                                                   const scalarField& c,
                                                                   scalarField&       dcdt) const {
+
 
     // TODO: pre-allocate me!
     // the '()' operator at the end sets the chunk to zero
@@ -229,6 +250,11 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives(const scalar  
     for (label i = 0; i < nSpecie_; i++) { dcdt[i] = dy[i]; }
     // dp/dt = 0
     dcdt[nSpecie_] = 0.0;
+
+
+
+
+
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -236,6 +262,7 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian(const scalar     
                                                                const scalarField&  c,
                                                                scalarField&        dcdt,
                                                                scalarSquareMatrix& J) const {
+
     std::vector<double> yToPyJac(nSpecie_ + 1, 0.0);
     std::vector<double> jac(nSpecie_ * nSpecie_, 0.0);
 
@@ -272,7 +299,141 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian(const scalar     
         J[nSpecie_][j] = 0.0;
         J[j][nSpecie_] = 0.0;
     }
+
+
 }
+*/
+
+
+
+template<class ReactionThermo, class ThermoType>
+void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::derivatives
+(
+    const scalar time,
+    const scalarField& c,
+    scalarField& dcdt
+) const
+{
+    const scalar T = c[nSpecie_];
+    const scalar p = c[nSpecie_ + 1];
+
+    forAll(c_, i)
+    {
+        c_[i] = max(c[i], 0);
+    }
+
+    omega(c_, T, p, dcdt);
+
+    // Constant pressure
+    // dT/dt = ...
+    scalar rho = 0;
+    scalar cSum = 0;
+    for (label i = 0; i < nSpecie_; i++)
+    {
+        const scalar W = specieThermo_[i].W();
+        cSum += c_[i];
+        rho += W*c_[i];
+    }
+    scalar cp = 0;
+    for (label i=0; i<nSpecie_; i++)
+    {
+        cp += c_[i]*specieThermo_[i].cp(p, T);
+    }
+    cp /= rho;
+
+    scalar dT = 0;
+    for (label i = 0; i < nSpecie_; i++)
+    {
+        const scalar hi = specieThermo_[i].ha(p, T);
+        dT += hi*dcdt[i];
+    }
+    dT /= rho*cp;
+
+    dcdt[nSpecie_] = -dT;
+
+    // dp/dt = ...
+    dcdt[nSpecie_ + 1] = 0;
+}
+
+
+template<class ReactionThermo, class ThermoType>
+void Foam::pyJacChemistryModel<ReactionThermo, ThermoType>::jacobian
+(
+    const scalar t,
+    const scalarField& c,
+    scalarField& dcdt,
+    scalarSquareMatrix& J
+) const
+{
+    const scalar T = c[nSpecie_];
+    const scalar p = c[nSpecie_ + 1];
+
+    forAll(c_, i)
+    {
+        c_[i] = max(c[i], 0);
+    }
+
+    J = Zero;
+    dcdt = Zero;
+
+    // To compute the species derivatives of the temperature term,
+    // the enthalpies of the individual species is needed
+    scalarField hi(nSpecie_);
+    scalarField cpi(nSpecie_);
+    for (label i = 0; i < nSpecie_; i++)
+    {
+        hi[i] = specieThermo_[i].ha(p, T);
+        cpi[i] = specieThermo_[i].cp(p, T);
+    }
+    scalar omegaI = 0;
+    List<label> dummy;
+    forAll(reactions_, ri)
+    {
+        const Reaction<ThermoType>& R = reactions_[ri];
+        scalar kfwd, kbwd;
+        R.dwdc(p, T, c_, J, dcdt, omegaI, kfwd, kbwd, false, dummy);
+        R.dwdT(p, T, c_, omegaI, kfwd, kbwd, J, false, dummy, nSpecie_);
+    }
+
+    // The species derivatives of the temperature term are partially computed
+    // while computing dwdc, they are completed hereunder:
+    scalar cpMean = 0;
+    scalar dcpdTMean = 0;
+    for (label i=0; i<nSpecie_; i++)
+    {
+        cpMean += c_[i]*cpi[i]; // J/(m3.K)
+        dcpdTMean += c_[i]*specieThermo_[i].dcpdT(p, T);
+    }
+    scalar dTdt = 0.0;
+    for (label i=0; i<nSpecie_; i++)
+    {
+        dTdt += hi[i]*dcdt[i]; // J/(m3.s)
+    }
+    dTdt /= -cpMean; // K/s
+
+    for (label i = 0; i < nSpecie_; i++)
+    {
+        J(nSpecie_, i) = 0;
+        for (label j = 0; j < nSpecie_; j++)
+        {
+            J(nSpecie_, i) += hi[j]*J(j, i);
+        }
+        J(nSpecie_, i) += cpi[i]*dTdt; // J/(mol.s)
+        J(nSpecie_, i) /= -cpMean;    // K/s / (mol/m3)
+    }
+
+    // ddT of dTdt
+    J(nSpecie_, nSpecie_) = 0;
+    for (label i = 0; i < nSpecie_; i++)
+    {
+        J(nSpecie_, nSpecie_) += cpi[i]*dcdt[i] + hi[i]*J(i, nSpecie_);
+    }
+    J(nSpecie_, nSpecie_) += dTdt*dcpdTMean;
+    J(nSpecie_, nSpecie_) /= -cpMean;
+    J(nSpecie_, nSpecie_) += dTdt/T;
+}
+
+
 
 template <class ReactionThermo, class ThermoType>
 tmp<volScalarField> pyJacChemistryModel<ReactionThermo, ThermoType>::tc() const {
@@ -362,6 +523,29 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
     chemistrySolution             ref_soln(this->nSpecie_);
 
     forAll(p, celli) {
+        
+        for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
+
+        // Create the problem
+        chemistryProblem problem;
+        problem.pi         = p[celli];
+        problem.Ti         = T[celli];
+        problem.c          = c_;
+        problem.rhoi       = rho[celli];
+        problem.deltaTChem = this->deltaTChem_[celli];
+        problem.cellid     = celli;
+        problem.deltaT     = deltaT;
+
+        if (refcell_mapper_->shouldMap(problem)) {
+            solve_single(problem, ref_soln);
+            break;
+        }
+
+
+    }
+
+
+    forAll(p, celli) {
 
         for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
         // Create the problem
@@ -375,6 +559,37 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
         problem.deltaT     = deltaT;
 
 
+        if (refcell_mapper_->shouldMap(problem)) {
+            update_reaction_rate(ref_soln, ref_soln.cellid);
+        }
+        else {
+            chem_problems.append(problem);
+        }
+
+    }        
+
+
+    /*
+
+    forAll(p, celli) {
+
+        for (label i = 0; i < nSpecie_; i++) { c_[i] = Y_[i][celli]; }
+        // Create the problem
+        chemistryProblem problem;
+        problem.pi         = p[celli];
+        problem.Ti         = T[celli];
+        problem.c          = c_;
+        problem.rhoi       = rho[celli];
+        problem.deltaTChem = this->deltaTChem_[celli];
+        problem.cellid     = celli;
+        problem.deltaT     = deltaT;
+
+
+        //chem_problems.append(problem);
+
+
+        //The below part is broken
+
         
         if (refcell_mapper_->active()) {
 
@@ -385,7 +600,7 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
                     update_reaction_rate(ref_soln, ref_soln.cellid);
                     refCellFound = true;
                 } else {
-                    update_reaction_rate(ref_soln, celli);
+                    //update_reaction_rate(ref_soln, celli);
                 }
             } else {
                 chem_problems.append(problem);
@@ -394,7 +609,9 @@ pyJacChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarF
 
             chem_problems.append(problem);
         }
+        
     }
+    */
     return chem_problems;
 }
 
@@ -404,6 +621,8 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::solve_single(chemistryProb
 
     //TODO: Make this work so that chemistryProblem is a const &
 
+
+    
     scalar     timeLeft = prob.deltaT;
     const scalarList c0 = prob.c;
 
@@ -411,21 +630,19 @@ void pyJacChemistryModel<ReactionThermo, ThermoType>::solve_single(chemistryProb
     // Calculate the chemical source terms
     while (timeLeft > small) {
         scalar dt = timeLeft;
+
         this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        //solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
         timeLeft -= dt;
     }
 
     soln.c = prob.c;
-    /*
-    // RR_ should be weighted by density, due to NS formulation. rr = Y0-Y1 / dt, but RR_ =
-    // rho(Y0-Y1)/dt , the effect at Sh() function too!
-    for (label i = 0; i < this->nSpecie_; i++) {
-        soln.RR[i] = prob.rhoi * (soln.c[i] - c0[i]) / prob.deltaT;
-    }
-    */
     soln.RR = prob.rhoi * (soln.c - c0) / prob.deltaT;
     soln.cellid     = prob.cellid;
     soln.deltaTChem = min(prob.deltaTChem, this->deltaTChemMax_);
+    
+
+
 }
 
 
@@ -459,50 +676,25 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
     using problem_buffer_t  = chemistryLoadBalancingMethod::buffer_t<chemistryProblem>;
     using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
 
-    clockTime timer;
 
-    double interval = timer.timeIncrement();    
     BasicChemistryModel<ReactionThermo>::correct();
-    Info << "correct() took: " << timer.timeIncrement() << endl;
 
 
     if (!this->chemistry_) { return great; }
     const scalar deltaT_ = deltaT[0]; // TODO: Check if this is true (all cells have same deltaT)
 
-    
-
-    
-    timer.timeIncrement();
     // This assumes no refMapping, all the cells are in problems list
     DynamicList<chemistryProblem> all_problems = get_problems(Y_, deltaT_);
-    Info << "get_problems() took: " << timer.timeIncrement() << endl;
-
 
     int original_problem_count = all_problems.size();
 
-    timer.timeIncrement();
     load_balancer_->update_state(all_problems);
-    Info << "update_state() took: " << timer.timeIncrement() << endl;
-
-
     load_balancer_->print_state();
     
-    timer.timeIncrement();
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
-    Info << "balance() took: " << timer.timeIncrement() << endl;
-
-
-    timer.timeIncrement();
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
-    Info << "solve_buffer() took: " << timer.timeIncrement() << endl;
-
-    timer.timeIncrement();
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
-    Info << "unbalance() took: " << timer.timeIncrement() << endl;
 
-
-
-    timer.timeIncrement();
 
     int solution_count = 0;
 
@@ -516,15 +708,14 @@ scalar pyJacChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& 
         solution_count += my_solutions[i].size(); 
     }
 
-    Info << "update_reaction_rates() took: " << timer.timeIncrement() << endl;
-
-
     if (solution_count != original_problem_count){
         throw error("Solution count differs from problem count.");
     }
 
 
     return deltaTMin;
+    
+   return 0;
 }
 
 template <class ReactionThermo, class ThermoType>

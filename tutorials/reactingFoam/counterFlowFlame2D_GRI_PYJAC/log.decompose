@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 6-fa1285188035
 Exec   : decomposePar
-Date   : May 29 2020
-Time   : 02:25:16
+Date   : Jun 25 2020
+Time   : 19:45:14
 Host   : "peltonp1-All-Series"
-PID    : 1934
+PID    : 5766
 I/O    : uncollated
 Case   : /home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_PYJAC
 nProcs : 1

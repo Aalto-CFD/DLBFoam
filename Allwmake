@@ -9,4 +9,8 @@ src/Allwmake $targetType $*
 cd unittests
 #wclean
 wmake
+cd ..
 
+cd benchmarks
+#wclean
+wmake
