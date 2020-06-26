@@ -38,8 +38,8 @@ SourceFiles
 #ifndef loadBalancedChemistryModel_H
 #define loadBalancedChemistryModel_H
 
-//#include "aaltoChemistryModelBase.H"
 #include "StandardChemistryModel.H"
+#include "clockTime.H"
 
 #include "simpleBalancingMethod.H"
 #include "chemistryProblem.H"
@@ -73,7 +73,6 @@ class loadBalancedChemistryModel :
     //- Disallow default bitwise assignment
     void operator=(const loadBalancedChemistryModel&);
 
-protected:
 public:
     //- Runtime type information
     TypeName("loadBalanced");
@@ -89,13 +88,66 @@ public:
 
     //- Solve the reaction system for the given time step
     //  and return the characteristic time
-    virtual scalar solve(const scalarField& deltaT);
+    virtual scalar solve(const scalarField& deltaT) override;
 
 
     // ODE functions (overriding abstract functions in ODE.H)
     // this function is somehow injected in the ODE
     virtual void
     solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
+
+
+private:
+
+    chemistryLoadBalancingMethod* load_balancer_;
+
+
+
+    ///
+    ///@brief 
+    ///
+    ///@param prob 
+    ///@param soln 
+    ///
+    void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
+
+
+    ///
+    ///@brief 
+    ///
+    ///@param problems 
+    ///@return chemistryLoadBalancingMethod::buffer_t<chemistrySolution> 
+    ///
+    chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
+    solve_buffer(chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const;
+
+
+    ///
+    ///@brief Get the problems object
+    ///
+    ///@param Y_ 
+    ///@param deltaT 
+    ///@return DynamicList<chemistryProblem> 
+    ///
+    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const scalar& deltaT);
+
+
+
+    ///
+    ///@brief 
+    ///
+    ///@param solutions 
+    ///@return scalar 
+    ///
+    scalar update_reaction_rates(const DynamicList<chemistrySolution>& solutions);
+
+    ///
+    ///@brief 
+    ///
+    ///@param solution 
+    ///@param cellid 
+    ///
+    void   update_reaction_rate(const chemistrySolution& solution, const label& cellid);
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

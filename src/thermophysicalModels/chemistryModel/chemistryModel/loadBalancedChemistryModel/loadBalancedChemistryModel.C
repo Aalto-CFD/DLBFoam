@@ -24,57 +24,41 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "loadBalancedChemistryModel.H"
-#include "reactingMixture.H"
-#include "UniformField.H"
-#include "extrapolatedCalculatedFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class ReactionThermo, class ThermoType>
-Foam::loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryModel
-(
-    ReactionThermo& thermo
-)
-//: aaltoChemistryModelBase<ReactionThermo, ThermoType>(thermo)
-: StandardChemistryModel<ReactionThermo, ThermoType>(thermo)
-{
-   // Info<< "loadBalancedChemistryModel: Number of species = " << nSpecie_
-   //     << " and reactions = " << nReaction_ << endl;
-}
+namespace Foam {
 
+template <class ReactionThermo, class ThermoType>
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryModel(
+    ReactionThermo& thermo)
+    : StandardChemistryModel<ReactionThermo, ThermoType>(thermo) {
+
+    Info << "loadBalancedChemistryModel: Number of species = " << this->nSpecie()
+         << " and reactions = " << this->nReaction() << endl;
+
+    load_balancer_ = new simpleBalancingMethod();
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template<class ReactionThermo, class ThermoType>
-Foam::loadBalancedChemistryModel<ReactionThermo, ThermoType>::
-~loadBalancedChemistryModel()
-{}
+template <class ReactionThermo, class ThermoType>
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryModel() {
+    delete load_balancer_; // TODO: use a smart pointer
+}
 
-
-
-
-
-template<class ReactionThermo, class ThermoType>
-template<class DeltaTType>
-Foam::scalar Foam::loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
-(
-    const DeltaTType& deltaT
-)
-{
+template <class ReactionThermo, class ThermoType>
+template <class DeltaTType>
+scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& deltaT) {
 
     BasicChemistryModel<ReactionThermo>::correct();
 
     scalar deltaTMin = great;
 
-    if (!this->chemistry_)
-    {
-        return deltaTMin;
-    }
-
-
+    if (!this->chemistry_) { return deltaTMin; }
 
     tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField& rho = trho();
+    const scalarField&  rho = trho();
 
     const scalarField& T = this->thermo().T();
     const scalarField& p = this->thermo().p();
@@ -83,29 +67,23 @@ Foam::scalar Foam::loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
 
     scalarField c0(this->nSpecie());
 
-    
-    forAll(rho, celli)
-    {
+    forAll(rho, celli) {
         scalar Ti = T[celli];
 
-        
-        if (Ti > this->Treact())
-        {
+        if (Ti > this->Treact()) {
             const scalar rhoi = rho[celli];
-            scalar pi = p[celli];
+            scalar       pi   = p[celli];
 
-            for (label i=0; i<this->nSpecie(); i++)
-            {
-                this->c_[i] = rhoi*this->Y_[i][celli]/this->specieThermo_[i].W();
-                c0[i] = this->c_[i];
+            for (label i = 0; i < this->nSpecie(); i++) {
+                this->c_[i] = rhoi * this->Y_[i][celli] / this->specieThermo_[i].W();
+                c0[i]       = this->c_[i];
             }
 
             // Initialise time progress
             scalar timeLeft = deltaT[celli];
 
             // Calculate the chemical source terms
-            while (timeLeft > small)
-            {
+            while (timeLeft > small) {
                 scalar dt = timeLeft;
                 this->solve(this->c_, Ti, pi, dt, this->deltaTChem_[celli]);
                 timeLeft -= dt;
@@ -113,38 +91,146 @@ Foam::scalar Foam::loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
 
             deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
 
-            this->deltaTChem_[celli] =
-                min(this->deltaTChem_[celli], this->deltaTChemMax_);
+            this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
 
-            for (label i=0; i<this->nSpecie(); i++)
-            {
-                RR[i][celli] =
-                    (this->c_[i] - c0[i])*this->specieThermo_[i].W()/deltaT[celli];
+            for (label i = 0; i < this->nSpecie(); i++) {
+                RR[i][celli] = (this->c_[i] - c0[i]) * this->specieThermo_[i].W() / deltaT[celli];
             }
+        } else {
+            for (label i = 0; i < this->nSpecie(); i++) { RR[i][celli] = 0; }
         }
-        else
-        {
-            for (label i=0; i<this->nSpecie(); i++)
-            {
-                RR[i][celli] = 0;
-            }
-        }
-        
     }
-    
-    
+
     return deltaTMin;
 }
 
-template<class ReactionThermo, class ThermoType>
-Foam::scalar Foam::loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
-(
-    const scalarField& deltaT
-)
-{
+template <class ReactionThermo, class ThermoType>
+scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const scalarField& deltaT) {
     return this->solve<scalarField>(deltaT);
+}
+
+template <class ReactionThermo, class ThermoType>
+void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
+    chemistryProblem& prob, chemistrySolution& soln) const {
+
+    // TODO: Make this work so that chemistryProblem is a const &
+
+    scalar           timeLeft = prob.deltaT;
+    const scalarList c0       = prob.c;
+
+    // Calculate the chemical source terms
+    while (timeLeft > small) {
+        scalar dt = timeLeft;
+        this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        timeLeft -= dt;
+    }
+
+    soln.c = prob.c;
+    soln.RR         = prob.rhoi * (soln.c - c0) / prob.deltaT;
+    soln.cellid     = prob.cellid;
+    soln.deltaTChem = min(prob.deltaTChem, this->deltaTChemMax_);
 }
 
 
 
-// ************************************************************************* //
+
+
+
+
+template <class ReactionThermo, class ThermoType>
+chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
+    chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const {
+
+    //allocate the solutions buffer
+    chemistryLoadBalancingMethod::buffer_t<chemistrySolution> solutions;
+    for (int i = 0; i < problems.size(); ++i){
+        DynamicList<chemistrySolution> sublist(problems[i].size(), chemistrySolution(this->nSpecie_));
+        solutions.append(sublist);
+    }
+
+    for (int i = 0; i < solutions.size(); ++i){
+        for (int j = 0; j < solutions[i].size(); ++j ){
+            
+            solve_single(problems[i][j], solutions[i][j]);
+        }
+    }
+
+    return solutions;
+}
+
+
+
+
+template <class ReactionThermo, class ThermoType>
+DynamicList<chemistryProblem>
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_,
+                                                              const scalar&            deltaT) {
+
+    // TODO: Add refcell and Treact as conditions to get problems.
+
+    const scalarField&            T = this->thermo().T();
+    const scalarField&            p = this->thermo().p();
+    tmp<volScalarField>           trho(this->thermo().rho());
+    const scalarField&            rho          = trho();
+    bool                          refCellFound = false;
+
+    DynamicList<chemistryProblem> chem_problems;
+    chem_problems.reserve(T.size());
+
+    chemistrySolution             ref_soln(this->nSpecie_);
+
+    forAll(p, celli) {
+
+        for (label i = 0; i < this->nSpecie_; i++) { this->c_[i] = this->Y_[i][celli]; }
+        // Create the problem
+        chemistryProblem problem;
+        problem.pi         = p[celli];
+        problem.Ti         = T[celli];
+        problem.c          = this->c_;
+        problem.rhoi       = rho[celli];
+        problem.deltaTChem = this->deltaTChem_[celli];
+        problem.cellid     = celli;
+        problem.deltaT     = deltaT;
+
+
+        chem_problems.append(problem);
+    }
+    return chem_problems;
+}
+
+
+
+
+
+
+template <class ReactionThermo, class ThermoType>
+scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(
+    const DynamicList<chemistrySolution>& solutions) {
+
+    scalar deltaTMin = great;
+    for (int i = 0; i < solutions.size(); i++) {
+        update_reaction_rate(solutions[i],solutions[i].cellid);
+        deltaTMin                = min(solutions[i].deltaTChem, deltaTMin);
+    }
+
+    return deltaTMin;
+}
+
+
+
+
+template <class ReactionThermo, class ThermoType>
+void loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rate(
+    const chemistrySolution& solution, const label& cellid){
+
+        for (label j = 0; j < this->nSpecie_; j++) { this->RR_[j][cellid] = solution.RR[j]; }
+        this->deltaTChem_[cellid] = min(solution.deltaTChem, this->deltaTChemMax_);
+}
+
+
+
+
+
+
+} // namespace Foam
