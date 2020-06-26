@@ -51,6 +51,60 @@ template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
 scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& deltaT) {
 
+
+    using problem_buffer_t  = chemistryLoadBalancingMethod::buffer_t<chemistryProblem>;
+    using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
+
+
+    if (!this->chemistry_) { return great; }
+
+
+    //TODO: What happens here???
+    const scalar SOMEOTHER_DELTAT = deltaT[0]; 
+    // This assumes no refMapping, all the cells are in problems list
+    DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, SOMEOTHER_DELTAT);
+
+
+    int original_problem_count = all_problems.size();
+
+    load_balancer_->update_state(all_problems);
+
+
+    load_balancer_->print_state();
+    
+    problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
+
+
+    solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
+
+    solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
+
+
+
+
+    int solution_count = 0;
+
+    scalar deltaTMin = great;
+    for (size_t i = 0; i < my_solutions.size(); ++i){
+
+        scalar temp = update_reaction_rates(my_solutions[i]);
+        if (temp < deltaTMin) {
+            deltaTMin = temp;
+        }
+        solution_count += my_solutions[i].size(); 
+    }
+
+
+
+    if (solution_count != original_problem_count){
+        throw error("Solution count differs from problem count.");
+    }
+
+
+    return deltaTMin;
+
+
+    /*
     BasicChemistryModel<ReactionThermo>::correct();
 
     scalar deltaTMin = great;
@@ -102,6 +156,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     }
 
     return deltaTMin;
+    */
 }
 
 template <class ReactionThermo, class ThermoType>
