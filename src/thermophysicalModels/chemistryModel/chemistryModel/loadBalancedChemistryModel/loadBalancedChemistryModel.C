@@ -102,30 +102,6 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     }
 
 
-    /*
-deltaTMin4.63801e-07
-Qdot = -1005.62, T = 1000, p = 1.36789e+06, CH4 = 0.0551873
-ExecutionTime = 0.01 s  ClockTime = 0 s
-
-deltaT = 1.99998e-07
-Time = 2.99998e-07
-
-deltaTMin9.27592e-07
-Qdot = -1005.19, T = 1000, p = 1.36789e+06, CH4 = 0.0551873
-ExecutionTime = 0.01 s  ClockTime = 0 s
-
-deltaT = 3.99988e-07
-Time = 6.99986e-07
-
-deltaTMin1.85515e-06
-Qdot = -1004.34, T = 1000, p = 1.36789e+06, CH4 = 0.0551873
-ExecutionTime = 0.01 s  ClockTime = 0 s
-
-deltaT = 7.99944e-07
-Time = 1.49993e-06
-
-    */
-
    /*
 
     BasicChemistryModel<ReactionThermo>::correct();
@@ -276,7 +252,6 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
     DynamicList<chemistryProblem> chem_problems;
     chem_problems.reserve(T.size());
 
-    chemistrySolution             ref_soln(this->nSpecie_);
 
     forAll(p, celli) {
 
