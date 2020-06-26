@@ -56,6 +56,8 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
 
 
+    Info << "HELLO FROM HERE" << endl;
+
     if (!this->chemistry_) { return great; }
 
 
@@ -163,6 +165,22 @@ template <class ReactionThermo, class ThermoType>
 scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const scalarField& deltaT) {
     return this->solve<scalarField>(deltaT);
 }
+
+
+template<class ReactionThermo, class ThermoType>
+scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
+(
+    const scalar deltaT
+)
+{
+    // Don't allow the time-step to change more than a factor of 2
+    return min
+    (
+        this->solve<UniformField<scalar>>(UniformField<scalar>(deltaT)),
+        2*deltaT
+    );
+}
+
 
 template <class ReactionThermo, class ThermoType>
 void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
