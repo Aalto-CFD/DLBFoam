@@ -8,8 +8,6 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
-    -I$(WM_PROJECT_USER_DIR)/pyJac/out \
-    -I$(WM_PROJECT_USER_DIR)/pyJac/out/jacobs\
     -DDEBUG
 
 
@@ -23,7 +21,6 @@ LIB_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -lchemistryModel \
-    -lc_pyjac
     
     
 

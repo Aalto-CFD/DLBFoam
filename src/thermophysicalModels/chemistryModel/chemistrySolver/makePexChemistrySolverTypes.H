@@ -32,30 +32,31 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/
 
 
 
-#include "pyJacChemistryModel.H"
-//#include "TDAC_pyJacChemistryModel.H" #TODO: add TDAC
+#include "loadBalancedChemistryModel.H"
+//#include "TDAC_loadBalancedChemistryModel.H" #TODO: add TDAC
 
 #include "noChemistrySolver.H"
-#include "./ode/ode.H" //important to not use the stock ode
+//#include "./ode/ode.H" //important to not use the stock ode for pyJac
 
+#include "ode.H" //important to use the stock ODE's with others
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #define makePexChemistrySolverType(SS, Comp, Thermo)                              \
                                                                                \
                                                                                \
-    typedef SS<pyJacChemistryModel<Comp, Thermo>> pyJac##SS##Comp##Thermo;     \
+    typedef SS<loadBalancedChemistryModel<Comp, Thermo>> loadBalanced##SS##Comp##Thermo;     \
                                                                                \
     defineTemplateTypeNameAndDebugWithName                                     \
     (                                                                          \
-        pyJac##SS##Comp##Thermo,                                               \
-        (#SS"<" + word(pyJacChemistryModel<Comp, Thermo>::typeName_()) + "<"   \
+        loadBalanced##SS##Comp##Thermo,                                               \
+        (#SS"<" + word(loadBalancedChemistryModel<Comp, Thermo>::typeName_()) + "<"   \
         + word(Comp::typeName_()) + "," + Thermo::typeName() + ">>").c_str(),  \
         0                                                                      \
     );                                                                         \
                                                                                \
     BasicChemistryModel<Comp>::                                                \
-        add##thermo##ConstructorToTable<pyJac##SS##Comp##Thermo>               \
-        add##pyJac##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel\
+        add##thermo##ConstructorToTable<loadBalanced##SS##Comp##Thermo>               \
+        add##loadBalanced##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel\
 ##Comp##Table_;                                                                \
                                                                                \
                                                                                \

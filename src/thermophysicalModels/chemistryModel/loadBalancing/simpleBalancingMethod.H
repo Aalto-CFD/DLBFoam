@@ -17,13 +17,13 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class simpleLoadBalancing : public chemistryLoadBalancingMethod
+class simpleBalancingMethod : public chemistryLoadBalancingMethod
 {
 
 public:
 
 
-    simpleLoadBalancing() = default;
+    simpleBalancingMethod() = default;
 
 
 

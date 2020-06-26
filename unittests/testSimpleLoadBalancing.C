@@ -1,6 +1,6 @@
 #include "../third_party/catch.hpp"
 
-#include "simpleLoadBalancing.H"
+#include "simpleBalancingMethod.H"
 #include "chemistryProblem.H"
 
 
@@ -36,10 +36,10 @@ DynamicList<chemistryProblem> create_problems2(int count){
 
 
 
-TEST_CASE("simpleLoadBalancing balance() / unbalance()"){
+TEST_CASE("simpleBalancingMethod balance() / unbalance()"){
 
     
-    simpleLoadBalancing l;
+    simpleBalancingMethod l;
 
     auto problems = create_problems2(3 + 1*Pstream::myProcNo());
     l.update_state(problems);

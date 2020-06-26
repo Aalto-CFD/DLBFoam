@@ -17,7 +17,8 @@
 
 
 
-#include "pyJacChemistryModel.H"
+//#include "aaltoChemistryModelBase.H"
+#include "loadBalancedChemistryModel.H"
 #include "StandardChemistryModel.H"
 #include "noChemistrySolver.H"
 #include "ode.H"
@@ -121,11 +122,20 @@ struct ChemState{
             );
 
 
-    BasicChemistryModel<psiReactionThermo>* model1 
-    = new ode<pyJacChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+    //for pyJac, ensure that the correct ODE is used
+
+    //BasicChemistryModel<psiReactionThermo>* model1 
+    //= new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+    
+
+    BasicChemistryModel<psiReactionThermo>* model1 = nullptr;
+
+    //BasicChemistryModel<psiReactionThermo>* model1 
+    //= new ode<aaltoChemistryModelBase<psiReactionThermo, gasHThermoPhysics>>(thermo);
     
     BasicChemistryModel<psiReactionThermo>* model2 
     = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+
 
 
     volScalarField dpdt = 
@@ -278,17 +288,8 @@ PICOBENCH(pyjac_chemistry_solve);
 
 int main(int argc, char* argv[]){
 
-    for (size_t i = 0; i < argc; ++i){
-        Info << argv[i] << endl;
-    }
 
-
-    //ChemState s;
-
-    //Info << s.Y << endl;
-
-
-    
+    //ode<aaltoChemistryModelBase<psiReactionThermo, gasHThermoPhysics>> asd(global_chemistry_state.thermo);
 
     picobench::runner runner;
     // Disregard command-line for simplicity

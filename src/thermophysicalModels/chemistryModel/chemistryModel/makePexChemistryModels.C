@@ -37,7 +37,7 @@ Description
 #include "psiReactionThermo.H"
 #include "rhoReactionThermo.H"
 
-#include "pyJacChemistryModel.H"
+#include "loadBalancedChemistryModel.H"
 
 
 #include "thermoPhysicsTypes.H"
@@ -55,7 +55,7 @@ namespace Foam
     // Chemistry moldels based on sensibleEnthalpy
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constGasHThermoPhysics
     );
@@ -64,7 +64,7 @@ namespace Foam
     
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         gasHThermoPhysics
     );
@@ -72,42 +72,42 @@ namespace Foam
     
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constIncompressibleGasHThermoPhysics
     );
     
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         incompressibleGasHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         icoPoly8HThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constFluidHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constAdiabaticFluidHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constHThermoPhysics
     );
@@ -115,56 +115,56 @@ namespace Foam
     
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constGasHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         gasHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constIncompressibleGasHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         incompressibleGasHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         icoPoly8HThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constFluidHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constAdiabaticFluidHThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constHThermoPhysics
     );
@@ -176,56 +176,56 @@ namespace Foam
     // Chemistry moldels based on sensibleInternalEnergy
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constGasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         gasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constIncompressibleGasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         incompressibleGasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         icoPoly8EThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constFluidEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constAdiabaticFluidEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         psiReactionThermo,
         constEThermoPhysics
     );
@@ -234,56 +234,56 @@ namespace Foam
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constGasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         gasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constIncompressibleGasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         incompressibleGasEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         icoPoly8EThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constFluidEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constAdiabaticFluidEThermoPhysics
     );
 
     makeChemistryModelType
     (
-        pyJacChemistryModel,
+        loadBalancedChemistryModel,
         rhoReactionThermo,
         constEThermoPhysics
     );

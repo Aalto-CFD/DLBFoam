@@ -48,7 +48,6 @@ SourceFiles
 
 #include "chemistryLoad.H"
 #include "chemistryProblem.H"
-#include "chemistryRefMappingMethod.H"
 #include "chemistrySolution.H"
 
 #ifdef DEBUG

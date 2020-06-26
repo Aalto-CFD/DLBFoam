@@ -1,9 +1,9 @@
-#include "simpleLoadBalancing.H"
+#include "simpleBalancingMethod.H"
 
 namespace Foam{
 
 
-chemistryLoadBalancingMethod::sendRecvInfo simpleLoadBalancing::determine_state(const DynamicList<chemistryLoad>& loads) const{
+chemistryLoadBalancingMethod::sendRecvInfo simpleBalancingMethod::determine_state(const DynamicList<chemistryLoad>& loads) const{
     // This chunk balances the load between ranks n and n+1, periodically.
 
     // The ratio of (between 0, 1) original problems on a rank to swap between the neighbour.
