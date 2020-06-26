@@ -1,3 +1,2 @@
 SOURCE = \
-benchmark.C \
-benchmark_chemistry.C 
+serial_benchmark.C 

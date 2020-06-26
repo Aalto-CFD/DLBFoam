@@ -34,8 +34,8 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
     ReactionThermo& thermo)
     : StandardChemistryModel<ReactionThermo, ThermoType>(thermo) {
 
-    Info << "loadBalancedChemistryModel: Number of species = " << this->nSpecie()
-         << " and reactions = " << this->nReaction() << endl;
+    Info << "Running with a load balanced" << endl;
+
 
     load_balancer_ = new simpleBalancingMethod();
 }
@@ -56,7 +56,6 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
 
 
-    Info << "HELLO FROM HERE" << endl;
 
     if (!this->chemistry_) { return great; }
 
@@ -103,10 +102,32 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     }
 
 
-    return deltaTMin;
-
-
     /*
+deltaTMin4.63801e-07
+Qdot = -1005.62, T = 1000, p = 1.36789e+06, CH4 = 0.0551873
+ExecutionTime = 0.01 s  ClockTime = 0 s
+
+deltaT = 1.99998e-07
+Time = 2.99998e-07
+
+deltaTMin9.27592e-07
+Qdot = -1005.19, T = 1000, p = 1.36789e+06, CH4 = 0.0551873
+ExecutionTime = 0.01 s  ClockTime = 0 s
+
+deltaT = 3.99988e-07
+Time = 6.99986e-07
+
+deltaTMin1.85515e-06
+Qdot = -1004.34, T = 1000, p = 1.36789e+06, CH4 = 0.0551873
+ExecutionTime = 0.01 s  ClockTime = 0 s
+
+deltaT = 7.99944e-07
+Time = 1.49993e-06
+
+    */
+
+   /*
+
     BasicChemistryModel<ReactionThermo>::correct();
 
     scalar deltaTMin = great;
@@ -157,8 +178,12 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
         }
     }
 
-    return deltaTMin;
+
     */
+
+    Info << "deltaTMin" <<deltaTMin << endl;
+
+    return deltaTMin;
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -255,19 +280,31 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
 
     forAll(p, celli) {
 
-        for (label i = 0; i < this->nSpecie_; i++) { this->c_[i] = this->Y_[i][celli]; }
-        // Create the problem
-        chemistryProblem problem;
-        problem.pi         = p[celli];
-        problem.Ti         = T[celli];
-        problem.c          = this->c_;
-        problem.rhoi       = rho[celli];
-        problem.deltaTChem = this->deltaTChem_[celli];
-        problem.cellid     = celli;
-        problem.deltaT     = deltaT;
+        
+       // scalar Ti = T[celli];
+       // if (Ti > this->Treact_){
 
 
-        chem_problems.append(problem);
+            for (label i = 0; i < this->nSpecie_; i++) { this->c_[i] = this->Y_[i][celli]; }
+
+
+            // Create the problem
+            chemistryProblem problem;
+            problem.pi         = p[celli];
+            problem.Ti         = T[celli];
+            problem.c          = this->c_;
+            problem.rhoi       = rho[celli];
+            problem.deltaTChem = this->deltaTChem_[celli];
+            problem.cellid     = celli;
+            problem.deltaT     = deltaT;
+
+        
+            chem_problems.append(problem);
+        //}
+        //set reaction rate to zero
+        //else {
+        //    for (label i = 0; i < this->nSpecie_; i++) { this->RR_[i][celli] = 0.0; }
+        //}
     }
     return chem_problems;
 }

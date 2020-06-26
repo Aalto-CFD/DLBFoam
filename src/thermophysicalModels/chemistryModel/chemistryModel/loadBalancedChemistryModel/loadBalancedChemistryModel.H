@@ -86,13 +86,6 @@ public:
     virtual ~loadBalancedChemistryModel();
 
 
-    ///
-    ///@brief These are the main solve loops which compute the reaction rates. 
-    ///       It is mandatory to override both.
-    ///
-    ///@param deltaT 
-    ///@return scalar 
-    ///
     virtual scalar solve(const scalar deltaT) override;
     virtual scalar solve(const scalarField& deltaT) override;
 
