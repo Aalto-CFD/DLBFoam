@@ -136,6 +136,32 @@ TEST_CASE("chemistryLoadBalancingMethod constructors"){
 
 }
 
+TEST_CASE("chemistryLoadBalancingMethod all_gather()"){
+
+
+
+    using namespace Foam;
+
+    double my_data = 2.5 * Pstream::myProcNo();
+
+    auto data = chemistryLoadBalancingMethod::all_gather(my_data);
+
+    CHECK(data[Pstream::myProcNo()] == 2.5 * Pstream::myProcNo());
+
+
+    for (int i = 0; i < data.size(); ++i){
+
+        CHECK(data[i] == double(i * 2.5));
+
+    }
+
+    
+
+
+}
+
+
+
 
 TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 

@@ -83,14 +83,22 @@ private:
 
 public:
 
-    /*
     template<class T>
-    DynamicList<T> all_gather(const T& my_data) {
-    
-        
+    static DynamicList<T> all_gather(const T& my_data) {
+
+
+        DynamicList<T> ret(Pstream::nProcs(), my_data);
+        ret[Pstream::myProcNo()] = my_data;
+
+        int tag                    = 1;
+        Pstream::gatherList(ret, tag);
+        Pstream::scatterList(ret, tag);
+
+
+        return ret;
+
     
     }
-    */
 
 
     ///

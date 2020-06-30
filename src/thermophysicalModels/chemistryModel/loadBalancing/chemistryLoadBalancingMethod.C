@@ -23,17 +23,8 @@ size_t chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistr
 
 
 DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads(const DynamicList<chemistryProblem>& problems) const {
-
-    label nprocs = Pstream::nProcs();
-
-    DynamicList<chemistryLoad> loads(nprocs, chemistryLoad());
-
-    loads[Pstream::myProcNo()] = this->get_my_load(problems);
-
-    int tag                    = 1;
-    Pstream::gatherList(loads, tag);
-    Pstream::scatterList(loads, tag);
-
+    
+    auto loads = all_gather(this->get_my_load(problems));
     std::sort(loads.begin(), loads.end());
 
     return loads;
