@@ -1,8 +1,19 @@
 #include "simpleBalancingMethod.H"
 
 namespace Foam{
+/*
+chemistryLoadBalancingMethod::sendRecvInfo simpleBalancingMethod::determine_state(const DynamicList<chemistryLoad>& loads) const{
 
 
+    DynamicList<chemistryLoad> loads2(loads);
+
+    std::vector<double> target
+
+
+
+
+}
+*/
 chemistryLoadBalancingMethod::sendRecvInfo simpleBalancingMethod::determine_state(const DynamicList<chemistryLoad>& loads) const{
     // This chunk balances the load between ranks n and n+1, periodically.
 
