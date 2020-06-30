@@ -61,34 +61,61 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     if (!this->chemistry_) { return great; }
 
 
-    //TODO: What happens here???
-    const scalar SOMEOTHER_DELTAT = deltaT[0]; 
-    // This assumes no refMapping, all the cells are in problems list
-    DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, SOMEOTHER_DELTAT);
-
-
-
+    
+    DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, deltaT);
     int original_problem_count = all_problems.size();
 
     load_balancer_->update_state(all_problems);
-
     load_balancer_->print_state();
-    
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
 
-
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
-
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
+
+
+    return update_reaction_rates(my_solutions);
+
+}
+
+
+template <class ReactionThermo, class ThermoType>
+void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
+    chemistryProblem& prob, chemistrySolution& soln) const {
+
+    // TODO: Make this work so that chemistryProblem is a const &
+
+    scalar           timeLeft = prob.deltaT;
+    const scalarList c0       = prob.c;
+
+    // Calculate the chemical source terms
+    while (timeLeft > small) {
+        scalar dt = timeLeft;
+        this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        timeLeft -= dt;
+    }
+
+    soln.c_increment = (prob.c - c0) / prob.deltaT;
+    soln.deltaTChem = prob.deltaTChem;
+    soln.cellid = prob.cellid;
+
+
+}
+
+
+
+template <class ReactionThermo, class ThermoType>
+scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(const  chemistryLoadBalancingMethod::buffer_t<chemistrySolution>& solutions){
 
 
     scalar deltaTMin = great;
 
-    for (size_t i = 0; i < my_solutions.size(); ++i){
-    for (const auto& solution : my_solutions[i]){
+    for (size_t i = 0; i < solutions.size(); ++i){
+    for (const auto& solution : solutions[i]){
 
         
-        for (label j = 0; j < this->nSpecie_; j++) { this->RR_[j][solution.cellid] = solution.RR[j]; }
+        for (label j = 0; j < this->nSpecie_; j++) { 
+            this->RR_[j][solution.cellid] = solution.c_increment[j] * this->specieThermo_[j].W();                 
+        }
 
         deltaTMin = min(solution.deltaTChem, deltaTMin);
         deltaTMin = min(deltaTMin, this->deltaTChemMax_);
@@ -98,70 +125,9 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
     }
 
-
-    //if (solution_count != original_problem_count){
-    //    throw error("Solution count differs from problem count.");
-    //}
-
-
-   /*
-
-    BasicChemistryModel<ReactionThermo>::correct();
-
-    scalar deltaTMin = great;
-
-    if (!this->chemistry_) { return deltaTMin; }
-
-    tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField&  rho = trho();
-
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-
-    auto& RR = this->RR();
-
-    scalarField c0(this->nSpecie());
-
-    forAll(rho, celli) {
-        scalar Ti = T[celli];
-
-        if (Ti > this->Treact()) {
-            const scalar rhoi = rho[celli];
-            scalar       pi   = p[celli];
-
-            for (label i = 0; i < this->nSpecie(); i++) {
-                this->c_[i] = rhoi * this->Y_[i][celli] / this->specieThermo_[i].W();
-                c0[i]       = this->c_[i];
-            }
-
-            // Initialise time progress
-            scalar timeLeft = deltaT[celli];
-
-            // Calculate the chemical source terms
-            while (timeLeft > small) {
-                scalar dt = timeLeft;
-                this->solve(this->c_, Ti, pi, dt, this->deltaTChem_[celli]);
-                timeLeft -= dt;
-            }
-
-            deltaTMin = min(this->deltaTChem_[celli], deltaTMin);
-
-            this->deltaTChem_[celli] = min(this->deltaTChem_[celli], this->deltaTChemMax_);
-
-            for (label i = 0; i < this->nSpecie(); i++) {
-                RR[i][celli] = (this->c_[i] - c0[i]) * this->specieThermo_[i].W() / deltaT[celli];
-            }
-        } else {
-            for (label i = 0; i < this->nSpecie(); i++) { RR[i][celli] = 0; }
-        }
-    }
-
-
-    */
-
-    Info << "deltaTMin" <<deltaTMin << endl;
-
     return deltaTMin;
+
+
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -184,47 +150,6 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
     );
 }
 
-
-template <class ReactionThermo, class ThermoType>
-void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
-    chemistryProblem& prob, chemistrySolution& soln) const {
-
-    // TODO: Make this work so that chemistryProblem is a const &
-
-    scalar           timeLeft = prob.deltaT;
-    const scalarList c0       = prob.c;
-
-    // Calculate the chemical source terms
-    while (timeLeft > small) {
-        scalar dt = timeLeft;
-        this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
-        timeLeft -= dt;
-    }
-
-
-    //soln.c = prob.c;
-    //soln.RR         = prob.rhoi * (soln.c - c0) / prob.deltaT; //THIS IS THE PYJAC DEFININITION
-    //RR[i][celli] = (this->c_[i] - c0[i]) * this->specieThermo_[i].W() / deltaT[celli];
-    //soln.cellid     = prob.cellid;
-    //soln.deltaTChem = prob.deltaTChem; //min(prob.deltaTChem, this->deltaTChemMax_);
-
-    for (label i = 0; i < this->nSpecie(); i++) { 
-
-        soln.c[i] = prob.c[i];
-        soln.RR[i] = this->specieThermo_[i].W() * (soln.c[i] - c0[i]) / prob.deltaT;
-        soln.cellid = prob.cellid;
-        soln.deltaTChem = prob.deltaTChem;
-
-    }
-
-
-//    Info << soln.c << endl;
-//    Info << "Reaction rate: " <<soln.RR << endl;
-//    Info << soln.cellid << endl;
-//    Info << soln.deltaTChem << endl;
-
-
-}
 
 
 
@@ -258,9 +183,10 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
 
 
 template <class ReactionThermo, class ThermoType>
+template<class DeltaTType>
 DynamicList<chemistryProblem>
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_,
-                                                              const scalar&            deltaT) {
+                                                              const DeltaTType&            deltaT) {
 
     // TODO: Add refcell and Treact as conditions to get problems.
 
@@ -283,55 +209,32 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
                 this->c_[i] = rho[celli] * this->Y_[i][celli]/this->specieThermo_[i].W(); 
             }
 
+            scalar Ti = T[celli];
 
-            // Create the problem
-            chemistryProblem problem;
-            problem.pi         = p[celli];
-            problem.Ti         = T[celli];
-            problem.c          = this->c_;
-            problem.rhoi       = rho[celli];
-            problem.deltaTChem = this->deltaTChem_[celli];
-            problem.cellid     = celli;
-            problem.deltaT     = deltaT;
+            if (Ti > this->Treact()) {
 
-            if (problem.Ti > this->Treact()){
+
+                // Create the problem
+                chemistryProblem problem;
+                problem.pi         = p[celli];
+                problem.Ti         = T[celli];
+                problem.c          = this->c_;
+                problem.rhoi       = rho[celli];
+                problem.deltaTChem = this->deltaTChem_[celli];
+                problem.cellid     = celli;
+                problem.deltaT     = deltaT[celli];
+
                 chem_problems.append(problem);
+            }
+
+            else {
+                for (label i = 0; i < this->nSpecie(); i++) { this->RR_[i][celli] = 0; }
             }
 
 
     }
     return chem_problems;
 }
-
-
-
-
-
-
-template <class ReactionThermo, class ThermoType>
-scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(
-    const DynamicList<chemistrySolution>& solutions) {
-
-    scalar deltaTMin = great;
-    for (int i = 0; i < solutions.size(); i++) {
-        update_reaction_rate(solutions[i],solutions[i].cellid);
-        deltaTMin                = min(solutions[i].deltaTChem, deltaTMin);
-    }
-
-    return deltaTMin;
-}
-
-
-
-
-template <class ReactionThermo, class ThermoType>
-void loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rate(
-    const chemistrySolution& solution, const label& cellid){
-
-        for (label j = 0; j < this->nSpecie_; j++) { this->RR_[j][cellid] = solution.RR[j]; }
-        this->deltaTChem_[cellid] = min(solution.deltaTChem, this->deltaTChemMax_);
-}
-
 
 
 

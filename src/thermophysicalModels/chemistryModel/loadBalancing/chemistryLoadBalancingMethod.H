@@ -82,6 +82,36 @@ private:
     sendRecvInfo m_current_state; // the current state of the object
 
 public:
+
+    /*
+    template<class T>
+    DynamicList<T> all_gather(const T& my_data) {
+    
+        
+    
+    }
+    */
+
+
+    ///
+    ///@brief Sets the current state
+    ///
+    ///@param state state to set to
+    ///
+    void set_state(const sendRecvInfo& state) {
+
+        m_current_state = state;
+
+        if (!valid_state()) {
+
+            print_state();
+
+            throw error("Invalid balance state in chemistryLoadBalancing.");
+        }
+    }
+
+
+
     void update_state(const DynamicList<chemistryProblem>& problems) {
 
         DynamicList<chemistryLoad> loads = get_loads(problems);
@@ -212,22 +242,7 @@ public:
             return true;
     }
 
-    ///
-    ///@brief Sets the current state
-    ///
-    ///@param state state to set to
-    ///
-    void set_state(const sendRecvInfo& state) {
-
-        m_current_state = state;
-
-        if (!valid_state()) {
-
-            print_state();
-
-            throw error("Invalid balance state in chemistryLoadBalancing.");
-        }
-    }
+    
 
     ///
     ///@brief Prints the current state information.

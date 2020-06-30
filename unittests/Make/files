@@ -1,10 +1,8 @@
 test.C
 testChemistryLoad.C
-testMixtureFraction.C
-testRefMapper.C
 testSimpleLoadBalancing.C
 testChemistryLoadBalancingMethod.C
-testChemistryProblem.C
+
 
 
 

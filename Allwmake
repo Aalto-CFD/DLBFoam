@@ -6,10 +6,10 @@ wclean all
 # Compile OpenFOAM_Aalto libraries
 src/Allwmake $targetType $*
 
-#cd unittests
-#wclean
-#wmake
-#cd ..
+cd unittests
+wclean
+wmake
+cd ..
 
 cd benchmarks
 wclean

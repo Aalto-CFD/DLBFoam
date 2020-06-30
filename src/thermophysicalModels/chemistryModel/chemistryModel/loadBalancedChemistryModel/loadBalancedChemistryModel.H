@@ -128,8 +128,9 @@ private:
     ///@param deltaT 
     ///@return DynamicList<chemistryProblem> 
     ///
-    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const scalar& deltaT);
-
+    
+    template<class DeltaTType>
+    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const DeltaTType& deltaT);
 
 
     ///
@@ -138,15 +139,8 @@ private:
     ///@param solutions 
     ///@return scalar 
     ///
-    scalar update_reaction_rates(const DynamicList<chemistrySolution>& solutions);
+    scalar update_reaction_rates(const  chemistryLoadBalancingMethod::buffer_t<chemistrySolution>& solutions);
 
-    ///
-    ///@brief 
-    ///
-    ///@param solution 
-    ///@param cellid 
-    ///
-    void   update_reaction_rate(const chemistrySolution& solution, const label& cellid);
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
