@@ -56,6 +56,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
 
 
+    BasicChemistryModel<ReactionThermo>::correct();
 
     if (!this->chemistry_) { return great; }
 
@@ -66,10 +67,10 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, SOMEOTHER_DELTAT);
 
 
+
     int original_problem_count = all_problems.size();
 
     load_balancer_->update_state(all_problems);
-
 
     load_balancer_->print_state();
     
@@ -81,25 +82,26 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
 
 
-
-
-    int solution_count = 0;
-
     scalar deltaTMin = great;
+
     for (size_t i = 0; i < my_solutions.size(); ++i){
+    for (const auto& solution : my_solutions[i]){
 
-        scalar temp = update_reaction_rates(my_solutions[i]);
-        if (temp < deltaTMin) {
-            deltaTMin = temp;
-        }
-        solution_count += my_solutions[i].size(); 
+        
+        for (label j = 0; j < this->nSpecie_; j++) { this->RR_[j][solution.cellid] = solution.RR[j]; }
+
+        deltaTMin = min(solution.deltaTChem, deltaTMin);
+        deltaTMin = min(deltaTMin, this->deltaTChemMax_);
+        this->deltaTChem_[solution.cellid] = deltaTMin;
+
+    }
+
     }
 
 
-
-    if (solution_count != original_problem_count){
-        throw error("Solution count differs from problem count.");
-    }
+    //if (solution_count != original_problem_count){
+    //    throw error("Solution count differs from problem count.");
+    //}
 
 
    /*
@@ -199,10 +201,29 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
         timeLeft -= dt;
     }
 
-    soln.c = prob.c;
-    soln.RR         = prob.rhoi * (soln.c - c0) / prob.deltaT;
-    soln.cellid     = prob.cellid;
-    soln.deltaTChem = min(prob.deltaTChem, this->deltaTChemMax_);
+
+    //soln.c = prob.c;
+    //soln.RR         = prob.rhoi * (soln.c - c0) / prob.deltaT; //THIS IS THE PYJAC DEFININITION
+    //RR[i][celli] = (this->c_[i] - c0[i]) * this->specieThermo_[i].W() / deltaT[celli];
+    //soln.cellid     = prob.cellid;
+    //soln.deltaTChem = prob.deltaTChem; //min(prob.deltaTChem, this->deltaTChemMax_);
+
+    for (label i = 0; i < this->nSpecie(); i++) { 
+
+        soln.c[i] = prob.c[i];
+        soln.RR[i] = this->specieThermo_[i].W() * (soln.c[i] - c0[i]) / prob.deltaT;
+        soln.cellid = prob.cellid;
+        soln.deltaTChem = prob.deltaTChem;
+
+    }
+
+
+//    Info << soln.c << endl;
+//    Info << "Reaction rate: " <<soln.RR << endl;
+//    Info << soln.cellid << endl;
+//    Info << soln.deltaTChem << endl;
+
+
 }
 
 
@@ -250,17 +271,17 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
     bool                          refCellFound = false;
 
     DynamicList<chemistryProblem> chem_problems;
-    chem_problems.reserve(T.size());
+    
+    //TODO: reserve
+    //chem_problems.reserve(T.size());
 
 
     forAll(p, celli) {
 
-        
-       // scalar Ti = T[celli];
-       // if (Ti > this->Treact_){
 
-
-            for (label i = 0; i < this->nSpecie_; i++) { this->c_[i] = this->Y_[i][celli]; }
+            for (label i = 0; i < this->nSpecie_; i++) { 
+                this->c_[i] = rho[celli] * this->Y_[i][celli]/this->specieThermo_[i].W(); 
+            }
 
 
             // Create the problem
@@ -273,13 +294,11 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
             problem.cellid     = celli;
             problem.deltaT     = deltaT;
 
-        
-            chem_problems.append(problem);
-        //}
-        //set reaction rate to zero
-        //else {
-        //    for (label i = 0; i < this->nSpecie_; i++) { this->RR_[i][celli] = 0.0; }
-        //}
+            if (problem.Ti > this->Treact()){
+                chem_problems.append(problem);
+            }
+
+
     }
     return chem_problems;
 }
