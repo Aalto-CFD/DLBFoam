@@ -98,9 +98,16 @@ public:
 
 private:
 
+    scalarField                   cpu_times_;
+
     chemistryLoadBalancingMethod* load_balancer_;
 
-
+    ///
+    ///@brief A factory function for creating the balancer
+    ///
+    ///@return chemistryLoadBalancingMethod* 
+    ///
+    static chemistryLoadBalancingMethod* create_balancer();
 
     ///
     ///@brief 

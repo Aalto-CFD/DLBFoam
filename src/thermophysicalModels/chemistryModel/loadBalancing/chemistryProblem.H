@@ -15,6 +15,7 @@ struct chemistryProblem {
     scalar      rhoi;
     scalar      deltaTChem;
     scalar      deltaT;
+    scalar      cpuTime;
     label       cellid;
 
     // TODO: implement!

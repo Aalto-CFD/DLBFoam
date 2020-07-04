@@ -32,20 +32,29 @@ namespace Foam {
 template <class ReactionThermo, class ThermoType>
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryModel(
     ReactionThermo& thermo)
-    : StandardChemistryModel<ReactionThermo, ThermoType>(thermo) {
+    : StandardChemistryModel<ReactionThermo, ThermoType>(thermo)
+    , cpu_times_(this->mesh().cells().size(), 0.0)
+    , load_balancer_(create_balancer()) {
 
     Info << "Running with a load balanced" << endl;
-
-
-    load_balancer_ = new simpleBalancingMethod();
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template <class ReactionThermo, class ThermoType>
-loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryModel() {
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryModel(){
     delete load_balancer_; // TODO: use a smart pointer
 }
+
+
+
+template <class ReactionThermo, class ThermoType>
+chemistryLoadBalancingMethod* loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer(){
+
+    return new simpleBalancingMethod();
+
+}
+
 
 template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
@@ -84,8 +93,17 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
 
     // TODO: Make this work so that chemistryProblem is a const &
 
+
+
+
     scalar           timeLeft = prob.deltaT;
     const scalarList c0       = prob.c;
+
+
+
+    //Timer begin
+    clockTime time;
+    time.timeIncrement();
 
     // Calculate the chemical source terms
     while (timeLeft > small) {
@@ -94,8 +112,13 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
         timeLeft -= dt;
     }
 
+
+
+
     soln.c_increment = (prob.c - c0) / prob.deltaT;
     soln.deltaTChem = prob.deltaTChem;
+    //Timer end
+    soln.cpuTime = time.timeIncrement();
     soln.cellid = prob.cellid;
 
 
@@ -120,7 +143,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_r
         deltaTMin = min(solution.deltaTChem, deltaTMin);
         deltaTMin = min(deltaTMin, this->deltaTChemMax_);
         this->deltaTChem_[solution.cellid] = deltaTMin;
-
+        this->cpu_times_[solution.cellid]  = solution.cpuTime;
     }
 
     }
@@ -213,16 +236,16 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
 
             if (Ti > this->Treact()) {
 
-
                 // Create the problem
                 chemistryProblem problem;
-                problem.pi         = p[celli];
-                problem.Ti         = T[celli];
                 problem.c          = this->c_;
+                problem.Ti         = T[celli];
+                problem.pi         = p[celli];
                 problem.rhoi       = rho[celli];
                 problem.deltaTChem = this->deltaTChem_[celli];
-                problem.cellid     = celli;
                 problem.deltaT     = deltaT[celli];
+                problem.cpuTime    = this->cpu_times_[celli];
+                problem.cellid     = celli;
 
                 chem_problems.append(problem);
             }

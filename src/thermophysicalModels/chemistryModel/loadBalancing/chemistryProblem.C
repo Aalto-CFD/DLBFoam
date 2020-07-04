@@ -10,6 +10,7 @@ Ostream& operator<<(Ostream& os, const chemistryProblem& p) {
     os << p.rhoi;
     os << p.deltaTChem;
     os << p.deltaT;
+    os << p.cpuTime;
     os << p.cellid;
 
     return os;
@@ -23,6 +24,7 @@ Istream& operator>>(Istream& is, chemistryProblem& p) {
     is >> p.rhoi;
     is >> p.deltaTChem;
     is >> p.deltaT;
+    is >> p.cpuTime;
     is >> p.cellid;
 
     return is;

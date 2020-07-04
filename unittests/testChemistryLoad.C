@@ -1,5 +1,6 @@
 #include "../third_party/catch.hpp"
 #include "chemistryLoad.H"
+#include "chemistryProblem.H"
 #include "Pstream.H"
 
 TEST_CASE("chemistryLoad comparisons"){
@@ -21,6 +22,11 @@ TEST_CASE("chemistryLoad comparisons"){
 
 
 }
+
+
+
+
+
 
 TEST_CASE("chemistryLoad mpi send and receive"){
 
