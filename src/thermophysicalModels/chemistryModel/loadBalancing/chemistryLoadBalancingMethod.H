@@ -120,11 +120,15 @@ public:
 
 
 
+    virtual void update_state(const DynamicList<chemistryProblem>& problems) = 0;
+
+    /*
     void update_state(const DynamicList<chemistryProblem>& problems) {
 
         DynamicList<chemistryLoad> loads = get_loads(problems);
         set_state(determine_state(loads));
     }
+    */
 
     ///
     ///@brief Given a list of values splits them evenly between the mpi-processes.
@@ -333,22 +337,9 @@ protected:
         return send_buffer;
     }
 
-private:
-    ///
-    ///@brief Given a list of problems belonging to this rank, determine the load of this process
-    ///
-    ///@param problems problems of this rank
-    ///@return chemistryLoad my load
-    ///
-    virtual chemistryLoad get_my_load(const DynamicList<chemistryProblem>& problems) const;
 
-    ///
-    ///@brief Determines if a process is a sender receiver or do-nothinger
-    ///
-    ///@param loads a sorted array of loads
-    ///@return WHATTODO state information on what the process should do
-    ///
-    virtual sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const = 0;
+
+
 };
 
 } // namespace Foam

@@ -3,6 +3,8 @@ loadBalancing/chemistrySolution.C
 loadBalancing/chemistryLoad.C
 loadBalancing/chemistryLoadBalancingMethod.C
 loadBalancing/simpleBalancingMethod.C
+loadBalancing/loadTree.C
+
 
 chemistryModel/makePexChemistryModels.C
 chemistrySolver/makePexChemistrySolvers.C

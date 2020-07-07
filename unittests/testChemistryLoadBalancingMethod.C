@@ -50,6 +50,9 @@ public:
   
     }
     
+    void update_state(const DynamicList<chemistryProblem>& problems) {
+        /*empty*/
+    }
 
     template<class ET, Pstream::commsTypes CT>
     static buffer_t<ET> test_send_recv(const buffer_t<ET>& buffer, std::vector<int> sources, std::vector<int> dests){
@@ -66,60 +69,6 @@ public:
     }
 
     */
-private:
-
-    chemistryLoad get_my_load(const DynamicList<chemistryProblem>& problems) const override{
-        chemistryLoad load;    
-        load.rank = Pstream::myProcNo();
-
-        if (load.rank % 2 == 0){
-            load.number_of_active_cells = load.rank * 2 + 50;
-            load.value = double(3.0 * load.rank + 50);
-        }
-
-        else{
-            load.number_of_active_cells = load.rank * 4 + 50;
-            load.value = double(3.65 * load.rank + 50);
-        }
-        
-        
-        return load;
-    }
-
-
-
-    sendRecvInfo determine_state(const DynamicList<chemistryLoad>& loads) const override{
-        
-        
-        sendRecvInfo i;
-
-
-        if (Pstream::myProcNo() == Pstream::master()){
-
-            for (const auto& load : loads){
-                if (load.rank != Pstream::myProcNo()){
-
-                    i.sources.emplace_back(load.rank);
-                    i.number_of_problems.emplace_back(10);
-                }
-            }
-            i.destinations = {};
-        }
-
-        else {
-
-            i.number_of_problems = {10};
-            i.destinations = {Pstream::master()};
-            i.sources = {};
-        }
-
-
-
-        return i;
-        
-
-
-    }
 };
 
 } //namespace Foam
@@ -155,13 +104,14 @@ TEST_CASE("chemistryLoadBalancingMethod all_gather()"){
 
     }
 
+    CHECK(data.size() == Pstream::nProcs());
     
 
 
 }
 
 
-
+/*
 
 TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 
@@ -196,6 +146,7 @@ TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
 
     
 }
+*/
 
 TEST_CASE("chemistryLoadBalancingMethod partition()"){
 

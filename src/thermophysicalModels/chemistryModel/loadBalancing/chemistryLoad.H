@@ -18,16 +18,14 @@ struct chemistryLoad{
 
     chemistryLoad() = default;
 
-    chemistryLoad(int rank_in, double val_in, int n_active_cells) : 
-    rank(rank_in), 
-    value(val_in), 
-    number_of_active_cells(n_active_cells) 
+    chemistryLoad(int _rank, double _value) : 
+    rank(_rank), 
+    value(_value) 
     {} 
 
 
     int rank;     //rank of the process 
     double value; //an indicator how busy the processor is
-    int    number_of_active_cells; //number of chemically active cells
 
     //overload comparisons for sorting
     bool operator==(const chemistryLoad& rhs) const {return value == rhs.value;}
@@ -36,6 +34,33 @@ struct chemistryLoad{
     bool operator>=(const chemistryLoad& rhs) const {return value >= rhs.value;}
     bool operator< (const chemistryLoad& rhs) const {return value <  rhs.value;}
     bool operator> (const chemistryLoad& rhs) const {return value >  rhs.value;}
+
+
+    bool operator==(double rhs) const {return value == rhs;}
+    bool operator!=(double rhs) const {return !(*this == rhs);}
+    bool operator<=(double rhs) const {return value <= rhs;}
+    bool operator>=(double rhs) const {return value >= rhs;}
+    bool operator<(double rhs) const {return value < rhs;}
+    bool operator>(double rhs) const {return value > rhs;}
+
+
+    chemistryLoad& operator+=(const chemistryLoad& rhs) {value += rhs.value; return *this;}    
+    chemistryLoad& operator-=(const chemistryLoad& rhs) {value -= rhs.value; return *this;}    
+    chemistryLoad& operator*=(const chemistryLoad& rhs) {value *= rhs.value; return *this;}    
+    chemistryLoad& operator/=(const chemistryLoad& rhs) {value /= rhs.value; return *this;}
+
+    chemistryLoad operator+(double rhs) {chemistryLoad l(*this); return l+=rhs;}    
+    chemistryLoad operator-(double rhs) {chemistryLoad l(*this); return l-=rhs;}    
+    chemistryLoad operator*(double rhs) {chemistryLoad l(*this); return l*=rhs;}    
+    chemistryLoad operator/(double rhs) {chemistryLoad l(*this); return l/=rhs;}    
+
+    chemistryLoad& operator+=(double rhs) {value += rhs; return *this;}    
+    chemistryLoad& operator-=(double rhs) {value -= rhs; return *this;}    
+    chemistryLoad& operator*=(double rhs) {value *= rhs; return *this;}    
+    chemistryLoad& operator/=(double rhs) {value /= rhs; return *this;}
+
+
+
 };
 
 Ostream& operator<<(Ostream& os, const chemistryLoad& l);

@@ -11,9 +11,6 @@ int main(int argc, char* argv[])
 {
 
     using namespace Foam;
-    
-    //This is the MPI_Init call, only works for mpirun and should be checked somehow
-    //TODO: break if not mpirun
 
     if (Pstream::parRun()){
         bool ok = UPstream::init(argc, argv, true);

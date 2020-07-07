@@ -6,6 +6,19 @@
 
 namespace Foam{
 
+static Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t n){
+    
+    using namespace Foam;
+
+    DynamicList<chemistryLoad> ret(n, chemistryLoad());
+
+    for( size_t i = 0; i < n; ++i ) {
+        ret[i].value = double(rand() % 100) + 1;
+        ret[i].rank = i;
+    }
+    return ret;
+}
+
 
 //create some arbitrary data
 DynamicList<chemistryProblem> create_problems2(int count){
@@ -15,7 +28,6 @@ DynamicList<chemistryProblem> create_problems2(int count){
     DynamicList<chemistryProblem> problems;
     
     for (int i = 0; i < count; ++i){
-        //send data
         chemistryProblem p;
         
         scalarField s(10);
@@ -25,7 +37,7 @@ DynamicList<chemistryProblem> create_problems2(int count){
         p.pi = 54.0;
         p.deltaTChem = 0.3;
         p.cellid = i;
-
+        p.cpuTime = 1.1;
         problems.append(p);
 
     }
@@ -36,22 +48,52 @@ DynamicList<chemistryProblem> create_problems2(int count){
 
 
 
-TEST_CASE("simpleBalancingMethod balance() / unbalance()"){
+
+TEST_CASE("simpleBalancingMethod get_my_load()"){
 
     
     simpleBalancingMethod l;
 
+
+
     auto problems = create_problems2(3 + 1*Pstream::myProcNo());
+    CHECK(problems[0].cpuTime == 1.1);
+
+    auto load = l.get_my_load(problems);
+
+    CHECK(load.value == problems.size() * 1.1);
+    CHECK(load.rank == Pstream::myProcNo());
+
+}
+
+TEST_CASE("simpleBalancingMethod build_tree()"){
+
+    auto loads = create_random_load(20);
+
+    simpleBalancingMethod l;
+    auto root = l.build_tree(loads);
+
+    std::vector<bool> flag(loads.size(),true);
+    loadTree::print_tree(root, flag);
+}
+
+
+TEST_CASE("simpleBalancingMethod update_state()"){
+
+    
+    simpleBalancingMethod l;
+
+    auto problems = create_problems2(10);
     l.update_state(problems);
 
-
+    /*
     auto buffer_s = l.balance(problems);
 
     Pout << buffer_s.size() << endl;
 
     //CHECK(buffer_s.size() != 0);
 
-
+    */
 }
 
 
