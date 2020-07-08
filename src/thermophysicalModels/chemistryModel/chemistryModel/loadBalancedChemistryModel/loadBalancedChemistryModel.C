@@ -135,7 +135,6 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_r
 
     scalar deltaTMin = great;
 
-//    for (size_t i = 0; i < size_t(solutions.size()); ++i){
 
     for (const auto& array : solutions){
     for (const auto& solution : array){

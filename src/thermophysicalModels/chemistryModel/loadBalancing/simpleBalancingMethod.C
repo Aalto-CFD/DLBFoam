@@ -9,7 +9,6 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
 
     auto root = build_tree(all_loads);
 
-    Info << problems.size() << endl;
 
     sendRecvInfo info;
     info.destinations       = {Pstream::myProcNo()};

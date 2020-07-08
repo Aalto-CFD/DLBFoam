@@ -12,9 +12,9 @@ int main(int argc, char* argv[])
 
     using namespace Foam;
 
-    if (Pstream::parRun()){
-        bool ok = UPstream::init(argc, argv, true);
-    }
+//    if (Pstream::parRun()){
+//        bool ok = UPstream::init(argc, argv, true);
+//    }
     
     Catch::Session session;
   

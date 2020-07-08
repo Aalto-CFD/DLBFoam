@@ -73,8 +73,13 @@ TEST_CASE("simpleBalancingMethod build_tree()"){
     simpleBalancingMethod l;
     auto root = l.build_tree(loads);
 
-    std::vector<bool> flag(loads.size(),true);
-    loadTree::print_tree(root, flag);
+    auto temp = loadTree::inorder(root, -1);
+
+//    CHECK(loadTree::inorder(root, 3));
+
+
+    //std::vector<bool> flag(loads.size(),true);
+    //loadTree::print_tree(root, flag);
 }
 
 

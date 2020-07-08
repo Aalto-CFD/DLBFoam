@@ -33,35 +33,84 @@ struct loadTree {
         return temp;
     }
 
-
-
-
     static void add_child(const node_ptr& parent, const node_ptr& child) {
 
         child->parent = parent;
         parent->children.push_back(child);
     }
 
+    static node_ptr inorder(const node_ptr& node, int rank) {
 
-    template<class Finder, class SendValue>
-    static void add_child(std::vector<node_ptr>& candidates, const chemistryLoad& load, const Finder& f, const SendValue& c) {
+
+        if (node == nullptr) {
+            return nullptr;
+        }
+
+        if (node->value.rank == rank) {return node;}
+
+
+        //this doesnt work because the return value is ignored
+
+//        for (auto i = node->children.begin(); i != node->children.end(); ++i, ++it) {
+//            auto asd = inorder(*i, rank, it == (node->children.size()) - 1);
+//        }
+
+
+
+
+
+
+
+        /*
+
+        // Total children count
+        size_t total = node->children.size();
+
+        std::cout << total << std::endl;
+
+
+
+        // All the children except the last
+        for (size_t i = 0; i < total - 1; ++i){
+            inorder(node->children[i], rank);
+        } 
+
+        */
+
+        //if (node->value.rank == rank) {
+        //    return node;
+        //}
+
+
+        // Print the current node's data
+        //std::cout << node->value.value << " ";
+
+        // Last child
+        //inorder(node->children[total - 1], rank);
+
+
+    }
+
+    template <class Finder, class SendValue>
+    static void add_child(std::vector<node_ptr>& candidates,
+                          const chemistryLoad&   load,
+                          const Finder&          f,
+                          const SendValue&       c) {
 
         node_ptr correct_parent = f(candidates);
 
-        if (correct_parent){
+        if (correct_parent) {
 
-            double send_value = c(correct_parent, load); //compute_send_value(correct_parent, load);
-            auto   node       = new_node(load);
+            double send_value = c(correct_parent, load); // compute_send_value(correct_parent,
+                                                         // load);
+            auto node = new_node(load);
 
             correct_parent->value -= send_value;
             node->value += send_value;
 
             add_child(correct_parent, node);
         }
-
     }
-
-    
 
     /*
 
@@ -88,7 +137,6 @@ struct loadTree {
     }
     */
 
-
     static std::pair<std::vector<chemistryLoad>, std::vector<chemistryLoad>>
     divide(const DynamicList<chemistryLoad>& in, double treshold) {
 
@@ -108,8 +156,8 @@ struct loadTree {
         return {big, small};
     }
 
-
-    static void print_tree(const node_ptr& x, std::vector<bool> flag, int depth = 0, bool isLast = false) {
+    static void
+    print_tree(const node_ptr& x, std::vector<bool> flag, int depth = 0, bool isLast = false) {
         if (x == NULL) return;
 
         for (int i = 1; i < depth; ++i) {
@@ -139,7 +187,6 @@ struct loadTree {
         } else {
             std::cout << "+--- " << x->value.value << '\n';
         }
-
 
         size_t it = 0;
         for (auto i = x->children.begin(); i != x->children.end(); ++i, ++it) {
