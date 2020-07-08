@@ -72,7 +72,6 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
     
     DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, deltaT);
-    int original_problem_count = all_problems.size();
 
     load_balancer_->update_state(all_problems);
     load_balancer_->print_state();
@@ -82,7 +81,11 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
 
 
+
     return update_reaction_rates(my_solutions);
+
+
+
 
 }
 
@@ -132,8 +135,10 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_r
 
     scalar deltaTMin = great;
 
-    for (size_t i = 0; i < solutions.size(); ++i){
-    for (const auto& solution : solutions[i]){
+//    for (size_t i = 0; i < size_t(solutions.size()); ++i){
+
+    for (const auto& array : solutions){
+    for (const auto& solution : array){
 
         
         for (label j = 0; j < this->nSpecie_; j++) { 
@@ -192,6 +197,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
         solutions.append(sublist);
     }
 
+
     for (int i = 0; i < solutions.size(); ++i){
         for (int j = 0; j < solutions[i].size(); ++j ){
             
@@ -217,7 +223,6 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
     const scalarField&            p = this->thermo().p();
     tmp<volScalarField>           trho(this->thermo().rho());
     const scalarField&            rho          = trho();
-    bool                          refCellFound = false;
 
     DynamicList<chemistryProblem> chem_problems;
     

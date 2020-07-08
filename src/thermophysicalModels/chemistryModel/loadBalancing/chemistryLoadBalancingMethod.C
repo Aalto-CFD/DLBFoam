@@ -19,7 +19,7 @@ size_t chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistr
 
     return iter - loads.begin();
     */
-    for (size_t i = 0; i < loads.size(); ++i){
+    for (size_t i = 0; i < size_t(loads.size()); ++i){
         if (loads[i].rank == rank) return i;
     }
 

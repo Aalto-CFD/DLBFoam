@@ -33,11 +33,37 @@ struct loadTree {
         return temp;
     }
 
-    static double compute_send_value(const node_ptr& parent_candidate, const chemistryLoad& load) {
 
-        // This is too arbitrary
-        return 0.3 * parent_candidate->value.value; // TODO!
+
+
+    static void add_child(const node_ptr& parent, const node_ptr& child) {
+
+        child->parent = parent;
+        parent->children.push_back(child);
     }
+
+
+    template<class Finder, class SendValue>
+    static void add_child(std::vector<node_ptr>& candidates, const chemistryLoad& load, const Finder& f, const SendValue& c) {
+
+        node_ptr correct_parent = f(candidates);
+
+        if (correct_parent){
+
+            double send_value = c(correct_parent, load); //compute_send_value(correct_parent, load);
+            auto   node       = new_node(load);
+
+            correct_parent->value -= send_value;
+            node->value += send_value;
+
+            add_child(correct_parent, node);
+        }
+
+    }
+
+    
+
+    /*
 
     static void add_child(std::vector<node_ptr>& candidates, const chemistryLoad& load) {
 
@@ -60,6 +86,8 @@ struct loadTree {
         node->parent = correct_parent;
         correct_parent->children.push_back(node);
     }
+    */
+
 
     static std::pair<std::vector<chemistryLoad>, std::vector<chemistryLoad>>
     divide(const DynamicList<chemistryLoad>& in, double treshold) {
@@ -112,7 +140,8 @@ struct loadTree {
             std::cout << "+--- " << x->value.value << '\n';
         }
 
-        int it = 0;
+
+        size_t it = 0;
         for (auto i = x->children.begin(); i != x->children.end(); ++i, ++it) {
             print_tree(*i, flag, depth + 1, it == (x->children.size()) - 1);
         }

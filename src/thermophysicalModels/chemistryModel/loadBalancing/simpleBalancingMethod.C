@@ -9,12 +9,15 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
 
     auto root = build_tree(all_loads);
 
+    Info << problems.size() << endl;
+
     sendRecvInfo info;
     info.destinations       = {Pstream::myProcNo()};
     info.sources            = {Pstream::myProcNo()};
     info.number_of_problems = {problems.size()};
 
     set_state(info);
+
 }
 
 
@@ -30,19 +33,15 @@ node_ptr simpleBalancingMethod::build_tree(const DynamicList<chemistryLoad>& loa
 
     auto root = loadTree::new_node(chemistryLoad(-1, -1));
 
-    
+        
     for (const auto& v : big){
-        auto node = loadTree::new_node(v);
-        node->parent = root;
-        root->children.push_back(node);
+        auto child = loadTree::new_node(v);
+        loadTree::add_child(root, child);
     }
 
-    
     for (const auto& v : small) {
-
-        loadTree::add_child(root->children, v);
+        loadTree::add_child(root->children, v, FindCandidate(), ComputeSendValue());
     }
-
 
     return root;
 

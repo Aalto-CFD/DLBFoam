@@ -287,8 +287,8 @@ protected:
 
         if (sources.size() < 1) return false;
         if (destinations.size() < 1) return false;
-        if (sources.size() > Pstream::nProcs()) return false;
-        if (destinations.size() > Pstream::nProcs()) return false;
+        if (sources.size() > size_t(Pstream::nProcs())) return false;
+        if (destinations.size() > size_t(Pstream::nProcs())) return false;
         if (sources[0] != Pstream::myProcNo())
             return false; // the first index must always be this process
         if (sources[0] != destinations[0]) return false;
@@ -318,7 +318,7 @@ protected:
         if (Pstream::parRun()) {
             PstreamBuffers pBufs(CT);
 
-            for (int i = 0; i < destinations.size(); ++i) {
+            for (size_t i = 0; i < destinations.size(); ++i) {
                 UOPstream send(destinations[i], pBufs);
                 send << send_buffer[i];
             }
@@ -326,7 +326,7 @@ protected:
 
             buffer_t<ET> recv_buffers;
             recv_buffers.setSize(sources.size());
-            for (int i = 0; i < sources.size(); ++i) {
+            for (size_t i = 0; i < sources.size(); ++i) {
                 UIPstream recv(sources[i], pBufs);
                 recv >> recv_buffers[i];
             }

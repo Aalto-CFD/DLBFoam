@@ -40,6 +40,7 @@ public:
     node_ptr build_tree(const DynamicList<chemistryLoad>& loads) const;
 
 
+
 private:
 
 
@@ -48,6 +49,32 @@ private:
 
 
     std::vector<int> times_to_problem_counts(const std::vector<double>& times, const DynamicList<chemistryProblem>& problems) const;
+
+    struct ComputeSendValue{
+
+        double operator()(const node_ptr& node, const chemistryLoad& load) const {
+            return 0.3 * node->value.value;
+        }
+    };
+
+    struct FindCandidate{
+
+        node_ptr operator()(const std::vector<node_ptr>& candidates) const{
+
+                        
+            node_ptr correct_parent;
+            double largest = 0.0;
+            for (const auto candidate : candidates) {
+
+                if (candidate->value > largest) {
+                    largest        = candidate->value.value; // TODO FIX!
+                    correct_parent = candidate;
+                }
+            }
+            return correct_parent;
+        }
+
+    };
 
 
 };

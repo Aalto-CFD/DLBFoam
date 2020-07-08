@@ -11,6 +11,6 @@ cd unittests
 wmake
 cd ..
 
-cd benchmarks
+#cd benchmarks
 #wclean
-wmake
+#wmake
