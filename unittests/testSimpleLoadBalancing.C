@@ -77,11 +77,13 @@ TEST_CASE("simpleBalancingMethod build_tree()"){
     
     CHECK(loadTree::find(root, -1) != nullptr);
 
-    for (int i = 0; i < n_nodes; ++i) {
+    for (size_t i = 0; i < n_nodes; ++i) {
         CHECK(loadTree::find(root, i) != nullptr);
     }
 
     CHECK(loadTree::find(root, 21) == nullptr);
+
+    //loadTree::print(root, n_nodes);
 
 }
 

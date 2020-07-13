@@ -7,6 +7,7 @@
 
 #include "DynamicList.H"
 #include "chemistryLoad.H"
+#include "Pstream.H"
 
 namespace Foam {
 
@@ -112,7 +113,7 @@ struct loadTree {
         std::vector<chemistryLoad> big, small;
 
         for (const auto& v : in) {
-            if (v > treshold) {
+            if (v >= treshold) {
                 big.push_back(v);
             } else {
                 small.push_back(v);
@@ -125,6 +126,16 @@ struct loadTree {
         return {big, small};
     }
 
+
+
+    static void print(const node_ptr& root, int n_nodes = Pstream::nProcs()){
+
+        std::vector<bool> flag(n_nodes, true); 
+        print_tree(root, flag);
+    }
+
+private:
+
     static void
     print_tree(const node_ptr& x, std::vector<bool> flag, int depth = 0, bool isLast = false) {
         if (x == NULL) return;
@@ -132,14 +143,14 @@ struct loadTree {
         for (int i = 1; i < depth; ++i) {
 
             if (flag[i] == true) {
-                std::cout << "| "
+                Info << "| "
                           << " "
                           << " "
                           << " ";
             }
 
             else {
-                std::cout << " "
+                Info << " "
                           << " "
                           << " "
                           << " ";
@@ -147,14 +158,14 @@ struct loadTree {
         }
 
         if (depth == 0)
-            std::cout << x->value.value << '\n';
+            Info << x->value.value << '\n';
 
         else if (isLast) {
-            std::cout << "+--- " << x->value.value << '\n';
+            Info << "+--- " << x->value.value << '\n';
 
             flag[depth] = false;
         } else {
-            std::cout << "+--- " << x->value.value << '\n';
+            Info << "+--- " << x->value.value << '\n';
         }
 
         size_t it = 0;

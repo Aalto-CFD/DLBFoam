@@ -2,18 +2,53 @@
 
 namespace Foam {
 
+chemistryLoadBalancingMethod::sendRecvInfo 
+simpleBalancingMethod::convert(const node_ptr& my_node, const chemistryLoad& my_org_load, const DynamicList<chemistryProblem>& problems) const{
+
+
+    sendRecvInfo info;
+
+    info.destinations       = {Pstream::myProcNo()};
+    info.sources            = {Pstream::myProcNo()};
+    info.number_of_problems = {problems.size()};
+    //return info;
+
+    //receiver
+    if (my_node->parent->value.rank != -1){
+        
+        info.sources.push_back(my_node->parent->value.rank);
+        info.number_of_problems.push_back(1);
+        return info;
+    }
+    else {
+
+        
+        for (const auto& child : my_node->children){
+            info.destinations.push_back(child->value.rank);
+            info.number_of_problems.push_back(1);
+            info.number_of_problems[0] -= 1;
+        }
+
+
+    }
+
+    return info;
+
+}
+
 void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& problems) {
 
     auto my_load   = get_my_load(problems);
     auto all_loads = all_gather(my_load);
 
     auto root = build_tree(all_loads);
+    loadTree::print(root);
 
+    auto my_node = loadTree::find(root, my_load.rank);
 
-    sendRecvInfo info;
-    info.destinations       = {Pstream::myProcNo()};
-    info.sources            = {Pstream::myProcNo()};
-    info.number_of_problems = {problems.size()};
+    runtime_assert(my_node != nullptr, "My node not found from the node tree");
+
+    auto info = convert(my_node, my_load, problems);
 
     set_state(info);
 
@@ -22,7 +57,7 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
 
 node_ptr simpleBalancingMethod::build_tree(const DynamicList<chemistryLoad>& loads) const{
 
-    double treshold = 0.5 * compute_mean_load(loads);
+    double treshold = 1.0 * compute_mean_load(loads);
 
 
     auto [big, small] = loadTree::divide(loads, treshold);
