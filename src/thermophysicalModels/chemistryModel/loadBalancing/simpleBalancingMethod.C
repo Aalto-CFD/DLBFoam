@@ -102,24 +102,9 @@ std::vector<int> simpleBalancingMethod::times_to_problem_counts(
     const std::vector<double>& times, const DynamicList<chemistryProblem>& problems) const {
 
     std::vector<int> counts;
-    double sum = 0.0;
-    int count = 0;
-
-    for (const auto& time : times){
-        
-        for (auto it = problems.begin(); it != problems.end(); ++it)
-        {
-            if (sum >= time) {
-                sum = 0.0;
-                counts.push_back(count);
-                count = 0;
-            }
-            count++;
-            sum+=it->cpuTime;
-        }
-    }
 
     
+
     return counts;
 }
 
