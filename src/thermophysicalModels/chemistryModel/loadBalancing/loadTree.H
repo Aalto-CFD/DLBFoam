@@ -18,9 +18,11 @@ struct Node {
 
     // chemistryLoad() = default;
     Node(const chemistryLoad& load)
-        : value(load) {}
+        : value(load), org_value(load) {}
 
     chemistryLoad         value;
+    chemistryLoad         org_value;
+    
     node_ptr              parent;
     std::vector<node_ptr> children;
 };

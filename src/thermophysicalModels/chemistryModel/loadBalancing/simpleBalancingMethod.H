@@ -30,18 +30,19 @@ public:
     std::pair<std::vector<chemistryLoad>, std::vector<chemistryLoad>>
     divide(const DynamicList<chemistryLoad>& in, double treshold = 0.3) const;
 
-    node_ptr build_tree(const DynamicList<chemistryLoad>& loads) const;
-
-    chemistryLoadBalancingMethod::sendRecvInfo
-    convert(const node_ptr&                      my_node,
-            const chemistryLoad&                 my_org_load,
-            const DynamicList<chemistryProblem>& problems) const;
-
-private:
-    double compute_mean_load(const DynamicList<chemistryLoad>& loads) const;
+    std::vector<int> compute_problem_count(const node_ptr&                      sender,
+                                           const DynamicList<chemistryProblem>& problems) const;
 
     std::vector<int> times_to_problem_counts(const std::vector<double>&           times,
                                              const DynamicList<chemistryProblem>& problems) const;
+
+    node_ptr build_tree(const DynamicList<chemistryLoad>& loads) const;
+
+    chemistryLoadBalancingMethod::sendRecvInfo
+    convert(const node_ptr& my_node, const DynamicList<chemistryProblem>& problems) const;
+
+private:
+    double compute_mean_load(const DynamicList<chemistryLoad>& loads) const;
 
     struct ComputeSendValue {
 
