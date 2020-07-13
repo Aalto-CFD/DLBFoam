@@ -67,19 +67,22 @@ TEST_CASE("simpleBalancingMethod get_my_load()"){
 }
 
 TEST_CASE("simpleBalancingMethod build_tree()"){
+;
+    size_t n_nodes = 20;
 
-    auto loads = create_random_load(20);
+    auto loads = create_random_load(n_nodes);
 
     simpleBalancingMethod l;
     auto root = l.build_tree(loads);
+    
+    CHECK(loadTree::find(root, -1) != nullptr);
 
-    auto temp = loadTree::inorder(root, -1);
+    for (int i = 0; i < n_nodes; ++i) {
+        CHECK(loadTree::find(root, i) != nullptr);
+    }
 
-//    CHECK(loadTree::inorder(root, 3));
+    CHECK(loadTree::find(root, 21) == nullptr);
 
-
-    //std::vector<bool> flag(loads.size(),true);
-    //loadTree::print_tree(root, flag);
 }
 
 

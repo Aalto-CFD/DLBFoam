@@ -39,8 +39,7 @@ struct loadTree {
         parent->children.push_back(child);
     }
 
-    static node_ptr inorder(const node_ptr& node, int rank) {
-
+    static node_ptr find(node_ptr& node, int rank) {
 
         if (node == nullptr) {
             return nullptr;
@@ -49,45 +48,15 @@ struct loadTree {
         if (node->value.rank == rank) {return node;}
 
 
-        //this doesnt work because the return value is ignored
-
-//        for (auto i = node->children.begin(); i != node->children.end(); ++i, ++it) {
-//            auto asd = inorder(*i, rank, it == (node->children.size()) - 1);
-//        }
-
-
-
+        for (auto child : node->children){
+            auto target = find(child, rank);
+            if (target != nullptr) {
+                return target;
+            }
+        }
 
 
-
-
-        /*
-
-        // Total children count
-        size_t total = node->children.size();
-
-        std::cout << total << std::endl;
-
-
-
-        // All the children except the last
-        for (size_t i = 0; i < total - 1; ++i){
-            inorder(node->children[i], rank);
-        } 
-
-        */
-
-        //if (node->value.rank == rank) {
-        //    return node;
-        //}
-
-
-        // Print the current node's data
-        //std::cout << node->value.value << " ";
-
-        // Last child
-        //inorder(node->children[total - 1], rank);
-
+        return nullptr;
 
     }
 
