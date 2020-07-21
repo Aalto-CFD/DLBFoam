@@ -99,11 +99,23 @@ TEST_CASE("simpleBalancingMethod build_tree()"){
 
 TEST_CASE("simpleBalancingMethod times_to_problem_counts"){
 
-    auto problems = create_problems2(11);
+    auto problems = create_problems2(3);
     auto one = TESTABLE::times_to_problem_counts({1.1}, problems);
     CHECK(one.size() == 1);
     CHECK(one[0] == 1);
 
+
+
+    auto two = TESTABLE::times_to_problem_counts({1.1, 1.1}, problems);
+    CHECK(two.size() == 2);
+    CHECK(two[0] == 1);
+    CHECK(two[1] == 1);
+
+    auto three = TESTABLE::times_to_problem_counts({1.1, 1.1, 1.1}, problems);
+    CHECK(three.size() == 3);
+    CHECK(three[0] == 1);
+    CHECK(three[1] == 1);
+    CHECK(three[2] == 1);
 
 }
 
