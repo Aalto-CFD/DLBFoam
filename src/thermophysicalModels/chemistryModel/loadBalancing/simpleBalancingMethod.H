@@ -11,7 +11,7 @@
 #include "chemistryLoadBalancingMethod.H"
 #include "chemistryProblem.H"
 #include "loadTree.H"
-
+#include "algorithms.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam {

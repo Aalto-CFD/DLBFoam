@@ -103,7 +103,20 @@ std::vector<int> simpleBalancingMethod::times_to_problem_counts(
 
     std::vector<int> counts;
 
-    
+
+    auto begin = problems.begin();
+
+    for (const auto& time : times){
+
+        double sum = 0.0;
+        auto operation = [&](const chemistryProblem& problem){
+            sum += problem.cpuTime;
+            return sum <= (time + 0.01 * time); //TODO: fix the 0.01 
+        };
+        auto count = count_while(begin, problems.end(), operation);
+        begin += count;
+        counts.push_back(count);
+    }
 
     return counts;
 }
