@@ -44,6 +44,14 @@ simpleBalancingMethod::compute_send_counts(const node_ptr&                      
     double remaining = sender->original_load.value - total;
     send_times.insert(send_times.begin(), remaining);
 
+    auto   sum_op = [](double sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
+    runtime_assert(
+        std::accumulate(send_times.begin(), send_times.end(), 0.0) == 
+        std::accumulate(problems.begin(), problems.end(), 0.0, sum_op),
+        "Original problem time not matching the split send times"
+    );
+
+
     return times_to_problem_counts(send_times, problems);
 }
 
