@@ -18,10 +18,10 @@ struct Node {
 
     // chemistryLoad() = default;
     Node(const chemistryLoad& load)
-        : value(load), org_value(load) {}
+        : balanced_load(load), original_load(load) {}
 
-    chemistryLoad         value;
-    chemistryLoad         org_value;
+    chemistryLoad         balanced_load;
+    chemistryLoad         original_load;
     
     node_ptr              parent;
     std::vector<node_ptr> children;
@@ -32,7 +32,7 @@ struct loadTree {
     // A utility function to create a new N-ary tree node
     static node_ptr new_node(const chemistryLoad& value) {
         node_ptr temp(new Node(value));
-        temp->value = value;
+        temp->balanced_load = value;
         return temp;
     }
 
@@ -42,13 +42,15 @@ struct loadTree {
         parent->children.push_back(child);
     }
 
+
+
     static node_ptr find(node_ptr& node, int rank) {
 
         if (node == nullptr) {
             return nullptr;
         }
 
-        if (node->value.rank == rank) {return node;}
+        if (node->balanced_load.rank == rank) {return node;}
 
 
         for (auto child : node->children){
@@ -77,8 +79,8 @@ struct loadTree {
                                                          // load);
             auto node = new_node(load);
 
-            correct_parent->value -= send_value;
-            node->value += send_value;
+            correct_parent->balanced_load -= send_value;
+            node->balanced_load += send_value;
 
             add_child(correct_parent, node);
         }
@@ -108,26 +110,6 @@ struct loadTree {
         correct_parent->children.push_back(node);
     }
     */
-
-    static std::pair<std::vector<chemistryLoad>, std::vector<chemistryLoad>>
-    divide(const DynamicList<chemistryLoad>& in, double treshold) {
-
-        std::vector<chemistryLoad> big, small;
-
-        for (const auto& v : in) {
-            if (v >= treshold) {
-                big.push_back(v);
-            } else {
-                small.push_back(v);
-            }
-        }
-
-        std::sort(big.begin(), big.end());
-        std::sort(small.begin(), small.end());
-
-        return {big, small};
-    }
-
 
 
     static void print(const node_ptr& root, int n_nodes = Pstream::nProcs()){
@@ -160,14 +142,14 @@ private:
         }
 
         if (depth == 0)
-            Info << x->value.value << '\n';
+            Info << x->balanced_load.value << '\n';
 
         else if (isLast) {
-            Info << "+--- " << x->value.value << '\n';
+            Info << "+--- " << x->balanced_load.value << '\n';
 
             flag[depth] = false;
         } else {
-            Info << "+--- " << x->value.value << '\n';
+            Info << "+--- " << x->balanced_load.value << '\n';
         }
 
         size_t it = 0;

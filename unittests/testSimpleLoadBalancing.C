@@ -6,6 +6,18 @@
 
 namespace Foam{
 
+
+
+
+struct TESTABLE : public simpleBalancingMethod {
+
+public:
+    using simpleBalancingMethod::compute_my_load;
+    using simpleBalancingMethod::build_tree;
+
+};
+
+
 static Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t n){
     
     using namespace Foam;
@@ -49,17 +61,16 @@ DynamicList<chemistryProblem> create_problems2(int count){
 
 
 
-TEST_CASE("simpleBalancingMethod get_my_load()"){
+TEST_CASE("simpleBalancingMethod compute_my_load()"){
+
 
     
-    simpleBalancingMethod l;
-
-
+    TESTABLE l;
 
     auto problems = create_problems2(3 + 1*Pstream::myProcNo());
     CHECK(problems[0].cpuTime == 1.1);
 
-    auto load = l.get_my_load(problems);
+    auto load = TESTABLE::compute_my_load(problems);
 
     CHECK(load.value == problems.size() * 1.1);
     CHECK(load.rank == Pstream::myProcNo());
@@ -67,13 +78,12 @@ TEST_CASE("simpleBalancingMethod get_my_load()"){
 }
 
 TEST_CASE("simpleBalancingMethod build_tree()"){
-;
+    
     size_t n_nodes = 20;
 
     auto loads = create_random_load(n_nodes);
 
-    simpleBalancingMethod l;
-    auto root = l.build_tree(loads);
+    auto root = TESTABLE::build_tree(loads);
     
     CHECK(loadTree::find(root, -1) != nullptr);
 

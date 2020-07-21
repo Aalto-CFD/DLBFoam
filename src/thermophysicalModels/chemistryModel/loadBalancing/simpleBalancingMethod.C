@@ -5,83 +5,85 @@ namespace Foam {
 
 
 
+void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& problems) {
+
+    auto my_load   = compute_my_load(problems);
+    auto all_loads = all_gather(my_load);
+
+    auto root = build_tree(all_loads);
+
+    loadTree::print(root);
+
+    auto my_node = loadTree::find(root, Pstream::myProcNo());
+    runtime_assert(my_node != nullptr, "My node not found from the node tree");
+    auto info = compute_info(my_node, problems);
+
+    set_state(info);
+}
+
+
+
+
+
 std::vector<int>
-simpleBalancingMethod::compute_problem_count(const node_ptr&                      sender,
-                                             const DynamicList<chemistryProblem>& problems) const {
+simpleBalancingMethod::compute_send_counts(const node_ptr&                      sender,
+                                             const DynamicList<chemistryProblem>& problems) {
 
     std::vector<double> send_times;
     double              total = 0.0;
     for (const auto& child : sender->children) {
 
-        double time_diff = child->value.value - child->org_value.value;
+        double time_diff = child->balanced_load.value - child->original_load.value;
         runtime_assert(time_diff > 0, "A receiver has more load before balancing.");
         send_times.push_back(time_diff);
         total += time_diff;
     }
 
-    double remaining = sender->org_value.value - total;
+    double remaining = sender->original_load.value - total;
     send_times.insert(send_times.begin(), remaining);
 
-
     return times_to_problem_counts(send_times, problems);
-
-
 }
 
 chemistryLoadBalancingMethod::sendRecvInfo
-simpleBalancingMethod::convert(const node_ptr&                      my_node,
-                               const DynamicList<chemistryProblem>& problems) const {
+simpleBalancingMethod::compute_info(const node_ptr&                      my_node,
+                               const DynamicList<chemistryProblem>& problems) {
+
 
     sendRecvInfo info;
 
     info.destinations       = {Pstream::myProcNo()};
     info.sources            = {Pstream::myProcNo()};
     info.number_of_problems = {problems.size()};
-    // return info;
 
     // receiver
-    if (my_node->parent->value.rank != -1) {
-
-        info.sources.push_back(my_node->parent->value.rank);
-        // info.number_of_problems.push_back(1);
+    if (my_node->parent->balanced_load.rank != -1) {
+        info.sources.push_back(my_node->parent->balanced_load.rank);
         return info;
-    } else {
+    } 
+    // sender
+    else {
 
         for (const auto& child : my_node->children) {
-            info.destinations.push_back(child->value.rank);
-            // info.number_of_problems.push_back(1);
-            // info.number_of_problems[0] -= 1;
+            info.destinations.push_back(child->balanced_load.rank);
         }
-        info.number_of_problems = compute_problem_count(my_node, problems);
-        // auto temp = compute_problem_count(my_node, problems);
+        info.number_of_problems = compute_send_counts(my_node, problems);
     }
 
     return info;
 }
 
-void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& problems) {
+node_ptr simpleBalancingMethod::build_tree(const DynamicList<chemistryLoad>& loads) {
 
-    auto my_load   = get_my_load(problems);
-    auto all_loads = all_gather(my_load);
 
-    auto root = build_tree(all_loads);
-    loadTree::print(root);
+    auto sum_op = [](double sum, const chemistryLoad& rhs) { return sum + rhs.value; };
+    double mean_load = std::accumulate(loads.begin(), loads.end(), 0.0, 
+                           sum_op) / loads.size();
 
-    auto my_node = loadTree::find(root, my_load.rank);
+    double treshold = 1.0 * mean_load;
 
-    runtime_assert(my_node != nullptr, "My node not found from the node tree");
-
-    auto info = convert(my_node, problems);
-
-    set_state(info);
-}
-
-node_ptr simpleBalancingMethod::build_tree(const DynamicList<chemistryLoad>& loads) const {
-
-    double treshold = 1.0 * compute_mean_load(loads);
-
-    auto [big, small] = loadTree::divide(loads, treshold);
-
+    auto [big, small] = divide(loads, treshold);
+    std::sort(big.begin(), big.end());
     std::reverse(big.begin(), big.end());
 
     auto root = loadTree::new_node(chemistryLoad(-1, -1));
@@ -99,19 +101,17 @@ node_ptr simpleBalancingMethod::build_tree(const DynamicList<chemistryLoad>& loa
 }
 
 std::vector<int> simpleBalancingMethod::times_to_problem_counts(
-    const std::vector<double>& times, const DynamicList<chemistryProblem>& problems) const {
+    const std::vector<double>& times, const DynamicList<chemistryProblem>& problems) {
 
     std::vector<int> counts;
+    auto             begin = problems.begin();
 
+    for (const auto& time : times) {
 
-    auto begin = problems.begin();
-
-    for (const auto& time : times){
-
-        double sum = 0.0;
-        auto operation = [&](const chemistryProblem& problem){
+        double sum       = 0.0;
+        auto   operation = [&](const chemistryProblem& problem) {
             sum += problem.cpuTime;
-            return sum <= (time + 0.01 * time); //TODO: fix the 0.01 
+            return sum <= (time + 0.01 * time); // TODO: fix the 0.01
         };
         auto count = count_while(begin, problems.end(), operation);
         begin += count;
@@ -122,18 +122,27 @@ std::vector<int> simpleBalancingMethod::times_to_problem_counts(
 }
 
 chemistryLoad
-simpleBalancingMethod::get_my_load(const DynamicList<chemistryProblem>& problems) const {
+simpleBalancingMethod::compute_my_load(const DynamicList<chemistryProblem>& problems) {
 
     auto   lambda = [](double sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
     double sum    = std::accumulate(problems.begin(), problems.end(), 0.0, lambda);
     return chemistryLoad(Pstream::myProcNo(), sum);
 }
 
-double simpleBalancingMethod::compute_mean_load(const DynamicList<chemistryLoad>& loads) const {
+std::pair<std::vector<chemistryLoad>, std::vector<chemistryLoad>>
+simpleBalancingMethod::divide(const DynamicList<chemistryLoad>& in, double treshold) {
 
-    auto   lambda = [](double sum, const chemistryLoad& rhs) { return sum + rhs.value; };
-    double sum    = std::accumulate(loads.begin(), loads.end(), 0.0, lambda);
-    return sum / loads.size();
+    std::vector<chemistryLoad> big, small;
+
+    for (const auto& v : in) {
+        if (v >= treshold) {
+            big.push_back(v);
+        } else {
+            small.push_back(v);
+        }
+    }
+
+    return {big, small};
 }
 
 } // namespace Foam
