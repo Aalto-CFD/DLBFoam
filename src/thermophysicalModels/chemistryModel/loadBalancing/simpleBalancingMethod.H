@@ -98,6 +98,7 @@ protected:
 private:
     struct ComputeSendValue {
 
+        //TODO: this value is currently somewhat arbitrary
         double operator()(const node_ptr& node, const chemistryLoad& load) const {
             return 0.3 * node->balanced_load.value;
         }

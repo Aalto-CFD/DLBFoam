@@ -29,7 +29,9 @@ std::vector<int>
 simpleBalancingMethod::compute_send_counts(const node_ptr&                      sender,
                                              const DynamicList<chemistryProblem>& problems) {
 
-    std::vector<double> send_times;
+    std::vector<double> send_times; 
+    send_times.reserve(sender->children.size() + 1);
+    
     double              total = 0.0;
     for (const auto& child : sender->children) {
 
@@ -103,7 +105,7 @@ node_ptr simpleBalancingMethod::build_tree(const DynamicList<chemistryLoad>& loa
 std::vector<int> simpleBalancingMethod::times_to_problem_counts(
     const std::vector<double>& times, const DynamicList<chemistryProblem>& problems) {
 
-    std::vector<int> counts;
+    std::vector<int> counts; counts.reserve(times.size());
     auto             begin = problems.begin();
 
     for (const auto& time : times) {
