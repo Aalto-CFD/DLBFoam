@@ -134,6 +134,9 @@ simpleBalancingMethod::divide(const DynamicList<chemistryLoad>& in, double tresh
 
     std::vector<chemistryLoad> big, small;
 
+    big.reserve(in.size());
+    small.reserve(in.size());
+
     for (const auto& v : in) {
         if (v >= treshold) {
             big.push_back(v);
