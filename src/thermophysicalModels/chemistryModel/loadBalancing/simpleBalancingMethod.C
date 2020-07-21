@@ -121,7 +121,8 @@ std::vector<int> simpleBalancingMethod::times_to_problem_counts(
         double sum       = 0.0;
         auto   operation = [&](const chemistryProblem& problem) {
             sum += problem.cpuTime;
-            return sum <= (time + 0.01 * time); // TODO: fix the 0.01
+            return sum <= time;
+            //return sum <= (time + 0.01 * time); // TODO: fix the 0.01
         };
         auto count = count_while(begin, problems.end(), operation);
         begin += count;

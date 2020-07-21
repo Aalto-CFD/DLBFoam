@@ -14,7 +14,7 @@ struct TESTABLE : public simpleBalancingMethod {
 public:
     using simpleBalancingMethod::compute_my_load;
     using simpleBalancingMethod::build_tree;
-
+    using simpleBalancingMethod::times_to_problem_counts;
 };
 
 
@@ -94,6 +94,16 @@ TEST_CASE("simpleBalancingMethod build_tree()"){
     CHECK(loadTree::find(root, 21) == nullptr);
 
     //loadTree::print(root, n_nodes);
+
+}
+
+TEST_CASE("simpleBalancingMethod times_to_problem_counts"){
+
+    auto problems = create_problems2(11);
+    auto one = TESTABLE::times_to_problem_counts({1.1}, problems);
+    CHECK(one.size() == 1);
+    CHECK(one[0] == 1);
+
 
 }
 
