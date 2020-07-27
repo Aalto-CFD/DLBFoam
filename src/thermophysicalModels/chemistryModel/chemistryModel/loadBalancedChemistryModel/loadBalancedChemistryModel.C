@@ -73,6 +73,16 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     
     DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, deltaT);
 
+    //I dont think this should be done as this operation is very expensive for large problem counts
+    // and ruins up the cellid order
+    /*
+    std::sort(all_problems.begin(), all_problems.end(), 
+    [](const chemistryProblem& lhs, const chemistryProblem& rhs){
+        return lhs.cpuTime < rhs.cpuTime;}
+    );
+    */
+
+
     load_balancer_->update_state(all_problems);
     load_balancer_->print_state();
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);

@@ -43,6 +43,19 @@ struct loadTree {
     }
 
 
+    static void set_balanced_to_original(node_ptr& node){
+
+        if (node) {
+            node->balanced_load = node->original_load;
+
+            for (auto child : node->children){
+                set_balanced_to_original(child);
+            }
+
+        }
+
+    }
+
 
     static node_ptr find(node_ptr& node, int rank) {
 
@@ -75,7 +88,7 @@ struct loadTree {
 
         if (correct_parent) {
 
-            double send_value = c(correct_parent, load); // compute_send_value(correct_parent,
+            scalar send_value = c(correct_parent, load); // compute_send_value(correct_parent,
                                                          // load);
             auto node = new_node(load);
 
@@ -92,7 +105,7 @@ struct loadTree {
 
         node_ptr correct_parent;
 
-        double largest = 0.0;
+        scalar largest = 0.0;
         for (const auto candidate : candidates) {
 
             if (candidate->value > largest) {
@@ -101,7 +114,7 @@ struct loadTree {
             }
         }
 
-        double send_value = compute_send_value(correct_parent, load);
+        scalar send_value = compute_send_value(correct_parent, load);
         auto   node       = new_node(load);
 
         correct_parent->value -= send_value;

@@ -92,7 +92,7 @@ TEST_CASE("simpleBalancingMethod times_to_problem_counts2"){
 }
 
 TEST_CASE("simpleBalancingMethod build_tree()"){
-    
+   /* 
 
     for (size_t n_nodes = 0; n_nodes < 20; ++n_nodes){
 
@@ -108,9 +108,9 @@ TEST_CASE("simpleBalancingMethod build_tree()"){
 
         CHECK(loadTree::find(root, n_nodes + 1) == nullptr);
 
-        loadTree::print(root);
+        //loadTree::print(root);
     }
-
+    */
 
     
 
