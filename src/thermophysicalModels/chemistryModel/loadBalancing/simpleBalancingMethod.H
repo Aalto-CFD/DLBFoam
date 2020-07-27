@@ -52,6 +52,16 @@ protected:
     ///
     static node_ptr build_tree(const DynamicList<chemistryLoad>& loads);
 
+
+    ///
+    ///@brief 
+    ///
+    ///@param root 
+    ///
+    static void balance_tree(node_ptr& root);
+
+
+
     ///
     ///@brief Computes the load of this process from a given list of problems on the process 
     ///

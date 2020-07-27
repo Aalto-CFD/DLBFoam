@@ -38,3 +38,12 @@ Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t count)
     }
     return ret;
 }
+
+
+void set_cpu_times(Foam::DynamicList<Foam::chemistryProblem>& problems, double cpu_time){
+
+    for (auto& problem : problems){
+        problem.cpuTime = cpu_time;
+    }
+
+}

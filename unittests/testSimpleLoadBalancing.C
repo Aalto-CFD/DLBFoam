@@ -29,9 +29,7 @@ TEST_CASE("simpleBalancingMethod compute_my_load()"){
 
         auto problems = create_random_problems(n_problems);
 
-        for (auto& problem : problems){
-            problem.cpuTime = 3.0;
-        }
+        set_cpu_times(problems, 3.0);
 
         if (n_problems > 0){
             CHECK(problems[0].cpuTime == 3.0);
@@ -44,33 +42,54 @@ TEST_CASE("simpleBalancingMethod compute_my_load()"){
         CHECK(load.rank == Pstream::myProcNo());
     }
 
+}
 
-    
+
+TEST_CASE("simpleBalancingMethod times_to_problem_counts1"){
+
+
+    size_t n_problems = 10;
+    auto problems = create_random_problems(n_problems);
+
+    set_cpu_times(problems, 1.0);
+
+    auto counts1 = TESTABLE::times_to_problem_counts({5.1, 1.1, 1.1, 1.1, 1.1, 1.1}, problems);
+    CHECK(counts1.size() == 6);
+    CHECK(std::accumulate(counts1.begin(), counts1.end(), 0) == n_problems);
+
+    auto counts2 = TESTABLE::times_to_problem_counts({2.0, 3.0, 5.0}, problems);
+    CHECK(counts2.size() == 3);
+    CHECK(std::accumulate(counts2.begin(), counts2.end(), 0) == n_problems);
+
+
+    auto counts3 = TESTABLE::times_to_problem_counts({10.0}, problems);
+    CHECK(counts3.size() == 1);
+    CHECK(std::accumulate(counts3.begin(), counts3.end(), 0) == n_problems);
+
+
+    //auto counts4 = TESTABLE::times_to_problem_counts({1.1}, problems);
+    //CHECK(counts4.size() == 1);
+    //CHECK(std::accumulate(counts4.begin(), counts4.end(), 0) == 1);
 
 }
 
-TEST_CASE("simpleBalancingMethod times_to_problem_counts"){
 
-    auto problems = create_problems2(3);
-    auto one = TESTABLE::times_to_problem_counts({1.1}, problems);
-    CHECK(one.size() == 1);
-    CHECK(one[0] == 1);
+TEST_CASE("simpleBalancingMethod times_to_problem_counts2"){
 
 
+    size_t n_problems = 3;
+    auto problems = create_random_problems(n_problems);
 
-    auto two = TESTABLE::times_to_problem_counts({1.1, 1.1}, problems);
-    CHECK(two.size() == 2);
-    CHECK(two[0] == 1);
-    CHECK(two[1] == 1);
+    std::vector<double> times;
+    times.push_back(problems[0].cpuTime);
+    times.push_back(problems[1].cpuTime + problems[2].cpuTime);
 
-    auto three = TESTABLE::times_to_problem_counts({1.1, 1.1, 1.1}, problems);
-    CHECK(three.size() == 3);
-    CHECK(three[0] == 1);
-    CHECK(three[1] == 1);
-    CHECK(three[2] == 1);
+    auto counts = TESTABLE::times_to_problem_counts(times, problems);
+
+    CHECK(counts.size() == 2);
+    CHECK(std::accumulate(counts.begin(), counts.end(), 0) == n_problems);
 
 }
-
 
 TEST_CASE("simpleBalancingMethod build_tree()"){
     
@@ -88,6 +107,8 @@ TEST_CASE("simpleBalancingMethod build_tree()"){
         }
 
         CHECK(loadTree::find(root, n_nodes + 1) == nullptr);
+
+        loadTree::print(root);
     }
 
 
@@ -97,22 +118,25 @@ TEST_CASE("simpleBalancingMethod build_tree()"){
 
 
 }
-
 TEST_CASE("simpleBalancingMethod update_state()"){
 
-    
-    simpleBalancingMethod l;
+    TESTABLE t;
 
-    for (size_t n_problems = 0; n_problems < 30; ++n_problems){
-        auto problems = create_problems2(n_problems);
-        REQUIRE_NOTHROW(l.update_state(problems));
+    size_t n_problems = 500;
 
-        //l.update_state(problems);
+    auto problems = create_random_problems(n_problems);
+
+    for (size_t i = 0; i < problems.size(); ++i) {
+        problems[i].cpuTime = (Pstream::myProcNo() + 1) * 5 * (i+1); // * random_double(1, 100);
     }
 
+    auto load = TESTABLE::compute_my_load(problems);
+    CHECK(load.value > 0);
+
+    REQUIRE_NOTHROW(t.update_state(problems));
+
 
 }
 
 
-
-}
+} //namespace Foam

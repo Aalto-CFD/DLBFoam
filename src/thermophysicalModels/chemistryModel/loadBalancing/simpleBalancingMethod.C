@@ -12,7 +12,9 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
 
     auto root = build_tree(all_loads);
 
-    //loadTree::print(root);
+    balance_tree(root);
+
+    loadTree::print(root);
 
     auto my_node = loadTree::find(root, Pstream::myProcNo());
     runtime_assert(my_node != nullptr, "My node not found from the node tree");
@@ -21,7 +23,47 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
     set_state(info);
 }
 
+void simpleBalancingMethod::balance_tree(node_ptr& root) {
 
+
+    auto senders = root->children;
+
+    for (const auto& sender : senders) {
+
+        sender->balanced_load = sender->original_load;        
+
+        double load_avg = sender->original_load.value;
+        for (const auto& child : sender->children){
+            load_avg += child->original_load.value;
+        }
+
+        load_avg /= (sender->children.size() + 1);
+
+
+        for (const auto& child : sender->children){
+            
+            double send_value = load_avg - child->original_load.value;
+
+            if ( (sender->balanced_load.value - send_value) > load_avg){
+
+                sender->balanced_load.value -= send_value;
+                child->balanced_load.value  += send_value;  
+            }
+
+            else {
+                child->balanced_load = child->original_load;
+                break;
+            }
+
+
+        }
+
+    }
+
+
+
+
+}
 
 
 
@@ -30,26 +72,46 @@ simpleBalancingMethod::compute_send_counts(const node_ptr&                      
                                              const DynamicList<chemistryProblem>& problems) {
 
     std::vector<double> send_times; 
-    send_times.reserve(sender->children.size() + 1);
-    
-    double              total = 0.0;
+    size_t n_children = sender->children.size();
+    send_times.reserve(n_children + 1);
+
+    /*
+    send_times.push_back(std::abs(sender->original_load.value - sender->balanced_load.value));
+
+
+    for (const auto& child : sender->children) {
+
+        send_times.push_back(std::abs(child->original_load.value - child->balanced_load.value));
+
+    }
+
+    */
+
+
     for (const auto& child : sender->children) {
 
         double time_diff = child->balanced_load.value - child->original_load.value;
-        runtime_assert(time_diff > 0, "A receiver has more load before balancing.");
+        //runtime_assert(time_diff >= 0, "A receiver has more load before balancing.");
         send_times.push_back(time_diff);
-        total += time_diff;
     }
 
-    double remaining = sender->original_load.value - total;
+    double send_total = std::accumulate(send_times.begin(), send_times.end(), 0.0);
+    double remaining = sender->original_load.value - send_total;
+
     send_times.insert(send_times.begin(), remaining);
 
+    /*
     auto   sum_op = [](double sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
     runtime_assert(
         std::accumulate(send_times.begin(), send_times.end(), 0.0) == 
         std::accumulate(problems.begin(), problems.end(), 0.0, sum_op),
         "Original problem time not matching the split send times"
     );
+    */
+
+
+    //add a small buffer to the remaining time
+    //send_times[0] += 0.01 * send_times[0];
 
 
     return times_to_problem_counts(send_times, problems);
@@ -121,13 +183,17 @@ std::vector<int> simpleBalancingMethod::times_to_problem_counts(
         double sum       = 0.0;
         auto   operation = [&](const chemistryProblem& problem) {
             sum += problem.cpuTime;
-            return sum <= time;
-            //return sum <= (time + 0.01 * time); // TODO: fix the 0.01
+            //return sum <= time;
+            return sum <= (time + 0.01 * time); // TODO: fix the 0.01
         };
         auto count = count_while(begin, problems.end(), operation);
         begin += count;
         counts.push_back(count);
     }
+
+    runtime_assert(std::accumulate(counts.begin(), counts.end(), 0) == problems.size(), 
+        "Mismatch in the sliced problem count and original problem count.");
+
 
     return counts;
 }
@@ -135,9 +201,15 @@ std::vector<int> simpleBalancingMethod::times_to_problem_counts(
 chemistryLoad
 simpleBalancingMethod::compute_my_load(const DynamicList<chemistryProblem>& problems) {
 
-    auto   lambda = [](double sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
-    double sum    = std::accumulate(problems.begin(), problems.end(), 0.0, lambda);
+    double sum = 0.0;
+    for (const auto& problem : problems) {
+        sum += problem.cpuTime;
+    }
     return chemistryLoad(Pstream::myProcNo(), sum);
+
+    //auto   lambda = [](double sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
+    //double sum    = std::accumulate(problems.begin(), problems.end(), 0.0, lambda);
+    //return chemistryLoad(Pstream::myProcNo(), sum);
 }
 
 std::pair<std::vector<chemistryLoad>, std::vector<chemistryLoad>>
