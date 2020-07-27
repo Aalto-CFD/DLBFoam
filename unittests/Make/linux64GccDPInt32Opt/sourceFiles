@@ -1,5 +1,6 @@
 SOURCE = \
 test.C \
+helpers.C \
 testChemistryLoad.C \
 testSimpleLoadBalancing.C \
 testChemistryLoadBalancingMethod.C 

@@ -12,7 +12,7 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
 
     auto root = build_tree(all_loads);
 
-    loadTree::print(root);
+    //loadTree::print(root);
 
     auto my_node = loadTree::find(root, Pstream::myProcNo());
     runtime_assert(my_node != nullptr, "My node not found from the node tree");
