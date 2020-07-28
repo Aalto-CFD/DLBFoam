@@ -59,7 +59,11 @@ struct Result{
 
 struct Benchmark{
 
-    Benchmark(ModelType model_type, psiReactionThermo& thermo) {
+    template<class InitialCondition>
+    Benchmark(ModelType model_type, psiReactionThermo& thermo, InitialCondition ic) {
+        
+        InitialCondition::set(thermo);
+
         if (model_type == ModelType::standard){
             m_model = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
         }
@@ -103,7 +107,8 @@ struct Runner{
 
 struct Benchmark1 : public Benchmark{
 
-    Benchmark1(ModelType model_type, psiReactionThermo& thermo) : Benchmark(model_type, thermo) {}
+    template<class InitialCondition>
+    Benchmark1(ModelType model_type, psiReactionThermo& thermo, InitialCondition ic) : Benchmark(model_type, thermo, ic) {}
 
     void run() {
         this->get_model()->solve(1E-3);
@@ -111,15 +116,24 @@ struct Benchmark1 : public Benchmark{
 
 
 };
-/*
-struct InidialCondition {
 
-    InidialCondition(psiReactionThermo& thermo) {
-        thermo.rho
+
+struct HighMasterLoadIc{
+
+    static void set(psiReactionThermo& thermo) {
+
+        if (Pstream::master()){
+            //thermo.rho().ref() = 1.2;
+            //thermo.p().ref() = 2E5;
+        }
+        else {
+            //thermo.rho().ref() = 0.3;
+            //thermo.p().ref() = 1E5;
+        }
+
     }
 
 };
-*/
 
 
 int main(int argc, char *argv[])
@@ -137,11 +151,11 @@ int main(int argc, char *argv[])
     #include "createFieldRefs.H"
 
 
-    auto result1 = Runner::run(Benchmark1(ModelType::standard, thermo), 10);
+    auto result1 = Runner::run(Benchmark1(ModelType::standard, thermo, HighMasterLoadIc()), 10);
     Info << result1.to_string() << endl;
 
 
-    auto result2 = Runner::run(Benchmark1(ModelType::balanced, thermo), 10);
+    auto result2 = Runner::run(Benchmark1(ModelType::balanced, thermo, HighMasterLoadIc()), 10);
     Info << result2.to_string() << endl;
 
 
