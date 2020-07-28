@@ -69,6 +69,15 @@ protected:
     static void balance_tree(node_ptr& root);
 
 
+    ///
+    ///@brief Applies balancing to the parent assuming that the parent is the sender
+    ///       and its children are receivers.
+    ///
+    ///@param parent root node of the _subtree_
+    ///
+    static void balance_subtree(node_ptr& parent);
+
+
 
     ///
     ///@brief Computes the load of this process from a given list of problems on the process 

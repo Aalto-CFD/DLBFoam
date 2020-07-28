@@ -34,35 +34,41 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
     set_state(info);
 }
 
+void simpleBalancingMethod::balance_subtree(node_ptr& parent) {
+
+
+    //this is the target value that all nodes of the subtree are targetting to
+    scalar load_avg(parent->original_load.value);
+    for (const auto& child : parent->children) { load_avg += child->original_load.value; }
+
+    load_avg /= (parent->children.size() + 1);
+
+    for (auto& child : parent->children) {
+
+        scalar send_value = load_avg - child->original_load.value;
+
+        if ((parent->balanced_load.value - send_value) > 0) {
+
+            parent->balanced_load.value -= send_value;
+            child->balanced_load.value += send_value;
+        }
+
+        else {
+            break;
+        }
+    }
+
+
+
+}
+
+
 void simpleBalancingMethod::balance_tree(node_ptr& root) {
 
     auto senders = root->children;
 
-    for (const auto& sender : senders) {
-
-        sender->balanced_load = sender->original_load;
-
-        scalar load_avg(sender->original_load.value);
-        for (const auto& child : sender->children) { load_avg += child->original_load.value; }
-
-        //load_avg /= sender->children.size();
-        load_avg /= (sender->children.size() + 1);
-
-        for (const auto& child : sender->children) {
-
-            scalar send_value = load_avg - child->original_load.value;
-
-            if ((sender->balanced_load.value - send_value) > load_avg) {
-
-                sender->balanced_load.value -= send_value;
-                child->balanced_load.value += send_value;
-            }
-
-            else {
-                child->balanced_load = child->original_load;
-                break;
-            }
-        }
+    for (auto& sender : senders) {
+        balance_subtree(sender);
     }
 }
 
