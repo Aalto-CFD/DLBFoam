@@ -25,7 +25,7 @@ enum class ModelType{standard, balanced};
 struct Result{
 
     Result(const std::vector<double>& times)
-    : average(calc_avg(times)), standard_dev(calc_std(times))
+    : samples(times.size()), average(calc_avg(times)), standard_dev(calc_std(times))
     {}
 
     double calc_avg(const std::vector<double>& times) const{
@@ -33,9 +33,26 @@ struct Result{
     }
 
     double calc_std(const std::vector<double>& times) const {
-        return 0.0;
+        auto mean = calc_avg(times);
+        double sum = 0.0;
+        for (const auto& time : times) {
+            sum += (mean - time) * (mean - time);
+        }
+        return sum / times.size(); //!
+
     }
 
+
+    std::string to_string() const {
+        std::string ret;
+        ret += std::string("Samples :") + std::to_string(samples);  
+        ret += std::string(" Mean runtime: ") + std::to_string(average);
+        ret += std::string(" Standard deviation: ") + std::to_string(standard_dev);
+        return ret;       
+    }
+
+
+    size_t samples;
     double average, standard_dev;
 
 };
@@ -88,17 +105,21 @@ struct Benchmark1 : public Benchmark{
 
     Benchmark1(ModelType model_type, psiReactionThermo& thermo) : Benchmark(model_type, thermo) {}
 
-
-
     void run() {
         this->get_model()->solve(1E-3);
     }
 
 
 };
+/*
+struct InidialCondition {
 
+    InidialCondition(psiReactionThermo& thermo) {
+        thermo.rho
+    }
 
-
+};
+*/
 
 
 int main(int argc, char *argv[])
@@ -117,8 +138,12 @@ int main(int argc, char *argv[])
 
 
     auto result1 = Runner::run(Benchmark1(ModelType::standard, thermo), 10);
+    Info << result1.to_string() << endl;
 
-    Info << "result 1 mean: " << result1.average << endl;
+
+    auto result2 = Runner::run(Benchmark1(ModelType::balanced, thermo), 10);
+    Info << result2.to_string() << endl;
+
 
 
     //Runner r1(B1<ModelType::standard>(m1), 10);
