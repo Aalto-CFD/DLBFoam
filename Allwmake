@@ -11,10 +11,6 @@ cd unittests
 wmake
 cd ..
 
-cd benchmarks/serial
-#wclean
-wmake
-
-cd ../parallel
+cd benchmarks
 #wclean
 wmake
