@@ -27,9 +27,11 @@ using namespace Foam;
 
 enum class parallel{on, off};
 
+enum class chemistryModelName{standard, loadBalanced};
 
 
-template<parallel flag>
+
+template<parallel flag, chemistryModelName modelName>
 struct ChemState{
 
     
@@ -46,9 +48,15 @@ struct ChemState{
             ),
     pimple(mesh)
     {}
-    
-    //////////////////////
 
+
+    ~ChemState() {delete model; }
+
+
+    
+
+    //////////////////////
+    //#include "addCheckCaseOptions.H"
     argList args = create_args();
     Time runTime;
     fvMesh mesh;
@@ -162,22 +170,10 @@ struct ChemState{
 
     //for pyJac, ensure that the correct ODE is used
 
-    BasicChemistryModel<psiReactionThermo>* model1 
-    = new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
     
-    BasicChemistryModel<psiReactionThermo>* model2 
-    = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+    
+    BasicChemistryModel<psiReactionThermo>* model = create_chem_model(thermo); 
 
-
-
-
-    //multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
-
-    //forAll(Y, i)
-    //{
-    //    fields.add(Y[i]);
-    //}
-    //fields.add(thermo.he());
 
 
 
@@ -185,7 +181,11 @@ struct ChemState{
 
 
     static argList create_args() {
+        /*int argc;
+        char** argv;
 
+        #include "setRootCaseLists.H" 
+        */
         if (flag == parallel::on){
             int argc = 2;
             char* argv[] = {"benchmarkChemistry", "-parallel"}; // exactly as it is defined in main
@@ -198,6 +198,16 @@ struct ChemState{
         char** ptr = argv;
 
         return argList(argc, ptr);
+    }
+
+    static BasicChemistryModel<psiReactionThermo>* create_chem_model(psiReactionThermo& thermo) {
+
+        if (modelName == chemistryModelName::standard){
+            return new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+        }
+
+        return new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+
 
     }
 

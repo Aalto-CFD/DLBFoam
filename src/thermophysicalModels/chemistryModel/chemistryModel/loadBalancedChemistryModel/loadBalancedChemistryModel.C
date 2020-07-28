@@ -84,7 +84,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
 
     load_balancer_->update_state(all_problems);
-    load_balancer_->print_state();
+    //load_balancer_->print_state();
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
 
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);

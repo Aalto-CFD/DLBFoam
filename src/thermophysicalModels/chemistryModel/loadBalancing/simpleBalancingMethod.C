@@ -11,9 +11,9 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
 
     loadTree::set_balanced_to_original(root);
 
-    //break early if no balancing is required
+    // break early if no balancing is required
     if (root->children.size() == 0) {
-    
+
         sendRecvInfo info;
         info.destinations       = {Pstream::myProcNo()};
         info.sources            = {Pstream::myProcNo()};
@@ -22,10 +22,9 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
         return;
     }
 
-
     balance_tree(root);
 
-    loadTree::print(root);
+    //loadTree::print(root);
 
     auto my_node = loadTree::find(root, Pstream::myProcNo());
     runtime_assert(my_node != nullptr, "My node not found from the node tree");
@@ -36,8 +35,7 @@ void simpleBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
 
 void simpleBalancingMethod::balance_subtree(node_ptr& parent) {
 
-
-    //this is the target value that all nodes of the subtree are targetting to
+    // this is the target value that all nodes of the subtree are targetting to
     scalar load_avg(parent->original_load.value);
     for (const auto& child : parent->children) { load_avg += child->original_load.value; }
 
@@ -57,19 +55,13 @@ void simpleBalancingMethod::balance_subtree(node_ptr& parent) {
             break;
         }
     }
-
-
-
 }
-
 
 void simpleBalancingMethod::balance_tree(node_ptr& root) {
 
     auto senders = root->children;
 
-    for (auto& sender : senders) {
-        balance_subtree(sender);
-    }
+    for (auto& sender : senders) { balance_subtree(sender); }
 }
 
 std::vector<int>
@@ -86,7 +78,7 @@ simpleBalancingMethod::compute_send_counts(const node_ptr&                      
         scalar time_diff = child->balanced_load.value - child->original_load.value;
         send_times.push_back(time_diff);
     }
-    
+
     // count the remaining send time on the sender
     scalar send_total = std::accumulate(send_times.begin(), send_times.end(), scalar(0));
     scalar remaining  = sender->original_load.value - send_total;
@@ -104,7 +96,7 @@ simpleBalancingMethod::compute_info(const node_ptr&                      my_node
     info.destinations       = {Pstream::myProcNo()};
     info.sources            = {Pstream::myProcNo()};
     info.number_of_problems = {problems.size()};
-    
+
     // receiver
     if (my_node->parent->balanced_load.rank != -1) {
         info.sources.push_back(my_node->parent->balanced_load.rank);
@@ -118,14 +110,15 @@ simpleBalancingMethod::compute_info(const node_ptr&                      my_node
         }
         info.number_of_problems = compute_send_counts(my_node, problems);
     }
-    
+
     return info;
 }
 
 node_ptr simpleBalancingMethod::build_tree(const DynamicList<chemistryLoad>& loads) {
 
-    auto   sum_op    = [](scalar sum, const chemistryLoad& rhs) { return sum + rhs.value; };
-    scalar mean_load = std::accumulate(loads.begin(), loads.end(), scalar(0), sum_op) / loads.size();
+    auto   sum_op = [](scalar sum, const chemistryLoad& rhs) { return sum + rhs.value; };
+    scalar mean_load =
+        std::accumulate(loads.begin(), loads.end(), scalar(0), sum_op) / loads.size();
 
     scalar treshold = (1.0 / HIGH_LOW_LOAD_SEPARATION_TRESHOLD) * mean_load;
 
@@ -167,10 +160,9 @@ simpleBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
         counts.push_back(count);
     }
 
-    //Add any remaining problems to this rank. This should not be required...
+    // Add any remaining problems to this rank. This should not be required...
     // TODO: fix
     counts[0] += (problems.size() - std::accumulate(counts.begin(), counts.end(), 0));
-
 
     runtime_assert(std::accumulate(counts.begin(), counts.end(), 0) == problems.size(),
                    "Mismatch in the sliced problem count and original problem count.");

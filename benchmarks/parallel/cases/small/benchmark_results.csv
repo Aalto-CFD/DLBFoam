@@ -1,0 +1,4 @@
+Suite,Benchmark,b,D,S,"Total ns",Result,"ns/op",Baseline
+,"sanity_check",*,1,10,191153059,0,191153059,1.000
+,"standard_chemistry_solve",,1,10,1033148816,0,1033148816,5.405
+,"loadbalanced_chemistry_solve",,1,10,1077345813,0,1077345813,5.636

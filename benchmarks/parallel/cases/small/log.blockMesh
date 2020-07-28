@@ -2,17 +2,17 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  6
+    \\  /    A nd           | Version:  7
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-Build  : 6-fa1285188035
+Build  : 7-1ff648926f77
 Exec   : blockMesh
-Date   : Jun 26 2020
-Time   : 14:46:59
+Date   : Jul 28 2020
+Time   : 11:56:58
 Host   : "peltonp1-All-Series"
-PID    : 30649
+PID    : 8261
 I/O    : uncollated
-Case   : /home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_loadBalanced
+Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/parallel/cases/small
 nProcs : 1
 sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
 fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
@@ -22,9 +22,9 @@ allowSystemOperations : Allowing user-supplied system call operations
 Create time
 
 Deleting polyMesh directory
-    "/home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_loadBalanced/constant/polyMesh"
+    "/home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/parallel/cases/small/constant/polyMesh"
 Creating block mesh from
-    "/home/peltonp1/OpenFOAM/peltonp1-6/applications/OpenFOAM-Aalto/tutorials/reactingFoam/counterFlowFlame2D_GRI_loadBalanced/system/blockMeshDict"
+    "/home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/parallel/cases/small/system/blockMeshDict"
 Creating block edges
 No non-planar block faces defined
 Creating topology blocks
@@ -49,27 +49,26 @@ Creating patches
 Creating cells
 Creating points with scale 1
     Block 0 cell size :
-        i : 0.0002 .. 0.0002
-        j : 0.0005 .. 0.0005
-        k : 0.02 .. 0.02
-
+        i : 0.002 .. 0.002
+        j : 0.002 .. 0.002
+        k : 0.02
 
 Writing polyMesh
 ----------------
 Mesh Information
 ----------------
   boundingBox: (0 -0.01 -0.01) (0.02 0.01 0.01)
-  nPoints: 8282
-  nCells: 4000
-  nFaces: 16140
-  nInternalFaces: 7860
+  nPoints: 242
+  nCells: 100
+  nFaces: 420
+  nInternalFaces: 180
 ----------------
 Patches
 ----------------
-  patch 0 (start: 7860 size: 40) name: fuel
-  patch 1 (start: 7900 size: 40) name: air
-  patch 2 (start: 7940 size: 200) name: outlet
-  patch 3 (start: 8140 size: 8000) name: frontAndBack
+  patch 0 (start: 180 size: 10) name: fuel
+  patch 1 (start: 190 size: 10) name: air
+  patch 2 (start: 200 size: 20) name: outlet
+  patch 3 (start: 220 size: 200) name: frontAndBack
 
 End
 

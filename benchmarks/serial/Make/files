@@ -1,0 +1,5 @@
+serial_benchmark.C
+
+
+EXE = ./serial_benchmark.bin
+
