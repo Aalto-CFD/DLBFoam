@@ -75,12 +75,13 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
     //I dont think this should be done as this operation is very expensive for large problem counts
     // and ruins up the cellid order
-    /*
+    /* 
     std::sort(all_problems.begin(), all_problems.end(), 
     [](const chemistryProblem& lhs, const chemistryProblem& rhs){
-        return lhs.cpuTime < rhs.cpuTime;}
+        return lhs.cpuTime > rhs.cpuTime;}
     );
-    */
+    }
+    */ 
 
 
     load_balancer_->update_state(all_problems);

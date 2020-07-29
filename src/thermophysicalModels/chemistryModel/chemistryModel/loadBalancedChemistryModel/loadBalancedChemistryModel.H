@@ -96,6 +96,19 @@ public:
     solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
 
 
+
+
+    ///
+    ///@brief 
+    ///
+    ///@param prob 
+    ///@param soln 
+    ///
+    void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
+
+
+
+
 private:
 
     scalarField                   cpu_times_;
@@ -108,14 +121,6 @@ private:
     ///@return chemistryLoadBalancingMethod* 
     ///
     static chemistryLoadBalancingMethod* create_balancer();
-
-    ///
-    ///@brief 
-    ///
-    ///@param prob 
-    ///@param soln 
-    ///
-    void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
 
 
     ///
