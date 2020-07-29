@@ -1,0 +1,142 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 7-1ff648926f77
+Exec   : decomposePar
+Date   : Jul 28 2020
+Time   : 16:53:12
+Host   : "peltonp1-All-Series"
+PID    : 1916
+I/O    : uncollated
+Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+
+
+Decomposing mesh region0
+
+Create mesh
+
+Calculating distribution of cells
+ Foam::decompositionMethod::New 
+{
+    numberOfSubdomains 8;
+    method          hierarchical;
+    hierarchicalCoeffs
+    {
+        n               ( 2 4 1 );
+        delta           0.001;
+        order           xyz;
+    }
+}
+
+Selecting decompositionMethod hierarchical
+
+Finished decomposition in 0 s
+
+Calculating original mesh data
+
+Distributing cells to processors
+
+Distributing faces to processors
+
+Distributing points to processors
+
+Constructing processor meshes
+
+Processor 0
+    Number of cells = 50
+    Number of faces shared with processor 1 = 5
+    Number of faces shared with processor 2 = 10
+    Number of processor patches = 2
+    Number of processor faces = 15
+    Number of boundary faces = 115
+
+Processor 1
+    Number of cells = 50
+    Number of faces shared with processor 0 = 5
+    Number of faces shared with processor 3 = 10
+    Number of processor patches = 2
+    Number of processor faces = 15
+    Number of boundary faces = 115
+
+Processor 2
+    Number of cells = 50
+    Number of faces shared with processor 0 = 10
+    Number of faces shared with processor 3 = 5
+    Number of faces shared with processor 4 = 10
+    Number of processor patches = 3
+    Number of processor faces = 25
+    Number of boundary faces = 105
+
+Processor 3
+    Number of cells = 50
+    Number of faces shared with processor 1 = 10
+    Number of faces shared with processor 2 = 5
+    Number of faces shared with processor 5 = 10
+    Number of processor patches = 3
+    Number of processor faces = 25
+    Number of boundary faces = 105
+
+Processor 4
+    Number of cells = 50
+    Number of faces shared with processor 2 = 10
+    Number of faces shared with processor 5 = 5
+    Number of faces shared with processor 6 = 10
+    Number of processor patches = 3
+    Number of processor faces = 25
+    Number of boundary faces = 105
+
+Processor 5
+    Number of cells = 50
+    Number of faces shared with processor 3 = 10
+    Number of faces shared with processor 4 = 5
+    Number of faces shared with processor 7 = 10
+    Number of processor patches = 3
+    Number of processor faces = 25
+    Number of boundary faces = 105
+
+Processor 6
+    Number of cells = 50
+    Number of faces shared with processor 4 = 10
+    Number of faces shared with processor 7 = 5
+    Number of processor patches = 2
+    Number of processor faces = 15
+    Number of boundary faces = 115
+
+Processor 7
+    Number of cells = 50
+    Number of faces shared with processor 5 = 10
+    Number of faces shared with processor 6 = 5
+    Number of processor patches = 2
+    Number of processor faces = 15
+    Number of boundary faces = 115
+
+Number of processor faces = 80
+Max number of cells = 50 (0% above average 50)
+Max number of processor patches = 3 (20% above average 2.5)
+Max number of faces between processors = 25 (25% above average 20)
+
+Time = 0
+
+Processor 0: field transfer
+Processor 1: field transfer
+Processor 2: field transfer
+Processor 3: field transfer
+Processor 4: field transfer
+Processor 5: field transfer
+Processor 6: field transfer
+Processor 7: field transfer
+
+End
+

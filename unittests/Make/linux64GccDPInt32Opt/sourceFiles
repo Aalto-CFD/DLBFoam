@@ -1,7 +1,6 @@
 SOURCE = \
 test.C \
+helpers.C \
 testChemistryLoad.C \
-testMixtureFraction.C \
-testRefMapper.C \
-testChemistryLoadBalancingMethod.C \
-testChemistryProblem.C 
+testSimpleLoadBalancing.C \
+testChemistryLoadBalancingMethod.C 

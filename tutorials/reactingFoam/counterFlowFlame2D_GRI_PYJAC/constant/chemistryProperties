@@ -18,7 +18,7 @@ FoamFile
 chemistryType
 {
     solver            ode;
-    method            pyJac;
+    method            loadBalanced_pyJac;
 }
 
 chemistry       on;
@@ -36,7 +36,7 @@ odeCoeffs
 
 refmapping
 {
-    active  true;
+    active  false;
     
     mixtureFractionProperties
     {
@@ -54,11 +54,5 @@ refmapping
         #include "$FOAM_CASE/constant/specieElements_GRI.foam"
     }
     tolerance	1e-4;
-}
-
-loadbalancing
-{
-    active   true;
-    chemCPUTimeLimit	2;
 }
 // ************************************************************************* //
