@@ -283,10 +283,12 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
                         solve_single(problem, ref_soln);
                         update_reaction_rate(ref_soln, ref_soln.cellid);
                         refCellFound = true;
+                        this->cpu_times_[ref_soln.cellid]  = ref_soln.cpuTime;
                     } 
                     
                     else {
                         update_reaction_rate(ref_soln, celli);
+                        this->cpu_times_[celli]  = ref_soln.cpuTime;
                     }
                 } 
                 else {
