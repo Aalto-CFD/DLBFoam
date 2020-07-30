@@ -17,8 +17,9 @@ struct Runner{
             time.timeIncrement();
             benchmark.run();
             times.push_back(time.timeIncrement());
+            Pstream::waitRequests(); //not sure if this is a barrier but it would be good to have one here...
         }
-        return Result(benchmark.name(), times);
+        return Result(benchmark.get_info(), times);
     }
 
 };

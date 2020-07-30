@@ -8,20 +8,19 @@
 #include "noChemistrySolver.H"
 #include "ode.H"
 #include "initial_conditions.H"
+#include "benchmark_info.H"
+
 
 enum class ModelType{standard, balanced};
 
 
 struct Benchmark{
 
-    template<class InitialCondition>
-    Benchmark(std::string name, ModelType model_type, psiReactionThermo& thermo, InitialCondition ic)
+    Benchmark(BenchmarkInfo info, ModelType model_type, psiReactionThermo& thermo)
     :
-    m_name(name)
+    m_info(info)
     {
         
-        InitialCondition::set(thermo);
-
         if (model_type == ModelType::standard){
             m_model = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
         }
@@ -34,26 +33,42 @@ struct Benchmark{
         delete m_model;
     }
 
-    std::string name() const {
-        return m_name; 
-    } 
+
+    const BenchmarkInfo& get_info() const {return m_info;}
 
 
     BasicChemistryModel<psiReactionThermo>* get_model() {return m_model;}
 
 private:
-    std::string m_name;
+    BenchmarkInfo m_info;
     BasicChemistryModel<psiReactionThermo>* m_model;    
 
 };
 
 
+
+struct BenchmarkSolve : public Benchmark{
+
+    BenchmarkSolve(BenchmarkInfo info, ModelType model_type, psiReactionThermo& thermo) : Benchmark(info, model_type, thermo) {}
+
+
+    void run() {
+        this->get_model()->solve(1E-6);
+    }
+
+
+};
+
+
+
+
+
 struct BenchmarkSolveSingle{
 
-    static constexpr size_t n_problems = 200;
+    static constexpr size_t n_problems = 10;
 
-    BenchmarkSolveSingle(std::string name, psiReactionThermo& thermo, bool heavy=true) 
-    : m_name(name), m_problems(create_problems(heavy)), m_solutions(create_solutions())
+    BenchmarkSolveSingle(BenchmarkInfo info, psiReactionThermo& thermo, bool heavy=true) 
+    : m_info(info), m_problems(create_problems(heavy)), m_solutions(create_solutions())
     {
         m_model = new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
     }
@@ -61,9 +76,8 @@ struct BenchmarkSolveSingle{
 
     ~BenchmarkSolveSingle() {delete m_model; }
 
-    std::string name() const {
-        return m_name; 
-    } 
+
+    const BenchmarkInfo& get_info() const {return m_info;}
 
 
     std::vector<chemistryProblem> create_problems(bool heavy) const {
@@ -94,24 +108,10 @@ struct BenchmarkSolveSingle{
 
 private:
 
-    std::string m_name;
+    BenchmarkInfo m_info;
     std::vector<chemistryProblem> m_problems;
     std::vector<chemistrySolution> m_solutions;
 
     ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>* m_model;
-
-};
-
-
-struct BenchmarkSolve : public Benchmark{
-
-    template<class InitialCondition>
-    BenchmarkSolve(std::string name, ModelType model_type, psiReactionThermo& thermo, InitialCondition ic) : Benchmark(name, model_type, thermo, ic) {}
-
-
-    void run() {
-        this->get_model()->solve(1E-6);
-    }
-
 
 };

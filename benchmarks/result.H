@@ -2,12 +2,13 @@
 
 #include <vector>
 #include <string>
-
+#include <iomanip>
+#include "benchmark_info.H"
 
 struct Result{
 
-    Result(const std::string& name_, const std::vector<double>& times)
-    : name(name_), samples(times.size()), average(calc_avg(times)), standard_dev(calc_std(times))
+    Result(const BenchmarkInfo& info_, const std::vector<double>& times)
+    : info(info_), samples(times.size()), average(calc_avg(times)), standard_dev(calc_std(times))
     {}
 
     double calc_avg(const std::vector<double>& times) const{
@@ -25,17 +26,52 @@ struct Result{
     }
 
 
-    std::string to_string() const {
-        std::string ret;
-        ret += name;
-        ret += std::string(" Samples :") + std::to_string(samples);  
-        ret += std::string(" Mean runtime: ") + std::to_string(average);
-        ret += std::string(" Standard deviation: ") + std::to_string(standard_dev);
-        return ret;       
+    static std::string get_header() {
+
+        std::ostringstream ss;
+
+        ss << std::setw(15) << "Model";
+        ss << std::setw(15) << "Function";
+        ss << std::setw(15) << "Balancer";
+        ss << std::setw(15) << "Init. Condition";
+        ss << std::setw(10) << "N samples";
+        ss << std::setw(10) << "Mean";
+        ss << std::setw(10) << "Stdev";
+        return ss.str();
+
     }
 
-    std::string name;
+    std::string to_string() const{
+
+        std::ostringstream ss;
+        ss << std::setw(15) << info.chem_model_name;
+        ss << std::setw(15) << info.benchmarked_function;
+        ss << std::setw(15) << info.balancer_name;
+        ss << std::setw(15) << info.initial_condition_name;
+        ss << std::setw(10) << samples;
+        ss << std::setw(10) << average;
+        ss << std::setw(10) << standard_dev;
+
+        return ss.str();
+
+
+    }
+
+
+    BenchmarkInfo info;
     size_t samples;
     double average, standard_dev;
 
 };
+/*
+std::string chem_model_name;
+    std::string benchmarked_function;
+    std::string balancer_name;
+    std::string initial_condition_name;
+*/
+Foam::Ostream& operator<<(Foam::Ostream& os, const Result& r) {
+
+    os << r.to_string();
+    return os;
+
+}

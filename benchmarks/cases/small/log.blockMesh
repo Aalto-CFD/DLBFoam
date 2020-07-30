@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 7-1ff648926f77
 Exec   : blockMesh
-Date   : Jul 29 2020
-Time   : 21:05:29
+Date   : Jul 30 2020
+Time   : 16:28:30
 Host   : "peltonp1-All-Series"
-PID    : 30206
+PID    : 7330
 I/O    : uncollated
 Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small
 nProcs : 1
@@ -49,8 +49,8 @@ Creating patches
 Creating cells
 Creating points with scale 1
     Block 0 cell size :
-        i : 0.001 .. 0.001
-        j : 0.001 .. 0.001
+        i : 0.002 .. 0.002
+        j : 0.002 .. 0.002
         k : 0.02
 
 Writing polyMesh
@@ -58,17 +58,17 @@ Writing polyMesh
 Mesh Information
 ----------------
   boundingBox: (0 -0.01 -0.01) (0.02 0.01 0.01)
-  nPoints: 882
-  nCells: 400
-  nFaces: 1640
-  nInternalFaces: 760
+  nPoints: 242
+  nCells: 100
+  nFaces: 420
+  nInternalFaces: 180
 ----------------
 Patches
 ----------------
-  patch 0 (start: 760 size: 20) name: fuel
-  patch 1 (start: 780 size: 20) name: air
-  patch 2 (start: 800 size: 40) name: outlet
-  patch 3 (start: 840 size: 800) name: frontAndBack
+  patch 0 (start: 180 size: 10) name: fuel
+  patch 1 (start: 190 size: 10) name: air
+  patch 2 (start: 200 size: 20) name: outlet
+  patch 3 (start: 220 size: 200) name: frontAndBack
 
 End
 

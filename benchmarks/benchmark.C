@@ -20,6 +20,7 @@
 #include "noChemistrySolver.H"
 #include "ode.H"
 
+#include "benchmark_info.H"
 #include "initial_conditions.H"
 #include "result.H"
 #include "runner.H"
@@ -27,7 +28,63 @@
 
 
 
+void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField>& Y, psiReactionThermo& thermo) {
 
+    BasicChemistryModel<psiReactionThermo>* model1 = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+    BasicChemistryModel<psiReactionThermo>* model2 = new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+
+    set_all_heavy(rho, thermo);
+
+    model1->solve(1E-3);
+
+    model2->solve(1E-3);
+
+
+    for (label i = 0; i < model1->nSpecie(); ++i){
+        
+        
+        const scalarField& r1 = model1->RR(i);
+        const scalarField& r2 = model2->RR(i);
+
+
+        double sum = 0.0;
+        forAll(r1, celli) {
+
+            double diff = r1[celli] - r2[celli];
+            sum += (diff * diff);
+        }
+
+        scalar norm =std::sqrt(sum);
+
+
+        if (norm > 1E-10){
+            Info << "Load balanced model and standard model give different answers! Be careful!" << endl;
+        }
+
+    }
+
+    delete model1; delete model2;
+
+
+}
+
+void dump_results(const std::vector<Result>& results) {
+
+
+    std::string fname = "results_" + std::to_string(Pstream::myProcNo()) + ".dat";
+
+    Foam::fileName outputFile(fname);
+    Foam::OFstream os(outputFile);
+
+    os << Result::get_header() << endl;
+
+    for (const auto& r : results) {
+        os << r << endl;
+    }
+
+    //os << "This is the first line in the file.\n"
+    //os << "scalarField area (" << areaField.size() << ";)" << endl;
+}
 
 
 
@@ -50,97 +107,173 @@ int main(int argc, char *argv[])
     #include "setDeltaT.H"
 
 
-    thermo.correct(); 
+    //thermo.correct(); 
 
     std::vector<Result> results;
 
-    /*
+    ///
+    ///@brief Sanity check that models give same answer
+    ///
+    ///
+    sanity_check(p, rho, Y, thermo);
+    
+    ///
+    ///@brief Benchmark the load balanced solver for light and heavy problems
+    ///
+    ///
+    
+
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( "LoadBalanced solve_single() light", thermo, false), 200 )
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all heavy"}, thermo, false), 400 )
+                    );
+
+    results.push_back(
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all light"}, thermo, true), 400 )
                     );
 
 
+    /////////////////////////
+    ///@brief All heavy problems on all ranks 
+    ///
+    ///
+
+
+    
+    set_all_heavy(rho, thermo);
+    
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( "LoadBalanced solve_single() heavy", thermo, true), 200 )
-                    );
-
-    */
-
-
-    assign_heavy(p, rho, Y, thermo);
-
+        Runner::run(
+            BenchmarkSolve({"Standard", "solve()","none", "all heavy"}, ModelType::standard, thermo),
+            2
+        )
+    );
 
     results.push_back(
         Runner::run(
-            BenchmarkSolve("Standard solve() heavy", ModelType::standard, thermo, HighMasterLoadIc()),
+            BenchmarkSolve({"loadBalanced", "solve()","simple", "all heavy"}, ModelType::balanced, thermo),
+            2
+        )
+    );
+
+    ///
+    ///@brief All light problems on all ranks
+    ///
+    ///
+
+    set_all_light(rho, thermo);
+
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"Standard", "solve()","none", "all light"}, ModelType::standard, thermo),
             10
         )
     );
     
-    assign_heavy(p, rho, Y, thermo);
 
     results.push_back(
         Runner::run(
-            BenchmarkSolve("Loadbalanced solve() heavy", ModelType::balanced, thermo, HighMasterLoadIc()),
+            BenchmarkSolve({"loadBalanced", "solve()","simple", "all light"}, ModelType::balanced, thermo),
             10
         )
     );
 
-    assign_light(p, rho, Y, thermo);
 
+
+    ///
+    ///@brief Set master to high value, others to light value
+    ///
+    ///
+    set_master_heavy(rho, thermo);
+    
 
     results.push_back(
         Runner::run(
-            BenchmarkSolve("Standard solve() light", ModelType::standard, thermo, HighMasterLoadIc()),
+            BenchmarkSolve({"Standard", "solve()","none", "master heavy"}, ModelType::standard, thermo),
             10
         )
     );
     
-    assign_light(p, rho, Y, thermo);
 
     results.push_back(
         Runner::run(
-            BenchmarkSolve("Loadbalanced solve() light", ModelType::balanced, thermo, HighMasterLoadIc()),
+            BenchmarkSolve({"loadBalanced", "solve()", "simple", "master heavy"}, ModelType::balanced, thermo),
             10
         )
     );
 
-    /*
-    auto result1 = Runner::run(
-        BenchmarkSolve( "Standard solve()",
-                        ModelType::standard, 
-                        thermo, 
-                        HighMasterLoadIc()), 
-                        10);
-    Info << result1.to_string() << endl;
+
+    ///
+    ///@brief Every second rank is heavy
+    ///
+    ///
+    set_every_n_heavy(rho, thermo, 2);
+    
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"Standard", "solve()","none", "every 2nd heavy"}, ModelType::standard, thermo),
+            10
+        )
+    );
+    
+
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"loadBalanced", "solve()","simple", "every 2nd heavy"}, ModelType::balanced, thermo),
+            10
+        )
+    );
 
 
+    ///
+    ///@brief Every fourth rank is heavy
+    ///
+    ///
+    set_every_n_heavy(rho, thermo, 4);
+    
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"Standard", "solve()","none", "every 4th heavy"}, ModelType::standard, thermo),
+            10
+        )
+    );
+    
 
-    auto result2 = Runner::run(
-        BenchmarkSolve( "Loadbalanced solve()",
-                        ModelType::balanced, 
-                        thermo, 
-                        HighMasterLoadIc()), 
-                        10);
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"loadBalanced", "solve()","simple", "every 4th heavy"}, ModelType::balanced, thermo),
+            10
+        )
+    );
 
-    Info << result2.to_string() << endl;
-    */
 
+    ///
+    ///@brief Every tenth rank is heavy
+    ///
+    ///
+    set_every_n_heavy(rho, thermo, 10);
+    
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"Standard", "solve()","none", "every 10th heavy"}, ModelType::standard, thermo),
+            10
+        )
+    );
+    
+
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"loadBalanced", "solve()","simple", "every 10th heavy"}, ModelType::balanced, thermo),
+            10
+        )
+    );
+
+    dump_results(results);
+
+    Info << Result::get_header() << endl;
 
     for (auto r : results) {
-        Info << r.to_string() << endl;
+        Info << r << endl;
     }
-
-    //Runner r1(B1<ModelType::standard>(m1), 10);
-
-
-    /*
-    auto times = Benchmark(B1(m1), 10).times;
-
-    for (auto t : times) {
-        Info << t << endl;
-    }
-    */
 
     return 0;
 
