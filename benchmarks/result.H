@@ -30,13 +30,21 @@ struct Result{
 
         std::ostringstream ss;
 
-        ss << std::setw(15) << "Model";
-        ss << std::setw(15) << "Function";
-        ss << std::setw(15) << "Balancer";
-        ss << std::setw(15) << "Init. Condition";
+        ss << std::setw(20) << "Model";
+        ss << std::setw(20) << "Function";
+        ss << std::setw(20) << "Balancer";
+        ss << std::setw(20) << "Init. Condition";
         ss << std::setw(10) << "N samples";
         ss << std::setw(10) << "Mean";
         ss << std::setw(10) << "Stdev";
+        return ss.str();
+    }
+
+    static std::string get_header_csv() {
+    
+
+        std::ostringstream ss;
+        ss << "Model," << "Function," << "Balancer," << "Init. Condition," << "N samples," << "Mean," << "Stdev"; 
         return ss.str();
 
     }
@@ -44,14 +52,36 @@ struct Result{
     std::string to_string() const{
 
         std::ostringstream ss;
-        ss << std::setw(15) << info.chem_model_name;
-        ss << std::setw(15) << info.benchmarked_function;
-        ss << std::setw(15) << info.balancer_name;
-        ss << std::setw(15) << info.initial_condition_name;
+        ss << std::setw(20) << info.chem_model_name;
+        ss << std::setw(20) << info.benchmarked_function;
+        ss << std::setw(20) << info.balancer_name;
+        ss << std::setw(20) << info.initial_condition_name;
         ss << std::setw(10) << samples;
         ss << std::setw(10) << average;
         ss << std::setw(10) << standard_dev;
 
+        return ss.str();
+
+
+    }
+
+    std::string to_csv() const{
+
+        std::ostringstream ss;
+        ss << info.chem_model_name; 
+        ss << ",";
+        ss << info.benchmarked_function;
+        ss << ",";
+        ss << info.balancer_name;
+        ss << ",";
+        ss << info.initial_condition_name;
+        ss << ",";
+        ss << samples;
+        ss << ",";
+        ss << average;
+        ss << ",";
+        ss << standard_dev;
+        
         return ss.str();
 
 

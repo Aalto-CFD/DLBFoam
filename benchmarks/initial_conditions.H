@@ -86,7 +86,6 @@ namespace detail{
         return chemistrySolution(n_species);
     }
 
-
 void generic_assign_all(volScalarField& rho, psiReactionThermo& thermo, scalar Tv, scalar pv, scalar rhov, scalar Yv) {
 
 
@@ -102,6 +101,29 @@ void generic_assign_all(volScalarField& rho, psiReactionThermo& thermo, scalar T
             
             for (label i = 0; i < n_species; i++) { 
                 Y[i][celli] = Yv; //detail::random_double(0.05, 0.1);
+            }
+            
+    }
+
+
+}
+
+template<class fractionType>
+void generic_assign_all(volScalarField& rho, psiReactionThermo& thermo, scalar Tv, scalar pv, scalar rhov, const fractionType& Yv) {
+
+
+    PtrList<volScalarField>& Y = thermo.composition().Y();
+
+    volScalarField& T = thermo.T();
+    volScalarField& p = thermo.p();
+    forAll(p, celli) {
+
+            p[celli] = pv;
+            rho[celli] = rhov;
+            T[celli] = Tv;
+            
+            for (label i = 0; i < n_species; i++) { 
+                Y[i][celli] = Yv(); //detail::random_double(0.05, 0.1);
             }
             
     }
@@ -135,7 +157,6 @@ void set_all_light( volScalarField& rho,  psiReactionThermo& thermo) {
 
 void set_master_heavy( volScalarField& rho,  psiReactionThermo& thermo) {
 
-    auto problem = detail::create_light_problem();
 
     if (Pstream::master()){
         set_all_heavy(rho, thermo);
@@ -144,12 +165,10 @@ void set_master_heavy( volScalarField& rho,  psiReactionThermo& thermo) {
     else {
         set_all_light(rho, thermo);
     }
-
 }
 
 void set_every_n_heavy( volScalarField& rho,  psiReactionThermo& thermo, size_t n) {
 
-    auto problem = detail::create_light_problem();
 
 
 
@@ -160,5 +179,57 @@ void set_every_n_heavy( volScalarField& rho,  psiReactionThermo& thermo, size_t 
     else {
         set_all_light(rho, thermo);
     }
+
+}
+
+
+void set_every_n_random_heavy( volScalarField& rho,  psiReactionThermo& thermo, size_t n) {
+
+    auto problem = detail::create_light_problem();
+
+    struct randomizer_heavy {
+        
+        scalar operator()() const{
+            return detail::random_double(0.05, 0.12);
+        }
+    };
+
+    struct randomizer_light {
+        
+        scalar operator()() const{
+            return detail::random_double(0.00005, 0.0012);
+        }
+    };
+
+    if (Pstream::myProcNo() % n == 0){
+        detail::generic_assign_all(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer_heavy());
+    }
+
+    else {
+
+        detail::generic_assign_all(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer_light());
+
+    }
+
+}
+
+
+void set_all_random( volScalarField& rho,  psiReactionThermo& thermo) {
+
+    auto problem = detail::create_light_problem();
+
+    struct randomizer {
+        
+        scalar operator()() const{
+            return detail::random_double(0.0001, 0.15);
+        }
+    };
+
+    
+
+    detail::generic_assign_all(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer());
+
+
+    
 
 }

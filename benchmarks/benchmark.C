@@ -73,17 +73,20 @@ void dump_results(const std::vector<Result>& results) {
 
     std::string fname = "results_" + std::to_string(Pstream::myProcNo()) + ".dat";
 
-    Foam::fileName outputFile(fname);
-    Foam::OFstream os(outputFile);
+    ofstream outfile;
+    outfile.open(fname);
 
-    os << Result::get_header() << endl;
+    outfile << Result::get_header_csv() << std::endl;
+
+    //Foam::fileName outputFile(fname);
+    //Foam::OFstream os(outputFile);
+
+    //os << Result::get_header() << endl;
 
     for (const auto& r : results) {
-        os << r << endl;
+        outfile << r.to_csv() << std::endl;
     }
 
-    //os << "This is the first line in the file.\n"
-    //os << "scalarField area (" << areaField.size() << ";)" << endl;
 }
 
 
@@ -115,21 +118,24 @@ int main(int argc, char *argv[])
     ///@brief Sanity check that models give same answer
     ///
     ///
-    sanity_check(p, rho, Y, thermo);
+    //sanity_check(p, rho, Y, thermo);
     
     ///
     ///@brief Benchmark the load balanced solver for light and heavy problems
     ///
     ///
     
-
+    /*
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all heavy"}, thermo, false), 400 )
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all heavy"}, thermo, false), 200 )
                     );
 
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all light"}, thermo, true), 400 )
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all light"}, thermo, true), 200 )
                     );
+
+
+    */
 
 
     /////////////////////////
@@ -144,14 +150,14 @@ int main(int argc, char *argv[])
     results.push_back(
         Runner::run(
             BenchmarkSolve({"Standard", "solve()","none", "all heavy"}, ModelType::standard, thermo),
-            2
+            10
         )
     );
 
     results.push_back(
         Runner::run(
             BenchmarkSolve({"loadBalanced", "solve()","simple", "all heavy"}, ModelType::balanced, thermo),
-            2
+            10
         )
     );
 
@@ -267,11 +273,57 @@ int main(int argc, char *argv[])
         )
     );
 
+    ///
+    ///@brief Every third rank is randomly heavy
+    ///
+    ///
+    set_every_n_random_heavy(rho, thermo, 4);
+    
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"Standard", "solve()","none", "every 3rd rnd heavy"}, ModelType::standard, thermo),
+            10
+        )
+    );
+    
+
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"loadBalanced", "solve()","simple", "every 3rd rnd heavy"}, ModelType::balanced, thermo),
+            10
+        )
+    );
+
+
+    ///
+    ///@brief All random
+    ///
+    ///
+    set_all_random(rho, thermo);
+    
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"Standard", "solve()","none", "all random"}, ModelType::standard, thermo),
+            10
+        )
+    );
+    
+
+    results.push_back(
+        Runner::run(
+            BenchmarkSolve({"loadBalanced", "solve()","simple", "all random"}, ModelType::balanced, thermo),
+            10
+        )
+    );
+
     dump_results(results);
+
+    
 
     Info << Result::get_header() << endl;
 
     for (auto r : results) {
+        
         Info << r << endl;
     }
 

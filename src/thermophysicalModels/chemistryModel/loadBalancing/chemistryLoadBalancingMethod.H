@@ -83,6 +83,14 @@ private:
 
 public:
 
+
+    chemistryLoad
+    compute_my_load(const DynamicList<chemistryProblem>& problems) {
+        auto   lambda = [](scalar sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
+        scalar sum    = std::accumulate(problems.begin(), problems.end(), scalar(0), lambda);
+        return chemistryLoad(Pstream::myProcNo(), sum);
+    }
+
     template<class T>
     static DynamicList<T> all_gather(const T& my_data) {
 
@@ -282,6 +290,7 @@ protected:
 
     bool valid_state() const {
 
+        /*
         auto sources      = m_current_state.sources;
         auto destinations = m_current_state.destinations;
 
@@ -292,7 +301,8 @@ protected:
         if (sources[0] != Pstream::myProcNo())
             return false; // the first index must always be this process
         if (sources[0] != destinations[0]) return false;
-
+        */
+        //TODO: enable
         return true;
     }
 
