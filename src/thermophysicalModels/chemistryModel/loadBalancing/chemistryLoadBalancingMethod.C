@@ -11,6 +11,16 @@ chemistryLoad chemistryLoadBalancingMethod::get_my_load(const DynamicList<chemis
 }
 */
 
+double chemistryLoadBalancingMethod::get_mean(const DynamicList<chemistryLoad>& loads){
+
+    auto op = [](double sum, const chemistryLoad& load) {
+    return sum + load.value;
+    };
+    return std::accumulate(loads.begin(), loads.end(), 0.0, op) / loads.size();
+
+}
+
+
 size_t chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistryLoad>& loads, int rank) const {
 
     /*

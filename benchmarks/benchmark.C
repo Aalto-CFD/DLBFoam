@@ -33,11 +33,13 @@ void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField
     BasicChemistryModel<psiReactionThermo>* model1 = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
     BasicChemistryModel<psiReactionThermo>* model2 = new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
 
-    set_all_heavy(rho, thermo);
+    set_master_heavy(rho, thermo);
 
-    model1->solve(1E-3);
+    for (size_t i = 0; i < 2; ++i){
+        model1->solve(detail::FLOWTIMESTEP);
+        model2->solve(detail::FLOWTIMESTEP);
+    }
 
-    model2->solve(1E-3);
 
 
     for (label i = 0; i < model1->nSpecie(); ++i){
@@ -118,22 +120,20 @@ int main(int argc, char *argv[])
     ///@brief Sanity check that models give same answer
     ///
     ///
-    //sanity_check(p, rho, Y, thermo);
+    sanity_check(p, rho, Y, thermo);
     
     ///
     ///@brief Benchmark the load balanced solver for light and heavy problems
     ///
     ///
-    
-    /*
+    /* 
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all heavy"}, thermo, false), 200 )
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all heavy"}, thermo, false), 50 )
                     );
 
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all light"}, thermo, true), 200 )
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all light"}, thermo, true), 50 )
                     );
-
 
     */
 
@@ -142,7 +142,6 @@ int main(int argc, char *argv[])
     ///@brief All heavy problems on all ranks 
     ///
     ///
-
 
     
     set_all_heavy(rho, thermo);
@@ -182,7 +181,6 @@ int main(int argc, char *argv[])
             10
         )
     );
-
 
 
     ///

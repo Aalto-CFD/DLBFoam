@@ -84,6 +84,10 @@ private:
 public:
 
 
+
+    static double get_mean(const DynamicList<chemistryLoad>& loads);
+
+
     chemistryLoad
     compute_my_load(const DynamicList<chemistryProblem>& problems) {
         auto   lambda = [](scalar sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };

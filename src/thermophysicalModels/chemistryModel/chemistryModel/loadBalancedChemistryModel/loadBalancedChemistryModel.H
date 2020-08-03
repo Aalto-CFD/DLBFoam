@@ -42,6 +42,7 @@ SourceFiles
 #include "clockTime.H"
 
 #include "simpleBalancingMethod.H"
+#include "globalBalancingMethod.H"
 #include "bulutLoadBalancing.H"
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"

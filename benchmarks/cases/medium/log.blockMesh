@@ -8,9 +8,9 @@
 Build  : 7-1ff648926f77
 Exec   : blockMesh
 Date   : Aug 03 2020
-Time   : 20:13:09
+Time   : 20:06:17
 Host   : "peltonp1-All-Series"
-PID    : 31451
+PID    : 30554
 I/O    : uncollated
 Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small
 nProcs : 1

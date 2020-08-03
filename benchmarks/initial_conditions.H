@@ -32,8 +32,8 @@ namespace detail{
     }
 
     static constexpr size_t n_species = 53;
-
-    static constexpr double HEAVY_Y_VALUE = 0.1;
+    static constexpr double FLOWTIMESTEP = 1E-7;
+    static constexpr double HEAVY_Y_VALUE = 0.001;
     static constexpr double LIGHT_Y_VALUE = 0.0001;
 
     
@@ -109,7 +109,7 @@ void generic_assign_all(volScalarField& rho, psiReactionThermo& thermo, scalar T
 }
 
 template<class fractionType>
-void generic_assign_all(volScalarField& rho, psiReactionThermo& thermo, scalar Tv, scalar pv, scalar rhov, const fractionType& Yv) {
+void generic_assign_all_random(volScalarField& rho, psiReactionThermo& thermo, scalar Tv, scalar pv, scalar rhov, const fractionType& Yv) {
 
 
     PtrList<volScalarField>& Y = thermo.composition().Y();
@@ -190,24 +190,24 @@ void set_every_n_random_heavy( volScalarField& rho,  psiReactionThermo& thermo, 
     struct randomizer_heavy {
         
         scalar operator()() const{
-            return detail::random_double(0.05, 0.12);
+            return detail::random_double(detail::HEAVY_Y_VALUE*0.5, detail::HEAVY_Y_VALUE*1.5);
         }
     };
 
     struct randomizer_light {
         
         scalar operator()() const{
-            return detail::random_double(0.00005, 0.0012);
+            return detail::random_double(detail::LIGHT_Y_VALUE*0.5, detail::LIGHT_Y_VALUE*1.5);
         }
     };
 
     if (Pstream::myProcNo() % n == 0){
-        detail::generic_assign_all(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer_heavy());
+        detail::generic_assign_all_random(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer_heavy());
     }
 
     else {
 
-        detail::generic_assign_all(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer_light());
+        detail::generic_assign_all_random(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer_light());
 
     }
 
@@ -221,13 +221,13 @@ void set_all_random( volScalarField& rho,  psiReactionThermo& thermo) {
     struct randomizer {
         
         scalar operator()() const{
-            return detail::random_double(0.0001, 0.15);
+            return detail::random_double(detail::LIGHT_Y_VALUE, detail::HEAVY_Y_VALUE);
         }
     };
 
     
 
-    detail::generic_assign_all(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer());
+    detail::generic_assign_all_random(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer());
 
 
     

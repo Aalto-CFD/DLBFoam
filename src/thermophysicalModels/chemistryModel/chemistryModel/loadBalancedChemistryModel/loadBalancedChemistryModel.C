@@ -51,8 +51,8 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryMo
 template <class ReactionThermo, class ThermoType>
 chemistryLoadBalancingMethod* loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer(){
 
-
-    return new bulutLoadBalancing();
+    return new globalBalancingMethod();
+    //return new bulutLoadBalancing();
     //return new simpleBalancingMethod();
 
 }
@@ -87,13 +87,16 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
 
     load_balancer_->update_state(all_problems);
-    //load_balancer_->print_state();
+    load_balancer_->print_state();
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
+
+    //Pstream::waitRequests(); 
 
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
 
-
+    
+    //Pstream::waitRequests(); 
 
     return update_reaction_rates(my_solutions);
 

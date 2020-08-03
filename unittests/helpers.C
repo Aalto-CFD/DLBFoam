@@ -33,7 +33,7 @@ Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t count)
     DynamicList<chemistryLoad> ret(count, chemistryLoad());
 
     for (size_t i = 0; i < count; ++i) {
-        ret[i].value = random_double(0.0, 1.0);
+        ret[i].value = random_double(0., 300.0);
         ret[i].rank  = i;
     }
     return ret;
@@ -44,6 +44,16 @@ void set_cpu_times(Foam::DynamicList<Foam::chemistryProblem>& problems, double c
 
     for (auto& problem : problems){
         problem.cpuTime = cpu_time;
+    }
+
+}
+
+void print_loads(const Foam::DynamicList<Foam::chemistryLoad>& loads) {
+
+    for (const auto& load : loads) {
+
+        Foam::Info << "Rank: " << load.rank << " Value: " << load.value << Foam::endl;
+
     }
 
 }

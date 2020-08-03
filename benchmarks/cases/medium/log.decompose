@@ -8,9 +8,9 @@
 Build  : 7-1ff648926f77
 Exec   : decomposePar
 Date   : Aug 03 2020
-Time   : 20:13:09
+Time   : 20:06:17
 Host   : "peltonp1-All-Series"
-PID    : 31453
+PID    : 30555
 I/O    : uncollated
 Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small
 nProcs : 1
@@ -36,7 +36,7 @@ Calculating distribution of cells
 
 Selecting decompositionMethod scotch
 
-Finished decomposition in 0.01 s
+Finished decomposition in 0 s
 
 Calculating original mesh data
 

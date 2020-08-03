@@ -53,7 +53,7 @@ struct BenchmarkSolve : public Benchmark{
 
 
     void run() {
-        this->get_model()->solve(1E-6);
+        this->get_model()->solve(detail::FLOWTIMESTEP);
     }
 
 

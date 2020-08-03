@@ -4,7 +4,6 @@
 
 #include "result.H"
 
-
 struct Runner{
 
 
