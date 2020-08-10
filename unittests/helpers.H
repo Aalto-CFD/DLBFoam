@@ -14,3 +14,4 @@ Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t n);
 
 
 void set_cpu_times(Foam::DynamicList<Foam::chemistryProblem>& problems, double cpu_time);
+void print_loads(const Foam::DynamicList<Foam::chemistryLoad>& loads);

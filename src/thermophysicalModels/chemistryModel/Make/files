@@ -9,7 +9,8 @@ loadBalancing/algorithms.C
 refMapping/mixtureFraction.C
 refMapping/chemistryRefMappingMethod.C
 refMapping/simpleRefMappingMethod.C
-
+loadBalancing/bulutLoadBalancing.C
+loadBalancing/globalBalancingMethod.C
 chemistryModel/makePexChemistryModels.C
 chemistrySolver/makePexChemistrySolvers.C
 

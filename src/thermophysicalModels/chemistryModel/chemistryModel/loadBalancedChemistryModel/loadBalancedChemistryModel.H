@@ -43,6 +43,8 @@ SourceFiles
 
 #include "simpleBalancingMethod.H"
 #include "simpleRefMappingMethod.H"
+#include "globalBalancingMethod.H"
+#include "bulutLoadBalancing.H"
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"
 
@@ -95,7 +97,6 @@ public:
     // this function is somehow injected in the ODE
     virtual void
     solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
-
 
 private:
 

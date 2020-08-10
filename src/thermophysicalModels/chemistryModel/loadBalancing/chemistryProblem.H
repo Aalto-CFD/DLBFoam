@@ -22,6 +22,10 @@ struct chemistryProblem {
     bool operator==(const chemistryProblem& rhs) const { return false; }
 
     bool operator!=(const chemistryProblem& rhs) const { return !(*this == rhs); }
+
+
+
+
 };
 
 // These are required for sending and receving using the OF MPI routines

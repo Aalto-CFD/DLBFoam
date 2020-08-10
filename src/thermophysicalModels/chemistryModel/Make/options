@@ -22,7 +22,6 @@ LIB_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -lchemistryModel \
-    -lc_pyjac
     
     
 

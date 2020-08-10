@@ -39,6 +39,7 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/
 #include "noChemistrySolver.H"
 #include "ode/ode.H" //important to not use the stock ode for pyJac
 
+#include "ode.H" //important to use the stock ODE's with others
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #define makePexChemistrySolverType(SS, Comp, Thermo)                              \
