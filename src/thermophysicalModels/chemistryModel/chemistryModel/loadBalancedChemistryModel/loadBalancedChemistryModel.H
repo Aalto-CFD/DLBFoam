@@ -92,6 +92,14 @@ public:
     virtual scalar solve(const scalar deltaT) override;
     virtual scalar solve(const scalarField& deltaT) override;
 
+    ///
+    ///@brief 
+    ///
+    ///@param prob 
+    ///@param soln 
+    ///
+    void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
+
 
     // ODE functions (overriding abstract functions in ODE.H)
     // this function is somehow injected in the ODE
@@ -120,14 +128,6 @@ private:
     ///
     chemistryRefMappingMethod* create_refmapper();
  
-    ///
-    ///@brief 
-    ///
-    ///@param prob 
-    ///@param soln 
-    ///
-    void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
-
 
     ///
     ///@brief 
