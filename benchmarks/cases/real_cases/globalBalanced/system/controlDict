@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  dev                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -17,19 +17,19 @@ FoamFile
 
 application     reactingFoam;
 
-startFrom       latestTime;//startTime;
+startFrom       latestTime;
 
 startTime       0;
 
 stopAt          endTime;
 
-endTime         0.5;
+endTime         0.2;
 
-deltaT          1e-5;
+deltaT          1e-6;
 
 writeControl    adjustableRunTime;
 
-writeInterval   0.01;
+writeInterval   0.05;
 
 purgeWrite      0;
 
@@ -45,17 +45,12 @@ timePrecision   6;
 
 runTimeModifiable true;
 
-adjustTimeStep  no;
+adjustTimeStep  yes;
 
-maxCo           0.2;
-
+maxCo           0.4;
 
 libs
 (
-    "libchemistryModel_pex.so"
-    "$FOAM_USER_LIBBIN/libc_pyjac.so"
+	"libchemistryModel_pex.so" 
 );
-
-
-
 // ************************************************************************* //

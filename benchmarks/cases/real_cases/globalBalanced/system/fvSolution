@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  dev                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -37,7 +37,7 @@ solvers
         relTol           0.0;
     }
 
-    "(U|h|k|epsilon)"
+    "(U|h|k|epsilon|Yi)"
     {
         solver          PBiCGStab;
         preconditioner  DILU;
@@ -45,7 +45,7 @@ solvers
         relTol          0.1;
     }
 
-    "(U|h|k|epsilon)Final"
+    "(U|h|k|epsilon|Yi)Final"
     {
         $U;
         relTol          0;

@@ -1,10 +1,9 @@
-
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  5                                     |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -12,13 +11,13 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      O2;
+    object      Ydefault;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField   uniform 0.23;
+internalField   uniform 0.0;
 
 boundaryField
 {
@@ -30,13 +29,14 @@ boundaryField
     air
     {
         type            fixedValue;
-        value           uniform 0.23;
+        value           uniform 0.0;
     }
     outlet
     {
         type            inletOutlet;
-        inletValue      uniform 1e-4;
-        value           uniform 1e-4;
+        inletValue      uniform 0.0;
+        value           uniform 0.0;
+
     }
     frontAndBack
     {

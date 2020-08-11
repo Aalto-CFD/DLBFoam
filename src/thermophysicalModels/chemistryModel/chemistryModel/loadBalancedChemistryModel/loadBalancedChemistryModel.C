@@ -51,8 +51,8 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryMo
 template <class ReactionThermo, class ThermoType>
 chemistryLoadBalancingMethod* loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer(){
 
-    return new globalBalancingMethod();
-    //return new bulutLoadBalancing();
+    //return new globalBalancingMethod();
+    return new bulutLoadBalancing();
     //return new simpleBalancingMethod();
 
 }

@@ -39,6 +39,19 @@ Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t count)
     return ret;
 }
 
+Foam::DynamicList<Foam::chemistryProblem> get_problems_for_load(size_t n_problems, double total_load){
+
+    double problem_value = total_load / n_problems;
+
+    auto problems = create_random_problems(n_problems);
+
+
+    for (auto& problem : problems){
+        problem.cpuTime = problem_value;
+    }
+    return problems;
+
+}
 
 void set_cpu_times(Foam::DynamicList<Foam::chemistryProblem>& problems, double cpu_time){
 

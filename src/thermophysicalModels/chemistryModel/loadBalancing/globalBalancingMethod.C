@@ -12,11 +12,11 @@ void globalBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
    // Info << global_mean << endl;
 
     auto operations    = get_operations(all_loads, global_mean, my_load);
-    auto my_operations = get_my_operations(operations, my_load, global_mean);
+    //auto my_operations = get_my_operations(operations, my_load, global_mean);
 
     //Pout << operations.size() << " " << my_operations.size() << endl;
 
-    auto info = operations_to_info(my_operations, problems, my_load);
+    auto info = operations_to_info(operations, problems, my_load);
 
     set_state(info);
 }
@@ -73,35 +73,6 @@ globalBalancingMethod::operations_to_info(const std::vector<Operation>&        o
         }
 
     }
-
-    /*
-     
-    std::vector<double> times;
-
-    for (const auto& op : operations){
-        if (op.from.rank == my_load.rank){
-            times.push_back(op.value);
-        }
-    }
-
-
-    double send_total = std::accumulate(times.begin(), times.end(), 0.0);
-    double remaining = my_load.value - send_total;
-
-    times.insert(times.begin(), remaining);
-
-    auto counts = times_to_problem_counts(times, problems);
-
-    sendRecvInfo info;
-    info.destinations = {Pstream::myProcNo()};
-    info.sources = {Pstream::myProcNo()};
-
-    for (const auto& op : operations) {
-        info.destinations.push_back(op.to.rank);
-        info.sources.push_back(op.from.rank);
-    }
-    info.number_of_problems = counts;
-    */
     return info;
 
 }
@@ -154,7 +125,7 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_my_oper
 }
 
 std::vector<globalBalancingMethod::Operation>
-globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double global_mean, const chemistryLoad& my_load) {
+globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double global_mean, const chemistryLoad& my_load) const {
 
     std::vector<Operation> operations;
 
@@ -164,15 +135,28 @@ globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double 
         auto sender   = get_max(loads);
         auto receiver = get_min(loads);
 
-        auto op = get_operation(sender, receiver, global_mean);
-        
-        if (op.value < 0.3 * global_mean) { break; }
-        if (op.value == 0.0) { break; }
+        if (std::abs(sender.value - global_mean) <= m_tolerance * global_mean) {break;} 
+        if (std::abs(receiver.value - global_mean) <= m_tolerance * global_mean) {break;} 
 
+
+
+        //if (sender.value <= 0.1 * global_mean) {break;}
+        //if (receiver.value >= 0.1 * global_mean) {break;}
+
+        auto op = get_operation(sender, receiver, global_mean);
+        /*
+        if (op.value < 0.1 * global_mean) { break; }
+        if (op.value == 0.0) { break; }
+        */
 
 
         apply_operation(loads, op);
-        operations.push_back(op);
+
+        if (sender.rank == my_load.rank || receiver.rank == my_load.rank){
+            operations.push_back(op);
+        }
+
+
         /*
         auto pred = [&](const Operation& rhs){
             return (op.from.rank == rhs.from.rank) && (op.to.rank == rhs.to.rank);
@@ -203,10 +187,13 @@ void globalBalancingMethod::apply_operation(DynamicList<chemistryLoad>&         
 globalBalancingMethod::Operation globalBalancingMethod::get_operation(const chemistryLoad& sender,
                                                                       const chemistryLoad& receiver,
                                                                       double               mean) {
-
+    
     double diff1 = mean - receiver.value;
     double diff2 = sender.value - mean;
 
+
+    runtime_assert(!(diff1 < 0), "Receiver value larger than mean.");
+    runtime_assert(!(diff2 < 0), "Sender value smaller than mean.");
 
     double send_value = std::min(diff1, diff2);
 
@@ -214,6 +201,8 @@ globalBalancingMethod::Operation globalBalancingMethod::get_operation(const chem
 }
 
 chemistryLoad globalBalancingMethod::get_min(const DynamicList<chemistryLoad>& vec) {
+
+    
     auto comp = [](const chemistryLoad& lhs, const chemistryLoad& rhs) {
         return lhs.value < rhs.value;
     };
