@@ -7,12 +7,12 @@
 \*---------------------------------------------------------------------------*/
 Build  : 7-3bcbaf946ae9
 Exec   : blockMesh
-Date   : Aug 03 2020
-Time   : 20:24:13
+Date   : Aug 13 2020
+Time   : 19:43:38
 Host   : "kakadu"
-PID    : 1018782
+PID    : 2183953
 I/O    : uncollated
-Case   : /m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/medium
+Case   : /m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/real_cases/standard
 nProcs : 1
 sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
 fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
@@ -22,9 +22,9 @@ allowSystemOperations : Allowing user-supplied system call operations
 Create time
 
 Deleting polyMesh directory
-    "/m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/medium/constant/polyMesh"
+    "/m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/real_cases/standard/constant/polyMesh"
 Creating block mesh from
-    "/m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/medium/system/blockMeshDict"
+    "/m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/real_cases/standard/system/blockMeshDict"
 Creating block edges
 No non-planar block faces defined
 Creating topology blocks

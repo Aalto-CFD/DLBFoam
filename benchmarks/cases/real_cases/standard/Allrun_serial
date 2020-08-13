@@ -1,0 +1,11 @@
+
+rm -rf 0.*
+rm -rf processor*
+rm -rf log*
+blockMesh > log.blockMesh
+#reactingFoam > log.reactingFoam
+reactingFoam
+
+
+
+

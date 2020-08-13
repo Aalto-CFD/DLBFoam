@@ -64,8 +64,8 @@ def plot_all(df):
         
         pl.title(title)
         pl.savefig("{0}.png".format(title))
-        pl.show()
-        
+        #pl.show()
+        pl.clf()
         
         
         
