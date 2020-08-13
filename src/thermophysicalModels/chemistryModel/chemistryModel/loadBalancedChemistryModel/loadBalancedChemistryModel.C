@@ -172,7 +172,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_r
         }
 
         deltaTMin = min(solution.deltaTChem, deltaTMin);
-        this->deltaTChem_[solution.cellid] = solution.deltaTChem;
+        this->deltaTChem_[solution.cellid] = min(solution.deltaTChem, this->deltaTChemMax_);
         this->cpu_times_[solution.cellid]  = solution.cpuTime;
     }
 
