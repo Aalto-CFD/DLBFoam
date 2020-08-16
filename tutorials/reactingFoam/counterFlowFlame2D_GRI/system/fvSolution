@@ -55,6 +55,11 @@ solvers
     {
         $hFinal;
     }
+
+    YiFinal
+    {
+        $hFinal;
+    }
 }
 
 PIMPLE
