@@ -1,6 +1,6 @@
 # pyJacChemistryModel
-![OpenFOAM 7](https://img.shields.io/badge/OpenFOAM-7-brightgreen.svg)
-![OpenFOAM 6](https://img.shields.io/badge/OpenFOAM-6-brightgreen.svg)
+![OpenFOAM 8](https://img.shields.io/badge/OpenFOAM-8-brightgreen)
+![OpenFOAM 7](https://img.shields.io/badge/OpenFOAM-7-brightgreen)
 
 An OpenFOAM chemistry model utilizing analytical Jacobian formulation, using [pyJac](https://github.com/SLACKHA/pyJac).
 
