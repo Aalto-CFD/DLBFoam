@@ -157,6 +157,11 @@ TEST_CASE("Known bug DynamicList reverse_iterator"){
         Info << *it << endl;
     }
 
+    //this fails
+    //int count = std::count(v_of.rbegin(), v_of.rend(), 1);
+    //Info << count << endl;
+
+    //because...
     /*
     //this is an infinite loop as the pointer is always shifted right
     for (auto it = v_of.rbegin(); it != v_of.rend(); it++){
