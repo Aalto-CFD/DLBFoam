@@ -38,6 +38,20 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
     , ref_mapper_(create_refmapper()) {
 
     Info << "Running with a load balanced" << endl;
+    cpuSolveFile_ = logFile("cpu_solve.out");
+    cpuSolveFile_() << "time"
+                    << "    "
+                    << "get_problem"
+                    << "    "
+                    << "update_state"
+                    << "    "
+                    << "balance"
+                    << "    "
+                    << "solve_buffer"
+                    << "    "
+                    << "unbalance"
+                    << "    "
+                    << "rank ID" << endl;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -81,24 +95,32 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
     if (!this->chemistry_) { return great; }
 
+    clockTime timer;
+
+    timer.timeIncrement();
     DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, deltaT);
+    scalar                        get_problem  = timer.timeIncrement();
 
-    // I dont think this should be done as this operation is very expensive for large problem counts
-    // and ruins up the cellid order
-    /*
-    std::sort(all_problems.begin(), all_problems.end(),
-    [](const chemistryProblem& lhs, const chemistryProblem& rhs){
-        return lhs.cpuTime > rhs.cpuTime;}
-    );
-    }
-    */
-
+    timer.timeIncrement();
     load_balancer_->update_state(all_problems);
-    load_balancer_->print_state();
-    problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
+    scalar update_state = timer.timeIncrement();
 
+    load_balancer_->print_state();
+    timer.timeIncrement();
+    problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
+    scalar           balance           = timer.timeIncrement();
+
+    timer.timeIncrement();
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
-    solution_buffer_t my_solutions       = load_balancer_->unbalance(balanced_solutions);
+    scalar            solve_buffer       = timer.timeIncrement();
+
+    timer.timeIncrement();
+    solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
+    scalar            unbalance    = timer.timeIncrement();
+
+    cpuSolveFile_() << this->time().timeOutputValue() << "    " << get_problem << "    "
+                    << update_state << "    " << balance << "    " << solve_buffer << "    "
+                    << unbalance << "    " << Pstream::myProcNo() << endl;
 
     return update_reaction_rates(my_solutions);
 }

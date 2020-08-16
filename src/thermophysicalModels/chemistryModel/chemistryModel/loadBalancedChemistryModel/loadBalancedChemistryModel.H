@@ -38,19 +38,19 @@ SourceFiles
 #ifndef loadBalancedChemistryModel_H
 #define loadBalancedChemistryModel_H
 
+#include "OFstream.H"
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
 
-#include "globalBalancingMethod.H"
 #include "bulutLoadBalancing.H"
-#include "simpleRefMappingMethod.H"
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"
+#include "globalBalancingMethod.H"
+#include "simpleRefMappingMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
+namespace Foam {
 
 // Forward declaration of classes
 class fvMesh;
@@ -87,27 +87,29 @@ public:
     //- Destructor
     virtual ~loadBalancedChemistryModel();
 
-
     virtual scalar solve(const scalar deltaT) override;
     virtual scalar solve(const scalarField& deltaT) override;
 
     ///
-    ///@brief 
+    ///@brief
     ///
-    ///@param prob 
-    ///@param soln 
+    ///@param prob
+    ///@param soln
     ///
     void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
-
 
     // ODE functions (overriding abstract functions in ODE.H)
     // this function is somehow injected in the ODE
     virtual void
     solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
 
-private:
+    //- Log file for average time spent solving the chemistry
+    autoPtr<OFstream> cpuSolveFile_;
+    //- Create and return a loadbal log file of the given name
+    inline autoPtr<OFstream> logFile(const word& name) const;
 
-    scalarField                   cpu_times_;
+private:
+    scalarField cpu_times_;
 
     chemistryLoadBalancingMethod* load_balancer_;
 
@@ -116,47 +118,46 @@ private:
     ///
     ///@brief A factory function for creating the balancer
     ///
-    ///@return chemistryLoadBalancingMethod* 
+    ///@return chemistryLoadBalancingMethod*
     ///
     static chemistryLoadBalancingMethod* create_balancer();
 
     ///
     ///@brief A factory function for creating the refmapper
     ///
-    ///@return chemistryRefMappingMethod* 
+    ///@return chemistryRefMappingMethod*
     ///
     chemistryRefMappingMethod* create_refmapper();
- 
 
     ///
-    ///@brief 
+    ///@brief
     ///
-    ///@param problems 
-    ///@return chemistryLoadBalancingMethod::buffer_t<chemistrySolution> 
+    ///@param problems
+    ///@return chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
     ///
     chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
     solve_buffer(chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const;
 
-
     ///
     ///@brief Get the problems object
     ///
-    ///@param Y_ 
-    ///@param deltaT 
-    ///@return DynamicList<chemistryProblem> 
+    ///@param Y_
+    ///@param deltaT
+    ///@return DynamicList<chemistryProblem>
     ///
-    
-    template<class DeltaTType>
-    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const DeltaTType& deltaT);
 
+    template <class DeltaTType>
+    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_,
+                                               const DeltaTType&        deltaT);
 
     ///
-    ///@brief 
+    ///@brief
     ///
-    ///@param solutions 
-    ///@return scalar 
+    ///@param solutions
+    ///@return scalar
     ///
-    scalar update_reaction_rates(const  chemistryLoadBalancingMethod::buffer_t<chemistrySolution>& solutions);
+    scalar update_reaction_rates(
+        const chemistryLoadBalancingMethod::buffer_t<chemistrySolution>& solutions);
 
     ///
     ///@brief updates a single problem's reaction rate for index i
@@ -167,30 +168,29 @@ private:
     ///
     ///@brief Compute c_ variable as concentration
     ///
-    ///@param rho 
-    ///@param i 
-    ///@param celli 
-    ///@return double 
+    ///@param rho
+    ///@param i
+    ///@param celli
+    ///@return double
     ///
     virtual double compute_c(const scalar& rho, const label& i, const label& celli) const;
 
     ///
     ///@brief Compute reaction rate for concentration
     ///
-    ///@param j 
-    ///@param solution 
-    ///@return double 
+    ///@param j
+    ///@param solution
+    ///@return double
     ///
     virtual double compute_RR(const label& j, const chemistrySolution& solution) const;
 
     ///
     ///@brief Get the mass fraction field for refmapping
     ///
-    ///@param problem 
-    ///@return scalarField 
+    ///@param problem
+    ///@return scalarField
     ///
     virtual scalarField get_mass_fraction(const chemistryProblem& problem) const;
-
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -199,11 +199,11 @@ private:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
+#include "loadBalancedChemistryModelI.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "loadBalancedChemistryModel.C"
+#include "loadBalancedChemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
