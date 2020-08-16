@@ -12,7 +12,7 @@ void bulutLoadBalancing::update_state(const DynamicList<chemistryProblem>& probl
     auto my_load = compute_my_load(problems);
     auto loads = all_gather(my_load);
 
-    
+    std::sort(loads.begin(), loads.end()); 
 
     //sendRecvInfo ret = initialize_to_nothinger(my_load); 
     sendRecvInfo ret;

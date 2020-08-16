@@ -130,6 +130,15 @@ public:
         }
     }
 
+    ///
+    ///@brief Get the state object
+    ///
+    ///@return const sendRecvInfo& 
+    ///
+    const sendRecvInfo& get_state() const {
+        return m_current_state;
+    }
+
 
 
     virtual void update_state(const DynamicList<chemistryProblem>& problems) = 0;
@@ -274,10 +283,33 @@ public:
     ///
     void print_state() const {
 
-        Pout << "Rank: " << Pstream::myProcNo()
+        //receiver
+        if (m_current_state.number_of_problems.size() == 1){
+
+            std::vector<int> recv_ranks(m_current_state.sources.begin() +1, m_current_state.sources.end());
+
+            Pout << "Receiver rank: " << Pstream::myProcNo()
+                 << " receives from"  << vector_to_string(recv_ranks)
+                 << endl;
+        }
+
+        //sender
+        else {
+            std::vector<int> send_counts(m_current_state.number_of_problems.begin() + 1,  m_current_state.number_of_problems.end());
+            std::vector<int> send_ranks(m_current_state.destinations.begin()+1, m_current_state.destinations.end());
+           
+            Pout << "Sender rank: " << Pstream::myProcNo()
+             << " sends to: " << vector_to_string(send_ranks)
+             << " counts: " << vector_to_string(send_counts) 
+             << " remaining problems:  " << m_current_state.number_of_problems[0] << endl;
+
+        }
+
+        /*Pout << "Rank: " << Pstream::myProcNo()
              << " sends to: " << vector_to_string(m_current_state.destinations)
              << " receives from: " << vector_to_string(m_current_state.sources)
-             << " counts: " << vector_to_string(m_current_state.number_of_problems) << endl;
+             << " counts: " << vector_to_string(m_current_state.number_of_problems) << endl;*/
+        
     }
 
     template <class T> std::string vector_to_string(const std::vector<T>& vec) const {

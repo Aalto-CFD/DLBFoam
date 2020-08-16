@@ -5,7 +5,7 @@ rm -rf log*
 blockMesh > log.blockMesh
 decomposePar > log.decompose
 N_PROCS=$(find processor* -maxdepth 0 -type d | wc -l)
-mpirun -np $N_PROCS chemistryBenchmark -parallel
+mpirun -np $N_PROCS --oversubscribe chemistryBenchmark -parallel
 
 
 

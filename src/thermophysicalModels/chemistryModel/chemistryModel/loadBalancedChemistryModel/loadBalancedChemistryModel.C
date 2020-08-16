@@ -126,8 +126,8 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
 
 
     scalar           timeLeft = prob.deltaT;
-    const scalarList c0       = prob.c;
-
+    //const scalarList c0       = prob.c;
+    scalarField c0 = prob.c;
 
 
     //Timer begin
@@ -170,10 +170,16 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_r
         for (label j = 0; j < this->nSpecie_; j++) { 
             this->RR_[j][solution.cellid] = compute_RR(j,solution);                 
         }
-
+        /*
         deltaTMin = min(solution.deltaTChem, deltaTMin);
         this->deltaTChem_[solution.cellid] = min(solution.deltaTChem, this->deltaTChemMax_);
         this->cpu_times_[solution.cellid]  = solution.cpuTime;
+        */
+        
+        deltaTMin = min(solution.deltaTChem, deltaTMin);
+        this->deltaTChem_[solution.cellid] = min(solution.deltaTChem, this->deltaTChemMax_);
+        this->cpu_times_[solution.cellid]  = solution.cpuTime;
+        
     }
 
     }

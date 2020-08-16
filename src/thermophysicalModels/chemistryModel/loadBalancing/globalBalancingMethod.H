@@ -8,7 +8,7 @@
 #include "runTimeSelectionTables.H"
 #include "scalarField.H"
 
-#include "algorithms.H"
+#include "algorithms_aalto.H"
 #include "chemistryLoadBalancingMethod.H"
 #include "chemistryProblem.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -37,6 +37,9 @@ public:
 
 protected:
 
+
+    double get_balancer_tolerance() const { return m_tolerance; }
+
     static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
     static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
 
@@ -45,11 +48,8 @@ protected:
 
     static void apply_operation(DynamicList<chemistryLoad>& loads, const Operation& operation);
 
-    static std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
-                                                                 double global_mean, const chemistryLoad& my_load);
-
-    static std::vector<globalBalancingMethod::Operation> get_my_operations(
-        const std::vector<Operation>& all_operations, const chemistryLoad& my_load, double mean);
+    std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
+                                                                 double global_mean, const chemistryLoad& my_load) const;
 
     static sendRecvInfo operations_to_info(const std::vector<Operation>&        operations,
                                            const DynamicList<chemistryProblem>& problems,
@@ -58,6 +58,10 @@ protected:
 
     static std::vector<int> times_to_problem_counts(const std::vector<scalar>&           times,
                                                     const DynamicList<chemistryProblem>& problems);
+
+private:
+    double m_tolerance = 0.3;
+
 
 };
 

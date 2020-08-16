@@ -2,14 +2,11 @@ loadBalancing/chemistryProblem.C
 loadBalancing/chemistrySolution.C
 loadBalancing/chemistryLoad.C
 loadBalancing/chemistryLoadBalancingMethod.C
-loadBalancing/simpleBalancingMethod.C
-loadBalancing/loadTree.C
-loadBalancing/algorithms.C
-
+loadBalancing/algorithms_aalto.C
+loadBalancing/bulutLoadBalancing.C
 refMapping/mixtureFraction.C
 refMapping/chemistryRefMappingMethod.C
 refMapping/simpleRefMappingMethod.C
-loadBalancing/bulutLoadBalancing.C
 loadBalancing/globalBalancingMethod.C
 chemistryModel/makePexChemistryModels.C
 chemistrySolver/makePexChemistrySolvers.C

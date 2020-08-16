@@ -5,14 +5,14 @@
     \\  /    A nd           | Version:  7
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-Build  : 7-1ff648926f77
+Build  : 7-3bcbaf946ae9
 Exec   : blockMesh
 Date   : Aug 03 2020
-Time   : 20:06:17
-Host   : "peltonp1-All-Series"
-PID    : 30554
+Time   : 20:24:13
+Host   : "kakadu"
+PID    : 1018782
 I/O    : uncollated
-Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small
+Case   : /m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/medium
 nProcs : 1
 sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
 fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
@@ -22,9 +22,9 @@ allowSystemOperations : Allowing user-supplied system call operations
 Create time
 
 Deleting polyMesh directory
-    "/home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small/constant/polyMesh"
+    "/m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/medium/constant/polyMesh"
 Creating block mesh from
-    "/home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small/system/blockMeshDict"
+    "/m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/medium/system/blockMeshDict"
 Creating block edges
 No non-planar block faces defined
 Creating topology blocks
@@ -49,8 +49,8 @@ Creating patches
 Creating cells
 Creating points with scale 1
     Block 0 cell size :
-        i : 0.001 .. 0.001
-        j : 0.001 .. 0.001
+        i : 0.0004 .. 0.0004
+        j : 0.0004 .. 0.0004
         k : 0.02
 
 Writing polyMesh
@@ -58,17 +58,17 @@ Writing polyMesh
 Mesh Information
 ----------------
   boundingBox: (0 -0.01 -0.01) (0.02 0.01 0.01)
-  nPoints: 882
-  nCells: 400
-  nFaces: 1640
-  nInternalFaces: 760
+  nPoints: 5202
+  nCells: 2500
+  nFaces: 10100
+  nInternalFaces: 4900
 ----------------
 Patches
 ----------------
-  patch 0 (start: 760 size: 20) name: fuel
-  patch 1 (start: 780 size: 20) name: air
-  patch 2 (start: 800 size: 40) name: outlet
-  patch 3 (start: 840 size: 800) name: frontAndBack
+  patch 0 (start: 4900 size: 50) name: fuel
+  patch 1 (start: 4950 size: 50) name: air
+  patch 2 (start: 5000 size: 100) name: outlet
+  patch 3 (start: 5100 size: 5000) name: frontAndBack
 
 End
 
