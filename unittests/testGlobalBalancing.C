@@ -63,8 +63,7 @@ TEST_CASE("simpleBalancingMethod get_min()/get_max()"){
     CHECK(max.value == 3);
 
 }
-
-
+/*
 TEST_CASE("globalBalancingMethod times_to_problem_counts1"){
 
 
@@ -92,61 +91,40 @@ TEST_CASE("globalBalancingMethod times_to_problem_counts1"){
     //CHECK(std::accumulate(counts4.begin(), counts4.end(), 0) == 1);
 
 }
+*/
 
-
-TEST_CASE("globalBalancingMethod times_to_problem_counts2"){
+TEST_CASE("globalBalancingMethod times_to_problem_counts"){
 
 
     size_t n_problems = 3;
     auto problems = create_random_problems(n_problems);
 
-    std::vector<double> times;
-    times.push_back(problems[0].cpuTime);
-    times.push_back(problems[1].cpuTime + problems[2].cpuTime);
+    set_cpu_times(problems, 1.0);
+    std::vector<double> times = {1.1, 1.1};
+
 
     auto counts = globalTest::times_to_problem_counts(times, problems);
 
-    CHECK(counts.size() == 2);
-    CHECK(std::accumulate(counts.begin(), counts.end(), 0) == n_problems);
+    CHECK(counts.size() == 3);
+    CHECK(counts[0] == 1);
+    CHECK(counts[1] == 1);
+    CHECK(counts[2] == 1);
+
+
+    set_cpu_times(problems, 1.0);
+    times = {2.1, 0.9};
+
+    counts = globalTest::times_to_problem_counts(times, problems);
+
+    CHECK(counts.size() == 3);
+    CHECK(counts[0] == 1);
+    CHECK(counts[1] == 2);
+    CHECK(counts[2] == 0);
+
 
 }
 
-TEST_CASE("globalBalancingMethod get_operations()"){
 
-    /*
-    auto loads = create_random_load(50);
-    auto my_load = loads[0];
-    double mean = globalTest::get_mean(loads);
-
-    Info << "mean " << mean << endl;
-
-    //print_loads(loads);
-    auto ops = globalTest::get_operations(loads, mean, my_load);
-    print_loads(loads);
-    print_ops(ops);
-    */
-
-    /*
-    TESTABLE l;
-    
-    for (size_t n_problems = 0; n_problems < 30; ++n_problems){
-
-        auto problems = create_random_problems(n_problems);
-
-        set_cpu_times(problems, 3.0);
-
-        if (n_problems > 0){
-            CHECK(problems[0].cpuTime == 3.0);
-        }
-
-
-        auto load = TESTABLE::compute_my_load(problems);
-
-        CHECK(load.value == problems.size() * 3.0);
-        CHECK(load.rank == Pstream::myProcNo());
-    }
-    */
-}
 
 
 TEST_CASE("globalBalancingMethod update_state0()"){
@@ -244,6 +222,7 @@ TEST_CASE("globalBalancingMethod update_state1()"){
     auto counts = state.number_of_problems;
     CHECK(std::accumulate(counts.begin(), counts.end(), 0) == n_problems);
 
+    //senders
     if (Pstream::myProcNo() % 2){
         CHECK(state.destinations.size() > 1);
         CHECK(state.sources.size() == 1);
@@ -256,10 +235,11 @@ TEST_CASE("globalBalancingMethod update_state1()"){
         CHECK(std::abs(remaining_load - global_mean) < t.get_balancer_tolerance() * global_mean );
 
     }
+    //receivers
     else {
         CHECK(state.destinations.size() == 1);
         
-        CHECK(state.sources.size() > 1);
+        CHECK(state.sources.size() >= 1);
         //CHECK(state.sources[1] == 0);
     }
 
@@ -301,5 +281,8 @@ TEST_CASE("globalBalancingMethod update_state2()"){
     
 
 }
+
+
+
 
 }

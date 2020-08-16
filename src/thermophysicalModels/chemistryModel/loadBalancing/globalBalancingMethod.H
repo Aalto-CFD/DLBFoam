@@ -8,7 +8,7 @@
 #include "runTimeSelectionTables.H"
 #include "scalarField.H"
 
-#include "algorithms.H"
+#include "algorithms_aalto.H"
 #include "chemistryLoadBalancingMethod.H"
 #include "chemistryProblem.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,9 +51,6 @@ protected:
     std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
                                                                  double global_mean, const chemistryLoad& my_load) const;
 
-    static std::vector<globalBalancingMethod::Operation> get_my_operations(
-        const std::vector<Operation>& all_operations, const chemistryLoad& my_load, double mean);
-
     static sendRecvInfo operations_to_info(const std::vector<Operation>&        operations,
                                            const DynamicList<chemistryProblem>& problems,
                                            const chemistryLoad&                 my_load);
@@ -63,7 +60,7 @@ protected:
                                                     const DynamicList<chemistryProblem>& problems);
 
 private:
-    double m_tolerance = 0.1;
+    double m_tolerance = 0.3;
 
 
 };

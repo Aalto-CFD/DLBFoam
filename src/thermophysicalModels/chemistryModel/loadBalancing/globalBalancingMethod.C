@@ -53,15 +53,12 @@ globalBalancingMethod::operations_to_info(const std::vector<Operation>&        o
 
 
     if (sender) {
-        double sum = 0.0;
+        
         std::vector<double> times;
         for (const auto& op : operations){
             info.destinations.push_back(op.to.rank);
-            sum += op.value;
             times.push_back(op.value);
         }
-        double remaining = my_load.value - sum;
-        times.insert(times.begin(), remaining);
         info.number_of_problems = times_to_problem_counts(times, problems);
 
     }
@@ -82,24 +79,33 @@ globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
                                                const DynamicList<chemistryProblem>& problems) {
 
     std::vector<int> counts;
+    
     counts.reserve(times.size());
-    auto begin = problems.begin();
+
+    //Note! It is important to call make reverse here, as the DynamicList.rbegin/end are buggy.
+    auto rbegin = make_reverse(problems.end());
+    auto rend =   make_reverse(problems.begin());
 
     for (const auto& time : times) {
 
         scalar sum(0);
-        auto   operation = [&](const chemistryProblem& problem) {
+        auto sum_upto = [&](const chemistryProblem& problem) {
             sum += problem.cpuTime;
-            return sum <= time;
+            return sum < time;
         };
-        auto count = count_while(begin, problems.end(), operation);
-        begin += count;
+        int count = count_while(rbegin, rend, sum_upto);
+        rbegin += count;
         counts.push_back(count);
     }
 
-    // Add any remaining problems to this rank. This should not be required...
-    // TODO: fix
-    counts[0] += (problems.size() - std::accumulate(counts.begin(), counts.end(), 0));
+    int total_send_count = std::accumulate(counts.begin(), counts.end(), 0);
+
+
+    int remaining = problems.size() - total_send_count;
+
+    runtime_assert(remaining > 0, "Negative remaining cells");
+
+    counts.insert(counts.begin(), remaining);
 
     runtime_assert(std::accumulate(counts.begin(), counts.end(), 0) == problems.size(),
                    "Mismatch in the sliced problem count and original problem count.");
@@ -107,22 +113,7 @@ globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
     return counts;
 }
 
-std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_my_operations(
-    const std::vector<Operation>& all_operations, const chemistryLoad& my_load, double mean) {
 
-    std::vector<Operation> my_operations;
-
-
-    for (const auto& op : all_operations) {
-        if ( (op.from.rank == my_load.rank) || (op.to.rank == my_load.rank) ){
-            my_operations.push_back(op);
-        }
-    }
-
-    return my_operations;
-
-
-}
 
 std::vector<globalBalancingMethod::Operation>
 globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double global_mean, const chemistryLoad& my_load) const {
@@ -144,10 +135,10 @@ globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double 
         //if (receiver.value >= 0.1 * global_mean) {break;}
 
         auto op = get_operation(sender, receiver, global_mean);
-        /*
-        if (op.value < 0.1 * global_mean) { break; }
+        
+        if (op.value < m_tolerance * global_mean) { break; }
         if (op.value == 0.0) { break; }
-        */
+        
 
 
         apply_operation(loads, op);

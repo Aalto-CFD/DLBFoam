@@ -2,7 +2,7 @@
 
 #include <stdlib.h>     //srand, rand
 
-#include "simpleBalancingMethod.H"
+#include "chemistryLoad.H"
 #include "chemistryProblem.H"
 
 

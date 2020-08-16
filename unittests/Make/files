@@ -1,7 +1,7 @@
 test.C
 helpers.C
+testAlgorithms.C
 testChemistryLoad.C
-testSimpleLoadBalancing.C
 testGlobalBalancing.C
 testChemistryLoadBalancingMethod.C
 
