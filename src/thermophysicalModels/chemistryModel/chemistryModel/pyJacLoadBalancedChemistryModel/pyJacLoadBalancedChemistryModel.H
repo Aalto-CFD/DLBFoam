@@ -38,12 +38,8 @@ SourceFiles
 #ifndef pyJacLoadBalancedChemistryModel_H
 #define pyJacLoadBalancedChemistryModel_H
 
-#include "StandardChemistryModel.H"
 #include "clockTime.H"
-
-#include "simpleBalancingMethod.H"
-#include "chemistryProblem.H"
-#include "chemistrySolution.H"
+#include "loadBalancedChemistryModel.H"
 
 // pyJac dependencies
 extern "C" {
@@ -52,11 +48,9 @@ extern "C" {
 #include "jacob.h"
 };
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
+namespace Foam {
 
 // Forward declaration of classes
 class fvMesh;
@@ -97,17 +91,16 @@ public:
 
     //- Override jacobian and derivatives function from StandardChemistryModel
 
-    virtual void jacobian(const scalar t, const scalarField& c, scalarField& dcdt, scalarSquareMatrix& J) const;   
+    virtual void
+    jacobian(const scalar t, const scalarField& c, scalarField& dcdt, scalarSquareMatrix& J) const;
 
     virtual void derivatives(const scalar t, const scalarField& c, scalarField& dcdt) const;
 
     //- Override Qdot function from StandardChemistryModel for using pyJac's enthalpy of formation
 
     virtual tmp<volScalarField> Qdot() const;
-    
 
 private:
-
     ///
     ///@brief List of enthalpy of formation from pyJac
     ///
@@ -117,30 +110,29 @@ private:
     ///
     ///@brief Compute c_ variable as mass fraction
     ///
-    ///@param rho 
-    ///@param i 
-    ///@param celli 
-    ///@return double 
+    ///@param rho
+    ///@param i
+    ///@param celli
+    ///@return double
     ///
     double compute_c(const scalar& rho, const label& i, const label& celli) const;
 
     ///
     ///@brief Compute reaction rate for mass fraction
     ///
-    ///@param j 
-    ///@param solution 
-    ///@return double 
+    ///@param j
+    ///@param solution
+    ///@return double
     ///
     double compute_RR(const label& j, const chemistrySolution& solution) const;
 
     ///
     ///@brief Get the mass fraction field for refmapping
     ///
-    ///@param problem 
-    ///@return scalarField 
+    ///@param problem
+    ///@return scalarField
     ///
     scalarField get_mass_fraction(const chemistryProblem& problem) const;
-
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -153,7 +145,7 @@ private:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "pyJacLoadBalancedChemistryModel.C"
+#include "pyJacLoadBalancedChemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

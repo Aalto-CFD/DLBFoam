@@ -21,82 +21,58 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955 
-Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/chemistrySolver/makePexChemistrySolverTypes.H
+Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955
+Base OF-dev file path :
+src/thermophysicalModels/chemistryModel/chemistrySolver/chemistrySolver/makePexChemistrySolverTypes.H
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef makePexChemistrySolverTypes_H
 #define makePexChemistrySolverTypes_H
 
-
-
-
 #include "loadBalancedChemistryModel.H"
 #include "pyJacLoadBalancedChemistryModel.H"
 //#include "TDAC_loadBalancedChemistryModel.H" #TODO: add TDAC
 
+#include "./ode/ode.H" //important to not use the stock ode for pyJac
 #include "noChemistrySolver.H"
-#include "./ode.H" //important to not use the stock ode for pyJac
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makePexChemistrySolverType(SS, Comp, Thermo)                              \
-                                                                               \
-                                                                               \
-    typedef SS<loadBalancedChemistryModel<Comp, Thermo>> loadBalanced##SS##Comp##Thermo;     \
-                                                                               \
-    defineTemplateTypeNameAndDebugWithName                                     \
-    (                                                                          \
-        loadBalanced##SS##Comp##Thermo,                                               \
-        (#SS"<" + word(loadBalancedChemistryModel<Comp, Thermo>::typeName_()) + "<"   \
-        + word(Comp::typeName_()) + "," + Thermo::typeName() + ">>").c_str(),  \
-        0                                                                      \
-    );                                                                         \
-                                                                               \
-    BasicChemistryModel<Comp>::                                                \
-        add##thermo##ConstructorToTable<loadBalanced##SS##Comp##Thermo>               \
-        add##loadBalanced##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel\
-##Comp##Table_;                                                                \
-                                                                               \
-                                                                               \
-    typedef SS<pyJacLoadBalancedChemistryModel<Comp, Thermo>> loadBalanced_pyJac##SS##Comp##Thermo;     \
-                                                                               \
-    defineTemplateTypeNameAndDebugWithName                                     \
-    (                                                                          \
-        loadBalanced_pyJac##SS##Comp##Thermo,                                               \
-        (#SS"<" + word(pyJacLoadBalancedChemistryModel<Comp, Thermo>::typeName_()) + "<"   \
-        + word(Comp::typeName_()) + "," + Thermo::typeName() + ">>").c_str(),  \
-        0                                                                      \
-    );                                                                         \
-                                                                               \
-    BasicChemistryModel<Comp>::                                                \
-        add##thermo##ConstructorToTable<loadBalanced_pyJac##SS##Comp##Thermo>               \
-        add##loadBalanced_pyJac##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel\
-##Comp##Table_;                                                                \
-                                                                               \
-                                                                               \
+#define makePexChemistrySolverType(SS, Comp, Thermo)                                                   \
+                                                                                                       \
+    typedef SS<loadBalancedChemistryModel<Comp, Thermo>> loadBalanced##SS##Comp##Thermo;               \
+                                                                                                       \
+    defineTemplateTypeNameAndDebugWithName(                                                            \
+        loadBalanced##SS##Comp##Thermo,                                                                \
+        (#SS "<" + word(loadBalancedChemistryModel<Comp, Thermo>::typeName_()) + "<" +                 \
+         word(Comp::typeName_()) + "," + Thermo::typeName() + ">>")                                    \
+            .c_str(),                                                                                  \
+        0);                                                                                            \
+                                                                                                       \
+    BasicChemistryModel<Comp>::add##thermo##ConstructorToTable<loadBalanced##SS##Comp##Thermo>         \
+        add##loadBalanced##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel##Comp##Table_; \
+                                                                                                       \
+    typedef SS<pyJacLoadBalancedChemistryModel<Comp, Thermo>>                                          \
+        loadBalanced_pyJac##SS##Comp##Thermo;                                                          \
+                                                                                                       \
+    defineTemplateTypeNameAndDebugWithName(                                                            \
+        loadBalanced_pyJac##SS##Comp##Thermo,                                                          \
+        (#SS "<" + word(pyJacLoadBalancedChemistryModel<Comp, Thermo>::typeName_()) + "<" +            \
+         word(Comp::typeName_()) + "," + Thermo::typeName() + ">>")                                    \
+            .c_str(),                                                                                  \
+        0);                                                                                            \
+                                                                                                       \
+    BasicChemistryModel<Comp>::add##thermo##ConstructorToTable<                                        \
+        loadBalanced_pyJac##SS##Comp##Thermo>                                                          \
+        add##loadBalanced_pyJac##SS##Comp##Thermo##thermo##ConstructorTo##BasicChemistryModel##Comp##Table_;
 
+// TODO: add TDAC
 
-//TODO: add TDAC
-
-
-#define makePexChemistrySolverTypes(Comp, Thermo)                                 \
-                                                                               \
-    makePexChemistrySolverType                                                    \
-    (                                                                          \
-        noChemistrySolver,                                                     \
-        Comp,                                                                  \
-        Thermo                                                                 \
-    );                                                                         \
-                                                                               \
-                                                                    \
-    makePexChemistrySolverType                                                    \
-    (                                                                          \
-        ode,                                                                   \
-        Comp,                                                                  \
-        Thermo                                                                 \
-    );                                                                         \
-
+#define makePexChemistrySolverTypes(Comp, Thermo)                                                  \
+                                                                                                   \
+    makePexChemistrySolverType(noChemistrySolver, Comp, Thermo);                                   \
+                                                                                                   \
+    makePexChemistrySolverType(ode, Comp, Thermo);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
