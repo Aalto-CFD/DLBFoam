@@ -40,6 +40,8 @@ SourceFiles
 
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
+#include "OFstream.H"
+
 
 #include "globalBalancingMethod.H"
 #include "bulutLoadBalancing.H"
@@ -74,6 +76,9 @@ class loadBalancedChemistryModel :
     //- Disallow default bitwise assignment
     void operator=(const loadBalancedChemistryModel&);
 
+    autoPtr<OFstream> cpuSolveFile_;
+
+    inline autoPtr<OFstream> logFile(const word& name) const;
 public:
     //- Runtime type information
     TypeName("loadBalanced");

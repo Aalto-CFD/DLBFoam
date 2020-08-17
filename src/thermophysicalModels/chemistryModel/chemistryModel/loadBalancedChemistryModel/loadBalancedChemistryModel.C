@@ -34,9 +34,11 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
     ReactionThermo& thermo)
     : StandardChemistryModel<ReactionThermo, ThermoType>(thermo)
     , cpu_times_(this->mesh().cells().size(), 0.0)
-    , load_balancer_(create_balancer()) {
+    , load_balancer_(create_balancer())
+{
 
     Info << "Running with a load balanced" << endl;
+
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -75,6 +77,14 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     
     DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, deltaT);
 
+    auto sum_op = [&](scalar sum, const chemistryProblem& p) {
+        return sum + p.cpuTime;
+    };
+
+    scalar cputime_estimate = std::accumulate(all_problems.begin(), all_problems.end(), 0.0, sum_op);
+
+
+
     //I dont think this should be done as this operation is very expensive for large problem counts
     // and ruins up the cellid order
     /* 
@@ -92,10 +102,19 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
     //Pstream::waitRequests(); 
 
+    clockTime timer;
+
+    timer.timeIncrement();
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
+    scalar buffertime = timer.timeIncrement();
+    Pout << "Solve_buffer() time: " << buffertime << " estimate: " << cputime_estimate << endl;
+        
+
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
 
     
+
+
     //Pstream::waitRequests(); 
 
     return update_reaction_rates(my_solutions);

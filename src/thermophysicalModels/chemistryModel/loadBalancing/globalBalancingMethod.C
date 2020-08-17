@@ -162,8 +162,8 @@ globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double 
 
         auto op = get_operation(sender, receiver, global_mean);
         
-        if (op.value < m_tolerance * global_mean) { break; }
-        if (op.value == 0.0) { break; }
+        //if (op.value <= m_tolerance * global_mean) { break; }
+        //if (op.value == 0.0) { break; }
         
 
 
