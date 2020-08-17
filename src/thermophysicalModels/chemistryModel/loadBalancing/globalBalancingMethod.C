@@ -120,7 +120,33 @@ globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double 
 
     std::vector<Operation> operations;
 
+    std::sort(loads.begin(), loads.end());
 
+
+    auto sender = loads.end()-1;
+    auto receiver = loads.begin();
+
+    while(sender != receiver){
+
+        double send_value = std::min(sender->value - global_mean, global_mean-receiver->value);
+        Operation operation{*sender, *receiver, send_value};
+        if (sender->rank == my_load.rank || receiver->rank == my_load.rank){
+            operations.push_back(operation);
+        }
+        sender->value -= send_value;
+        receiver->value +=send_value;
+
+        if (std::abs(sender->value-global_mean) < SMALL){
+            sender--;
+        }
+
+        else if (std::abs(receiver->value-global_mean) < SMALL ){
+            receiver++;
+        }
+        
+
+    }
+    /*
     while (1) {
 
         auto sender   = get_max(loads);
@@ -148,23 +174,9 @@ globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double 
         }
 
 
-        /*
-        auto pred = [&](const Operation& rhs){
-            return (op.from.rank == rhs.from.rank) && (op.to.rank == rhs.to.rank);
-        };
-
-        //combine duplicate operations if found
-        auto it = std::find_if(operations.begin(), operations.end(), pred);
-        if (it != operations.end()){
-            auto new_op = Operation{op.from, op.to, it->value + op.value};
-            operations.push_back(new_op);
-        }
-
-        else {
-            operations.push_back(op);
-        }
-        */
+        
     }
+    */
     return operations;
 }
 
