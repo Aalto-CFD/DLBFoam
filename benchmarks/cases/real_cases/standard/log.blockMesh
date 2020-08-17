@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 7-3bcbaf946ae9
 Exec   : blockMesh
-Date   : Aug 13 2020
-Time   : 19:43:38
+Date   : Aug 16 2020
+Time   : 20:40:23
 Host   : "kakadu"
-PID    : 2183953
+PID    : 2539909
 I/O    : uncollated
 Case   : /m/work/t212/unix/work/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/real_cases/standard
 nProcs : 1

@@ -60,7 +60,7 @@ protected:
                                                     const DynamicList<chemistryProblem>& problems);
 
 private:
-    double m_tolerance = 0.3;
+    double m_tolerance = 0.05;
 
 
 };
