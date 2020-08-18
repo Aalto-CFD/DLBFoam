@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <vector>
 #include <memory> //std::shared_ptr
 
 #include "IOdictionary.H"

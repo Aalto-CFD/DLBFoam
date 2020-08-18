@@ -284,31 +284,23 @@ public:
     void print_state() const {
 
         //receiver
-        if (m_current_state.number_of_problems.size() == 1){
-
-            std::vector<int> recv_ranks(m_current_state.sources.begin() +1, m_current_state.sources.end());
-
+        if (m_current_state.sources.size() > 1){
             Pout << "Receiver rank: " << Pstream::myProcNo()
-                 << " receives from"  << vector_to_string(recv_ranks)
+                 << " receives from"  << vector_to_string(m_current_state.sources)
                  << endl;
-        }
 
+        }
         //sender
-        else {
-            std::vector<int> send_counts(m_current_state.number_of_problems.begin() + 1,  m_current_state.number_of_problems.end());
-            std::vector<int> send_ranks(m_current_state.destinations.begin()+1, m_current_state.destinations.end());
-           
+        else if(m_current_state.destinations.size() > 1) {
             Pout << "Sender rank: " << Pstream::myProcNo()
-             << " sends to: " << vector_to_string(send_ranks)
-             << " counts: " << vector_to_string(send_counts) 
-             << " remaining problems:  " << m_current_state.number_of_problems[0] << endl;
-
+             << " sends to: " << vector_to_string(m_current_state.destinations)
+             << " counts: " << vector_to_string(m_current_state.number_of_problems) 
+             << " remaining problems:  " << m_current_state.number_of_problems.back() << endl;
         }
 
-        /*Pout << "Rank: " << Pstream::myProcNo()
-             << " sends to: " << vector_to_string(m_current_state.destinations)
-             << " receives from: " << vector_to_string(m_current_state.sources)
-             << " counts: " << vector_to_string(m_current_state.number_of_problems) << endl;*/
+        else {
+            Pout << "Rank: " << Pstream::myProcNo() << " does not take part in balancing.";
+        }
         
     }
 
