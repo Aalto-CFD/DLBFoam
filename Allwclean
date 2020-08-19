@@ -2,13 +2,10 @@
 cd ${0%/*} || exit 1    # Run from this directory
 
 cd src/thermophysicalModels/chemistryModel
-wmake libso
+rm -rf $FOAM_USER_LIBBIN/lichemistryMode_pex.so
+wclean
 
-cd ../../../unittests
-wmake
 
-cd ../benchmarks
-wmake
 
 #wclean all
 

@@ -65,11 +65,6 @@ class loadBalancedChemistryModel : public StandardChemistryModel<ReactionThermo,
 {
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
-    //- Disallow copy constructor
-    loadBalancedChemistryModel(const loadBalancedChemistryModel&);
-
-    //- Disallow default bitwise assignment
-    void operator=(const loadBalancedChemistryModel&);
 
     autoPtr<OFstream> cpuSolveFile_;
 
