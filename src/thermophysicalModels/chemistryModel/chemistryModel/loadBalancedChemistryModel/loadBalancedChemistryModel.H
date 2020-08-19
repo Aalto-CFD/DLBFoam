@@ -61,13 +61,8 @@ class fvMesh;
 \*---------------------------------------------------------------------------*/
 
 template <class ReactionThermo, class ThermoType>
-class loadBalancedChemistryModel :
-    // public aaltoChemistryModelBase<ReactionThermo, ThermoType>
-    public StandardChemistryModel<ReactionThermo, ThermoType> {
-    // Private Member Functions
-
-    //- Solve the reaction system for the given time step
-    //  of given type and return the characteristic time
+class loadBalancedChemistryModel : public StandardChemistryModel<ReactionThermo, ThermoType> 
+{
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
     //- Disallow copy constructor
@@ -79,6 +74,10 @@ class loadBalancedChemistryModel :
     autoPtr<OFstream> cpuSolveFile_;
 
     inline autoPtr<OFstream> logFile(const word& name) const;
+
+    using balancer_ptr = typename std::unique_ptr<chemistryLoadBalancingMethod>;
+
+
 public:
     //- Runtime type information
     TypeName("loadBalanced");
@@ -119,14 +118,14 @@ private:
 
     scalarField                   cpu_times_;
 
-    chemistryLoadBalancingMethod* load_balancer_;
+    balancer_ptr load_balancer_;
 
     ///
     ///@brief A factory function for creating the balancer
     ///
     ///@return chemistryLoadBalancingMethod* 
     ///
-    static chemistryLoadBalancingMethod* create_balancer();
+    static balancer_ptr create_balancer();
 
 
     ///

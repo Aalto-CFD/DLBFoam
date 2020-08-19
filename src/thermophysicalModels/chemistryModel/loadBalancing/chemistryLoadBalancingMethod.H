@@ -84,6 +84,10 @@ private:
 public:
 
 
+    chemistryLoadBalancingMethod() = default;
+
+    virtual ~chemistryLoadBalancingMethod() {}
+
 
     static double get_mean(const DynamicList<chemistryLoad>& loads);
 
@@ -201,8 +205,6 @@ public:
 
     
 
-    // Constructors
-    chemistryLoadBalancingMethod() = default;
 
     ///
     ///@brief Check whether the load balancer is active or not.
@@ -212,8 +214,6 @@ public:
     ///
     bool active() const { return true; }
 
-    //- Destructor
-    virtual ~chemistryLoadBalancingMethod() {}
 
     ///
     ///@brief Splits the big_array to arrays of size subsizes.
@@ -286,7 +286,8 @@ public:
         //receiver
         if (m_current_state.sources.size() > 1){
             Pout << "Receiver rank: " << Pstream::myProcNo()
-                 << " receives from"  << vector_to_string(m_current_state.sources)
+                 << " receives from "  << vector_to_string(m_current_state.sources)
+                 << " own problems "   << vector_to_string(m_current_state.number_of_problems)
                  << endl;
 
         }

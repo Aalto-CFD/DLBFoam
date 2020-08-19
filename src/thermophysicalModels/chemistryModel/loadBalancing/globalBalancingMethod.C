@@ -17,6 +17,28 @@ void globalBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
     set_state(info);
 }
 
+bool globalBalancingMethod::has_sends_and_receives(const std::vector<Operation>& operations, int my_rank){
+
+    bool sender = false;
+    bool receiver = false;
+
+    for (const auto& op: operations) {
+        if (op.from.rank == my_rank){
+            sender = true;
+            break;
+        }
+    } 
+
+    for (const auto& op: operations) {
+        if (op.to.rank == my_rank){
+            receiver = true;
+            break;
+        }
+    }
+    return (sender && receiver);
+    
+}
+
 chemistryLoadBalancingMethod::sendRecvInfo globalBalancingMethod::operations_to_info(const std::vector<Operation>&        operations,
                                            const DynamicList<chemistryProblem>& problems,
                                            const chemistryLoad&                 my_load){
@@ -38,10 +60,7 @@ chemistryLoadBalancingMethod::sendRecvInfo globalBalancingMethod::operations_to_
             receiver = true;
             break;
         }
-    } 
-
-    runtime_assert(!(sender && receiver), "Only sender or receiver should be possible.");
-
+    }
 
     if (sender) {
         double sum = 0.0;
@@ -60,12 +79,11 @@ chemistryLoadBalancingMethod::sendRecvInfo globalBalancingMethod::operations_to_
         for (const auto& op : operations){
             info.sources.push_back(op.from.rank);
         }
-
+        info.number_of_problems = {problems.size()};
     }
 
     info.destinations.push_back(Pstream::myProcNo());
     info.sources.push_back(Pstream::myProcNo());
-
 
     return info;
     
@@ -93,11 +111,8 @@ globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
         counts.push_back(count);
     }
 
-    // Add any remaining problems to this rank. This should not be required...
-    // TODO: fix
-    //counts[0] += (problems.size() - std::accumulate(counts.begin(), counts.end(), 0));
-    int left = problems.size() - std::accumulate(counts.begin(),counts.end(), 0);
-    counts.push_back(left);
+    int remaining = problems.size() - std::accumulate(counts.begin(),counts.end(), 0);
+    counts.push_back(remaining);
     runtime_assert(std::accumulate(counts.begin(), counts.end(), 0) == problems.size(),
                    "Mismatch in the sliced problem count and original problem count.");
     
@@ -134,30 +149,21 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operati
             receiver++;
         }
     }
-    
-    return operations;
-}
 
-void globalBalancingMethod::apply_operation(DynamicList<chemistryLoad>&             loads,
-                                            const globalBalancingMethod::Operation& operation) {
+    runtime_assert(!(has_sends_and_receives(operations, my_load.rank)), "Only sender or receiver should be possible.");
 
-    loads[operation.from.rank].value -= operation.value;
-    loads[operation.to.rank].value += operation.value;
-}
+    //explicitly filter very small operations
+    std::vector<Operation> large;
+    for (const auto& op : operations){
+        if (op.value > 0.01 * global_mean){
+            large.push_back(op);
+        }
+    }
 
-globalBalancingMethod::Operation globalBalancingMethod::get_operation(const chemistryLoad& sender,
-                                                                      const chemistryLoad& receiver,
-                                                                      double               mean) {
 
-    double diff1 = mean - receiver.value;
-    double diff2 = sender.value - mean;
+    return large;
 
-    runtime_assert(!(diff1 < 0), "Receiver value larger than mean.");
-    runtime_assert(!(diff2 < 0), "Sender value smaller than mean.");
-
-    double send_value = std::min(diff1, diff2);
-
-    return Operation{sender, receiver, send_value};
+    //return operations;
 }
 
 chemistryLoad globalBalancingMethod::get_min(const DynamicList<chemistryLoad>& vec) {

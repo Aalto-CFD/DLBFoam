@@ -29,6 +29,8 @@ public:
 public:
     globalBalancingMethod() = default;
 
+    ~globalBalancingMethod() {}
+
     ///
     ///@brief Given a list of all problems, updates the sendRecvInfo member
     ///
@@ -39,15 +41,9 @@ public:
 protected:
 
 
-    double get_balancer_tolerance() const { return m_tolerance; }
 
     static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
     static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
-
-    static Operation
-    get_operation(const chemistryLoad& sender, const chemistryLoad& receiver, double mean);
-
-    static void apply_operation(DynamicList<chemistryLoad>& loads, const Operation& operation);
 
     std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
                                                                  double global_mean, const chemistryLoad& my_load) const;
@@ -61,8 +57,9 @@ protected:
                                                     const DynamicList<chemistryProblem>& problems);
 
 private:
-    double m_tolerance = 0.05;
 
+    static bool has_sends_and_receives(const std::vector<Operation>& operations, int my_rank);
+    
 
 };
 

@@ -45,20 +45,16 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
 
 template <class ReactionThermo, class ThermoType>
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryModel(){
-    delete load_balancer_; // TODO: use a smart pointer
+
 }
-
-
 
 template <class ReactionThermo, class ThermoType>
-chemistryLoadBalancingMethod* loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer(){
+typename loadBalancedChemistryModel<ReactionThermo, ThermoType>::balancer_ptr
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer() {
 
-    return new globalBalancingMethod();
-    //return new bulutLoadBalancing();
-    //return new simpleBalancingMethod();
-
+    return balancer_ptr(new globalBalancingMethod());
+    //return balancer_ptr(new bulutLoadBalancing());
 }
-
 
 template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
