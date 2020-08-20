@@ -70,7 +70,8 @@ class loadBalancedChemistryModel : public StandardChemistryModel<ReactionThermo,
 
     inline autoPtr<OFstream> logFile(const word& name) const;
 
-    using balancer_ptr = typename std::unique_ptr<chemistryLoadBalancingMethod>;
+    //using balancer_ptr = typename std::unique_ptr<chemistryLoadBalancingMethod>;
+    using balancer_ptr = autoPtr<chemistryLoadBalancingMethod>;
 
 
 public:
@@ -84,6 +85,9 @@ public:
 
     //- Destructor
     virtual ~loadBalancedChemistryModel();
+
+    //- Disallow default bitwise copy construction
+    loadBalancedChemistryModel(const loadBalancedChemistryModel&);
 
 
     virtual scalar solve(const scalar deltaT) override;
@@ -106,6 +110,8 @@ public:
     ///
     void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
 
+    //- Disallow default bitwise assignment
+        void operator=(const loadBalancedChemistryModel&) = delete;
 
 
 

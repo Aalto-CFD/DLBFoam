@@ -58,7 +58,7 @@ libs
 functions
 {
 
-    #includeFunc Qdot
+//    #includeFunc Qdot
     fieldMinMax1
     {
         type        fieldMinMax;

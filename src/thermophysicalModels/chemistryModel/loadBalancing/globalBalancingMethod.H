@@ -1,4 +1,5 @@
-#pragma once
+#ifndef globalBalancingMethod_H
+#define globalBalancingMethod_H
 
 #include <algorithm>
 #include <vector>
@@ -29,7 +30,7 @@ public:
 public:
     globalBalancingMethod() = default;
 
-    ~globalBalancingMethod() {}
+    virtual ~globalBalancingMethod() {}
 
     ///
     ///@brief Given a list of all problems, updates the sendRecvInfo member
@@ -65,3 +66,5 @@ private:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // namespace Foam
+
+#endif

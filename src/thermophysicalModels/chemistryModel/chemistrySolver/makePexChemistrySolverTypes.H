@@ -29,7 +29,7 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/
 #ifndef makePexChemistrySolverTypes_H
 #define makePexChemistrySolverTypes_H
 
-
+#include "chemistrySolver.H"
 
 
 #include "loadBalancedChemistryModel.H"
