@@ -36,10 +36,10 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::pyJacLoadBalancedCh
     , sp_enth_form(this->nSpecie_) {
 
     if (this->chemistry_) {
-        std::vector<double> sp_enth_form_(this->nSpecie_, 0.0);
+        std::vector<scalar> sp_enth_form_(this->nSpecie_, 0.0);
         //- Enthalpy of formation is taken from pyJac at T-standard
         eval_h(298.15, sp_enth_form_.data());
-        for (int i = 0; i < this->nSpecie_; i++) { sp_enth_form[i] = sp_enth_form_[i]; }
+        for (label i = 0; i < this->nSpecie_; i++) { sp_enth_form[i] = sp_enth_form_[i]; }
     }
 }
 
@@ -51,8 +51,8 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::~pyJacLoadBalancedC
 template <class ReactionThermo, class ThermoType>
 void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
     const scalar t, const scalarField& c, scalarField& dcdt, scalarSquareMatrix& J) const {
-    std::vector<double> yToPyJac(this->nSpecie_ + 1, 0.0);
-    std::vector<double> jac(this->nSpecie_ * this->nSpecie_, 0.0);
+    std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
+    std::vector<scalar> jac(this->nSpecie_ * this->nSpecie_, 0.0);
 
     J                 = Zero;
     dcdt              = Zero;
@@ -74,7 +74,7 @@ void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
     // call pyJac Jacobian evaluation
 
     eval_jacob(0, p, yToPyJac.data(), jac.data());
-    int k = 0;
+    label k = 0;
     for (label j = 0; j < this->nSpecie_; j++) {
         for (label i = 0; i < this->nSpecie_; i++) { J[i][j] = jac[k + i]; }
         k += this->nSpecie_;
@@ -91,8 +91,8 @@ template <class ReactionThermo, class ThermoType>
 void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::derivatives(
     const scalar t, const scalarField& c, scalarField& dcdt) const {
 
-    std::vector<double> yToPyJac(this->nSpecie_ + 1, 0.0);
-    std::vector<double> dy(this->nSpecie_, 0.0);
+    std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
+    std::vector<scalar> dy(this->nSpecie_, 0.0);
 
     const scalar T    = c[0];
     const scalar p    = c[this->nSpecie_];
@@ -142,14 +142,14 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::Qdot() const {
 }
 
 template <class ReactionThermo, class ThermoType>
-double pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(
+scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(
     const scalar& rho, const label& i, const label& celli) const {
 
     return (this->Y_[i][celli]);
 }
 
 template <class ReactionThermo, class ThermoType>
-double pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
+scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
     const label& j, const chemistrySolution& solution) const {
 
     return (solution.rhoi * solution.c_increment[j]);

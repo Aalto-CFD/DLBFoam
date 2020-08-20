@@ -49,7 +49,7 @@ private:
     scalar cpu_time_to_send(chemistryLoad& sender_load, chemistryLoad& receiver_load, scalar& meanCPUT) const;
     void update_load(chemistryLoad& sender_load, chemistryLoad& receiver_load, scalar& meanCPUT) const;
 
-    int cpu_time_to_ncells(const scalar& load_to_send, const DynamicList<chemistryProblem>& all_problems, int& index) const;
+    label cpu_time_to_ncells(const scalar& load_to_send, const DynamicList<chemistryProblem>& all_problems, label& index) const;
 
 
     bool large_sender(const chemistryLoad& load, const scalar& meanCPUT) const;

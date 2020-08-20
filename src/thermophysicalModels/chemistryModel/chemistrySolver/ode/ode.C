@@ -72,7 +72,7 @@ void Foam::ode<ChemistryModel>::solve
     if(mag(nEqns-nSpecie) == 2) // original implementation
     {
         // Copy the concentration, T and P to the total solve-vector
-        for (int i=0; i<nSpecie; i++)
+        for (label i=0; i<nSpecie; i++)
         {
             cTp_[i] = c[i];
         }
@@ -81,7 +81,7 @@ void Foam::ode<ChemistryModel>::solve
 
         odeSolver_->solve(0, deltaT, cTp_, subDeltaT);
 
-        for (int i=0; i<nSpecie; i++)
+        for (label i=0; i<nSpecie; i++)
         {
             c[i] = max(0.0, cTp_[i]);
         }
@@ -97,7 +97,7 @@ void Foam::ode<ChemistryModel>::solve
         cTp_[0] = T;
         cTp_[nSpecie] = p;
 
-        for (int i=0; i<nSpecie-1; i++)
+        for (label i=0; i<nSpecie-1; i++)
         {
             cTp_[i+1] = c[i];
         }
@@ -108,7 +108,7 @@ void Foam::ode<ChemistryModel>::solve
         p = cTp_[nSpecie];
         scalar csum = 0;
 
-        for (int i=0; i<nSpecie-1; i++)
+        for (label i=0; i<nSpecie-1; i++)
         {
             c[i] = max(0.0, cTp_[i+1]);
     	    csum += c[i];

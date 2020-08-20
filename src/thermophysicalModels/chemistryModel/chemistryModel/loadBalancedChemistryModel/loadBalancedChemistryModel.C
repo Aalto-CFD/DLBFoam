@@ -194,14 +194,14 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
 
     // allocate the solutions buffer
     chemistryLoadBalancingMethod::buffer_t<chemistrySolution> solutions;
-    for (int i = 0; i < problems.size(); ++i) {
+    for (label i = 0; i < problems.size(); ++i) {
         DynamicList<chemistrySolution> sublist(problems[i].size(),
                                                chemistrySolution(this->nSpecie_));
         solutions.append(sublist);
     }
 
-    for (int i = 0; i < solutions.size(); ++i) {
-        for (int j = 0; j < solutions[i].size(); ++j) {
+    for (label i = 0; i < solutions.size(); ++i) {
+        for (label j = 0; j < solutions[i].size(); ++j) {
 
             solve_single(problems[i][j], solutions[i][j]);
         }
@@ -282,7 +282,7 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rat
 }
 
 template <class ReactionThermo, class ThermoType>
-double loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(const scalar& rho,
+scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(const scalar& rho,
                                                                          const label&  i,
                                                                          const label& celli) const {
 
@@ -290,7 +290,7 @@ double loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(const s
 }
 
 template <class ReactionThermo, class ThermoType>
-double loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
+scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
     const label& j, const chemistrySolution& solution) const {
 
     return (solution.c_increment[j] * this->specieThermo_[j].W());

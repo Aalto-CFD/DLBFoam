@@ -113,18 +113,18 @@ private:
     ///@param rho
     ///@param i
     ///@param celli
-    ///@return double
+    ///@return scalar
     ///
-    double compute_c(const scalar& rho, const label& i, const label& celli) const;
+    scalar compute_c(const scalar& rho, const label& i, const label& celli) const;
 
     ///
     ///@brief Compute reaction rate for mass fraction
     ///
     ///@param j
     ///@param solution
-    ///@return double
+    ///@return scalar
     ///
-    double compute_RR(const label& j, const chemistrySolution& solution) const;
+    scalar compute_RR(const label& j, const chemistrySolution& solution) const;
 
     ///
     ///@brief Get the mass fraction field for refmapping

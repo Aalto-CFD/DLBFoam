@@ -18,13 +18,13 @@ struct chemistryLoad{
 
     chemistryLoad() = default;
 
-    chemistryLoad(int _rank, scalar _value) : 
+    chemistryLoad(label _rank, scalar _value) : 
     rank(_rank), 
     value(_value) 
     {} 
 
 
-    int rank;     //rank of the process 
+    label rank;     //rank of the process 
     scalar value; //an indicator how busy the processor is
 
     //overload comparisons for sorting

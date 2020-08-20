@@ -7,7 +7,7 @@ void globalBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
     auto my_load   = compute_my_load(problems);
     auto all_loads = all_gather(my_load);
 
-    double global_mean = get_mean(all_loads);
+    scalar global_mean = get_mean(all_loads);
 
    // Info << global_mean << endl;
 
@@ -54,7 +54,7 @@ globalBalancingMethod::operations_to_info(const std::vector<Operation>&        o
 
     if (sender) {
         
-        std::vector<double> times;
+        std::vector<scalar> times;
         for (const auto& op : operations){
             info.destinations.push_back(op.to.rank);
             times.push_back(op.value);
@@ -74,11 +74,11 @@ globalBalancingMethod::operations_to_info(const std::vector<Operation>&        o
 
 }
 
-std::vector<int>
+std::vector<label>
 globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&           times,
                                                const DynamicList<chemistryProblem>& problems) {
 
-    std::vector<int> counts;
+    std::vector<label> counts;
     
     counts.reserve(times.size());
 
@@ -93,15 +93,15 @@ globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
             sum += problem.cpuTime;
             return sum < time;
         };
-        int count = count_while(rbegin, rend, sum_upto);
+        label count = count_while(rbegin, rend, sum_upto);
         rbegin += count;
         counts.push_back(count);
     }
 
-    int total_send_count = std::accumulate(counts.begin(), counts.end(), 0);
+    label total_send_count = std::accumulate(counts.begin(), counts.end(), 0);
 
 
-    int remaining = problems.size() - total_send_count;
+    label remaining = problems.size() - total_send_count;
 
     runtime_assert(remaining > 0, "Negative remaining cells");
 
@@ -116,7 +116,7 @@ globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
 
 
 std::vector<globalBalancingMethod::Operation>
-globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, double global_mean, const chemistryLoad& my_load) const {
+globalBalancingMethod::get_operations(DynamicList<chemistryLoad>& loads, scalar global_mean, const chemistryLoad& my_load) const {
 
     std::vector<Operation> operations;
 
@@ -177,16 +177,16 @@ void globalBalancingMethod::apply_operation(DynamicList<chemistryLoad>&         
 
 globalBalancingMethod::Operation globalBalancingMethod::get_operation(const chemistryLoad& sender,
                                                                       const chemistryLoad& receiver,
-                                                                      double               mean) {
+                                                                      scalar               mean) {
     
-    double diff1 = mean - receiver.value;
-    double diff2 = sender.value - mean;
+    scalar diff1 = mean - receiver.value;
+    scalar diff2 = sender.value - mean;
 
 
     runtime_assert(!(diff1 < 0), "Receiver value larger than mean.");
     runtime_assert(!(diff2 < 0), "Sender value smaller than mean.");
 
-    double send_value = std::min(diff1, diff2);
+    scalar send_value = std::min(diff1, diff2);
 
     return Operation{sender, receiver, send_value};
 }

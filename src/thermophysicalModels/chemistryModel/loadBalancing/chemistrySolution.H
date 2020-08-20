@@ -8,7 +8,7 @@ struct chemistrySolution {
 
     chemistrySolution() = default;
 
-    chemistrySolution(int nspecie) : c_increment(nspecie, 0.0), deltaTChem(0.0), cellid(0), rhoi(0.0) {}
+    chemistrySolution(label nspecie) : c_increment(nspecie, 0.0), deltaTChem(0.0), cellid(0), rhoi(0.0) {}
 
 
     // TODO: implement!

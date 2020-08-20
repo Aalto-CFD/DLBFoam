@@ -49,10 +49,10 @@ void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField
         const scalarField& r2 = model2->RR(i);
 
 
-        double sum = 0.0;
+        scalar sum = 0.0;
         forAll(r1, celli) {
 
-            double diff = r1[celli] - r2[celli];
+            scalar diff = r1[celli] - r2[celli];
             sum += (diff * diff);
         }
 

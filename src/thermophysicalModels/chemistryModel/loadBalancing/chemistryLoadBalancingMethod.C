@@ -11,9 +11,9 @@ chemistryLoad chemistryLoadBalancingMethod::get_my_load(const DynamicList<chemis
 }
 */
 
-double chemistryLoadBalancingMethod::get_mean(const DynamicList<chemistryLoad>& loads){
+scalar chemistryLoadBalancingMethod::get_mean(const DynamicList<chemistryLoad>& loads){
 
-    auto op = [](double sum, const chemistryLoad& load) {
+    auto op = [](scalar sum, const chemistryLoad& load) {
     return sum + load.value;
     };
     return std::accumulate(loads.begin(), loads.end(), 0.0, op) / loads.size();
@@ -21,7 +21,7 @@ double chemistryLoadBalancingMethod::get_mean(const DynamicList<chemistryLoad>& 
 }
 
 
-size_t chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistryLoad>& loads, int rank) const {
+label chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistryLoad>& loads, label rank) const {
 
     /*
     auto iter = std::find_if(loads.begin(), loads.end(), 
@@ -29,7 +29,7 @@ size_t chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistr
 
     return iter - loads.begin();
     */
-    for (size_t i = 0; i < size_t(loads.size()); ++i){
+    for (label i = 0; i < loads.size(); ++i){
         if (loads[i].rank == rank) return i;
     }
 

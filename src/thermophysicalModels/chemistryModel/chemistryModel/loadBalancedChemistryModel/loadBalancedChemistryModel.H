@@ -171,18 +171,18 @@ private:
     ///@param rho
     ///@param i
     ///@param celli
-    ///@return double
+    ///@return scalar
     ///
-    virtual double compute_c(const scalar& rho, const label& i, const label& celli) const;
+    virtual scalar compute_c(const scalar& rho, const label& i, const label& celli) const;
 
     ///
     ///@brief Compute reaction rate for concentration
     ///
     ///@param j
     ///@param solution
-    ///@return double
+    ///@return scalar
     ///
-    virtual double compute_RR(const label& j, const chemistrySolution& solution) const;
+    virtual scalar compute_RR(const label& j, const chemistrySolution& solution) const;
 
     ///
     ///@brief Get the mass fraction field for refmapping

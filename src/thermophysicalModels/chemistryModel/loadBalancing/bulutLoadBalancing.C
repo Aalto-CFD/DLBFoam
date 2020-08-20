@@ -23,27 +23,27 @@ void bulutLoadBalancing::update_state(const DynamicList<chemistryProblem>& probl
         std::accumulate(loads.begin(), loads.end(), scalar(0), sum_op) / loads.size();
     Info<<"MEANCPUT IS: "<<meanCPUT<<endl;
     scalar chemCPUTimeLimit = 2;
-    int send_problems = 0;
+    label send_problems = 0;
     if(active())
     {   
         // iterate from largest to smallest to account for efficient filling of the sent data
-        for(int sender_idx=Pstream::nProcs()-1; sender_idx>=0; sender_idx--) 
+        for(label sender_idx=Pstream::nProcs()-1; sender_idx>=0; sender_idx--) 
         {
             chemistryLoad& sender_load = loads[sender_idx];
-            int index = 0;
+            label index = 0;
 
             if(sender_load.value > (meanCPUT+m_tolerance_to_balance))
             {
-                int nCellsSentTot = 0;
+                label nCellsSentTot = 0;
                 // iterate over all ranks which we can send data
-                for(int receiver_idx=0; receiver_idx<sender_idx; receiver_idx++) 
+                for(label receiver_idx=0; receiver_idx<sender_idx; receiver_idx++) 
                 {
                     chemistryLoad& receiver_load = loads[receiver_idx];
                     if( large_sender(sender_load,meanCPUT)  && small_receiver(receiver_load,meanCPUT) )
                     {
                         scalar load_to_send = cpu_time_to_send(sender_load, receiver_load, meanCPUT);
                         update_load(sender_load,receiver_load,load_to_send);
-                        int nCells2Send;
+                        label nCells2Send;
                         PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);                    
 
                         if(sender_load.rank  == Pstream::myProcNo())
@@ -105,7 +105,7 @@ void bulutLoadBalancing::update_self_send(sendRecvInfo& ret) const
 {  
     if(ret.destinations.size()>1)
     {
-        int send_problems = std::accumulate(ret.number_of_problems.begin()+1, ret.number_of_problems.end(), 0);
+        label send_problems = std::accumulate(ret.number_of_problems.begin()+1, ret.number_of_problems.end(), 0);
         ret.number_of_problems[0] -= send_problems;
     }
 }
@@ -140,11 +140,11 @@ void bulutLoadBalancing::update_load(chemistryLoad& sender_load, chemistryLoad& 
 }
 
 
-int bulutLoadBalancing::cpu_time_to_ncells(const scalar& load_to_send, const DynamicList<chemistryProblem>& all_problems, int& index) const
+label bulutLoadBalancing::cpu_time_to_ncells(const scalar& load_to_send, const DynamicList<chemistryProblem>& all_problems, label& index) const
 {
-    int nCells2Send = 0;
+    label nCells2Send = 0;
     scalar relSendLoad = 0;
-    for (int i  = index; i<all_problems.size();i++)
+    for (label i  = index; i<all_problems.size();i++)
     {
         relSendLoad += all_problems[i].cpuTime;
         nCells2Send++;

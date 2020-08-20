@@ -22,7 +22,7 @@ class globalBalancingMethod : public chemistryLoadBalancingMethod {
 public:
     struct Operation {
         chemistryLoad from, to;
-        double        value;
+        scalar        value;
     };
 
 public:
@@ -38,29 +38,29 @@ public:
 protected:
 
 
-    double get_balancer_tolerance() const { return m_tolerance; }
+    scalar get_balancer_tolerance() const { return m_tolerance; }
 
     static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
     static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
 
     static Operation
-    get_operation(const chemistryLoad& sender, const chemistryLoad& receiver, double mean);
+    get_operation(const chemistryLoad& sender, const chemistryLoad& receiver, scalar mean);
 
     static void apply_operation(DynamicList<chemistryLoad>& loads, const Operation& operation);
 
     std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
-                                                                 double global_mean, const chemistryLoad& my_load) const;
+                                                                 scalar global_mean, const chemistryLoad& my_load) const;
 
     static sendRecvInfo operations_to_info(const std::vector<Operation>&        operations,
                                            const DynamicList<chemistryProblem>& problems,
                                            const chemistryLoad&                 my_load);
 
 
-    static std::vector<int> times_to_problem_counts(const std::vector<scalar>&           times,
+    static std::vector<label> times_to_problem_counts(const std::vector<scalar>&           times,
                                                     const DynamicList<chemistryProblem>& problems);
 
 private:
-    double m_tolerance = 0.3;
+    scalar m_tolerance = 0.3;
 
 
 };

@@ -71,9 +71,9 @@ class chemistryLoadBalancingMethod {
 public:
     struct sendRecvInfo {
 
-        std::vector<int> sources;            // ranks which send to this process
-        std::vector<int> destinations;       // ranks to which this process sends to
-        std::vector<int> number_of_problems; // number of problems which this rank sends/receivs
+        std::vector<label> sources;            // ranks which send to this process
+        std::vector<label> destinations;       // ranks to which this process sends to
+        std::vector<label> number_of_problems; // number of problems which this rank sends/receivs
     };
 
     template <class T> using buffer_t = DynamicList<DynamicList<T>>;
@@ -85,7 +85,7 @@ public:
 
 
 
-    static double get_mean(const DynamicList<chemistryLoad>& loads);
+    static scalar get_mean(const DynamicList<chemistryLoad>& loads);
 
 
     chemistryLoad
@@ -102,7 +102,7 @@ public:
         DynamicList<T> ret(Pstream::nProcs(), my_data);
         ret[Pstream::myProcNo()] = my_data;
 
-        int tag                    = 1;
+        label tag                    = 1;
         Pstream::gatherList(ret, tag);
         Pstream::scatterList(ret, tag);
 
@@ -237,9 +237,9 @@ public:
 
         for (auto s : subsizes) { ret.append(DynamicList<T>(s, element_copy)); }
 
-        int start = 0;
-        for (size_t i = 0; i < subsizes.size(); ++i) {
-            int end = start + subsizes[i];
+        label start = 0;
+        for (label i = 0; i < subsizes.size(); ++i) {
+            label end = start + subsizes[i];
             std::copy(
                 std::begin(big_array) + start, std::begin(big_array) + end, std::begin(ret[i]));
             start = end;
@@ -258,7 +258,7 @@ public:
     ///
     template <class T>
     static bool check_sendcount_size(const DynamicList<T>&   big_array,
-                              const std::vector<int>& subsizes) {
+                              const std::vector<label>& subsizes) {
         if (std::accumulate(subsizes.begin(), subsizes.end(), 0) != big_array.size()) {
             /*
             int s_total = std::accumulate(subsizes.begin(), subsizes.end(), 0);
@@ -286,7 +286,7 @@ public:
         //receiver
         if (m_current_state.number_of_problems.size() == 1){
 
-            std::vector<int> recv_ranks(m_current_state.sources.begin() +1, m_current_state.sources.end());
+            std::vector<label> recv_ranks(m_current_state.sources.begin() +1, m_current_state.sources.end());
 
             Pout << "Receiver rank: " << Pstream::myProcNo()
                  << " receives from"  << vector_to_string(recv_ranks)
@@ -295,8 +295,8 @@ public:
 
         //sender
         else {
-            std::vector<int> send_counts(m_current_state.number_of_problems.begin() + 1,  m_current_state.number_of_problems.end());
-            std::vector<int> send_ranks(m_current_state.destinations.begin()+1, m_current_state.destinations.end());
+            std::vector<label> send_counts(m_current_state.number_of_problems.begin() + 1,  m_current_state.number_of_problems.end());
+            std::vector<label> send_ranks(m_current_state.destinations.begin()+1, m_current_state.destinations.end());
            
             Pout << "Sender rank: " << Pstream::myProcNo()
              << " sends to: " << vector_to_string(send_ranks)
@@ -322,7 +322,7 @@ public:
     }
 
 protected:
-    size_t rank_to_load_idx(const DynamicList<chemistryLoad>& loads, int rank) const;
+    label rank_to_load_idx(const DynamicList<chemistryLoad>& loads, label rank) const;
 
     bool valid_state() const {
 
@@ -358,13 +358,13 @@ protected:
     ///
     template <class ET, Pstream::commsTypes CT>
     static buffer_t<ET> send_recv(const buffer_t<ET>&     send_buffer,
-                                  const std::vector<int>& sources,
-                                  const std::vector<int>& destinations) {
+                                  const std::vector<label>& sources,
+                                  const std::vector<label>& destinations) {
 
         if (Pstream::parRun()) {
             PstreamBuffers pBufs(CT);
 
-            for (size_t i = 0; i < destinations.size(); ++i) {
+            for (label i = 0; i < destinations.size(); ++i) {
                 UOPstream send(destinations[i], pBufs);
                 send << send_buffer[i];
             }
@@ -372,7 +372,7 @@ protected:
 
             buffer_t<ET> recv_buffers;
             recv_buffers.setSize(sources.size());
-            for (size_t i = 0; i < sources.size(); ++i) {
+            for (label i = 0; i < sources.size(); ++i) {
                 UIPstream recv(sources[i], pBufs);
                 recv >> recv_buffers[i];
             }
