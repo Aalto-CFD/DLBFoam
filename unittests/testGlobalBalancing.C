@@ -20,13 +20,6 @@ public:
     using globalBalancingMethod::times_to_problem_counts;
 };
 
-static void print_ops(const std::vector<globalTest::Operation>& ops) {
-
-    for (const auto& op : ops) {
-        Info << "From: " << op.from.rank << " To: " << op.to.rank << " Value: " << op.value << endl;
-    }
-
-}
 
 TEST_CASE("simpleBalancingMethod get_min()/get_max()"){
 

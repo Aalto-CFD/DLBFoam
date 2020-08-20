@@ -17,27 +17,7 @@ void globalBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
     set_state(info);
 }
 
-bool globalBalancingMethod::has_sends_and_receives(const std::vector<Operation>& operations, int my_rank){
 
-    bool sender = false;
-    bool receiver = false;
-
-    for (const auto& op: operations) {
-        if (op.from.rank == my_rank){
-            sender = true;
-            break;
-        }
-    } 
-
-    for (const auto& op: operations) {
-        if (op.to.rank == my_rank){
-            receiver = true;
-            break;
-        }
-    }
-    return (sender && receiver);
-    
-}
 
 chemistryLoadBalancingMethod::sendRecvInfo globalBalancingMethod::operations_to_info(const std::vector<Operation>&        operations,
                                            const DynamicList<chemistryProblem>& problems,
@@ -45,28 +25,11 @@ chemistryLoadBalancingMethod::sendRecvInfo globalBalancingMethod::operations_to_
 
     sendRecvInfo info;
 
-    bool sender = false;
-    bool receiver = false;
-
-    for (const auto& op: operations) {
-        if (op.from.rank == my_load.rank){
-            sender = true;
-            break;
-        }
-    } 
-
-    for (const auto& op: operations) {
-        if (op.to.rank == my_load.rank){
-            receiver = true;
-            break;
-        }
-    }
-
-    if (sender) {
+    if (is_sender(operations, my_load.rank)) {
         double sum = 0.0;
         std::vector<double> times;
         for (const auto& op : operations){
-            info.destinations.push_back(op.to.rank);
+            info.destinations.push_back(op.to);
             sum += op.value;
             times.push_back(op.value);
         }
@@ -74,10 +37,11 @@ chemistryLoadBalancingMethod::sendRecvInfo globalBalancingMethod::operations_to_
 
     }
 
-    else if (receiver) {
+    //receiver
+    else {
 
         for (const auto& op : operations){
-            info.sources.push_back(op.from.rank);
+            info.sources.push_back(op.from);
         }
         info.number_of_problems = {problems.size()};
     }
@@ -134,7 +98,7 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operati
     while (sender != receiver) {
 
         double    send_value = std::min(sender->value - global_mean, global_mean - receiver->value);
-        Operation operation{*sender, *receiver, send_value};
+        Operation operation{sender->rank, receiver->rank, send_value};
         if (sender->rank == my_load.rank || receiver->rank == my_load.rank) {
             operations.push_back(operation);
         }
@@ -145,12 +109,14 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operati
             sender--;
         }
 
-        else if (std::abs(receiver->value - global_mean) < SMALL) {
+        else{
             receiver++;
         }
     }
 
-    runtime_assert(!(has_sends_and_receives(operations, my_load.rank)), "Only sender or receiver should be possible.");
+    runtime_assert(
+        !((is_sender(operations, my_load.rank) && is_receiver(operations, my_load.rank))),
+        "Only sender or receiver should be possible.");
 
     //explicitly filter very small operations
     std::vector<Operation> large;
@@ -166,19 +132,24 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operati
     //return operations;
 }
 
-chemistryLoad globalBalancingMethod::get_min(const DynamicList<chemistryLoad>& vec) {
+bool globalBalancingMethod::is_sender(const std::vector<Operation>& operations, int rank){
 
-    auto comp = [](const chemistryLoad& lhs, const chemistryLoad& rhs) {
-        return lhs.value < rhs.value;
-    };
-    return *std::min_element(vec.begin(), vec.end(), comp);
+    for (const auto& op : operations){
+        if (op.from != rank){
+            return false;
+        }
+    }
+    return true;
 }
 
-chemistryLoad globalBalancingMethod::get_max(const DynamicList<chemistryLoad>& vec) {
-    auto comp = [](const chemistryLoad& lhs, const chemistryLoad& rhs) {
-        return lhs.value < rhs.value;
-    };
-    return *std::max_element(vec.begin(), vec.end(), comp);
+bool globalBalancingMethod::is_receiver(const std::vector<Operation>& operations, int rank){
+    
+    for (const auto& op : operations){
+        if (op.to != rank){
+            return false;
+        }
+    }
+    return true;
 }
 
 } // namespace Foam

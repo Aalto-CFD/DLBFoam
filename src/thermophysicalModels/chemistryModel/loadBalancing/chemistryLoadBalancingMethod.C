@@ -19,7 +19,20 @@ double chemistryLoadBalancingMethod::get_mean(const DynamicList<chemistryLoad>& 
     return std::accumulate(loads.begin(), loads.end(), 0.0, op) / loads.size();
 
 }
+chemistryLoad chemistryLoadBalancingMethod::get_min(const DynamicList<chemistryLoad>& vec) {
 
+    auto comp = [](const chemistryLoad& lhs, const chemistryLoad& rhs) {
+        return lhs.value < rhs.value;
+    };
+    return *std::min_element(vec.begin(), vec.end(), comp);
+}
+
+chemistryLoad chemistryLoadBalancingMethod::get_max(const DynamicList<chemistryLoad>& vec) {
+    auto comp = [](const chemistryLoad& lhs, const chemistryLoad& rhs) {
+        return lhs.value < rhs.value;
+    };
+    return *std::max_element(vec.begin(), vec.end(), comp);
+}
 
 size_t chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistryLoad>& loads, int rank) const {
 

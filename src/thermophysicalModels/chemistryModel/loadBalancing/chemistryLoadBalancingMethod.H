@@ -90,7 +90,8 @@ public:
 
 
     static double get_mean(const DynamicList<chemistryLoad>& loads);
-
+    static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
+    static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
 
     chemistryLoad
     compute_my_load(const DynamicList<chemistryProblem>& problems) {

@@ -22,7 +22,7 @@ class globalBalancingMethod : public chemistryLoadBalancingMethod {
 
 public:
     struct Operation {
-        chemistryLoad from, to;
+        int from, to; //ranks
         double        value;
     };
 
@@ -42,8 +42,6 @@ protected:
 
 
 
-    static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
-    static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
 
     std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
                                                                  double global_mean, const chemistryLoad& my_load) const;
@@ -58,8 +56,9 @@ protected:
 
 private:
 
-    static bool has_sends_and_receives(const std::vector<Operation>& operations, int my_rank);
-    
+
+    static bool is_sender(const std::vector<Operation>& operations, int rank);
+    static bool is_receiver(const std::vector<Operation>& operations, int rank);
 
 };
 
