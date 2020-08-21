@@ -33,7 +33,7 @@ public:
     ///
     ///@param composition NO IDEA
     ///
-    void update(basicSpecieMixture& composition);
+    void update(const basicSpecieMixture& composition);
 
 
 
@@ -43,7 +43,7 @@ public:
     ///@param composition 
     ///@param Yconst 
     ///
-    void print_information(basicSpecieMixture& composition, const List<List<scalar>>& Yconst) const;
+    void print_information(const basicSpecieMixture& composition, const List<List<scalar>>& Yconst) const;
     
 
 
@@ -61,7 +61,7 @@ private:
     ///
     ///@param composition 
     ///
-    void update_alpha(basicSpecieMixture& composition);
+    void update_alpha(const basicSpecieMixture& composition);
 
 
     ///
@@ -78,7 +78,7 @@ private:
     ///@param composition 
     ///@return List<List<scalar>> 
     ///
-    List<List<scalar>> compute_yconst(basicSpecieMixture& composition) const;
+    List<List<scalar>> compute_yconst(const basicSpecieMixture& composition) const;
 
     ///
     ///@brief NO IDEA WHAT THIS DOES
@@ -87,7 +87,7 @@ private:
     ///@return List<List<scalar>> 
     ///
     //TODO: RENAME!
-    List<List<scalar>> compute_a(basicSpecieMixture& composition) const;
+    List<List<scalar>> compute_a(const basicSpecieMixture& composition) const;
     
     ///
     ///@brief NO IDEA WHAT THIS DOES

@@ -13,7 +13,7 @@ mixtureFraction::mixtureFraction(const dictionary& mixFracDict, const wordList& 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void mixtureFraction::update(basicSpecieMixture& composition) {
+void mixtureFraction::update(const basicSpecieMixture& composition) {
 
     update_alpha(composition);
     auto Yconst = compute_yconst(composition);
@@ -24,7 +24,7 @@ void mixtureFraction::update(basicSpecieMixture& composition) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// TODO: simplify this and consider if necessary
-void mixtureFraction::print_information(basicSpecieMixture&       composition,
+void mixtureFraction::print_information(const basicSpecieMixture&       composition,
                                         const List<List<scalar>>& Yconst) const {
 
     auto a   = compute_a(composition);
@@ -59,7 +59,7 @@ void mixtureFraction::print_information(basicSpecieMixture&       composition,
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void mixtureFraction::update_alpha(basicSpecieMixture& composition) {
+void mixtureFraction::update_alpha(const basicSpecieMixture& composition) {
 
     forAll(alpha_, i) {
         const dictionary& dict = mixFracDict_.subDict(species_[i]).subDict("elements");
@@ -95,7 +95,7 @@ void mixtureFraction::update_beta(const List<List<scalar>>& Yconst, const List<s
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-List<List<scalar>> mixtureFraction::compute_yconst(basicSpecieMixture& composition) const {
+List<List<scalar>> mixtureFraction::compute_yconst(const basicSpecieMixture& composition) const {
 
     List<List<scalar>> Yconst(2, List<scalar>(species_.size(), 0.0));
     forAll(species_, i) {
@@ -109,7 +109,7 @@ List<List<scalar>> mixtureFraction::compute_yconst(basicSpecieMixture& compositi
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-List<List<scalar>> mixtureFraction::compute_a(basicSpecieMixture& composition) const {
+List<List<scalar>> mixtureFraction::compute_a(const basicSpecieMixture& composition) const {
 
     List<List<scalar>> a(species_.size(), List<scalar>(3, 0.0));
     forAll(species_, i) {

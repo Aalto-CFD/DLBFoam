@@ -29,7 +29,7 @@ public:
 
     simpleRefMappingMethod() = default;
 
-    simpleRefMappingMethod(const dictionary& dict, basicSpecieMixture& composition) :
+    simpleRefMappingMethod(const dictionary& dict, const basicSpecieMixture& composition) :
     chemistryRefMappingMethod(),
     dict_(dict),
     coeffsDict_(dict.subDict("refmapping")),

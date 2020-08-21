@@ -41,8 +41,6 @@ SourceFiles
 #include "OFstream.H"
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
-#include "OFstream.H"
-
 
 #include "bulutLoadBalancing.H"
 #include "chemistryProblem.H"
@@ -62,18 +60,13 @@ class fvMesh;
 \*---------------------------------------------------------------------------*/
 
 template <class ReactionThermo, class ThermoType>
-class loadBalancedChemistryModel : public StandardChemistryModel<ReactionThermo, ThermoType> 
-{
+class loadBalancedChemistryModel : public StandardChemistryModel<ReactionThermo, ThermoType> {
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
-
-    autoPtr<OFstream> cpuSolveFile_;
-
-    inline autoPtr<OFstream> logFile(const word& name) const;
-
-    //using balancer_ptr = typename std::unique_ptr<chemistryLoadBalancingMethod>;
+    // using balancer_ptr = typename std::unique_ptr<chemistryLoadBalancingMethod>;
     using balancer_ptr = autoPtr<chemistryLoadBalancingMethod>;
 
+    using refmapper_ptr = chemistryRefMappingMethod*; // chemistryautoPtr<chemistryRefMappingMethod>;
 
 public:
     //- Runtime type information
@@ -89,7 +82,6 @@ public:
 
     //- Disallow default bitwise copy construction
     loadBalancedChemistryModel(const loadBalancedChemistryModel&);
-
 
     virtual scalar solve(const scalar deltaT) override;
     virtual scalar solve(const scalarField& deltaT) override;
@@ -110,19 +102,18 @@ public:
     void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
 
     //- Disallow default bitwise assignment
-        void operator=(const loadBalancedChemistryModel&) = delete;
+    void operator=(const loadBalancedChemistryModel&) = delete;
 
-    //- Log file for average time spent solving the chemistry
-    autoPtr<OFstream> cpuSolveFile_;
     //- Create and return a loadbal log file of the given name
     inline autoPtr<OFstream> logFile(const word& name) const;
+    autoPtr<OFstream>        cpuSolveFile_;
 
 private:
     scalarField cpu_times_;
 
     balancer_ptr load_balancer_;
 
-    chemistryRefMappingMethod* ref_mapper_;
+    refmapper_ptr ref_mapper_;
 
     ///
     ///@brief A factory function for creating the balancer
@@ -136,7 +127,7 @@ private:
     ///
     ///@return chemistryRefMappingMethod*
     ///
-    chemistryRefMappingMethod* create_refmapper();
+    static refmapper_ptr create_refmapper(const ReactionThermo& thermo);
 
     ///
     ///@brief
@@ -154,8 +145,8 @@ private:
     ///@param deltaT
     ///@return DynamicList<chemistryProblem>
     ///
-    
-    template<class DeltaTType>
+
+    template <class DeltaTType>
     DynamicList<chemistryProblem> get_problems(const DeltaTType& deltaT);
 
     template <class DeltaTType>

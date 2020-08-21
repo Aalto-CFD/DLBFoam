@@ -35,7 +35,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
     : StandardChemistryModel<ReactionThermo, ThermoType>(thermo)
     , cpu_times_(this->mesh().cells().size(), 0.0)
     , load_balancer_(create_balancer())
-    , ref_mapper_(create_refmapper()) {
+    , ref_mapper_(create_refmapper(this->thermo())) {
 
     Info << "Running with a load balanced" << endl;
     cpuSolveFile_ = logFile("cpu_solve.out");
@@ -55,34 +55,30 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-s
 template <class ReactionThermo, class ThermoType>
-loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryModel(){
-
-}
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryModel() {}
 
 template <class ReactionThermo, class ThermoType>
 typename loadBalancedChemistryModel<ReactionThermo, ThermoType>::balancer_ptr
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer() {
 
     return balancer_ptr(new globalBalancingMethod());
-    //return balancer_ptr(new bulutLoadBalancing());
+    // return balancer_ptr(new bulutLoadBalancing());
 }
 
 template <class ReactionThermo, class ThermoType>
-typename loadBalancedChemistryModel<ReactionThermo, ThermoType>::balancer_ptr
-loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_refmapper() {
+typename loadBalancedChemistryModel<ReactionThermo, ThermoType>::refmapper_ptr
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_refmapper(
+    const ReactionThermo& thermo) {
 
-    const IOdictionary chemistryDict_tmp(
-        IOobject(this->thermo().phasePropertyName("chemistryProperties"),
-                 this->thermo().db().time().constant(),
-                 this->thermo().db(),
-                 IOobject::MUST_READ,
-                 IOobject::NO_WRITE,
-                 false));
-
-    return refmapper_ptr(new simpleRefMappingMethod(chemistryDict_tmp, this->thermo().composition()));
-    //return balancer_ptr(new bulutLoadBalancing());
+    const IOdictionary chemistryDict_tmp(IOobject(thermo.phasePropertyName("chemistryProperties"),
+                                                  thermo.db().time().constant(),
+                                                  thermo.db(),
+                                                  IOobject::MUST_READ,
+                                                  IOobject::NO_WRITE,
+                                                  false));
+    return refmapper_ptr(new simpleRefMappingMethod(chemistryDict_tmp, thermo.composition()));
+    // return balancer_ptr(new bulutLoadBalancing());
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -98,35 +94,33 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
     clockTime timer;
 
-    
+    timer.timeIncrement();
     DynamicList<chemistryProblem> all_problems = get_problems(deltaT);
+    scalar                        get_problem  = timer.timeIncrement();
 
-
-
-
+    timer.timeIncrement();
     load_balancer_->update_state(all_problems);
     scalar update_state = timer.timeIncrement();
 
     load_balancer_->print_state();
+
     timer.timeIncrement();
     problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
     scalar           balance           = timer.timeIncrement();
 
-    //Pstream::waitRequests(); 
-
-    clockTime timer;
-
     timer.timeIncrement();
     solution_buffer_t balanced_solutions = solve_buffer(balanced_problems);
-    scalar buffertime = timer.timeIncrement();
-        
+    scalar            solve_buffer       = timer.timeIncrement();
 
+    timer.timeIncrement();
     solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
     scalar            unbalance    = timer.timeIncrement();
 
+    cpuSolveFile_() << this->time().timeOutputValue() << "    " << get_problem << "    "
+                    << update_state << "    " << balance << "    " << solve_buffer << "    "
+                    << unbalance << "    " << Pstream::myProcNo() << endl;
 
-
-    Pstream::waitRequests(); 
+    Pstream::waitRequests();
 
     return update_reaction_rates(my_solutions);
 }
@@ -149,7 +143,7 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
     // Calculate the chemical source terms
     while (timeLeft > small) {
         scalar dt = timeLeft;
-        //this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        // this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
         this->solve(prob.pi, prob.Ti, prob.c, arbitrary, dt, prob.deltaTChem);
         timeLeft -= dt;
     }
@@ -221,8 +215,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
 template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
 DynamicList<chemistryProblem>
-loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(
-                                                              const DeltaTType&            deltaT) {
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(const DeltaTType& deltaT) {
 
     // TODO: Add refcell and Treact as conditions to get problems.
 
@@ -294,14 +287,14 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(const s
                                                                          const label&  i,
                                                                          const label& celli) const {
 
-    return (rho * this->Y_[i][celli] / this->specieThermo_[i].W());
+    return (rho * this->Y_[i][celli] / this->specieThermos_[i].W());
 }
 
 template <class ReactionThermo, class ThermoType>
 scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
     const label& j, const chemistrySolution& solution) const {
 
-    return (solution.c_increment[j] * this->specieThermo_[j].W());
+    return (solution.c_increment[j] * this->specieThermos_[j].W());
 }
 
 template <class ReactionThermo, class ThermoType>

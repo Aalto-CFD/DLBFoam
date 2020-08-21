@@ -33,6 +33,7 @@ odeCoeffs
     relTol          1e-6;
 }
 
+#include "reactionsGRI"
 
 refmapping
 {

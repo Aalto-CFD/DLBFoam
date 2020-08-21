@@ -55,7 +55,8 @@ static inline void runtime_assert(bool condition, const char* msg) {
     if (!condition) throw std::runtime_error(msg);
 }
 #else
-static inline void runtime_assert([[maybe_unused]] bool condition, [[maybe_unused]] const char* msg) {}
+static inline void runtime_assert([[maybe_unused]] bool        condition,
+                                  [[maybe_unused]] const char* msg) {}
 #endif
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -82,41 +83,31 @@ private:
     sendRecvInfo m_current_state; // the current state of the object
 
 public:
-
-
     chemistryLoadBalancingMethod() = default;
 
     virtual ~chemistryLoadBalancingMethod() {}
 
-
-    static double get_mean(const DynamicList<chemistryLoad>& loads);
+    static double        get_mean(const DynamicList<chemistryLoad>& loads);
     static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
     static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
 
-    chemistryLoad
-    compute_my_load(const DynamicList<chemistryProblem>& problems) {
+    chemistryLoad compute_my_load(const DynamicList<chemistryProblem>& problems) {
         auto   lambda = [](scalar sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
         scalar sum    = std::accumulate(problems.begin(), problems.end(), scalar(0), lambda);
         return chemistryLoad(Pstream::myProcNo(), sum);
     }
 
-    template<class T>
-    static DynamicList<T> all_gather(const T& my_data) {
-
+    template <class T> static DynamicList<T> all_gather(const T& my_data) {
 
         DynamicList<T> ret(Pstream::nProcs(), my_data);
         ret[Pstream::myProcNo()] = my_data;
 
-        label tag                    = 1;
+        label tag = 1;
         Pstream::gatherList(ret, tag);
         Pstream::scatterList(ret, tag);
 
-
         return ret;
-
-    
     }
-
 
     ///
     ///@brief Sets the current state
@@ -138,13 +129,9 @@ public:
     ///
     ///@brief Get the state object
     ///
-    ///@return const sendRecvInfo& 
+    ///@return const sendRecvInfo&
     ///
-    const sendRecvInfo& get_state() const {
-        return m_current_state;
-    }
-
-
+    const sendRecvInfo& get_state() const { return m_current_state; }
 
     virtual void update_state(const DynamicList<chemistryProblem>& problems) = 0;
 
@@ -165,13 +152,11 @@ public:
     ///
     template <class T> buffer_t<T> balance(const DynamicList<T>& values) const {
 
-    
-        //return send_recv<T, Pstream::commsTypes::blocking>(
+        // return send_recv<T, Pstream::commsTypes::blocking>(
         //    get_send_buffer(values), m_current_state.sources, m_current_state.destinations);
 
-        
         return send_recv<T, Pstream::commsTypes::nonBlocking>(
-            get_send_buffer(values), m_current_state.sources, m_current_state.destinations);    
+            get_send_buffer(values), m_current_state.sources, m_current_state.destinations);
     }
 
     ///
@@ -183,29 +168,20 @@ public:
     ///
     template <class T> buffer_t<T> unbalance(const buffer_t<T>& values) const {
 
-        
-        //return send_recv<T, Pstream::commsTypes::blocking>(
+        // return send_recv<T, Pstream::commsTypes::blocking>(
         //    values, m_current_state.destinations, m_current_state.sources);
 
         // It is probably impossible to avoid blocking in this phase
         return send_recv<T, Pstream::commsTypes::nonBlocking>(
             values, m_current_state.destinations, m_current_state.sources);
-
     }
 
-
-    
     template <class T> buffer_t<T> get_send_buffer(const DynamicList<T>& values) const {
 
         if (m_current_state.destinations.size() == 1) { return buffer_t<T>(1, values); }
 
         return partition(values, m_current_state.number_of_problems);
     }
-
-    
-
-    
-
 
     ///
     ///@brief Check whether the load balancer is active or not.
@@ -214,7 +190,6 @@ public:
     ///@return false
     ///
     bool active() const { return true; }
-
 
     ///
     ///@brief Splits the big_array to arrays of size subsizes.
@@ -227,8 +202,9 @@ public:
     template <class T>
     static DynamicList<DynamicList<T>> partition(const DynamicList<T>&   big_array,
                                                  const std::vector<int>& subsizes) {
-        
-        runtime_assert(check_sendcount_size(big_array,subsizes), "Total send count not matching the problem count!");
+
+        runtime_assert(check_sendcount_size(big_array, subsizes),
+                       "Total send count not matching the problem count!");
 
         // allocate storage based on the first element
         T element_copy;
@@ -258,8 +234,8 @@ public:
     ///@return bool
     ///
     template <class T>
-    static bool check_sendcount_size(const DynamicList<T>&   big_array,
-                              const std::vector<label>& subsizes) {
+    static bool check_sendcount_size(const DynamicList<T>&     big_array,
+                                     const std::vector<label>& subsizes) {
         if (std::accumulate(subsizes.begin(), subsizes.end(), 0) != big_array.size()) {
             /*
             int s_total = std::accumulate(subsizes.begin(), subsizes.end(), 0);
@@ -272,11 +248,9 @@ public:
                 std::to_string(a_total));
             */
             return false;
-        } 
-            return true;
+        }
+        return true;
     }
-
-    
 
     ///
     ///@brief Prints the current state information.
@@ -284,26 +258,24 @@ public:
     ///
     void print_state() const {
 
-        //receiver
-        if (m_current_state.sources.size() > 1){
-            Pout << "Receiver rank: " << Pstream::myProcNo()
-                 << " receives from "  << vector_to_string(m_current_state.sources)
-                 << " own problems "   << vector_to_string(m_current_state.number_of_problems)
-                 << endl;
+        // receiver
+        if (m_current_state.sources.size() > 1) {
+            Pout << "Receiver rank: " << Pstream::myProcNo() << " receives from "
+                 << vector_to_string(m_current_state.sources) << " own problems "
+                 << vector_to_string(m_current_state.number_of_problems) << endl;
 
         }
-        //sender
-        else if(m_current_state.destinations.size() > 1) {
+        // sender
+        else if (m_current_state.destinations.size() > 1) {
             Pout << "Sender rank: " << Pstream::myProcNo()
-             << " sends to: " << vector_to_string(m_current_state.destinations)
-             << " counts: " << vector_to_string(m_current_state.number_of_problems) 
-             << " remaining problems:  " << m_current_state.number_of_problems.back() << endl;
+                 << " sends to: " << vector_to_string(m_current_state.destinations)
+                 << " counts: " << vector_to_string(m_current_state.number_of_problems)
+                 << " remaining problems:  " << m_current_state.number_of_problems.back() << endl;
         }
 
         else {
             Pout << "Rank: " << Pstream::myProcNo() << " does not take part in balancing.";
         }
-        
     }
 
     template <class T> std::string vector_to_string(const std::vector<T>& vec) const {
@@ -332,7 +304,7 @@ protected:
             return false; // the first index must always be this process
         if (sources[0] != destinations[0]) return false;
         */
-        //TODO: enable
+        // TODO: enable
         return true;
     }
 
@@ -351,7 +323,7 @@ protected:
     ///@return buffer_t<ET> the received buffer
     ///
     template <class ET, Pstream::commsTypes CT>
-    static buffer_t<ET> send_recv(const buffer_t<ET>&     send_buffer,
+    static buffer_t<ET> send_recv(const buffer_t<ET>&       send_buffer,
                                   const std::vector<label>& sources,
                                   const std::vector<label>& destinations) {
 
@@ -376,10 +348,6 @@ protected:
 
         return send_buffer;
     }
-
-
-
-
 };
 
 } // namespace Foam
