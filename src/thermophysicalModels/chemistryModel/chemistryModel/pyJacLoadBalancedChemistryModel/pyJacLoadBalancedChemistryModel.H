@@ -87,14 +87,16 @@ public:
                           const scalarField&  c,
                           const label         li,
                           scalarField&        dcdt,
-                          scalarSquareMatrix& J) const;
+                          scalarSquareMatrix& J) const override;
 
-    virtual void
-    derivatives(const scalar t, const scalarField& c, const label li, scalarField& dcdt) const;
+    virtual void derivatives(const scalar       t,
+                             const scalarField& c,
+                             const label        li,
+                             scalarField&       dcdt) const override;
 
     //- Override Qdot function from StandardChemistryModel for using pyJac's enthalpy of formation
 
-    virtual tmp<volScalarField> Qdot() const;
+    virtual tmp<volScalarField> Qdot() const override;
 
 private:
     ///
