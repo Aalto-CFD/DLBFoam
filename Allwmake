@@ -3,23 +3,14 @@ cd ${0%/*} || exit 1    # Run from this directory
 
 cd src/thermophysicalModels/chemistryModel
 wmake libso
+cd ../../../
 
-cd ../../../unittests
+cd ./unittests
 wmake
+cd ..
 
-cd ../benchmarks
-wmake
 
-#wclean all
 
-# Compile OpenFOAM_Aalto libraries
-#src/Allwmake $targetType $*
-
-#cd unittests
-#wclean
+#cd ./benchmarks
 #wmake
-#cd ..
 
-#cd benchmarks
-#wclean
-#wmake

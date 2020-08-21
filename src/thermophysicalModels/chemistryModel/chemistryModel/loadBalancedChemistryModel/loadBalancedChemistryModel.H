@@ -81,7 +81,7 @@ public:
     // Constructors
 
     //- Construct from thermo
-    loadBalancedChemistryModel(ReactionThermo& thermo);
+    loadBalancedChemistryModel(const ReactionThermo& thermo);
 
     //- Destructor
     virtual ~loadBalancedChemistryModel();
@@ -93,14 +93,12 @@ public:
     virtual scalar solve(const scalar deltaT) override;
     virtual scalar solve(const scalarField& deltaT) override;
 
-
-    // ODE functions (overriding abstract functions in ODE.H)
-    // this function is somehow injected in the ODE
-    virtual void
-    solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
-
-
-
+    virtual void solve(scalar&      p,
+                       scalar&      T,
+                       scalarField& c,
+                       const label  li,
+                       scalar&      deltaT,
+                       scalar&      subDeltaT) const = 0;
 
     ///
     ///@brief 
@@ -148,7 +146,7 @@ private:
     ///
     
     template<class DeltaTType>
-    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_, const DeltaTType& deltaT);
+    DynamicList<chemistryProblem> get_problems(const DeltaTType& deltaT);
 
 
     ///

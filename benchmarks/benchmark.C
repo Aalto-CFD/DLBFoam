@@ -1,7 +1,9 @@
 #include <vector>
 
+
 #include "fvCFD.H"
-#include "turbulentFluidThermoModel.H"
+#include "fluidThermoMomentumTransportModel.H"
+#include "psiReactionThermophysicalTransportModel.H"
 #include "psiReactionThermo.H"
 #include "CombustionModel.H"
 #include "multivariateScheme.H"
@@ -10,10 +12,8 @@
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
-
-
 ///
-#include "thermoPhysicsTypes.H"
+//#include "thermoPhysicsTypes.H"
 #include "Random.H"
 #include "loadBalancedChemistryModel.H"
 #include "StandardChemistryModel.H"

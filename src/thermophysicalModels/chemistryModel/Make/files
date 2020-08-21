@@ -6,8 +6,7 @@ loadBalancing/algorithms_aalto.C
 loadBalancing/bulutLoadBalancing.C
 loadBalancing/globalBalancingMethod.C
 
-chemistryModel/makePexChemistryModels.C
-chemistrySolver/makePexChemistrySolvers.C
+chemistrySolver/pexChemistrySolvers.C
 
 
 

@@ -31,7 +31,7 @@ namespace Foam {
 
 template <class ReactionThermo, class ThermoType>
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryModel(
-    ReactionThermo& thermo)
+    const ReactionThermo& thermo)
     : StandardChemistryModel<ReactionThermo, ThermoType>(thermo)
     , cpu_times_(this->mesh().cells().size(), 0.0)
     , load_balancer_(create_balancer())
@@ -71,7 +71,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
 
     
-    DynamicList<chemistryProblem> all_problems = get_problems(this->Y_, deltaT);
+    DynamicList<chemistryProblem> all_problems = get_problems(deltaT);
 
     auto sum_op = [&](scalar sum, const chemistryProblem& p) {
         return sum + p.cpuTime;
@@ -129,10 +129,12 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
     clockTime time;
     time.timeIncrement();
 
+    const label arbitrary = 0;
     // Calculate the chemical source terms
     while (timeLeft > small) {
         scalar dt = timeLeft;
-        this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        //this->solve(prob.c, prob.Ti, prob.pi, dt, prob.deltaTChem);
+        this->solve(prob.pi, prob.Ti, prob.c, arbitrary, dt, prob.deltaTChem);
         timeLeft -= dt;
     }
 
@@ -162,7 +164,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_r
 
         
         for (label j = 0; j < this->nSpecie_; j++) { 
-            this->RR_[j][solution.cellid] = solution.c_increment[j] * this->specieThermo_[j].W();                 
+            this->RR_[j][solution.cellid] = solution.c_increment[j] * this->specieThermos_[j].W();                 
         }
         /*
         deltaTMin = min(solution.deltaTChem, deltaTMin);
@@ -240,7 +242,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
 template <class ReactionThermo, class ThermoType>
 template<class DeltaTType>
 DynamicList<chemistryProblem>
-loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<volScalarField>& Y_,
+loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(
                                                               const DeltaTType&            deltaT) {
 
     // TODO: Add refcell and Treact as conditions to get problems.
@@ -260,7 +262,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(PtrList<vol
 
 
             for (label i = 0; i < this->nSpecie_; i++) { 
-                this->c_[i] = rho[celli] * this->Y_[i][celli]/this->specieThermo_[i].W(); 
+                this->c_[i] = rho[celli] * this->Y_[i][celli]/this->specieThermos_[i].W(); 
             }
 
             scalar Ti = T[celli];
