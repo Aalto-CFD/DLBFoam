@@ -1,6 +1,8 @@
-#pragma once
+#ifndef globalBalancingMethod_H
+#define globalBalancingMethod_H
 
 #include <algorithm>
+#include <vector>
 #include <memory> //std::shared_ptr
 
 #include "IOdictionary.H"
@@ -21,12 +23,14 @@ class globalBalancingMethod : public chemistryLoadBalancingMethod {
 
 public:
     struct Operation {
-        chemistryLoad from, to;
-        scalar        value;
+        int from, to; //ranks
+        double        value;
     };
 
 public:
     globalBalancingMethod() = default;
+
+    virtual ~globalBalancingMethod() {}
 
     ///
     ///@brief Given a list of all problems, updates the sendRecvInfo member
@@ -38,15 +42,7 @@ public:
 protected:
 
 
-    scalar get_balancer_tolerance() const { return m_tolerance; }
 
-    static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
-    static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
-
-    static Operation
-    get_operation(const chemistryLoad& sender, const chemistryLoad& receiver, scalar mean);
-
-    static void apply_operation(DynamicList<chemistryLoad>& loads, const Operation& operation);
 
     std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
                                                                  scalar global_mean, const chemistryLoad& my_load) const;
@@ -60,11 +56,15 @@ protected:
                                                     const DynamicList<chemistryProblem>& problems);
 
 private:
-    scalar m_tolerance = 0.3;
 
+
+    static bool is_sender(const std::vector<Operation>& operations, int rank);
+    static bool is_receiver(const std::vector<Operation>& operations, int rank);
 
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // namespace Foam
+
+#endif

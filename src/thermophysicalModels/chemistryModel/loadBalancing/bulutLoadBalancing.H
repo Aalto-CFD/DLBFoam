@@ -24,6 +24,8 @@ public:
 
     bulutLoadBalancing() = default;
 
+    virtual ~bulutLoadBalancing() {}
+
     bool active() const {return true;}
 
 private:

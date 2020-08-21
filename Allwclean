@@ -1,0 +1,22 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+cd src/thermophysicalModels/chemistryModel
+rm -rf $FOAM_USER_LIBBIN/lichemistryMode_pex.so
+wclean
+
+
+
+#wclean all
+
+# Compile OpenFOAM_Aalto libraries
+#src/Allwmake $targetType $*
+
+#cd unittests
+#wclean
+#wmake
+#cd ..
+
+#cd benchmarks
+#wclean
+#wmake

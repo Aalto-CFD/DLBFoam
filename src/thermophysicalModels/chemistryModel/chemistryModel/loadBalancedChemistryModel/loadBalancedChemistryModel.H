@@ -41,6 +41,8 @@ SourceFiles
 #include "OFstream.H"
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
+#include "OFstream.H"
+
 
 #include "bulutLoadBalancing.H"
 #include "chemistryProblem.H"
@@ -60,20 +62,18 @@ class fvMesh;
 \*---------------------------------------------------------------------------*/
 
 template <class ReactionThermo, class ThermoType>
-class loadBalancedChemistryModel :
-    // public aaltoChemistryModelBase<ReactionThermo, ThermoType>
-    public StandardChemistryModel<ReactionThermo, ThermoType> {
-    // Private Member Functions
-
-    //- Solve the reaction system for the given time step
-    //  of given type and return the characteristic time
+class loadBalancedChemistryModel : public StandardChemistryModel<ReactionThermo, ThermoType> 
+{
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
-    //- Disallow copy constructor
-    loadBalancedChemistryModel(const loadBalancedChemistryModel&);
 
-    //- Disallow default bitwise assignment
-    void operator=(const loadBalancedChemistryModel&);
+    autoPtr<OFstream> cpuSolveFile_;
+
+    inline autoPtr<OFstream> logFile(const word& name) const;
+
+    //using balancer_ptr = typename std::unique_ptr<chemistryLoadBalancingMethod>;
+    using balancer_ptr = autoPtr<chemistryLoadBalancingMethod>;
+
 
 public:
     //- Runtime type information
@@ -82,13 +82,24 @@ public:
     // Constructors
 
     //- Construct from thermo
-    loadBalancedChemistryModel(ReactionThermo& thermo);
+    loadBalancedChemistryModel(const ReactionThermo& thermo);
 
     //- Destructor
     virtual ~loadBalancedChemistryModel();
 
+    //- Disallow default bitwise copy construction
+    loadBalancedChemistryModel(const loadBalancedChemistryModel&);
+
+
     virtual scalar solve(const scalar deltaT) override;
     virtual scalar solve(const scalarField& deltaT) override;
+
+    virtual void solve(scalar&      p,
+                       scalar&      T,
+                       scalarField& c,
+                       const label  li,
+                       scalar&      deltaT,
+                       scalar&      subDeltaT) const = 0;
 
     ///
     ///@brief
@@ -98,10 +109,8 @@ public:
     ///
     void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
 
-    // ODE functions (overriding abstract functions in ODE.H)
-    // this function is somehow injected in the ODE
-    virtual void
-    solve(scalarField& c, scalar& T, scalar& p, scalar& deltaT, scalar& subDeltaT) const = 0;
+    //- Disallow default bitwise assignment
+        void operator=(const loadBalancedChemistryModel&) = delete;
 
     //- Log file for average time spent solving the chemistry
     autoPtr<OFstream> cpuSolveFile_;
@@ -111,7 +120,7 @@ public:
 private:
     scalarField cpu_times_;
 
-    chemistryLoadBalancingMethod* load_balancer_;
+    balancer_ptr load_balancer_;
 
     chemistryRefMappingMethod* ref_mapper_;
 
@@ -120,7 +129,7 @@ private:
     ///
     ///@return chemistryLoadBalancingMethod*
     ///
-    static chemistryLoadBalancingMethod* create_balancer();
+    static balancer_ptr create_balancer();
 
     ///
     ///@brief A factory function for creating the refmapper
@@ -145,6 +154,9 @@ private:
     ///@param deltaT
     ///@return DynamicList<chemistryProblem>
     ///
+    
+    template<class DeltaTType>
+    DynamicList<chemistryProblem> get_problems(const DeltaTType& deltaT);
 
     template <class DeltaTType>
     DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_,

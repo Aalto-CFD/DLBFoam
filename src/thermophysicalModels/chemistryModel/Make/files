@@ -8,8 +8,7 @@ refMapping/mixtureFraction.C
 refMapping/chemistryRefMappingMethod.C
 refMapping/simpleRefMappingMethod.C
 loadBalancing/globalBalancingMethod.C
-chemistryModel/makePexChemistryModels.C
-chemistrySolver/makePexChemistrySolvers.C
+chemistrySolver/pexChemistrySolvers.C
 
 
 

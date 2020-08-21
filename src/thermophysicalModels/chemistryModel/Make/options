@@ -1,5 +1,4 @@
 EXE_INC = \
-    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
@@ -13,15 +12,15 @@ EXE_INC = \
     -DDEBUG
 
 LIB_LIBS = \
-    -lcompressibleTransportModels \
-    -L$(FOAM_USER_LIBBIN) \
     -lfluidThermophysicalModels \
     -lreactionThermophysicalModels \
     -lspecie \
     -lODE \
     -lfiniteVolume \
     -lmeshTools \
-    -lchemistryModel \
+    -lchemistryModel\
     -lc_pyjac    
+
+    
     
 

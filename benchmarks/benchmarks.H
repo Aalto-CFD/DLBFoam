@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "thermoPhysicsTypes.H"
+//#include "thermoPhysicsTypes.H"
 #include "loadBalancedChemistryModel.H"
 #include "StandardChemistryModel.H"
 #include "noChemistrySolver.H"

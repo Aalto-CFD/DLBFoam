@@ -84,9 +84,14 @@ private:
 public:
 
 
+    chemistryLoadBalancingMethod() = default;
 
-    static scalar get_mean(const DynamicList<chemistryLoad>& loads);
+    virtual ~chemistryLoadBalancingMethod() {}
 
+
+    static double get_mean(const DynamicList<chemistryLoad>& loads);
+    static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
+    static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
 
     chemistryLoad
     compute_my_load(const DynamicList<chemistryProblem>& problems) {
@@ -201,8 +206,6 @@ public:
 
     
 
-    // Constructors
-    chemistryLoadBalancingMethod() = default;
 
     ///
     ///@brief Check whether the load balancer is active or not.
@@ -212,8 +215,6 @@ public:
     ///
     bool active() const { return true; }
 
-    //- Destructor
-    virtual ~chemistryLoadBalancingMethod() {}
 
     ///
     ///@brief Splits the big_array to arrays of size subsizes.
@@ -284,31 +285,24 @@ public:
     void print_state() const {
 
         //receiver
-        if (m_current_state.number_of_problems.size() == 1){
-
-            std::vector<label> recv_ranks(m_current_state.sources.begin() +1, m_current_state.sources.end());
-
+        if (m_current_state.sources.size() > 1){
             Pout << "Receiver rank: " << Pstream::myProcNo()
-                 << " receives from"  << vector_to_string(recv_ranks)
+                 << " receives from "  << vector_to_string(m_current_state.sources)
+                 << " own problems "   << vector_to_string(m_current_state.number_of_problems)
                  << endl;
-        }
 
+        }
         //sender
-        else {
-            std::vector<label> send_counts(m_current_state.number_of_problems.begin() + 1,  m_current_state.number_of_problems.end());
-            std::vector<label> send_ranks(m_current_state.destinations.begin()+1, m_current_state.destinations.end());
-           
+        else if(m_current_state.destinations.size() > 1) {
             Pout << "Sender rank: " << Pstream::myProcNo()
-             << " sends to: " << vector_to_string(send_ranks)
-             << " counts: " << vector_to_string(send_counts) 
-             << " remaining problems:  " << m_current_state.number_of_problems[0] << endl;
-
+             << " sends to: " << vector_to_string(m_current_state.destinations)
+             << " counts: " << vector_to_string(m_current_state.number_of_problems) 
+             << " remaining problems:  " << m_current_state.number_of_problems.back() << endl;
         }
 
-        /*Pout << "Rank: " << Pstream::myProcNo()
-             << " sends to: " << vector_to_string(m_current_state.destinations)
-             << " receives from: " << vector_to_string(m_current_state.sources)
-             << " counts: " << vector_to_string(m_current_state.number_of_problems) << endl;*/
+        else {
+            Pout << "Rank: " << Pstream::myProcNo() << " does not take part in balancing.";
+        }
         
     }
 

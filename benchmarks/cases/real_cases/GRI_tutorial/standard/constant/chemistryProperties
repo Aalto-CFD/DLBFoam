@@ -17,7 +17,7 @@ FoamFile
 chemistryType
 {
     solver          ode;
-    method          standard; //loadBalanced;
+    method          standard;
 }
 
 chemistry       on;
