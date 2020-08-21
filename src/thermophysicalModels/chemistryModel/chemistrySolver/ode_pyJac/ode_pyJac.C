@@ -31,7 +31,7 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-Foam::ode_pyJac<ChemistryModel>::ode_pyJac(typename ChemistryModel::reactionThermo& thermo)
+Foam::ode_pyJac<ChemistryModel>::ode_pyJac(const typename ChemistryModel::reactionThermo& thermo)
 :
     chemistrySolver<ChemistryModel>(thermo),
     coeffsDict_(this->subDict("odeCoeffs")),

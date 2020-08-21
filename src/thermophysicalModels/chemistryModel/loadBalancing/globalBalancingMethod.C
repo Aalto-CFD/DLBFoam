@@ -134,6 +134,8 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operati
 
 bool globalBalancingMethod::is_sender(const std::vector<Operation>& operations, int rank){
 
+    if (operations.size() == 0) {return false;}
+
     for (const auto& op : operations){
         if (op.from != rank){
             return false;
