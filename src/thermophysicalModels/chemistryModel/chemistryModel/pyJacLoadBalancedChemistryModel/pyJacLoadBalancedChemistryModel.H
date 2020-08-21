@@ -61,19 +61,8 @@ class fvMesh;
 
 template <class ReactionThermo, class ThermoType>
 class pyJacLoadBalancedChemistryModel :
-    // public aaltoChemistryModelBase<ReactionThermo, ThermoType>
     public loadBalancedChemistryModel<ReactionThermo, ThermoType> {
-    // Private Member Functions
-
-    //- Solve the reaction system for the given time step
-    //  of given type and return the characteristic time
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
-
-    //- Disallow copy constructor
-    pyJacLoadBalancedChemistryModel(const pyJacLoadBalancedChemistryModel&);
-
-    //- Disallow default bitwise assignment
-    void operator=(const pyJacLoadBalancedChemistryModel&);
 
 public:
     //- Runtime type information
@@ -82,10 +71,13 @@ public:
     // Constructors
 
     //- Construct from thermo
-    pyJacLoadBalancedChemistryModel(ReactionThermo& thermo);
+    pyJacLoadBalancedChemistryModel(const ReactionThermo& thermo);
 
     //- Destructor
     virtual ~pyJacLoadBalancedChemistryModel();
+
+    //- Disallow default bitwise copy construction
+    pyJacLoadBalancedChemistryModel(const pyJacLoadBalancedChemistryModel&);
 
     inline virtual label nEqns() const;
 

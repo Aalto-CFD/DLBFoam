@@ -26,12 +26,12 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/
 
 \*---------------------------------------------------------------------------*/
 
-#include "ode.H"
+#include "ode_pyJac.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-Foam::ode<ChemistryModel>::ode(typename ChemistryModel::reactionThermo& thermo)
+Foam::ode_pyJac<ChemistryModel>::ode_pyJac(typename ChemistryModel::reactionThermo& thermo)
 :
     chemistrySolver<ChemistryModel>(thermo),
     coeffsDict_(this->subDict("odeCoeffs")),
@@ -43,18 +43,19 @@ Foam::ode<ChemistryModel>::ode(typename ChemistryModel::reactionThermo& thermo)
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-Foam::ode<ChemistryModel>::~ode()
+Foam::ode_pyJac<ChemistryModel>::~ode_pyJac()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-void Foam::ode<ChemistryModel>::solve
+void Foam::ode_pyJac<ChemistryModel>::solve
 (
-    scalarField& c,
-    scalar& T,
     scalar& p,
+    scalar& T,
+    scalarField& c,
+    const label li,
     scalar& deltaT,
     scalar& subDeltaT
 ) const
@@ -79,7 +80,7 @@ void Foam::ode<ChemistryModel>::solve
         cTp_[nSpecie] = T;
         cTp_[nSpecie+1] = p;
 
-        odeSolver_->solve(0, deltaT, cTp_, subDeltaT);
+        odeSolver_->solve(0, deltaT, cTp_, li, subDeltaT);
 
         for (label i=0; i<nSpecie; i++)
         {
@@ -102,7 +103,7 @@ void Foam::ode<ChemistryModel>::solve
             cTp_[i+1] = c[i];
         }
 
-        odeSolver_->solve(0, deltaT, cTp_, subDeltaT);
+        odeSolver_->solve(0, deltaT, cTp_, li, subDeltaT);
 
         T = cTp_[0];
         p = cTp_[nSpecie];

@@ -35,8 +35,8 @@ Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ode_H
-#define ode_H
+#ifndef ode_pyJac_H
+#define ode_pyJac_H
 
 #include "chemistrySolver.H"
 #include "ODESolver.H"
@@ -51,7 +51,7 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 template<class ChemistryModel>
-class ode
+class ode_pyJac
 :
     public chemistrySolver<ChemistryModel>
 {
@@ -68,17 +68,17 @@ class ode
 public:
 
     //- Runtime type information
-    TypeName("ode");
+    TypeName("ode_pyJac");
 
 
     // Constructors
 
         //- Construct from thermo
-        ode(typename ChemistryModel::reactionThermo& thermo);
+        ode_pyJac(typename ChemistryModel::reactionThermo& thermo);
 
 
     //- Destructor
-    virtual ~ode();
+    virtual ~ode_pyJac();
 
 
     // Member Functions
@@ -86,9 +86,10 @@ public:
         //- Update the concentrations and return the chemical time
         virtual void solve
         (
-            scalarField& c,
-            scalar& T,
             scalar& p,
+            scalar& T,
+            scalarField& c,
+            const label li,
             scalar& deltaT,
             scalar& subDeltaT
         ) const;
@@ -102,7 +103,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "ode.C"
+    #include "ode_pyJac.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
