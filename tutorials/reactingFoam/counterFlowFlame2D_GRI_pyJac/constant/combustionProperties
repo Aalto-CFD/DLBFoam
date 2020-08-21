@@ -10,13 +10,11 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    note        "mesh decomposition control dictionary";
-    object      decomposeParDict;
+    location    "constant";
+    object      combustionProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains  4;
-
-method          scotch;
+combustionModel  laminar;
 
 // ************************************************************************* //

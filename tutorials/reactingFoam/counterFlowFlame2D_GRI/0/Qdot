@@ -9,14 +9,38 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    note        "mesh decomposition control dictionary";
-    object      decomposeParDict;
+    class       volScalarField;
+    location    "0";
+    object      Qdot;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains  4;
+dimensions      [1 -1 -3 0 0 0 0];
 
-method          scotch;
+internalField   uniform 0;
+
+boundaryField
+{
+    fuel
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    air
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    outlet
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
 
 // ************************************************************************* //

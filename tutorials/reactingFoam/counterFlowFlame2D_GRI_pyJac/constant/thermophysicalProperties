@@ -10,13 +10,31 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    note        "mesh decomposition control dictionary";
-    object      decomposeParDict;
+    location    "constant";
+    object      thermophysicalProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains  4;
+thermoType
+{
+    type            hePsiThermo;
+    mixture         multiComponentMixture;
+    transport       sutherland;
+    thermo          janaf;
+    energy          sensibleEnthalpy;
+    equationOfState perfectGas;
+    specie          specie;
+}
 
-method          scotch;
+inertSpecie N2;
+
+#include "chem.foam"
+#include "thermoProps_GRI.foam"
+
+
+//chemistryReader foamChemistryReader;
+//foamChemistryFile "$FOAM_CASE/constant/chem.foam";
+//foamChemistryThermoFile "$FOAM_CASE/constant/thermoProps_GRI.foam";
+
 
 // ************************************************************************* //

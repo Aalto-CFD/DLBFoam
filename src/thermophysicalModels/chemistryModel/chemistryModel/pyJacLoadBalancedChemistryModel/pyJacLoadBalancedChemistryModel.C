@@ -50,7 +50,8 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::~pyJacLoadBalancedC
 
 template <class ReactionThermo, class ThermoType>
 void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
-    const scalar t, const scalarField& c, scalarField& dcdt, scalarSquareMatrix& J) const {
+    const scalar t, const scalarField& c, const label li, scalarField& dcdt, scalarSquareMatrix& J)
+    const {
     std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
     std::vector<scalar> jac(this->nSpecie_ * this->nSpecie_, 0.0);
 
@@ -72,7 +73,6 @@ void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
 
     yToPyJac[this->nSpecie_] = this->c_[this->nSpecie_ - 1];
     // call pyJac Jacobian evaluation
-
     eval_jacob(0, p, yToPyJac.data(), jac.data());
     label k = 0;
     for (label j = 0; j < this->nSpecie_; j++) {
@@ -89,7 +89,7 @@ void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
 
 template <class ReactionThermo, class ThermoType>
 void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::derivatives(
-    const scalar t, const scalarField& c, scalarField& dcdt) const {
+    const scalar t, const scalarField& c, const label li, scalarField& dcdt) const {
 
     std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
     std::vector<scalar> dy(this->nSpecie_, 0.0);

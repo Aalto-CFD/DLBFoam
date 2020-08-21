@@ -10,13 +10,20 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    note        "mesh decomposition control dictionary";
-    object      decomposeParDict;
+    location    "0/uniform";
+    object      time;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains  4;
+value           0;
 
-method          scotch;
+name            "0";
+
+index           0;
+
+deltaT          1e-07;
+
+deltaT0         1e-07;
+
 
 // ************************************************************************* //
