@@ -15,7 +15,7 @@
 ///
 //#include "thermoPhysicsTypes.H"
 #include "Random.H"
-#include "loadBalancedChemistryModel.H"
+#include "LoadBalancedChemistryModel.H"
 #include "StandardChemistryModel.H"
 #include "noChemistrySolver.H"
 #include "ode.H"
@@ -31,7 +31,7 @@
 void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField>& Y, psiReactionThermo& thermo) {
 
     BasicChemistryModel<psiReactionThermo>* model1 = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
-    BasicChemistryModel<psiReactionThermo>* model2 = new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+    BasicChemistryModel<psiReactionThermo>* model2 = new ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
 
     set_master_heavy(rho, thermo);
 
@@ -128,11 +128,11 @@ int main(int argc, char *argv[])
     ///
     /* 
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all heavy"}, thermo, false), 50 )
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solveSingle()",  "simple", "all heavy"}, thermo, false), 50 )
                     );
 
     results.push_back(
-        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solve_single()",  "simple", "all light"}, thermo, true), 50 )
+        Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solveSingle()",  "simple", "all light"}, thermo, true), 50 )
                     );
 
     */

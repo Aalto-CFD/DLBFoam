@@ -39,7 +39,7 @@ Foam::DynamicList<Foam::ChemistryLoad> create_random_load(size_t count)
     return ret;
 }
 
-Foam::DynamicList<Foam::ChemistryProblem> get_problems_for_load(size_t n_problems, double total_load){
+Foam::DynamicList<Foam::ChemistryProblem> getProblems_for_load(size_t n_problems, double total_load){
 
     double problem_value = total_load / n_problems;
 

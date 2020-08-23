@@ -109,7 +109,7 @@ TEST_CASE("LoadBalancer updateState0()"){
 
     globalTest t;
 
-    auto problems = get_problems_for_load(n_problems, local_load_total);
+    auto problems = getProblems_for_load(n_problems, local_load_total);
 
     auto myLoad   = t.computeLoad(problems);
     double global_mean = t.getMean(t.allGather(myLoad));
@@ -166,7 +166,7 @@ TEST_CASE("LoadBalancer updateState1()"){
 
     globalTest t;
 
-    auto problems = get_problems_for_load(n_problems, local_load_total);
+    auto problems = getProblems_for_load(n_problems, local_load_total);
 
     auto myLoad   = t.computeLoad(problems);
     double global_mean = t.getMean(t.allGather(myLoad));
@@ -215,7 +215,7 @@ TEST_CASE("LoadBalancer updateState2()"){
     size_t n_problems = Pstream::myProcNo() * 41;
     double local_load_total = std::abs(sin(Pstream::myProcNo() * 0.2));
 
-    auto problems = get_problems_for_load(n_problems, local_load_total);
+    auto problems = getProblems_for_load(n_problems, local_load_total);
 
     globalTest t;
 

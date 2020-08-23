@@ -32,7 +32,7 @@ namespace Foam {
 template <class ReactionThermo, class ThermoType>
 pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::pyJacLoadBalancedChemistryModel(
     const ReactionThermo& thermo)
-    : loadBalancedChemistryModel<ReactionThermo, ThermoType>(thermo)
+    : LoadBalancedChemistryModel<ReactionThermo, ThermoType>(thermo)
     , sp_enth_form(this->nSpecie_) {
 
     if (this->chemistry_) {
@@ -142,21 +142,21 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::Qdot() const {
 }
 
 template <class ReactionThermo, class ThermoType>
-scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(
+scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::computeConcentration(
     const scalar& rho, const label& i, const label& celli) const {
 
     return (this->Y_[i][celli]);
 }
 
 template <class ReactionThermo, class ThermoType>
-scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
+scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::computeReactionRate(
     const label& j, const ChemistrySolution& solution) const {
 
     return (solution.rhoi * solution.c_increment[j]);
 }
 
 template <class ReactionThermo, class ThermoType>
-scalarField pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::get_mass_fraction(
+scalarField pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::getMassFraction(
     const ChemistryProblem& problem) const {
 
     return problem.c;

@@ -39,7 +39,7 @@ SourceFiles
 #define pyJacLoadBalancedChemistryModel_H
 
 #include "clockTime.H"
-#include "loadBalancedChemistryModel.H"
+#include "LoadBalancedChemistryModel.H"
 
 // pyJac dependencies
 extern "C" {
@@ -61,7 +61,7 @@ class fvMesh;
 
 template <class ReactionThermo, class ThermoType>
 class pyJacLoadBalancedChemistryModel
-    : public loadBalancedChemistryModel<ReactionThermo, ThermoType> {
+    : public LoadBalancedChemistryModel<ReactionThermo, ThermoType> {
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
 public:
@@ -113,7 +113,7 @@ private:
     ///@param celli
     ///@return scalar
     ///
-    scalar compute_c(const scalar& rho, const label& i, const label& celli) const;
+    scalar computeConcentration(const scalar& rho, const label& i, const label& celli) const;
 
     ///
     ///@brief Compute reaction rate for mass fraction
@@ -122,7 +122,7 @@ private:
     ///@param solution
     ///@return scalar
     ///
-    scalar compute_RR(const label& j, const ChemistrySolution& solution) const;
+    scalar computeReactionRate(const label& j, const ChemistrySolution& solution) const;
 
     ///
     ///@brief Get the mass fraction field for refmapping
@@ -130,7 +130,7 @@ private:
     ///@param problem
     ///@return scalarField
     ///
-    scalarField get_mass_fraction(const ChemistryProblem& problem) const;
+    scalarField getMassFraction(const ChemistryProblem& problem) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

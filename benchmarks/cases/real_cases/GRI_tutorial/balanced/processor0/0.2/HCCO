@@ -1,0 +1,86 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  8
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0.2";
+    object      HCCO;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 0 0 0 0];
+
+internalField   nonuniform List<scalar> 
+25
+(
+4.64232e-13
+2.01851e-11
+1.00474e-09
+2.52733e-08
+2.29414e-07
+4.02204e-13
+1.6603e-11
+8.14618e-10
+2.02389e-08
+1.88335e-07
+3.64429e-13
+1.4482e-11
+7.01764e-10
+1.72626e-08
+1.60803e-07
+3.43748e-13
+1.34077e-11
+6.47869e-10
+1.59379e-08
+1.4837e-07
+3.35605e-13
+1.30001e-11
+6.26428e-10
+1.53953e-08
+1.43806e-07
+)
+;
+
+boundaryField
+{
+    fuel
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    air
+    {
+        type            fixedValue;
+        value           nonuniform List<scalar> 0();
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform 0;
+        value           nonuniform List<scalar> 5(4.64232e-13 2.01851e-11 1.00474e-09 2.52733e-08 2.29414e-07);
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
+    procBoundary0to1
+    {
+        type            processor;
+        value           nonuniform List<scalar> 5(1.27567e-06 1.0241e-06 8.44754e-07 7.69799e-07 7.44781e-07);
+    }
+    procBoundary0to2
+    {
+        type            processor;
+        value           nonuniform List<scalar> 5(3.35625e-13 1.30003e-11 6.26435e-10 1.53956e-08 1.43811e-07);
+    }
+}
+
+
+// ************************************************************************* //

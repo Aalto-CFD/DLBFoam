@@ -23,7 +23,7 @@ License
 #include "EulerImplicit.H"
 #include "ode.H"
 //#include "./ode_pyJac/ode_pyJac.H"
-#include "loadBalancedChemistryModel.H"
+#include "LoadBalancedChemistryModel.H"
 //#include "pyJacLoadBalancedChemistryModel.H"
 
 #include "psiReactionThermo.H"
@@ -40,7 +40,7 @@ License
 #define defineChemistrySolvers(ReactionThermo, ThermoPhysics)                  \
     defineChemistrySolver                                                      \
     (                                                                          \
-        loadBalancedChemistryModel,                                            \
+        LoadBalancedChemistryModel,                                            \
         ReactionThermo,                                                        \
         ThermoPhysics                                                          \
     );                                                                         \
@@ -49,7 +49,7 @@ License
     makeChemistrySolver                                                        \
     (                                                                          \
         Solver,                                                                \
-        loadBalancedChemistryModel,                                            \
+        LoadBalancedChemistryModel,                                            \
         ReactionThermo,                                                        \
         ThermoPhysics                                                          \
     );                                                                         \

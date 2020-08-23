@@ -3,7 +3,7 @@
 #include <string>
 
 //#include "thermoPhysicsTypes.H"
-#include "loadBalancedChemistryModel.H"
+#include "LoadBalancedChemistryModel.H"
 #include "StandardChemistryModel.H"
 #include "noChemistrySolver.H"
 #include "ode.H"
@@ -25,7 +25,7 @@ struct Benchmark{
             m_model = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
         }
         else {
-            m_model = new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+            m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
         }
     }
 
@@ -70,7 +70,7 @@ struct BenchmarkSolveSingle{
     BenchmarkSolveSingle(BenchmarkInfo info, psiReactionThermo& thermo, bool heavy=true) 
     : m_info(info), m_problems(create_problems(heavy)), m_solutions(create_solutions())
     {
-        m_model = new ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+        m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
     }
 
 
@@ -101,7 +101,7 @@ struct BenchmarkSolveSingle{
     void run() {
 
         for (size_t i = 0; i < m_problems.size(); ++i){
-            m_model->solve_single(m_problems[i], m_solutions[i]);
+            m_model->solveSingle(m_problems[i], m_solutions[i]);
         }
 
     }
@@ -112,6 +112,6 @@ private:
     std::vector<ChemistryProblem> m_problems;
     std::vector<ChemistrySolution> m_solutions;
 
-    ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>* m_model;
+    ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>* m_model;
 
 };
