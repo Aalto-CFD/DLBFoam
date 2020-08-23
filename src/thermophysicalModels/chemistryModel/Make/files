@@ -3,7 +3,6 @@ loadBalancing/chemistrySolution.C
 loadBalancing/chemistryLoad.C
 loadBalancing/chemistryLoadBalancingMethod.C
 loadBalancing/algorithms_aalto.C
-loadBalancing/bulutLoadBalancing.C
 refMapping/mixtureFraction.C
 refMapping/chemistryRefMappingMethod.C
 refMapping/simpleRefMappingMethod.C
