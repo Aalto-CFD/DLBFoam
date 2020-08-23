@@ -91,7 +91,7 @@ public:
     static chemistryLoad get_min(const DynamicList<chemistryLoad>& vec);
     static chemistryLoad get_max(const DynamicList<chemistryLoad>& vec);
 
-    chemistryLoad compute_my_load(const DynamicList<chemistryProblem>& problems) {
+    chemistryLoad compute_myLoad(const DynamicList<chemistryProblem>& problems) {
         auto   lambda = [](scalar sum, const chemistryProblem& rhs) { return sum + rhs.cpuTime; };
         scalar sum    = std::accumulate(problems.begin(), problems.end(), scalar(0), lambda);
         return chemistryLoad(Pstream::myProcNo(), sum);
@@ -133,10 +133,10 @@ public:
     ///
     const sendRecvInfo& get_state() const { return m_current_state; }
 
-    virtual void update_state(const DynamicList<chemistryProblem>& problems) = 0;
+    virtual void updateState(const DynamicList<chemistryProblem>& problems) = 0;
 
     /*
-    void update_state(const DynamicList<chemistryProblem>& problems) {
+    void updateState(const DynamicList<chemistryProblem>& problems) {
 
         DynamicList<chemistryLoad> loads = get_loads(problems);
         set_state(determine_state(loads));

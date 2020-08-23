@@ -50,7 +50,7 @@ public:
   
     }
     
-    void update_state(const DynamicList<chemistryProblem>& problems) {
+    void updateState(const DynamicList<chemistryProblem>& problems) {
         /*empty*/
     }
 
@@ -297,7 +297,7 @@ TEST_CASE("chemistryLoadBalancingMethod balance() / unbalance()"){
     testableLoadBalancing l;
 
     auto problems = create_problems(50);
-    l.update_state(problems);
+    l.updateState(problems);
 
     
 

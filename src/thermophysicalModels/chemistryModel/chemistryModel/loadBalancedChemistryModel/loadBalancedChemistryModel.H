@@ -44,7 +44,7 @@ SourceFiles
 
 #include "chemistryProblem.H"
 #include "chemistrySolution.H"
-#include "globalBalancingMethod.H"
+#include "GlobalBalancingMethod.H"
 #include "simpleRefMappingMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

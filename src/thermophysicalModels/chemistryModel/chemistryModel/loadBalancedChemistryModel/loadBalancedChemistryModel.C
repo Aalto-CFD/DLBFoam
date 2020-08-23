@@ -43,7 +43,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
                     << "    "
                     << "get_problem"
                     << "    "
-                    << "update_state"
+                    << "updateState"
                     << "    "
                     << "balance"
                     << "    "
@@ -62,7 +62,7 @@ template <class ReactionThermo, class ThermoType>
 typename loadBalancedChemistryModel<ReactionThermo, ThermoType>::balancer_ptr
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer() {
 
-    return balancer_ptr(new globalBalancingMethod());
+    return balancer_ptr(new GlobalBalancingMethod());
     // return balancer_ptr(new bulutLoadBalancing());
 }
 
@@ -99,8 +99,8 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     scalar                        get_problem  = timer.timeIncrement();
 
     timer.timeIncrement();
-    load_balancer_->update_state(all_problems);
-    scalar update_state = timer.timeIncrement();
+    load_balancer_->updateState(all_problems);
+    scalar updateState = timer.timeIncrement();
 
     load_balancer_->print_state();
 
@@ -117,7 +117,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     scalar            unbalance    = timer.timeIncrement();
 
     cpuSolveFile_() << this->time().timeOutputValue() << "    " << get_problem << "    "
-                    << update_state << "    " << balance << "    " << solve_buffer << "    "
+                    << updateState << "    " << balance << "    " << solve_buffer << "    "
                     << unbalance << "    " << Pstream::myProcNo() << endl;
 
     Pstream::waitRequests();

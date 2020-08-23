@@ -3,7 +3,7 @@
 namespace Foam {
 
 /*
-chemistryLoad chemistryLoadBalancingMethod::get_my_load(const DynamicList<chemistryProblem>&
+chemistryLoad chemistryLoadBalancingMethod::get_myLoad(const DynamicList<chemistryProblem>&
 problems) const{
 
     //this sets value = n_active cells
@@ -52,7 +52,7 @@ label chemistryLoadBalancingMethod::rank_to_load_idx(const DynamicList<chemistry
 DynamicList<chemistryLoad> chemistryLoadBalancingMethod::get_loads(const
 DynamicList<chemistryProblem>& problems) const {
 
-    auto loads = all_gather(this->get_my_load(problems));
+    auto loads = all_gather(this->get_myLoad(problems));
     std::sort(loads.begin(), loads.end());
 
     return loads;

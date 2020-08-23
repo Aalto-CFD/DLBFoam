@@ -6,7 +6,7 @@ loadBalancing/algorithms_aalto.C
 refMapping/mixtureFraction.C
 refMapping/chemistryRefMappingMethod.C
 refMapping/simpleRefMappingMethod.C
-loadBalancing/globalBalancingMethod.C
+loadBalancing/GlobalBalancingMethod.C
 chemistrySolver/pexChemistrySolvers.C
 
 

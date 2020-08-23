@@ -1,7 +1,7 @@
 #include "../third_party/catch.hpp"
 
 #include "helpers.H"
-#include "globalBalancingMethod.H"
+#include "GlobalBalancingMethod.H"
 #include "chemistryProblem.H"
 
 
@@ -10,14 +10,14 @@ namespace Foam{
 
 
 
-struct globalTest : public globalBalancingMethod {
+struct globalTest : public GlobalBalancingMethod {
 
 public:
-    using globalBalancingMethod::Operation;
-    using globalBalancingMethod::get_min;
-    using globalBalancingMethod::get_max;
-    using globalBalancingMethod::get_operations;
-    using globalBalancingMethod::times_to_problem_counts;
+    using GlobalBalancingMethod::Operation;
+    using GlobalBalancingMethod::get_min;
+    using GlobalBalancingMethod::get_max;
+    using GlobalBalancingMethod::getOperations;
+    using GlobalBalancingMethod::timesToProblemCounts;
 };
 
 
@@ -38,7 +38,7 @@ TEST_CASE("simpleBalancingMethod get_min()/get_max()"){
 
 }
 
-TEST_CASE("globalBalancingMethod times_to_problem_counts"){
+TEST_CASE("GlobalBalancingMethod timesToProblemCounts"){
 
 
     size_t n_problems = 3;
@@ -48,7 +48,7 @@ TEST_CASE("globalBalancingMethod times_to_problem_counts"){
     std::vector<double> times = {1.1, 1.1};
 
 
-    auto counts = globalTest::times_to_problem_counts(times, problems);
+    auto counts = globalTest::timesToProblemCounts(times, problems);
 
     CHECK(counts.size() == 3);
     CHECK(counts[0] == 1);
@@ -59,7 +59,7 @@ TEST_CASE("globalBalancingMethod times_to_problem_counts"){
     set_cpu_times(problems, 1.0);
     times = {2.1, 0.9};
 
-    counts = globalTest::times_to_problem_counts(times, problems);
+    counts = globalTest::timesToProblemCounts(times, problems);
 
     CHECK(counts.size() == 3);
     CHECK(counts[0] == 2);
@@ -69,7 +69,7 @@ TEST_CASE("globalBalancingMethod times_to_problem_counts"){
 
 }
 
-TEST_CASE("globalBalancingMethod get_operations"){
+TEST_CASE("GlobalBalancingMethod getOperations"){
 
     size_t n_tests = 50;
 
@@ -77,7 +77,7 @@ TEST_CASE("globalBalancingMethod get_operations"){
         auto loads = create_random_load(i);
 
         for (size_t j = 0; j < i; ++j){
-            REQUIRE_NOTHROW(globalTest::get_operations(loads, loads[i]));
+            REQUIRE_NOTHROW(globalTest::getOperations(loads, loads[i]));
         }
             
     }
@@ -89,7 +89,7 @@ TEST_CASE("globalBalancingMethod get_operations"){
 /*
 
 
-TEST_CASE("globalBalancingMethod update_state0()"){
+TEST_CASE("GlobalBalancingMethod updateState0()"){
 
 
     size_t n_problems = 100;
@@ -111,14 +111,14 @@ TEST_CASE("globalBalancingMethod update_state0()"){
 
     auto problems = get_problems_for_load(n_problems, local_load_total);
 
-    auto my_load   = t.compute_my_load(problems);
-    double global_mean = t.get_mean(t.all_gather(my_load));
+    auto myLoad   = t.compute_myLoad(problems);
+    double global_mean = t.get_mean(t.all_gather(myLoad));
 
 
     
 
 
-    t.update_state(problems);
+    t.updateState(problems);
 
 
     auto state = t.get_state();
@@ -146,7 +146,7 @@ TEST_CASE("globalBalancingMethod update_state0()"){
 
 }
 
-TEST_CASE("globalBalancingMethod update_state1()"){
+TEST_CASE("GlobalBalancingMethod updateState1()"){
 
 
     size_t n_problems = 100;
@@ -168,14 +168,14 @@ TEST_CASE("globalBalancingMethod update_state1()"){
 
     auto problems = get_problems_for_load(n_problems, local_load_total);
 
-    auto my_load   = t.compute_my_load(problems);
-    double global_mean = t.get_mean(t.all_gather(my_load));
+    auto myLoad   = t.compute_myLoad(problems);
+    double global_mean = t.get_mean(t.all_gather(myLoad));
 
 
     
 
 
-    t.update_state(problems);
+    t.updateState(problems);
 
     t.print_state();
 
@@ -208,7 +208,7 @@ TEST_CASE("globalBalancingMethod update_state1()"){
 }
 
 
-TEST_CASE("globalBalancingMethod update_state2()"){
+TEST_CASE("GlobalBalancingMethod updateState2()"){
 
 
     
@@ -219,14 +219,14 @@ TEST_CASE("globalBalancingMethod update_state2()"){
 
     globalTest t;
 
-    auto my_load   = t.compute_my_load(problems);
-    auto all_loads = t.all_gather(my_load);
+    auto myLoad   = t.compute_myLoad(problems);
+    auto all_loads = t.all_gather(myLoad);
 
     double global_mean = t.get_mean(all_loads);
 
 
 
-    t.update_state(problems);
+    t.updateState(problems);
 
 
     auto state = t.get_state();
