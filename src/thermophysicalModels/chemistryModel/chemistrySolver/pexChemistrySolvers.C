@@ -22,9 +22,9 @@ License
 #include "noChemistrySolver.H"
 #include "EulerImplicit.H"
 #include "ode.H"
-#include "./ode_pyJac/ode_pyJac.H"
+//#include "./ode_pyJac/ode_pyJac.H"
 #include "loadBalancedChemistryModel.H"
-#include "pyJacLoadBalancedChemistryModel.H"
+//#include "pyJacLoadBalancedChemistryModel.H"
 
 #include "psiReactionThermo.H"
 #include "rhoReactionThermo.H"
@@ -55,6 +55,7 @@ License
     );                                                                         \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+/*
 
 #define defineChemistrySolversPyjac(ReactionThermo, ThermoPhysics)                  \
     defineChemistrySolver                                                      \
@@ -72,7 +73,7 @@ License
         ReactionThermo,                                                        \
         ThermoPhysics                                                          \
     )
-
+*/
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -106,7 +107,7 @@ namespace Foam
 
 
 
-
+    /*
     //using pyjac ode
     //gasses
     forCommonGases(defineChemistrySolversPyjac, psiReactionThermo);
@@ -122,7 +123,7 @@ namespace Foam
     //polynomials
     forPolynomials(defineChemistrySolversPyjac, rhoReactionThermo);
     forPolynomials(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
-
+    */
 
 }
 

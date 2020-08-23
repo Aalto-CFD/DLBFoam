@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.1;
+endTime         0.2;
 
 deltaT          1e-6;
 
@@ -74,36 +74,6 @@ functions
         );
     }
 
-    /*
-    fieldMinMax1
-    {
-        // Mandatory entries (unmodifiable)
-        type        fieldMinMax;
-        libs        (fieldFunctionObjects);
-
-        // Mandatory entries (runtime modifiable)
-        mode        magnitude;
-        fields      (T);
-
-        // Optional entries (runtime modifiable)
-        location    true;
-
-        // Optional (inherited) entries
-        writePrecision  8;
-        writeToFile     true;
-        useUserTime     true;
-        region          region0;
-        enabled         true;
-        log             true;
-        timeStart       0;
-        timeEnd         1000;
-        executeControl  timeStep;
-        executeInterval 1;
-        writeControl    timeStep;
-        writeInterval   1;
-    }
-
-    */
 }
 
 
