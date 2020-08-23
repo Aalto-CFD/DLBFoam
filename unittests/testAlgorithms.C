@@ -100,6 +100,7 @@ TEST_CASE("Algorithms count_while for list of problems (forward iterators)"){
 //THIS TEST CASE CATCHES A BUG THAT PETTERI SPENT SOME TIME AT.
 //THE BEHAVIOUR OF std::reverse_iterator and Foam::DynamicList reverse iterators appear to be different.
 //IT IS REQUIRED TO CALL (and implement) make_reverse TO GET A REAL REVERSE ITERATOR
+// THE BUG IS FIXED IN OF DEV AS OF 23.8.2020
 TEST_CASE("Algorithms count_while for list of problems (reverse iterators)"){
 
 
@@ -140,34 +141,6 @@ TEST_CASE("Algorithms count_while for list of problems (reverse iterators)"){
     max = 1000;
     CHECK(count_while(make_reverse(v.end()), make_reverse(v.begin()), sum_upto) == 4);
 
-}
-
-TEST_CASE("Known bug DynamicList reverse_iterator"){
-
-    using namespace Foam;
-
-    std::vector<int> v_std = {1, 10, 3, 5};
-    DynamicList<int> v_of(4, int());
-
-    std::copy(v_std.begin(), v_std.end(), v_of.begin());
-    CHECK(v_of[1] == 10);
-
-
-    for (auto it = v_std.rbegin(); it != v_std.rend(); it++){
-        Info << *it << endl;
-    }
-
-    //this fails
-    //int count = std::count(v_of.rbegin(), v_of.rend(), 1);
-    //Info << count << endl;
-
-    //because...
-    /*
-    //this is an infinite loop as the pointer is always shifted right
-    for (auto it = v_of.rbegin(); it != v_of.rend(); it++){
-        Info << *it << endl;
-    }
-    */
 }
 
 

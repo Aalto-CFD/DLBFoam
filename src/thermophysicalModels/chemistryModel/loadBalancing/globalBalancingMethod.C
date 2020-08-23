@@ -85,7 +85,7 @@ globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
 
 
 std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operations(
-    DynamicList<chemistryLoad>& loads, const chemistryLoad& my_load) const {
+    DynamicList<chemistryLoad>& loads, const chemistryLoad& my_load) {
 
     double global_mean = get_mean(loads);
 
@@ -115,9 +115,8 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operati
         }
     }
 
-    runtime_assert(
-        !((is_sender(operations, my_load.rank) && is_receiver(operations, my_load.rank))),
-        "Only sender or receiver should be possible.");
+    
+
 
     //explicitly filter very small operations
     std::vector<Operation> large;
@@ -126,6 +125,13 @@ std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operati
             large.push_back(op);
         }
     }
+
+    runtime_assert(
+        !((is_sender(operations, my_load.rank) && is_receiver(operations, my_load.rank))),
+        "Only sender or receiver should be possible.");
+
+
+    runtime_assert(std::abs(get_mean(loads) - global_mean) < 1E-7, "Vanishing load");
 
 
     return large;

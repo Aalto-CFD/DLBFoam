@@ -71,7 +71,16 @@ TEST_CASE("globalBalancingMethod times_to_problem_counts"){
 
 TEST_CASE("globalBalancingMethod get_operations"){
 
-    
+    size_t n_tests = 50;
+
+    for (size_t i = 0; i < n_tests; ++i){
+        auto loads = create_random_load(i);
+
+        for (size_t j = 0; j < i; ++j){
+            REQUIRE_NOTHROW(globalTest::get_operations(loads, loads[i]));
+        }
+            
+    }
 
 
 
