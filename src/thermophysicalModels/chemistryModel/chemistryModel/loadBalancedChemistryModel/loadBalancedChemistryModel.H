@@ -42,9 +42,9 @@ SourceFiles
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
 
-#include "chemistryProblem.H"
-#include "chemistrySolution.H"
-#include "GlobalBalancingMethod.H"
+#include "ChemistryProblem.H"
+#include "ChemistrySolution.H"
+#include "LoadBalancer.H"
 #include "simpleRefMappingMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -62,10 +62,7 @@ template <class ReactionThermo, class ThermoType>
 class loadBalancedChemistryModel : public StandardChemistryModel<ReactionThermo, ThermoType> {
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
-    // using balancer_ptr = typename std::unique_ptr<chemistryLoadBalancingMethod>;
-    using balancer_ptr = autoPtr<chemistryLoadBalancingMethod>;
 
-    using refmapper_ptr = chemistryRefMappingMethod*; // chemistryautoPtr<chemistryRefMappingMethod>;
 
 public:
     //- Runtime type information
@@ -98,7 +95,7 @@ public:
     ///@param prob
     ///@param soln
     ///
-    void solve_single(chemistryProblem& prob, chemistrySolution& soln) const;
+    void solve_single(ChemistryProblem& prob, ChemistrySolution& soln) const;
 
     //- Disallow default bitwise assignment
     void operator=(const loadBalancedChemistryModel&) = delete;
@@ -110,46 +107,40 @@ public:
 private:
     scalarField cpu_times_;
 
-    balancer_ptr load_balancer_;
+    LoadBalancer load_balancer_;
 
-    refmapper_ptr ref_mapper_;
+    simpleRefMappingMethod ref_mapper_;
 
-    ///
-    ///@brief A factory function for creating the balancer
-    ///
-    ///@return chemistryLoadBalancingMethod*
-    ///
-    static balancer_ptr create_balancer();
 
     ///
     ///@brief A factory function for creating the refmapper
     ///
-    ///@return chemistryRefMappingMethod*
+    ///@return simpleRefMappingMethod
     ///
-    static refmapper_ptr create_refmapper(const ReactionThermo& thermo);
+    static simpleRefMappingMethod create_refmapper(const ReactionThermo& thermo);
 
     ///
     ///@brief
     ///
     ///@param problems
-    ///@return chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
+    ///@return LoadBalancerBase::buffer_t<ChemistrySolution>
     ///
-    chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
-    solve_buffer(chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const;
+    LoadBalancerBase::buffer_t<ChemistrySolution>
+    solve_buffer(LoadBalancerBase::buffer_t<ChemistryProblem>& problems) const;
 
     ///
     ///@brief Get the problems object
     ///
     ///@param Y_
     ///@param deltaT
-    ///@return DynamicList<chemistryProblem>
+    ///@return DynamicList<ChemistryProblem>
     ///
 
     template <class DeltaTType>
-    DynamicList<chemistryProblem> get_problems(const DeltaTType& deltaT);
+    DynamicList<ChemistryProblem> get_problems(const DeltaTType& deltaT);
 
     template <class DeltaTType>
-    DynamicList<chemistryProblem> get_problems(PtrList<volScalarField>& Y_,
+    DynamicList<ChemistryProblem> get_problems(PtrList<volScalarField>& Y_,
                                                const DeltaTType&        deltaT);
 
     ///
@@ -159,13 +150,13 @@ private:
     ///@return scalar
     ///
     scalar update_reaction_rates(
-        const chemistryLoadBalancingMethod::buffer_t<chemistrySolution>& solutions);
+        const LoadBalancerBase::buffer_t<ChemistrySolution>& solutions);
 
     ///
     ///@brief updates a single problem's reaction rate for index i
     ///
     ///
-    virtual void update_reaction_rate(const chemistrySolution& solution, const label& i);
+    virtual void update_reaction_rate(const ChemistrySolution& solution, const label& i);
 
     ///
     ///@brief Compute c_ variable as concentration
@@ -184,7 +175,7 @@ private:
     ///@param solution
     ///@return scalar
     ///
-    virtual scalar compute_RR(const label& j, const chemistrySolution& solution) const;
+    virtual scalar compute_RR(const label& j, const ChemistrySolution& solution) const;
 
     ///
     ///@brief Get the mass fraction field for refmapping
@@ -192,7 +183,7 @@ private:
     ///@param problem
     ///@return scalarField
     ///
-    virtual scalarField get_mass_fraction(const chemistryProblem& problem) const;
+    virtual scalarField get_mass_fraction(const ChemistryProblem& problem) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

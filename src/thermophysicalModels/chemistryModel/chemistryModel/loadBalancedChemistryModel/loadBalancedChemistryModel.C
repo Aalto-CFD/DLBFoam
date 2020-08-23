@@ -34,7 +34,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
     const ReactionThermo& thermo)
     : StandardChemistryModel<ReactionThermo, ThermoType>(thermo)
     , cpu_times_(this->mesh().cells().size(), 0.0)
-    , load_balancer_(create_balancer())
+    , load_balancer_(LoadBalancer())
     , ref_mapper_(create_refmapper(this->thermo())) {
 
     Info << "Running with a load balanced" << endl;
@@ -58,16 +58,9 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::loadBalancedChemistryMod
 template <class ReactionThermo, class ThermoType>
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::~loadBalancedChemistryModel() {}
 
-template <class ReactionThermo, class ThermoType>
-typename loadBalancedChemistryModel<ReactionThermo, ThermoType>::balancer_ptr
-loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_balancer() {
-
-    return balancer_ptr(new GlobalBalancingMethod());
-    // return balancer_ptr(new bulutLoadBalancing());
-}
 
 template <class ReactionThermo, class ThermoType>
-typename loadBalancedChemistryModel<ReactionThermo, ThermoType>::refmapper_ptr
+simpleRefMappingMethod
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_refmapper(
     const ReactionThermo& thermo) {
 
@@ -77,7 +70,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::create_refmapper(
                                                   IOobject::MUST_READ,
                                                   IOobject::NO_WRITE,
                                                   false));
-    return refmapper_ptr(new simpleRefMappingMethod(chemistryDict_tmp, thermo.composition()));
+    return simpleRefMappingMethod(chemistryDict_tmp, thermo.composition());
     // return balancer_ptr(new bulutLoadBalancing());
 }
 
@@ -85,8 +78,8 @@ template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
 scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const DeltaTType& deltaT) {
 
-    using problem_buffer_t  = chemistryLoadBalancingMethod::buffer_t<chemistryProblem>;
-    using solution_buffer_t = chemistryLoadBalancingMethod::buffer_t<chemistrySolution>;
+    using problem_buffer_t  = LoadBalancerBase::buffer_t<ChemistryProblem>;
+    using solution_buffer_t = LoadBalancerBase::buffer_t<ChemistrySolution>;
 
     BasicChemistryModel<ReactionThermo>::correct();
 
@@ -95,17 +88,17 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     clockTime timer;
 
     timer.timeIncrement();
-    DynamicList<chemistryProblem> all_problems = get_problems(deltaT);
+    DynamicList<ChemistryProblem> all_problems = get_problems(deltaT);
     scalar                        get_problem  = timer.timeIncrement();
 
     timer.timeIncrement();
-    load_balancer_->updateState(all_problems);
+    load_balancer_.updateState(all_problems);
     scalar updateState = timer.timeIncrement();
 
-    load_balancer_->print_state();
+    load_balancer_.printState();
 
     timer.timeIncrement();
-    problem_buffer_t balanced_problems = load_balancer_->balance(all_problems);
+    problem_buffer_t balanced_problems = load_balancer_.balance(all_problems);
     scalar           balance           = timer.timeIncrement();
 
     timer.timeIncrement();
@@ -113,7 +106,7 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
     scalar            solve_buffer       = timer.timeIncrement();
 
     timer.timeIncrement();
-    solution_buffer_t my_solutions = load_balancer_->unbalance(balanced_solutions);
+    solution_buffer_t my_solutions = load_balancer_.unbalance(balanced_solutions);
     scalar            unbalance    = timer.timeIncrement();
 
     cpuSolveFile_() << this->time().timeOutputValue() << "    " << get_problem << "    "
@@ -127,9 +120,9 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const Delta
 
 template <class ReactionThermo, class ThermoType>
 void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
-    chemistryProblem& prob, chemistrySolution& soln) const {
+    ChemistryProblem& prob, ChemistrySolution& soln) const {
 
-    // TODO: Make this work so that chemistryProblem is a const &
+    // TODO: Make this work so that ChemistryProblem is a const &
 
     scalar timeLeft = prob.deltaT;
     // const scalarList c0       = prob.c;
@@ -158,7 +151,7 @@ void loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_single(
 
 template <class ReactionThermo, class ThermoType>
 scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rates(
-    const chemistryLoadBalancingMethod::buffer_t<chemistrySolution>& solutions) {
+    const LoadBalancerBase::buffer_t<ChemistrySolution>& solutions) {
 
     scalar deltaTMin = great;
 
@@ -190,15 +183,15 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(const scala
 }
 
 template <class ReactionThermo, class ThermoType>
-chemistryLoadBalancingMethod::buffer_t<chemistrySolution>
+LoadBalancerBase::buffer_t<ChemistrySolution>
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
-    chemistryLoadBalancingMethod::buffer_t<chemistryProblem>& problems) const {
+    LoadBalancerBase::buffer_t<ChemistryProblem>& problems) const {
 
     // allocate the solutions buffer
-    chemistryLoadBalancingMethod::buffer_t<chemistrySolution> solutions;
+    LoadBalancerBase::buffer_t<ChemistrySolution> solutions;
     for (label i = 0; i < problems.size(); ++i) {
-        DynamicList<chemistrySolution> sublist(problems[i].size(),
-                                               chemistrySolution(this->nSpecie_));
+        DynamicList<ChemistrySolution> sublist(problems[i].size(),
+                                               ChemistrySolution(this->nSpecie_));
         solutions.append(sublist);
     }
 
@@ -214,7 +207,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::solve_buffer(
 
 template <class ReactionThermo, class ThermoType>
 template <class DeltaTType>
-DynamicList<chemistryProblem>
+DynamicList<ChemistryProblem>
 loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(const DeltaTType& deltaT) {
 
     // TODO: Add refcell and Treact as conditions to get problems.
@@ -224,8 +217,8 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(const Delta
     tmp<volScalarField>           trho(this->thermo().rho());
     const scalarField&            rho          = trho();
     bool                          refCellFound = false;
-    DynamicList<chemistryProblem> chem_problems;
-    chemistrySolution             ref_soln(this->nSpecie_);
+    DynamicList<ChemistryProblem> chem_problems;
+    ChemistrySolution             ref_soln(this->nSpecie_);
 
     // TODO: reserve
     // chem_problems.reserve(T.size());
@@ -241,7 +234,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(const Delta
         if (Ti > this->Treact()) {
 
             // Create the problem
-            chemistryProblem problem;
+            ChemistryProblem problem;
             problem.c          = this->c_;
             problem.Ti         = T[celli];
             problem.pi         = p[celli];
@@ -251,7 +244,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(const Delta
             problem.cpuTime    = this->cpu_times_[celli];
             problem.cellid     = celli;
 
-            if (ref_mapper_->active() && ref_mapper_->shouldMap(get_mass_fraction(problem))) {
+            if (ref_mapper_.active() && ref_mapper_.shouldMap(get_mass_fraction(problem))) {
 
                 if (!refCellFound) {
                     solve_single(problem, ref_soln);
@@ -276,7 +269,7 @@ loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_problems(const Delta
 
 template <class ReactionThermo, class ThermoType>
 void loadBalancedChemistryModel<ReactionThermo, ThermoType>::update_reaction_rate(
-    const chemistrySolution& solution, const label& i) {
+    const ChemistrySolution& solution, const label& i) {
 
     for (label j = 0; j < this->nSpecie_; j++) { this->RR_[j][i] = compute_RR(j, solution); }
     this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
@@ -292,14 +285,14 @@ scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(const s
 
 template <class ReactionThermo, class ThermoType>
 scalar loadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
-    const label& j, const chemistrySolution& solution) const {
+    const label& j, const ChemistrySolution& solution) const {
 
     return (solution.c_increment[j] * this->specieThermos_[j].W());
 }
 
 template <class ReactionThermo, class ThermoType>
 scalarField loadBalancedChemistryModel<ReactionThermo, ThermoType>::get_mass_fraction(
-    const chemistryProblem& problem) const {
+    const ChemistryProblem& problem) const {
 
     scalarField tmp(this->nSpecie_);
     for (label i = 0; i < this->nSpecie_; i++) { tmp[i] = this->Y_[i][problem.cellid]; }

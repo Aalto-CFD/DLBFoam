@@ -5,13 +5,13 @@ double random_double(double min, double max) {
     return min + f * (max - min);
 }
 
-Foam::DynamicList<Foam::chemistryProblem> create_random_problems(size_t count) {
+Foam::DynamicList<Foam::ChemistryProblem> create_random_problems(size_t count) {
 
     using namespace Foam;
-    DynamicList<chemistryProblem> problems;
+    DynamicList<ChemistryProblem> problems;
 
     for (size_t i = 0; i < count; ++i) {
-        chemistryProblem p;
+        ChemistryProblem p;
 
         scalarField s(10);
         p.c          = random_double(0.0, 1.0);
@@ -26,11 +26,11 @@ Foam::DynamicList<Foam::chemistryProblem> create_random_problems(size_t count) {
     return problems;
 }
 
-Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t count)
+Foam::DynamicList<Foam::ChemistryLoad> create_random_load(size_t count)
 {
     using namespace Foam;
 
-    DynamicList<chemistryLoad> ret(count, chemistryLoad());
+    DynamicList<ChemistryLoad> ret(count, ChemistryLoad());
 
     for (size_t i = 0; i < count; ++i) {
         ret[i].value = random_double(0., 300.0);
@@ -39,7 +39,7 @@ Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t count)
     return ret;
 }
 
-Foam::DynamicList<Foam::chemistryProblem> get_problems_for_load(size_t n_problems, double total_load){
+Foam::DynamicList<Foam::ChemistryProblem> get_problems_for_load(size_t n_problems, double total_load){
 
     double problem_value = total_load / n_problems;
 
@@ -53,7 +53,7 @@ Foam::DynamicList<Foam::chemistryProblem> get_problems_for_load(size_t n_problem
 
 }
 
-void set_cpu_times(Foam::DynamicList<Foam::chemistryProblem>& problems, double cpu_time){
+void set_cpu_times(Foam::DynamicList<Foam::ChemistryProblem>& problems, double cpu_time){
 
     for (auto& problem : problems){
         problem.cpuTime = cpu_time;
@@ -61,7 +61,7 @@ void set_cpu_times(Foam::DynamicList<Foam::chemistryProblem>& problems, double c
 
 }
 
-void print_loads(const Foam::DynamicList<Foam::chemistryLoad>& loads) {
+void print_loads(const Foam::DynamicList<Foam::ChemistryLoad>& loads) {
 
     for (const auto& load : loads) {
 

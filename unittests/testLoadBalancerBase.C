@@ -1,19 +1,19 @@
 #include "../third_party/catch.hpp"
 
-#include "chemistryLoadBalancingMethod.H"
-#include "chemistryProblem.H"
+#include "LoadBalancerBase.H"
+#include "ChemistryProblem.H"
 
 
 namespace Foam{
 
 //create some arbitrary data
-DynamicList<chemistryProblem> create_problems(int count){
+DynamicList<ChemistryProblem> create_problems(int count){
 
-    DynamicList<chemistryProblem> problems;
+    DynamicList<ChemistryProblem> problems;
     
     for (int i = 0; i < count; ++i){
         //send data
-        chemistryProblem p;
+        ChemistryProblem p;
         
         scalarField s(10);
         s = 32.04; 
@@ -32,7 +32,7 @@ DynamicList<chemistryProblem> create_problems(int count){
 }
 
 
-class testableLoadBalancing : public chemistryLoadBalancingMethod{
+class testableLoadBalancing : public LoadBalancerBase{
 
 public:
 
@@ -40,32 +40,31 @@ public:
     //handy for testing
     void set_test_state(const std::vector<int>& sources, const std::vector<int>& destinations, const std::vector<int>& n_probs) {
 
-        sendRecvInfo i;
+        BalancerState i;
 
         i.sources = sources;
         i.destinations = destinations;
-        i.number_of_problems = n_probs;
+        i.nProblems = n_probs;
 
-        this->set_state(i);
+        this->setState(i);
   
     }
     
-    void updateState(const DynamicList<chemistryProblem>& problems) {
+    void updateState(const DynamicList<ChemistryProblem>& problems) {
         /*empty*/
     }
 
     template<class ET, Pstream::commsTypes CT>
-    static buffer_t<ET> test_send_recv(const buffer_t<ET>& buffer, std::vector<int> sources, std::vector<int> dests){
-        return chemistryLoadBalancingMethod::send_recv<ET, CT>(buffer, sources, dests);
+    static buffer_t<ET> test_sendRecv(const buffer_t<ET>& buffer, std::vector<int> sources, std::vector<int> dests){
+        return LoadBalancerBase::sendRecv<ET, CT>(buffer, sources, dests);
     }
    
-    DynamicList<chemistryLoad> test_get_loads(const DynamicList<chemistryProblem>& problems) const   {return this->get_loads(problems);}
 
    /* void update() {
 
         auto loads = get_loads();
         auto state = determine_state(loads);
-        this->set_state(state);
+        this->setState(state);
     }
 
     */
@@ -76,7 +75,7 @@ public:
 
 
 
-TEST_CASE("chemistryLoadBalancingMethod constructors"){
+TEST_CASE("LoadBalancerBase constructors"){
 
 
     using namespace Foam;
@@ -85,15 +84,15 @@ TEST_CASE("chemistryLoadBalancingMethod constructors"){
 
 }
 
-TEST_CASE("chemistryLoadBalancingMethod all_gather()"){
+TEST_CASE("LoadBalancerBase allGather()"){
 
 
 
     using namespace Foam;
 
-    double my_data = 2.5 * Pstream::myProcNo();
+    double myData = 2.5 * Pstream::myProcNo();
 
-    auto data = chemistryLoadBalancingMethod::all_gather(my_data);
+    auto data = LoadBalancerBase::allGather(myData);
 
     CHECK(data[Pstream::myProcNo()] == 2.5 * Pstream::myProcNo());
 
@@ -111,44 +110,8 @@ TEST_CASE("chemistryLoadBalancingMethod all_gather()"){
 }
 
 
-/*
 
-TEST_CASE("chemistryLoadBalancingMethod get_loads()"){
-
-
-    using namespace Foam;
-
-    testableLoadBalancing l;
-
-    auto loads = l.test_get_loads(create_problems(13));
-    CHECK(Pstream::nProcs() == loads.size());
-
-    CHECK(std::is_sorted(loads.begin(), loads.end()));
-
-
-    for (const auto & load : loads){
-        
-
-        if (load.rank % 2 == 0){
-
-            CHECK(load.value == double(3.0 * load.rank + 50));
-            CHECK(load.number_of_active_cells == load.rank * 2 + 50);
-        
-        }
-
-        else{
-            CHECK(load.value == double(3.65 * load.rank + 50));
-            CHECK(load.number_of_active_cells == load.rank * 4 + 50);
-        
-        }
-
-    }
-
-    
-}
-*/
-
-TEST_CASE("chemistryLoadBalancingMethod partition()"){
+TEST_CASE("LoadBalancerBase partition()"){
 
 
     using namespace Foam;
@@ -160,7 +123,7 @@ TEST_CASE("chemistryLoadBalancingMethod partition()"){
     }
     std::vector<int> subsizes{2, 2, 1, 5};
  
-    auto r = chemistryLoadBalancingMethod::partition(arr, subsizes);
+    auto r = LoadBalancerBase::partition(arr, subsizes);
 
     CHECK(r[0][0] == 0);
     CHECK(r[0][1] == 1);
@@ -170,7 +133,7 @@ TEST_CASE("chemistryLoadBalancingMethod partition()"){
 
     auto problems = create_problems(10);
 
-    auto split = chemistryLoadBalancingMethod::partition(problems, subsizes);
+    auto split = LoadBalancerBase::partition(problems, subsizes);
 
     CHECK(split[0][0].cellid == 0);
     CHECK(split[0][1].cellid == 1);
@@ -178,14 +141,14 @@ TEST_CASE("chemistryLoadBalancingMethod partition()"){
     CHECK(split[3][4].cellid == 9);
 
 
-    REQUIRE_THROWS(chemistryLoadBalancingMethod::partition(problems, {3,3,3}));
+    REQUIRE_THROWS(LoadBalancerBase::partition(problems, {3,3,3}));
 
 
 }
 
 
 
-TEST_CASE("chemistryLoadBalancingMethod send_recv() swap test"){
+TEST_CASE("LoadBalancerBase sendRecv() swap test"){
 
     
     using namespace Foam;
@@ -207,11 +170,11 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv() swap test"){
 
   
 
-    DynamicList<DynamicList<chemistryProblem>> send_buffer;
+    DynamicList<DynamicList<ChemistryProblem>> send_buffer;
     send_buffer.setSize(1);
     send_buffer[0] = create_problems(10);
 
-    auto recv_buffer = testableLoadBalancing::test_send_recv<chemistryProblem, Pstream::commsTypes::nonBlocking>(
+    auto recv_buffer = testableLoadBalancing::test_sendRecv<ChemistryProblem, Pstream::commsTypes::nonBlocking>(
         send_buffer, sources, destinations);
 
     if (Pstream::myProcNo() == 1) {
@@ -227,7 +190,7 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv() swap test"){
     
 }
 
-TEST_CASE("chemistryLoadBalancingMethod send_recv() self send") {
+TEST_CASE("LoadBalancerBase sendRecv() self send") {
 
     using namespace Foam;
 
@@ -237,9 +200,9 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv() self send") {
     std::vector<int> destinations = {Pstream::myProcNo()};
     std::vector<int> counts       = {10};
 
-    auto send_buffer = chemistryLoadBalancingMethod::partition(problems, counts);
+    auto send_buffer = LoadBalancerBase::partition(problems, counts);
 
-    auto recv_buffer = testableLoadBalancing::test_send_recv<chemistryProblem,
+    auto recv_buffer = testableLoadBalancing::test_sendRecv<ChemistryProblem,
          Pstream::commsTypes::nonBlocking>(send_buffer, sources, destinations);
 
 
@@ -254,7 +217,7 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv() self send") {
 
 }
 
-TEST_CASE("chemistryLoadBalancingMethod send_recv() self send 2") {
+TEST_CASE("LoadBalancerBase sendRecv() self send 2") {
 
     using namespace Foam;
 
@@ -264,9 +227,9 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv() self send 2") {
     std::vector<int> destinations = {Pstream::myProcNo()};
     std::vector<int> counts       = {1};
 
-    auto send_buffer = chemistryLoadBalancingMethod::partition(problems, counts);
+    auto send_buffer = LoadBalancerBase::partition(problems, counts);
 
-    auto recv_buffer = testableLoadBalancing::test_send_recv<chemistryProblem,
+    auto recv_buffer = testableLoadBalancing::test_sendRecv<ChemistryProblem,
          Pstream::commsTypes::nonBlocking>(send_buffer, sources, destinations);
 
 
@@ -285,7 +248,7 @@ TEST_CASE("chemistryLoadBalancingMethod send_recv() self send 2") {
 
 
 
-TEST_CASE("chemistryLoadBalancingMethod balance() / unbalance()"){
+TEST_CASE("LoadBalancerBase balance() / unbalance()"){
 
     
 
@@ -306,7 +269,7 @@ TEST_CASE("chemistryLoadBalancingMethod balance() / unbalance()"){
 
     }
 
-    //l.set_state(l.determine_state(loads));
+    //l.setState(l.determine_state(loads));
 
     label startOfRequests = Pstream::nRequests();
     auto buffer = l.balance(problems);

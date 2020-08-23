@@ -1,8 +1,8 @@
 #include "../third_party/catch.hpp"
 
 #include "helpers.H"
-#include "GlobalBalancingMethod.H"
-#include "chemistryProblem.H"
+#include "LoadBalancer.H"
+#include "ChemistryProblem.H"
 
 
 namespace Foam{
@@ -10,26 +10,26 @@ namespace Foam{
 
 
 
-struct globalTest : public GlobalBalancingMethod {
+struct globalTest : public LoadBalancer {
 
 public:
-    using GlobalBalancingMethod::Operation;
-    using GlobalBalancingMethod::get_min;
-    using GlobalBalancingMethod::get_max;
-    using GlobalBalancingMethod::getOperations;
-    using GlobalBalancingMethod::timesToProblemCounts;
+    using LoadBalancer::Operation;
+    using LoadBalancer::getMin;
+    using LoadBalancer::getMax;
+    using LoadBalancer::getOperations;
+    using LoadBalancer::timesToProblemCounts;
 };
 
 
-TEST_CASE("simpleBalancingMethod get_min()/get_max()"){
+TEST_CASE("simpleBalancingMethod getMin()/getMax()"){
 
-    DynamicList<chemistryLoad> loads;
-    loads.append(chemistryLoad(1, 1.0));
-    loads.append(chemistryLoad(2, 2.0));
-    loads.append(chemistryLoad(3, 3.0));
+    DynamicList<ChemistryLoad> loads;
+    loads.append(ChemistryLoad(1, 1.0));
+    loads.append(ChemistryLoad(2, 2.0));
+    loads.append(ChemistryLoad(3, 3.0));
 
-    auto min = globalTest::get_min(loads);
-    auto max = globalTest::get_max(loads);
+    auto min = globalTest::getMin(loads);
+    auto max = globalTest::getMax(loads);
 
     CHECK(min.rank == 1);
     CHECK(min.value == 1.0);
@@ -38,7 +38,7 @@ TEST_CASE("simpleBalancingMethod get_min()/get_max()"){
 
 }
 
-TEST_CASE("GlobalBalancingMethod timesToProblemCounts"){
+TEST_CASE("LoadBalancer timesToProblemCounts"){
 
 
     size_t n_problems = 3;
@@ -69,7 +69,7 @@ TEST_CASE("GlobalBalancingMethod timesToProblemCounts"){
 
 }
 
-TEST_CASE("GlobalBalancingMethod getOperations"){
+TEST_CASE("LoadBalancer getOperations"){
 
     size_t n_tests = 50;
 
@@ -89,7 +89,7 @@ TEST_CASE("GlobalBalancingMethod getOperations"){
 /*
 
 
-TEST_CASE("GlobalBalancingMethod updateState0()"){
+TEST_CASE("LoadBalancer updateState0()"){
 
 
     size_t n_problems = 100;
@@ -111,8 +111,8 @@ TEST_CASE("GlobalBalancingMethod updateState0()"){
 
     auto problems = get_problems_for_load(n_problems, local_load_total);
 
-    auto myLoad   = t.compute_myLoad(problems);
-    double global_mean = t.get_mean(t.all_gather(myLoad));
+    auto myLoad   = t.computeLoad(problems);
+    double global_mean = t.getMean(t.allGather(myLoad));
 
 
     
@@ -121,13 +121,13 @@ TEST_CASE("GlobalBalancingMethod updateState0()"){
     t.updateState(problems);
 
 
-    auto state = t.get_state();
+    auto state = t.getState();
 
     if (Pstream::master()){
         CHECK(state.destinations.size() == nprocs);
         CHECK(state.sources.size() == 1);
 
-        auto counts = state.number_of_problems;
+        auto counts = state.nProblems;
         scalar remaining_load = counts[0] * local_load_total/n_problems;
 
 
@@ -146,7 +146,7 @@ TEST_CASE("GlobalBalancingMethod updateState0()"){
 
 }
 
-TEST_CASE("GlobalBalancingMethod updateState1()"){
+TEST_CASE("LoadBalancer updateState1()"){
 
 
     size_t n_problems = 100;
@@ -168,8 +168,8 @@ TEST_CASE("GlobalBalancingMethod updateState1()"){
 
     auto problems = get_problems_for_load(n_problems, local_load_total);
 
-    auto myLoad   = t.compute_myLoad(problems);
-    double global_mean = t.get_mean(t.all_gather(myLoad));
+    auto myLoad   = t.computeLoad(problems);
+    double global_mean = t.getMean(t.allGather(myLoad));
 
 
     
@@ -177,11 +177,11 @@ TEST_CASE("GlobalBalancingMethod updateState1()"){
 
     t.updateState(problems);
 
-    t.print_state();
+    t.printState();
 
-    auto state = t.get_state();
+    auto state = t.getState();
 
-    auto counts = state.number_of_problems;
+    auto counts = state.nProblems;
     CHECK(std::accumulate(counts.begin(), counts.end(), 0) == n_problems);
 
     //senders
@@ -190,7 +190,7 @@ TEST_CASE("GlobalBalancingMethod updateState1()"){
         CHECK(state.sources.size() == 1);
 
 
-        auto counts = state.number_of_problems;
+        auto counts = state.nProblems;
         scalar remaining_load = counts[0] * local_load_total/n_problems;
 
 
@@ -208,7 +208,7 @@ TEST_CASE("GlobalBalancingMethod updateState1()"){
 }
 
 
-TEST_CASE("GlobalBalancingMethod updateState2()"){
+TEST_CASE("LoadBalancer updateState2()"){
 
 
     
@@ -219,19 +219,19 @@ TEST_CASE("GlobalBalancingMethod updateState2()"){
 
     globalTest t;
 
-    auto myLoad   = t.compute_myLoad(problems);
-    auto all_loads = t.all_gather(myLoad);
+    auto myLoad   = t.computeLoad(problems);
+    auto all_loads = t.allGather(myLoad);
 
-    double global_mean = t.get_mean(all_loads);
+    double global_mean = t.getMean(all_loads);
 
 
 
     t.updateState(problems);
 
 
-    auto state = t.get_state();
+    auto state = t.getState();
 
-    auto counts = state.number_of_problems;
+    auto counts = state.nProblems;
 
     CHECK(std::accumulate(counts.begin(), counts.end(), 0) == n_problems);
 

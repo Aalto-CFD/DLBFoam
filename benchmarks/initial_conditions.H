@@ -3,8 +3,8 @@
 #include <stdlib.h>     //srand, rand
 #include "Random.H"
 
-#include "chemistryProblem.H"
-#include "chemistrySolution.H"
+#include "ChemistryProblem.H"
+#include "ChemistrySolution.H"
 
 
 
@@ -37,10 +37,10 @@ namespace detail{
     static constexpr double LIGHT_Y_VALUE = 0.0001;
 
     
-    chemistryProblem create_heavy_problem() {
+    ChemistryProblem create_heavy_problem() {
 
 
-        chemistryProblem p(n_species);
+        ChemistryProblem p(n_species);
         p.c = 0.1;
 
         p.Ti = 1800;
@@ -54,7 +54,7 @@ namespace detail{
 
     }
 
-    chemistryProblem create_light_problem() {
+    ChemistryProblem create_light_problem() {
 
         auto p = create_heavy_problem();
         p.c = 0.0001;
@@ -62,9 +62,9 @@ namespace detail{
 
 
     }
-   std::vector<chemistryProblem> create_n_random_heavy(size_t n) {
+   std::vector<ChemistryProblem> create_n_random_heavy(size_t n) {
 
-        std::vector<chemistryProblem> p;
+        std::vector<ChemistryProblem> p;
 
         for (size_t i = 0; i < n;  ++i){
             p.push_back(create_heavy_problem());
@@ -72,9 +72,9 @@ namespace detail{
         return p;
     }
 
-     std::vector<chemistryProblem> create_n_random_light(size_t n) {
+     std::vector<ChemistryProblem> create_n_random_light(size_t n) {
 
-        std::vector<chemistryProblem> p;
+        std::vector<ChemistryProblem> p;
 
         for (size_t i = 0; i < n;  ++i){
             p.push_back(create_light_problem());
@@ -82,8 +82,8 @@ namespace detail{
         return p;
     }
 
-    chemistrySolution create_empty_solution() {
-        return chemistrySolution(n_species);
+    ChemistrySolution create_empty_solution() {
+        return ChemistrySolution(n_species);
     }
 
 void generic_assign_all(volScalarField& rho, psiReactionThermo& thermo, scalar Tv, scalar pv, scalar rhov, scalar Yv) {

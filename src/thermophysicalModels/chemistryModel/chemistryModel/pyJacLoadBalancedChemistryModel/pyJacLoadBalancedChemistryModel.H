@@ -122,7 +122,7 @@ private:
     ///@param solution
     ///@return scalar
     ///
-    scalar compute_RR(const label& j, const chemistrySolution& solution) const;
+    scalar compute_RR(const label& j, const ChemistrySolution& solution) const;
 
     ///
     ///@brief Get the mass fraction field for refmapping
@@ -130,7 +130,7 @@ private:
     ///@param problem
     ///@return scalarField
     ///
-    scalarField get_mass_fraction(const chemistryProblem& problem) const;
+    scalarField get_mass_fraction(const ChemistryProblem& problem) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

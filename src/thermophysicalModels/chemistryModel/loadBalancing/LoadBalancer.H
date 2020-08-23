@@ -18,27 +18,27 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 Class
-    Foam::GlobalBalancingMethod
+    Foam::LoadBalancer
 Description
-    Extends the base class chemistryLoadBalancingMethod by implementing a 
+    Extends the base class LoadBalancerBase by implementing a
     balancing algorithm which tries to set the global mean load to each rank.
 SourceFiles
-    GlobalBalancingMethod.C
+    LoadBalancer.C
 \*---------------------------------------------------------------------------*/
 
-#ifndef GlobalBalancingMethod_H
-#define GlobalBalancingMethod_H
-
-#include <algorithm>
-#include <vector>
+#ifndef LoadBalancer_H
+#define LoadBalancer_H
 
 #include "IOdictionary.H"
 #include "Switch.H"
 #include "algorithms_aalto.H"
-#include "chemistryLoadBalancingMethod.H"
-#include "chemistryProblem.H"
+#include "LoadBalancerBase.H"
+#include "ChemistryProblem.H"
 #include "runTimeSelectionTables.H"
 #include "scalarField.H"
+
+#include <algorithm>
+#include <vector>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,7 +47,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class GlobalBalancingMethod : public chemistryLoadBalancingMethod
+class LoadBalancer : public LoadBalancerBase
 {
 
 public:
@@ -58,69 +58,73 @@ public:
     };
 
 public:
-    GlobalBalancingMethod() = default;
+    LoadBalancer() = default;
 
-    virtual ~GlobalBalancingMethod() = default;
+    virtual ~LoadBalancer() = default;
 
     ///
-    ///@brief Given a list of all problems, updates the sendRecvInfo member
+    ///@brief Given a list of all problems, updates the BalancerState member
     ///
     ///@param problems a list of all problems on a rank
     ///
-    virtual void updateState(const DynamicList<chemistryProblem>& problems);
+    virtual void updateState(const DynamicList<ChemistryProblem>& problems);
 
 protected:
-
     ///
-    ///@brief Get the operations of this process which minimize the deviation from global mean
+    ///@brief Get the operations of this process which minimize the deviation
+    ///from global mean
     ///
-    ///@param loads Loads on all processes 
+    ///@param loads Loads on all processes
     ///@param myLoad Load on this process
-    ///@return std::vector<GlobalBalancingMethod::Operation> Operations of this rank
+    ///@return std::vector<LoadBalancer::Operation> Operations of this
+    ///rank
     ///
-    static std::vector<GlobalBalancingMethod::Operation> getOperations(
-        DynamicList<chemistryLoad>& loads, const chemistryLoad& myLoad);
+    static std::vector<LoadBalancer::Operation> getOperations(
+        DynamicList<ChemistryLoad>& loads, const ChemistryLoad& myLoad);
 
     ///
-    ///@brief Converts the operations to send and receive info for the base class to handle balancing
+    ///@brief Converts the operations to send and receive info for the base
+    ///class to handle balancing
     ///
     ///@param operations Operations of this process
     ///@param problems Problems of this process
     ///@param myLoad   Load on this process
-    ///@return sendRecvInfo An object describing how many problems to send/recv from different ranks
+    ///@return BalancerState An object describing how many problems to send/recv
+    ///from different ranks
     ///
-    static sendRecvInfo operationsToInfo(
+    static BalancerState operationsToInfo(
         const std::vector<Operation>&        operations,
-        const DynamicList<chemistryProblem>& problems,
-        const chemistryLoad&                 myLoad);
-
+        const DynamicList<ChemistryProblem>& problems,
+        const ChemistryLoad&                 myLoad);
 
     ///
     ///@brief Converts the vector of cpu times to number of problems
     ///
-    ///@param times Vector of cpu times 
+    ///@param times Vector of cpu times
     ///@param problems Problems of this process
-    ///@return std::vector<label> 
+    ///@return std::vector<label>
     ///
     static std::vector<label> timesToProblemCounts(
         const std::vector<scalar>&           times,
-        const DynamicList<chemistryProblem>& problems);
+        const DynamicList<ChemistryProblem>& problems);
 
 private:
-
     ///
-    ///@brief Based on the given operations checks if a process is a sender or receiver. 
+    ///@brief Based on the given operations checks if a process is a sender or
+    ///receiver.
     ///       Zero operations are marked as a receiver rank.
     ///
     ///@param operations Operations to check.
     ///@param rank       Rank to check.
     ///@return true      If all operations have a from = rank
-    ///@return false     If operations are null or any of the operations from != rank
+    ///@return false     If operations are null or any of the operations from !=
+    ///rank
     ///
     static bool isSender(const std::vector<Operation>& operations, int rank);
 
     ///
-    ///@brief Based on the given operations checks if a process is a sender or receiver. 
+    ///@brief Based on the given operations checks if a process is a sender or
+    ///receiver.
     ///       Zero operations are marked as a receiver rank.
     ///
     ///@param operations Operations to check

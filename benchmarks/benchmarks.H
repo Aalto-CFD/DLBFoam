@@ -80,7 +80,7 @@ struct BenchmarkSolveSingle{
     const BenchmarkInfo& get_info() const {return m_info;}
 
 
-    std::vector<chemistryProblem> create_problems(bool heavy) const {
+    std::vector<ChemistryProblem> create_problems(bool heavy) const {
 
         if (heavy) {
             return detail::create_n_random_heavy(n_problems);
@@ -90,8 +90,8 @@ struct BenchmarkSolveSingle{
 
     }
 
-    std::vector<chemistrySolution> create_solutions() const {
-        std::vector<chemistrySolution> solutions;
+    std::vector<ChemistrySolution> create_solutions() const {
+        std::vector<ChemistrySolution> solutions;
         for (size_t i=0; i < n_problems; ++i){
             solutions.push_back(detail::create_empty_solution());
         }
@@ -109,8 +109,8 @@ struct BenchmarkSolveSingle{
 private:
 
     BenchmarkInfo m_info;
-    std::vector<chemistryProblem> m_problems;
-    std::vector<chemistrySolution> m_solutions;
+    std::vector<ChemistryProblem> m_problems;
+    std::vector<ChemistrySolution> m_solutions;
 
     ode<loadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>* m_model;
 

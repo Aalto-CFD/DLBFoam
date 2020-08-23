@@ -150,14 +150,14 @@ scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(
 
 template <class ReactionThermo, class ThermoType>
 scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
-    const label& j, const chemistrySolution& solution) const {
+    const label& j, const ChemistrySolution& solution) const {
 
     return (solution.rhoi * solution.c_increment[j]);
 }
 
 template <class ReactionThermo, class ThermoType>
 scalarField pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::get_mass_fraction(
-    const chemistryProblem& problem) const {
+    const ChemistryProblem& problem) const {
 
     return problem.c;
 }

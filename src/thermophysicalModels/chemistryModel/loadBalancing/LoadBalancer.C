@@ -19,35 +19,35 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "GlobalBalancingMethod.H"
+#include "LoadBalancer.H"
 
 namespace Foam
 {
 
 void
-GlobalBalancingMethod::updateState(
-    const DynamicList<chemistryProblem>& problems)
+LoadBalancer::updateState(
+    const DynamicList<ChemistryProblem>& problems)
 {
 
-    auto myLoad   = compute_myLoad(problems);
-    auto allLoads = all_gather(myLoad);
+    auto myLoad   = computeLoad(problems);
+    auto allLoads = allGather(myLoad);
 
     // Info << globalMean << endl;
 
     auto operations = getOperations(allLoads, myLoad);
     auto info       = operationsToInfo(operations, problems, myLoad);
 
-    set_state(info);
+    setState(info);
 }
 
-chemistryLoadBalancingMethod::sendRecvInfo
-GlobalBalancingMethod::operationsToInfo(
+LoadBalancerBase::BalancerState
+LoadBalancer::operationsToInfo(
     const std::vector<Operation>&        operations,
-    const DynamicList<chemistryProblem>& problems,
-    const chemistryLoad&                 myLoad)
+    const DynamicList<ChemistryProblem>& problems,
+    const ChemistryLoad&                 myLoad)
 {
 
-    sendRecvInfo info;
+    BalancerState info;
 
     if(isSender(operations, myLoad.rank))
     {
@@ -59,7 +59,7 @@ GlobalBalancingMethod::operationsToInfo(
             sum += op.value;
             times.push_back(op.value);
         }
-        info.number_of_problems = timesToProblemCounts(times, problems);
+        info.nProblems = timesToProblemCounts(times, problems);
     }
 
     // receiver
@@ -70,7 +70,7 @@ GlobalBalancingMethod::operationsToInfo(
         {
             info.sources.push_back(op.from);
         }
-        info.number_of_problems = {problems.size()};
+        info.nProblems = {problems.size()};
     }
 
     info.destinations.push_back(Pstream::myProcNo());
@@ -80,9 +80,9 @@ GlobalBalancingMethod::operationsToInfo(
 }
 
 std::vector<label>
-GlobalBalancingMethod::timesToProblemCounts(
+LoadBalancer::timesToProblemCounts(
     const std::vector<scalar>&           times,
-    const DynamicList<chemistryProblem>& problems)
+    const DynamicList<ChemistryProblem>& problems)
 {
 
     std::vector<int> counts;
@@ -93,7 +93,7 @@ GlobalBalancingMethod::timesToProblemCounts(
     {
 
         scalar sum(0);
-        auto   operation = [&](const chemistryProblem& problem) {
+        auto   operation = [&](const ChemistryProblem& problem) {
             sum += problem.cpuTime;
             return sum <= time;
         };
@@ -105,19 +105,16 @@ GlobalBalancingMethod::timesToProblemCounts(
     int remaining =
         problems.size() - std::accumulate(counts.begin(), counts.end(), 0);
     counts.push_back(remaining);
-    runtime_assert(
-        std::accumulate(counts.begin(), counts.end(), 0) == problems.size(),
-        "Mismatch in the sliced problem count and original problem count.");
 
     return counts;
 }
 
-std::vector<GlobalBalancingMethod::Operation>
-GlobalBalancingMethod::getOperations(
-    DynamicList<chemistryLoad>& loads, const chemistryLoad& myLoad)
+std::vector<LoadBalancer::Operation>
+LoadBalancer::getOperations(
+    DynamicList<ChemistryLoad>& loads, const ChemistryLoad& myLoad)
 {
 
-    double globalMean = get_mean(loads);
+    double globalMean = getMean(loads);
 
     std::vector<Operation> operations;
 
@@ -166,7 +163,7 @@ GlobalBalancingMethod::getOperations(
         "Only sender or receiver should be possible.");
 
     runtime_assert(
-        std::abs(get_mean(loads) - globalMean) < 1E-7, "Vanishing load");
+        std::abs(getMean(loads) - globalMean) < 1E-7, "Vanishing load");
 
     return large;
 
@@ -174,7 +171,7 @@ GlobalBalancingMethod::getOperations(
 }
 
 bool
-GlobalBalancingMethod::isSender(
+LoadBalancer::isSender(
     const std::vector<Operation>& operations, int rank)
 {
 
@@ -194,7 +191,7 @@ GlobalBalancingMethod::isSender(
 }
 
 bool
-GlobalBalancingMethod::isReceiver(
+LoadBalancer::isReceiver(
     const std::vector<Operation>& operations, int rank)
 {
 

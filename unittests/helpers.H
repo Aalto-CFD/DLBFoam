@@ -2,16 +2,16 @@
 
 #include <stdlib.h>     //srand, rand
 
-#include "chemistryLoad.H"
-#include "chemistryProblem.H"
+#include "ChemistryLoad.H"
+#include "ChemistryProblem.H"
 
 
 double random_double(double min, double max);
 
-Foam::DynamicList<Foam::chemistryProblem> create_random_problems(size_t count = 10);
+Foam::DynamicList<Foam::ChemistryProblem> create_random_problems(size_t count = 10);
 
-Foam::DynamicList<Foam::chemistryLoad> create_random_load(size_t n);
-Foam::DynamicList<Foam::chemistryProblem> get_problems_for_load(size_t n_problems, double total_load);
+Foam::DynamicList<Foam::ChemistryLoad> create_random_load(size_t n);
+Foam::DynamicList<Foam::ChemistryProblem> get_problems_for_load(size_t n_problems, double total_load);
 
-void set_cpu_times(Foam::DynamicList<Foam::chemistryProblem>& problems, double cpu_time);
-void print_loads(const Foam::DynamicList<Foam::chemistryLoad>& loads);
+void set_cpu_times(Foam::DynamicList<Foam::ChemistryProblem>& problems, double cpu_time);
+void print_loads(const Foam::DynamicList<Foam::ChemistryLoad>& loads);

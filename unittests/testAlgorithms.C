@@ -1,7 +1,7 @@
 #include "../third_party/catch.hpp"
 
 #include <vector>
-#include "chemistryProblem.H"
+#include "ChemistryProblem.H"
 #include "algorithms_aalto.H"
 #include "helpers.H"
 
@@ -74,7 +74,7 @@ TEST_CASE("Algorithms count_while for list of problems (forward iterators)"){
 
     double sum;
     double max;
-    auto sum_upto = [&](const chemistryProblem& p) {
+    auto sum_upto = [&](const ChemistryProblem& p) {
         sum += p.cpuTime;
         return sum <= max;
     };
@@ -118,7 +118,7 @@ TEST_CASE("Algorithms count_while for list of problems (reverse iterators)"){
 
     double sum;
     double max;
-    auto sum_upto = [&](const chemistryProblem& p) {
+    auto sum_upto = [&](const ChemistryProblem& p) {
         sum += p.cpuTime;
         return sum <= max;
     };
