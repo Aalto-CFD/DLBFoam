@@ -7,11 +7,10 @@ void globalBalancingMethod::update_state(const DynamicList<chemistryProblem>& pr
     auto my_load   = compute_my_load(problems);
     auto all_loads = all_gather(my_load);
 
-    scalar global_mean = get_mean(all_loads);
 
     // Info << global_mean << endl;
 
-    auto operations = get_operations(all_loads, global_mean, my_load);
+    auto operations = get_operations(all_loads, my_load);
     auto info       = operations_to_info(operations, problems, my_load);
 
     set_state(info);
@@ -86,7 +85,9 @@ globalBalancingMethod::times_to_problem_counts(const std::vector<scalar>&       
 
 
 std::vector<globalBalancingMethod::Operation> globalBalancingMethod::get_operations(
-    DynamicList<chemistryLoad>& loads, double global_mean, const chemistryLoad& my_load) const {
+    DynamicList<chemistryLoad>& loads, const chemistryLoad& my_load) const {
+
+    double global_mean = get_mean(loads);
 
     std::vector<Operation> operations;
 

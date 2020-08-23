@@ -37,35 +37,6 @@ TEST_CASE("simpleBalancingMethod get_min()/get_max()"){
     CHECK(max.value == 3);
 
 }
-/*
-TEST_CASE("globalBalancingMethod times_to_problem_counts1"){
-
-
-    size_t n_problems = 10;
-    auto problems = create_random_problems(n_problems);
-
-    set_cpu_times(problems, 1.0);
-
-    auto counts1 = globalTest::times_to_problem_counts({5.1, 1.1, 1.1, 1.1, 1.1, 1.1}, problems);
-    CHECK(counts1.size() == 6);
-    CHECK(std::accumulate(counts1.begin(), counts1.end(), 0) == n_problems);
-
-    auto counts2 = globalTest::times_to_problem_counts({2.0, 3.0, 5.0}, problems);
-    CHECK(counts2.size() == 3);
-    CHECK(std::accumulate(counts2.begin(), counts2.end(), 0) == n_problems);
-
-
-    auto counts3 = globalTest::times_to_problem_counts({10.0}, problems);
-    CHECK(counts3.size() == 1);
-    CHECK(std::accumulate(counts3.begin(), counts3.end(), 0) == n_problems);
-
-
-    //auto counts4 = TESTABLE::times_to_problem_counts({1.1}, problems);
-    //CHECK(counts4.size() == 1);
-    //CHECK(std::accumulate(counts4.begin(), counts4.end(), 0) == 1);
-
-}
-*/
 
 TEST_CASE("globalBalancingMethod times_to_problem_counts"){
 
@@ -94,6 +65,14 @@ TEST_CASE("globalBalancingMethod times_to_problem_counts"){
     CHECK(counts[0] == 2);
     CHECK(counts[1] == 0);
     CHECK(counts[2] == 1);
+
+
+}
+
+TEST_CASE("globalBalancingMethod get_operations"){
+
+    
+
 
 
 }

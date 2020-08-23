@@ -45,7 +45,7 @@ protected:
 
 
     std::vector<globalBalancingMethod::Operation> get_operations(DynamicList<chemistryLoad>& loads,
-                                                                 scalar global_mean, const chemistryLoad& my_load) const;
+                                                                 const chemistryLoad& my_load) const;
 
     static sendRecvInfo operations_to_info(const std::vector<Operation>&        operations,
                                            const DynamicList<chemistryProblem>& problems,
