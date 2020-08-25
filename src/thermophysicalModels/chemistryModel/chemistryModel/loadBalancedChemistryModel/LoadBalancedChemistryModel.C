@@ -285,6 +285,8 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems(
             problem.cpuTime    = this->cpuTimes_[celli];
             problem.cellid     = celli;
 
+            // First reference cell is found and solved, following reference cells 
+            // are mapped from the first reference cell found
             if(mapper_.active() && mapper_.shouldMap(getMassFraction(problem)))
             {
 
