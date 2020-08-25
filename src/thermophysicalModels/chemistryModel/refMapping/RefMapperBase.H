@@ -22,32 +22,29 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::chemistryRefMappingMethod
+    Foam::RefMapperBased
 
 Description
-    An abstract class for chemistry tabulation.
+    An abstract class for all reference mapping methods.
 
 SourceFiles
-    chemistryRefMappingMethod.C
+    RefMapperBase.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef chemistryRefMappingMethod_H
-#define chemistryRefMappingMethod_H
-
-#include "IOdictionary.H"
-#include "scalarField.H"
-#include "Switch.H"
-#include "runTimeSelectionTables.H"
-
+#ifndef RefMapperBase_H
+#define RefMapperBase_H
 
 #include "ChemistryProblem.H"
+#include "IOdictionary.H"
+#include "Switch.H"
+#include "runTimeSelectionTables.H"
+#include "scalarField.H"
 
 // Mixture fraction headers
 #include "atomicWeights.H"
-#include "psiReactionThermo.H"
 #include "mixtureFraction.H"
-
+#include "psiReactionThermo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,36 +53,25 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /*---------------------------------------------------------------------------*\
-                           Class chemistryRefMappingMethod Declaration
+                           Class RefMapperBased Declaration
 \*---------------------------------------------------------------------------*/
 
-class chemistryRefMappingMethod
+class RefMapperBase
 {
 
 public:
-
     // Constructors
-    chemistryRefMappingMethod() = default;
-
-
+    RefMapperBase() = default;
 
     virtual bool shouldMap(const scalarField& mass_fraction) const = 0;
 
     virtual bool active() const = 0;
 
-
     //- Destructor
-    virtual ~chemistryRefMappingMethod() {}
-
-
-
+    virtual ~RefMapperBase() = default;
 };
 
-  
-
-
-} //namespace Foam
-
+} // namespace Foam
 
 #endif
 

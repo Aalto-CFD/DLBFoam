@@ -5,8 +5,8 @@ loadBalancing/LoadBalancerBase.C
 loadBalancing/algorithms_aalto.C
 loadBalancing/runtime_assert.C
 refMapping/mixtureFraction.C
-refMapping/chemistryRefMappingMethod.C
-refMapping/simpleRefMappingMethod.C
+refMapping/RefMapperBase.C
+refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
 chemistrySolver/pexChemistrySolvers.C
 

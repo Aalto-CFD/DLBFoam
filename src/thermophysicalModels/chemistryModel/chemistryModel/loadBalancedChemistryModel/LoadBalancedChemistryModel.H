@@ -44,7 +44,7 @@ SourceFiles
 #include "OFstream.H"
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
-#include "simpleRefMappingMethod.H"
+#include "mixtureFractionRefMapper.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,7 +66,7 @@ class LoadBalancedChemistryModel
 private:
     scalarField            cpuTimes_;
     LoadBalancer           balancer_;
-    simpleRefMappingMethod mapper_;
+    mixtureFractionRefMapper mapper_;
     autoPtr<OFstream>      cpuSolveFile_;
 
 public:
@@ -146,7 +146,7 @@ public:
 private:
 
     //TODO: remove
-    static simpleRefMappingMethod createMapper(const ReactionThermo& thermo);
+    static mixtureFractionRefMapper createMapper(const ReactionThermo& thermo);
 
     ///
     ///@brief Solves the whole buffer coming from the balancer

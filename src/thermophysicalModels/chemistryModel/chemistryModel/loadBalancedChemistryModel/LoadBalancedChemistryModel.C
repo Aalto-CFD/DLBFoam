@@ -63,7 +63,7 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
 }
 
 template <class ReactionThermo, class ThermoType>
-simpleRefMappingMethod
+mixtureFractionRefMapper
 LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createMapper(
     const ReactionThermo& thermo)
 {
@@ -75,7 +75,7 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createMapper(
         IOobject::MUST_READ,
         IOobject::NO_WRITE,
         false));
-    return simpleRefMappingMethod(chemistryDict_tmp, thermo.composition());
+    return mixtureFractionRefMapper(chemistryDict_tmp, thermo.composition());
     // return balancer_ptr(new bulutLoadBalancing());
 }
 
