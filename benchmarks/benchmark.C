@@ -30,8 +30,8 @@
 
 void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField>& Y, psiReactionThermo& thermo) {
 
-    BasicChemistryModel<psiReactionThermo>* model1 = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
-    BasicChemistryModel<psiReactionThermo>* model2 = new ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+    BasicChemistryModel<psiReactionThermo>* model1 = new ode<StandardChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
+    BasicChemistryModel<psiReactionThermo>* model2 = new ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
 
     set_master_heavy(rho, thermo);
 

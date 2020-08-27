@@ -22,10 +22,10 @@ struct Benchmark{
     {
         
         if (model_type == ModelType::standard){
-            m_model = new ode<StandardChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+            m_model = new ode<StandardChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
         }
         else {
-            m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+            m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
         }
     }
 
@@ -70,7 +70,7 @@ struct BenchmarkSolveSingle{
     BenchmarkSolveSingle(BenchmarkInfo info, psiReactionThermo& thermo, bool heavy=true) 
     : m_info(info), m_problems(create_problems(heavy)), m_solutions(create_solutions())
     {
-        m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>(thermo);
+        m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
     }
 
 
@@ -112,6 +112,6 @@ private:
     std::vector<ChemistryProblem> m_problems;
     std::vector<ChemistrySolution> m_solutions;
 
-    ode<LoadBalancedChemistryModel<psiReactionThermo, gasHThermoPhysics>>* m_model;
+    ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>* m_model;
 
 };
