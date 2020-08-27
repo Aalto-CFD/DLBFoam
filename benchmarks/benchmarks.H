@@ -2,14 +2,13 @@
 
 #include <string>
 
-//#include "thermoPhysicsTypes.H"
 #include "LoadBalancedChemistryModel.H"
 #include "StandardChemistryModel.H"
 #include "noChemistrySolver.H"
 #include "ode.H"
 #include "initial_conditions.H"
 #include "benchmark_info.H"
-
+#include "thermo_type.H"
 
 enum class ModelType{standard, balanced};
 
@@ -22,10 +21,10 @@ struct Benchmark{
     {
         
         if (model_type == ModelType::standard){
-            m_model = new ode<StandardChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
+            m_model = new ode<StandardChemistryModel<psiReactionThermo, ThermoType>>(thermo);
         }
         else {
-            m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
+            m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, ThermoType>>(thermo);
         }
     }
 
@@ -37,11 +36,11 @@ struct Benchmark{
     const BenchmarkInfo& get_info() const {return m_info;}
 
 
-    BasicChemistryModel<psiReactionThermo>* get_model() {return m_model;}
+    basicChemistryModel* get_model() {return m_model;}
 
 private:
     BenchmarkInfo m_info;
-    BasicChemistryModel<psiReactionThermo>* m_model;    
+    basicChemistryModel* m_model;    
 
 };
 
@@ -61,8 +60,7 @@ struct BenchmarkSolve : public Benchmark{
 
 
 
-
-
+/*
 struct BenchmarkSolveSingle{
 
     static constexpr size_t n_problems = 10;
@@ -70,7 +68,7 @@ struct BenchmarkSolveSingle{
     BenchmarkSolveSingle(BenchmarkInfo info, psiReactionThermo& thermo, bool heavy=true) 
     : m_info(info), m_problems(create_problems(heavy)), m_solutions(create_solutions())
     {
-        m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
+        m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, ThermoType>>(thermo);
     }
 
 
@@ -112,6 +110,7 @@ private:
     std::vector<ChemistryProblem> m_problems;
     std::vector<ChemistrySolution> m_solutions;
 
-    ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>* m_model;
+    basicChemistryModel* m_model;
 
 };
+*/

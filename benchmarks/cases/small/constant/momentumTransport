@@ -11,10 +11,11 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      combustionProperties;
+    object      momentumTransport;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-combustionModel  laminar;
+simulationType  laminar;
+
 
 // ************************************************************************* //

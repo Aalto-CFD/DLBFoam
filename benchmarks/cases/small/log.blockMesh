@@ -2,15 +2,15 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  7
+    \\  /    A nd           | Version:  8
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-Build  : 7-1ff648926f77
+Build  : 8-1ac1210412fb
 Exec   : blockMesh
-Date   : Jun 25 2020
-Time   : 19:45:14
+Date   : Aug 27 2020
+Time   : 14:24:24
 Host   : "peltonp1-All-Series"
-PID    : 5765
+PID    : 30264
 I/O    : uncollated
 Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small
 nProcs : 1
@@ -24,7 +24,7 @@ Create time
 Deleting polyMesh directory
     "/home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small/constant/polyMesh"
 Creating block mesh from
-    "/home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small/system/blockMeshDict"
+    "system/blockMeshDict"
 Creating block edges
 No non-planar block faces defined
 Creating topology blocks

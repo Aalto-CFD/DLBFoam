@@ -20,55 +20,16 @@
 #include "noChemistrySolver.H"
 #include "ode.H"
 
+#include "thermo_type.H"
 #include "benchmark_info.H"
 #include "initial_conditions.H"
 #include "result.H"
 #include "runner.H"
 #include "benchmarks.H"
+#include "sanity_check.H"
 
 
 
-void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField>& Y, psiReactionThermo& thermo) {
-
-    BasicChemistryModel<psiReactionThermo>* model1 = new ode<StandardChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
-    BasicChemistryModel<psiReactionThermo>* model2 = new ode<LoadBalancedChemistryModel<psiReactionThermo, thermoPhysics>>(thermo);
-
-    set_master_heavy(rho, thermo);
-
-    for (size_t i = 0; i < 2; ++i){
-        model1->solve(detail::FLOWTIMESTEP);
-        model2->solve(detail::FLOWTIMESTEP);
-    }
-
-
-
-    for (label i = 0; i < model1->nSpecie(); ++i){
-        
-        
-        const scalarField& r1 = model1->RR(i);
-        const scalarField& r2 = model2->RR(i);
-
-
-        scalar sum = 0.0;
-        forAll(r1, celli) {
-
-            scalar diff = r1[celli] - r2[celli];
-            sum += (diff * diff);
-        }
-
-        scalar norm =std::sqrt(sum);
-
-
-        if (norm > 1E-10){
-            Info << "Load balanced model and standard model give different answers! Be careful!" << endl;
-        }
-
-    }
-
-    delete model1; delete model2;
-
-
-}
 
 void dump_results(const std::vector<Result>& results) {
 
@@ -80,10 +41,6 @@ void dump_results(const std::vector<Result>& results) {
 
     outfile << Result::get_header_csv() << std::endl;
 
-    //Foam::fileName outputFile(fname);
-    //Foam::OFstream os(outputFile);
-
-    //os << Result::get_header() << endl;
 
     for (const auto& r : results) {
         outfile << r.to_csv() << std::endl;
@@ -112,7 +69,7 @@ int main(int argc, char *argv[])
     #include "setDeltaT.H"
 
 
-    //thermo.correct(); 
+    thermo.correct(); 
 
     std::vector<Result> results;
 
@@ -121,12 +78,15 @@ int main(int argc, char *argv[])
     ///
     ///
     sanity_check(p, rho, Y, thermo);
+
     
+
     ///
     ///@brief Benchmark the load balanced solver for light and heavy problems
     ///
     ///
-    /* 
+    /*
+     
     results.push_back(
         Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solveSingle()",  "simple", "all heavy"}, thermo, false), 50 )
                     );
@@ -135,7 +95,7 @@ int main(int argc, char *argv[])
         Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solveSingle()",  "simple", "all light"}, thermo, true), 50 )
                     );
 
-    */
+    */    
 
 
     /////////////////////////
@@ -324,7 +284,7 @@ int main(int argc, char *argv[])
         
         Info << r << endl;
     }
-
+    
     return 0;
 
 
