@@ -12,6 +12,6 @@ cd ..
 
 
 
-#cd ./benchmarks
-#wmake
+cd ./benchmarks
+wmake
 
