@@ -41,7 +41,7 @@ refmapping
 chemistryType
 {
     solver          ode;
-    method          loadBalanced;
+    method          standard;
     //solver            ode_pyJac;
     //method            loadBalanced_pyJac;
 }

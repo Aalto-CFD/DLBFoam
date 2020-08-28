@@ -95,6 +95,89 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
         return great;
     }
 
+    
+
+    DynamicList<ChemistryProblem> allProblems = getProblems(deltaT);
+
+
+    balancer_.updateState(allProblems);
+    
+    balancer_.printState();
+
+    auto state = balancer_.getStateNew();
+
+    problem_buffer_t problemsIWillSend = balancer_.getSendBuffer(allProblems);
+
+    PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
+    balancer_.sendCall(problemsIWillSend, state.destinations, pBufs);
+
+    DynamicList<ChemistryProblem> ownProblems = balancer_.getRemaining(allProblems);
+    problem_buffer_t ownBuffer; ownBuffer.append(ownProblems);
+    solution_buffer_t ownSolutions = solveBuffer(ownBuffer);
+    
+    problem_buffer_t guestProblems;
+    balancer_.recvCall(guestProblems, state.sources, pBufs);
+    
+    solution_buffer_t guestSolutions = solveBuffer(guestProblems);
+
+    PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
+    balancer_.sendCall(guestSolutions, state.sources, pBufs2);
+
+    solution_buffer_t incomingSolutions;
+    balancer_.recvCall(incomingSolutions, state.destinations, pBufs2);
+
+
+
+    incomingSolutions.append(ownSolutions);
+
+    return updateReactionRates(incomingSolutions);
+
+
+    /*
+    template <class ET>
+    static void sendCall(
+        const buffer_t<ET>&       send_buffer,
+        const std::vector<label>& destinations,
+        PstreamBuffers& pBufs)
+    */
+
+    //sendBuffer = slice_sendProblems(allProblems)
+    //callSends()
+    //myProblems = getMyProblems(allProblems)
+    //mySolutions = solveMyProblems(myProblems)
+    //updateReactionRates(mySolutions)
+    //guestProblems = callReceive()
+    //guestSolutions = solveGuest(guestProblems)
+    //callSends(guestSolutions)
+    //IS THERE ANY WORK THAT COULD BE DONE HERE?
+    //myIncomingSolutions = callReceives(guestSolutions)
+    //updateReactionRates(myIncomingSolutions)
+
+
+    /*
+    problem_buffer_t guestProblems = balancer_.balance(allProblems);
+
+    DynamicList<ChemistryProblem> ownProblems = balancer_.getRemaining(allProblems);
+    solution_buffer_t guestSolutions = solveBuffer(guestProblems);
+
+    problem_buffer_t ownBuffer; ownBuffer.append(ownProblems);
+    solution_buffer_t ownSolutions = solveBuffer(ownBuffer);
+
+
+    solution_buffer_t incomingSolutions = balancer_.unbalance(guestSolutions);
+
+
+
+
+
+    incomingSolutions.append(ownSolutions[0]);
+
+    return updateReactionRates(incomingSolutions);
+    */
+
+
+    /*
+
     clockTime timer;
 
     timer.timeIncrement();
@@ -127,6 +210,9 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
     Pstream::waitRequests();
 
     return updateReactionRates(my_solutions);
+
+    */
+    
 }
 
 template <class ReactionThermo, class ThermoType>

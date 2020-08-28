@@ -1,5 +1,6 @@
-cd standard
+cd ./balanced
 ./Allrun
+cd ..
 
-cd ../balanced
+cd standard
 ./Allrun

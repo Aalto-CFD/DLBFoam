@@ -60,11 +60,22 @@ public:
             nProblems; // number of problems which this rank sends/receives
     };
 
+
+    struct BalancerStateNew{
+        std::vector<label> sources;
+        std::vector<label> destinations;
+        std::vector<label> nProblems;
+        label nRemaining;
+
+    };
+
+
     template <class T>
     using buffer_t = DynamicList<DynamicList<T>>;
 
 private:
     BalancerState state_; // the current state of the object
+    BalancerStateNew stateNew_;
 
 public:
     LoadBalancerBase() = default;
@@ -78,6 +89,33 @@ public:
     ///@param problems Problems of this process
     ///
     virtual void updateState(const DynamicList<ChemistryProblem>& problems) = 0;
+
+
+    void convertNew(){
+
+        std::vector<label> sources;
+        for (size_t i = 0; i < state_.sources.size() - 1; ++i){
+            sources.push_back(state_.sources[i]);
+        }
+
+        std::vector<label> destinations;
+        for (size_t i = 0; i < state_.destinations.size() - 1; ++i){
+            destinations.push_back(state_.destinations[i]);
+        }
+
+        std::vector<label> nProblems;
+        for (size_t i = 0; i < state_.nProblems.size() - 1; ++i){
+            nProblems.push_back(state_.nProblems[i]);
+        }
+
+        label nRemaining = state_.nProblems.back(); 
+
+        stateNew_.sources = sources;
+        stateNew_.destinations = destinations;
+        stateNew_.nProblems = nProblems;
+        stateNew_.nRemaining = nRemaining;
+
+    }
 
     ///
     ///@brief Computes the mean of the input loads
@@ -139,6 +177,13 @@ public:
     {
         return state_;
     }
+
+    const BalancerStateNew& getStateNew() const
+    {
+        return stateNew_;
+    }
+
+
 
     ///
     ///@brief Given a list of values splits them evenly between the
@@ -256,6 +301,65 @@ public:
         const buffer_t<ET>&       send_buffer,
         const std::vector<label>& sources,
         const std::vector<label>& destinations);
+
+
+
+    
+    template <class ET>
+    static void sendCall(
+        const buffer_t<ET>&       send_buffer,
+        const std::vector<label>& destinations,
+        PstreamBuffers& pBufs)
+    {
+
+        if(Pstream::parRun())
+        {
+            for(label i = 0; i < label(destinations.size()); ++i)
+            {
+                UOPstream send(destinations[i], pBufs);
+                send << send_buffer[i];
+            }
+            pBufs.finishedSends();
+        }    
+
+
+    }
+
+
+    template <class ET>
+    static void recvCall(
+        buffer_t<ET>&       recv_buffer,
+        const std::vector<label>& sources,
+        PstreamBuffers& pBufs)
+    {
+        if(Pstream::parRun()){
+            
+            recv_buffer.setSize(sources.size());
+            for(label i = 0; i < label(sources.size()); ++i)
+            {
+                UIPstream recv(sources[i], pBufs);
+                recv >> recv_buffer[i];
+            }
+        }
+
+    }
+
+
+
+
+    template<class T>
+    DynamicList<T> getRemaining(const DynamicList<T>& values) {
+        DynamicList<T> remaining(stateNew_.nRemaining, T());
+    
+        std::copy(values.end() - stateNew_.nRemaining,
+             values.end(),
+             remaining.begin()
+        );
+
+        return remaining;
+    }
+
+
 };
 
 template <class T>
@@ -277,30 +381,37 @@ LoadBalancerBase::buffer_t<T>
 LoadBalancerBase::balance(const DynamicList<T>& values) const
 {
 
-    return sendRecv<T, Pstream::commsTypes::nonBlocking>(
-        getSendBuffer(values), state_.sources, state_.destinations);
+    auto sendBuffer = partition(values, stateNew_.nProblems);
+
+    auto recvBuffer = sendRecv<T, Pstream::commsTypes::nonBlocking>(
+        sendBuffer, stateNew_.sources, stateNew_.destinations);
+
+    return recvBuffer;
+    
+
+    //return sendRecv<T, Pstream::commsTypes::nonBlocking>(
+    //    getSendBuffer(values), state_.sources, state_.destinations);
 }
+
+
+
+
 
 template <class T>
 LoadBalancerBase::buffer_t<T>
 LoadBalancerBase::unbalance(const buffer_t<T>& values) const
 {
-
+    
+     
     return sendRecv<T, Pstream::commsTypes::nonBlocking>(
-        values, state_.destinations, state_.sources);
+        values, stateNew_.destinations, stateNew_.sources);
 }
 
 template <class T>
 LoadBalancerBase::buffer_t<T>
 LoadBalancerBase::getSendBuffer(const DynamicList<T>& values) const
 {
-
-    if(state_.destinations.size() == 1)
-    {
-        return buffer_t<T>(1, values);
-    }
-
-    return partition(values, state_.nProblems);
+    return partition(values, stateNew_.nProblems);
 }
 
 template <class T>
@@ -310,6 +421,24 @@ LoadBalancerBase::partition(
 {
 
     //TODO: dont make copies, use subList instead
+
+    buffer_t<T> ret;
+
+    label start = 0;
+    for (const auto& count : subsizes){
+        label end = start + count;
+        DynamicList<T> slice(count, T());
+        std::copy(
+            std::begin(bigArray) + start,
+            std::begin(bigArray) + end,
+            std::begin(slice)
+        );
+        ret.append(slice);
+    }
+
+    return ret;
+
+    /*
 
     runtime_assert(
         checkSizes(bigArray, subsizes),
@@ -339,8 +468,8 @@ LoadBalancerBase::partition(
             std::begin(ret[i]));
         start = end;
     }
+    */
 
-    return ret;
 }
 
 template <class T>
@@ -379,6 +508,8 @@ LoadBalancerBase::sendRecv(
 
     if(Pstream::parRun())
     {
+
+    
         PstreamBuffers pBufs(CT);
 
         for(label i = 0; i < label(destinations.size()); ++i)
@@ -397,6 +528,7 @@ LoadBalancerBase::sendRecv(
         }
 
         return recv_buffers;
+    
     }
 
     return send_buffer;

@@ -38,6 +38,8 @@ LoadBalancer::updateState(
     auto info       = operationsToInfo(operations, problems, myLoad);
 
     setState(info);
+
+    convertNew();
 }
 
 LoadBalancerBase::BalancerState
