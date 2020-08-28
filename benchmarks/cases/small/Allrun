@@ -1,4 +1,5 @@
 
+./Allclean
 rm -rf 0.*
 rm -rf processor*
 rm -rf log*
