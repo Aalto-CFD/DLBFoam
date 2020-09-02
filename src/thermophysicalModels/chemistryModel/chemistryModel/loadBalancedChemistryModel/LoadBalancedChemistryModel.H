@@ -156,17 +156,17 @@ private:
     ///@return DynamicList<ChemistrySolution> A list of solutions
     ///
     DynamicList<ChemistrySolution>
-    solveList(DynamicList<ChemistryProblem>& problems) const;
+    solveList(UList<ChemistryProblem>& problems) const;
 
 
     ///
     ///@brief Solves the whole buffer coming from the balancer
     ///
     ///@param problems All problems this process whill solve
-    ///@return LoadBalancerBase::buffer_t<ChemistrySolution> A buffer of solutions
+    ///@return RecvBuffer<ChemistrySolution> A buffer of solutions
     ///
-    LoadBalancerBase::buffer_t<ChemistrySolution>
-    solveBuffer(LoadBalancerBase::buffer_t<ChemistryProblem>& problems) const;
+    RecvBuffer<ChemistrySolution>
+    solveBuffer(RecvBuffer<ChemistryProblem>& problems) const;
 
 
     ///
@@ -187,7 +187,7 @@ private:
     ///@return scalar minimum chemistry time step
     ///
     scalar updateReactionRates(
-        const LoadBalancerBase::buffer_t<ChemistrySolution>& solutions);
+        const RecvBuffer<ChemistrySolution>& solutions);
 
     ///
     ///@brief Updates the reaction rate for cell i
