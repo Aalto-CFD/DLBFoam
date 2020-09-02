@@ -39,6 +39,8 @@ SourceFiles
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
 #include "runtime_assert.H"
+#include "SendBuffer.H"
+#include "RecvBuffer.H"
 
 #include <algorithm> //std::min/max element
 #include <numeric>   //std::accumulate
@@ -47,21 +49,25 @@ SourceFiles
 namespace Foam
 {
 
+
+
+
+
+
 class LoadBalancerBase
 {
 
 public:
-    struct BalancerState
-    {
 
-        std::vector<label> sources;      // ranks which send to this process
-        std::vector<label> destinations; // ranks to which this process sends to
-        std::vector<label>
-            nProblems; // number of problems which this rank sends/receives
+
+    struct BalancerState{
+        std::vector<label> sources; //ranks which send to this process
+        std::vector<label> destinations; //ranks to which this process sends to
+        std::vector<label> nProblems; //counts which this process sends/receivs
+        label nRemaining; //own problems / solutions
+
     };
 
-    template <class T>
-    using buffer_t = DynamicList<DynamicList<T>>;
 
 private:
     BalancerState state_; // the current state of the object
@@ -78,6 +84,8 @@ public:
     ///@param problems Problems of this process
     ///
     virtual void updateState(const DynamicList<ChemistryProblem>& problems) = 0;
+
+
 
     ///
     ///@brief Computes the mean of the input loads
@@ -140,16 +148,19 @@ public:
         return state_;
     }
 
+
+
+
     ///
     ///@brief Given a list of values splits them evenly between the
     /// mpi-processes.
     ///
     ///@tparam T type of value (typically a ChemistryProblem)
     ///@param values values to split
-    ///@return buffer_t<T> additional values coming to the current process
+    ///@return RecvBuffer<T> additional values coming to the current process
     ///
     template <class T>
-    buffer_t<T> balance(const DynamicList<T>& values) const;
+    RecvBuffer<T> balance(const DynamicList<T>& values) const;
 
     ///
     ///@brief Given a buffer of values, sends the values back to their rightful
@@ -157,21 +168,11 @@ public:
     ///
     ///@tparam T type of value (typically a ChemistrySolution)
     ///@param values values to send back
-    ///@return buffer_t<T> values coming back to this process
+    ///@return RecvBuffer<T> values coming back to this process
     ///
     template <class T>
-    buffer_t<T> unbalance(const buffer_t<T>& values) const;
+    RecvBuffer<T> unbalance(const RecvBuffer<T>& values) const;
 
-    ///
-    ///@brief Get the send buffer based on the current state and the input
-    ///values
-    ///
-    ///@tparam T Any serializable type
-    ///@param values Values to put to the send buffer
-    ///@return buffer_t<T> The send buffer
-    ///
-    template <class T>
-    buffer_t<T> getSendBuffer(const DynamicList<T>& values) const;
 
     ///
     ///@brief Check whether the load balancer is active or not.
@@ -181,30 +182,7 @@ public:
     ///
     bool active() const;
 
-    ///
-    ///@brief Splits the bigArray to arrays of size subsizes.
-    ///
-    ///@tparam T element type
-    ///@param bigArray the array to split
-    ///@param subsizes  vector of subarray sizes
-    ///@return DynamicList<DynamicList<T>> array of subarrays, if succesful
-    ///
-    template <class T>
-    static DynamicList<DynamicList<T>>
-    partition(const DynamicList<T>& bigArray, const std::vector<int>& subsizes);
 
-    ///
-    ///@brief Checks if the total send count matches the problem count for
-    /// subsizes
-    ///
-    ///@tparam T element type
-    ///@param bigArray the array to split
-    ///@param subsizes  vector of subarray sizes
-    ///@return bool
-    ///
-    template <class T>
-    static bool checkSizes(
-        const DynamicList<T>& bigArray, const std::vector<label>& subsizes);
 
     ///
     ///@brief Prints the current state information.
@@ -245,17 +223,37 @@ public:
     /// from destinations.
     ///
     ///@tparam ET element type of the send and receive buffers
-    ///@tparam CT mpi communication type blocking/nonBlocking
+    ///@tparam Indexable an indexable send buffer type
     ///@param send_buffer the buffer to send
     ///@param sources the ranks to receive from
     ///@param destinations the ranks to send to
-    ///@return buffer_t<ET> the received buffer
+    ///@return RecvBuffer<ET> the received buffer
     ///
-    template <class ET, Pstream::commsTypes CT>
-    static buffer_t<ET> sendRecv(
-        const buffer_t<ET>&       send_buffer,
+    template <class ET, class Indexable>
+    static RecvBuffer<ET> sendRecv(
+        const Indexable& send_buffer,
         const std::vector<label>& sources,
         const std::vector<label>& destinations);
+
+
+
+
+    ///
+    ///@brief Slices an nRemaining size portion from the _end_ of the values
+    ///
+    ///@tparam T element type of the input list
+    ///@param values the input list to slice
+    ///@return SubList<T> the sliced list
+    ///
+    template<class T>
+    SubList<T> getRemaining(const DynamicList<T>& values) {
+        
+        return SubList<T>(values, state_.nRemaining, values.size() - state_.nRemaining);
+
+    }
+
+
+
 };
 
 template <class T>
@@ -273,86 +271,37 @@ DynamicList<T> LoadBalancerBase::allGather(const T& myData)
 }
 
 template <class T>
-LoadBalancerBase::buffer_t<T>
+RecvBuffer<T>
 LoadBalancerBase::balance(const DynamicList<T>& values) const
 {
 
-    return sendRecv<T, Pstream::commsTypes::nonBlocking>(
-        getSendBuffer(values), state_.sources, state_.destinations);
+    
+    return sendRecv<T, SendBuffer<T>>( SendBuffer<T>(values, state_.nProblems),
+        state_.sources, state_.destinations);
+    
+    
 }
 
+
+
+
+
 template <class T>
-LoadBalancerBase::buffer_t<T>
-LoadBalancerBase::unbalance(const buffer_t<T>& values) const
+RecvBuffer<T>
+LoadBalancerBase::unbalance(const RecvBuffer<T>& values) const
 {
 
-    return sendRecv<T, Pstream::commsTypes::nonBlocking>(
+
+    return sendRecv<T, RecvBuffer<T>>(
         values, state_.destinations, state_.sources);
+
 }
 
-template <class T>
-LoadBalancerBase::buffer_t<T>
-LoadBalancerBase::getSendBuffer(const DynamicList<T>& values) const
-{
 
-    if(state_.destinations.size() == 1)
-    {
-        return buffer_t<T>(1, values);
-    }
 
-    return partition(values, state_.nProblems);
-}
 
-template <class T>
-LoadBalancerBase::buffer_t<T>
-LoadBalancerBase::partition(
-    const DynamicList<T>& bigArray, const std::vector<int>& subsizes)
-{
 
-    //TODO: dont make copies, use subList instead
 
-    runtime_assert(
-        checkSizes(bigArray, subsizes),
-        "Total send count not matching the problem count!");
-
-    // allocate storage based on the first element
-    T element_copy;
-    if(bigArray.size() > 0)
-    {
-        element_copy = bigArray[0];
-    }
-
-    DynamicList<DynamicList<T>> ret;
-
-    for(auto s : subsizes)
-    {
-        ret.append(DynamicList<T>(s, element_copy));
-    }
-
-    label start = 0;
-    for(label i = 0; i < label(subsizes.size()); ++i)
-    {
-        label end = start + subsizes[i];
-        std::copy(
-            std::begin(bigArray) + start,
-            std::begin(bigArray) + end,
-            std::begin(ret[i]));
-        start = end;
-    }
-
-    return ret;
-}
-
-template <class T>
-bool LoadBalancerBase::checkSizes(
-    const DynamicList<T>& bigArray, const std::vector<label>& subsizes)
-{
-    if(std::accumulate(subsizes.begin(), subsizes.end(), 0) != label(bigArray.size()))
-    {
-        return false;
-    }
-    return true;
-}
 
 template <class T>
 std::string
@@ -369,38 +318,46 @@ LoadBalancerBase::vectorToString(const std::vector<T>& vec)
     return ret;
 }
 
-template <class ET, Pstream::commsTypes CT>
-LoadBalancerBase::buffer_t<ET>
+
+
+
+template <class ET, class Indexable>
+RecvBuffer<ET>
 LoadBalancerBase::sendRecv(
-    const LoadBalancerBase::buffer_t<ET>& send_buffer,
+    const Indexable& send_buffer,
     const std::vector<label>&                         sources,
     const std::vector<label>&                         destinations)
 {
 
+    RecvBuffer<ET> ret;
+
     if(Pstream::parRun())
     {
-        PstreamBuffers pBufs(CT);
+
+
+        PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
 
         for(label i = 0; i < label(destinations.size()); ++i)
         {
             UOPstream send(destinations[i], pBufs);
             send << send_buffer[i];
         }
+
+        
         pBufs.finishedSends();
 
-        buffer_t<ET> recv_buffers;
-        recv_buffers.setSize(sources.size());
+        ret.setSize(sources.size());
         for(label i = 0; i < label(sources.size()); ++i)
         {
             UIPstream recv(sources[i], pBufs);
-            recv >> recv_buffers[i];
+            recv >> ret[i];
         }
-
-        return recv_buffers;
+    
     }
 
-    return send_buffer;
+    return ret;
 }
+
 
 } // namespace Foam
 

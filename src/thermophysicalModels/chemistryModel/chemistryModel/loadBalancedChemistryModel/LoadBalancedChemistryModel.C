@@ -85,8 +85,8 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
     const DeltaTType& deltaT)
 {
 
-    using problem_buffer_t  = LoadBalancerBase::buffer_t<ChemistryProblem>;
-    using solution_buffer_t = LoadBalancerBase::buffer_t<ChemistrySolution>;
+    using problem_RecvBuffer  = RecvBuffer<ChemistryProblem>;
+    using solution_RecvBuffer = RecvBuffer<ChemistrySolution>;
 
     BasicChemistryModel<ReactionThermo>::correct();
 
@@ -95,38 +95,33 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
         return great;
     }
 
-    clockTime timer;
+    
 
-    timer.timeIncrement();
-    DynamicList<ChemistryProblem> all_problems = getProblems(deltaT);
-    scalar                        get_problem  = timer.timeIncrement();
+    DynamicList<ChemistryProblem> allProblems = getProblems(deltaT);
 
-    timer.timeIncrement();
-    balancer_.updateState(all_problems);
-    scalar updateState = timer.timeIncrement();
 
+    balancer_.updateState(allProblems);
+    
     balancer_.printState();
 
-    timer.timeIncrement();
-    problem_buffer_t balanced_problems = balancer_.balance(all_problems);
-    scalar           balance           = timer.timeIncrement();
 
-    timer.timeIncrement();
-    solution_buffer_t balanced_solutions = solveBuffer(balanced_problems);
-    scalar            solveBuffer        = timer.timeIncrement();
+    problem_RecvBuffer guestProblems = balancer_.balance(allProblems);
+    SubList<ChemistryProblem> ownProblems = balancer_.getRemaining(allProblems);
+    DynamicList<ChemistrySolution> ownSolutions = solveList(ownProblems);
 
-    timer.timeIncrement();
-    solution_buffer_t my_solutions = balancer_.unbalance(balanced_solutions);
-    scalar            unbalance    = timer.timeIncrement();
+    solution_RecvBuffer guestSolutions = solveBuffer(guestProblems); //Solve call
 
-    cpuSolveFile_() << this->time().timeOutputValue() << "    " << get_problem
-                    << "    " << updateState << "    " << balance << "    "
-                    << solveBuffer << "    " << unbalance << "    "
-                    << Pstream::myProcNo() << endl;
+    solution_RecvBuffer incomingSolutions = balancer_.unbalance(guestSolutions);
 
-    Pstream::waitRequests();
+    
 
-    return updateReactionRates(my_solutions);
+
+    incomingSolutions.append(ownSolutions);
+
+        
+    return updateReactionRates(incomingSolutions);
+
+    
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -171,7 +166,7 @@ void LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveSingle(
 template <class ReactionThermo, class ThermoType>
 scalar
 LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRates(
-    const LoadBalancerBase::buffer_t<ChemistrySolution>& solutions)
+    const RecvBuffer<ChemistrySolution>& solutions)
 {
 
     scalar deltaTMin = great;
@@ -215,30 +210,32 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
 }
 
 template <class ReactionThermo, class ThermoType>
-LoadBalancerBase::buffer_t<ChemistrySolution>
+RecvBuffer<ChemistrySolution>
 LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveBuffer(
-    LoadBalancerBase::buffer_t<ChemistryProblem>& problems) const
+    RecvBuffer<ChemistryProblem>& problems) const
 {
 
     // allocate the solutions buffer
-    LoadBalancerBase::buffer_t<ChemistrySolution> solutions;
-    for(label i = 0; i < problems.size(); ++i)
-    {
-        DynamicList<ChemistrySolution> sublist(
-            problems[i].size(), ChemistrySolution(this->nSpecie_));
-        solutions.append(sublist);
+    RecvBuffer<ChemistrySolution> solutions;
+    for (auto& p : problems){
+        solutions.append(solveList(p));
     }
-
-    for(label i = 0; i < solutions.size(); ++i)
-    {
-        for(label j = 0; j < solutions[i].size(); ++j)
-        {
-
-            solveSingle(problems[i][j], solutions[i][j]);
-        }
-    }
-
     return solutions;
+    
+}
+
+template <class ReactionThermo, class ThermoType>
+DynamicList<ChemistrySolution>
+LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList(UList<ChemistryProblem>& problems) const{
+
+    DynamicList<ChemistrySolution> solutions(problems.size(), ChemistrySolution(this->nSpecie_));
+
+    for (label i = 0; i < problems.size(); ++i){
+        solveSingle(problems[i], solutions[i]);
+    }
+    return solutions;
+
+
 }
 
 template <class ReactionThermo, class ThermoType>

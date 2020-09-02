@@ -84,13 +84,14 @@ namespace Foam
     forCommonGases(defineChemistrySolvers, psiReactionThermo);
     forCommonGases(defineChemistrySolvers, rhoReactionThermo);
 
-    forCommonGases(makeChemistrySolvers, noChemistrySolver, psiReactionThermo);
+    /*forCommonGases(makeChemistrySolvers, noChemistrySolver, psiReactionThermo);
     forCommonGases(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
     forCommonGases(makeChemistrySolvers, EulerImplicit, psiReactionThermo);
-    forCommonGases(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
+    forCommonGases(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);*/
     forCommonGases(makeChemistrySolvers, ode, psiReactionThermo);
     forCommonGases(makeChemistrySolvers, ode, rhoReactionThermo);
 
+    /*
     //liquids
     forCommonLiquids(defineChemistrySolvers, rhoReactionThermo);
 
@@ -104,6 +105,8 @@ namespace Foam
     forPolynomials(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
     forPolynomials(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
     forPolynomials(makeChemistrySolvers, ode, rhoReactionThermo);
+
+    */
 
 
 

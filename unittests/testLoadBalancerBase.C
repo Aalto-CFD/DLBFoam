@@ -37,6 +37,8 @@ class testableLoadBalancing : public LoadBalancerBase{
 public:
 
 
+    using LoadBalancerBase::sendRecv;
+
     //handy for testing
     void set_test_state(const std::vector<int>& sources, const std::vector<int>& destinations, const std::vector<int>& n_probs) {
 
@@ -54,20 +56,9 @@ public:
         /*empty*/
     }
 
-    template<class ET, Pstream::commsTypes CT>
-    static buffer_t<ET> test_sendRecv(const buffer_t<ET>& buffer, std::vector<int> sources, std::vector<int> dests){
-        return LoadBalancerBase::sendRecv<ET, CT>(buffer, sources, dests);
-    }
+    
    
 
-   /* void update() {
-
-        auto loads = get_loads();
-        auto state = determine_state(loads);
-        this->setState(state);
-    }
-
-    */
 };
 
 } //namespace Foam
@@ -111,41 +102,6 @@ TEST_CASE("LoadBalancerBase allGather()"){
 
 
 
-TEST_CASE("LoadBalancerBase partition()"){
-
-
-    using namespace Foam;
-
-    DynamicList<int> arr(10, int());
-
-    for (int i = 0; i < 10; ++i){
-        arr[i] = i;
-    }
-    std::vector<int> subsizes{2, 2, 1, 5};
- 
-    auto r = LoadBalancerBase::partition(arr, subsizes);
-
-    CHECK(r[0][0] == 0);
-    CHECK(r[0][1] == 1);
-    CHECK(r[1][0] == 2);
-    CHECK(r[3][4] == 9);
-
-
-    auto problems = create_problems(10);
-
-    auto split = LoadBalancerBase::partition(problems, subsizes);
-
-    CHECK(split[0][0].cellid == 0);
-    CHECK(split[0][1].cellid == 1);
-    CHECK(split[1][0].cellid == 2);
-    CHECK(split[3][4].cellid == 9);
-
-
-    REQUIRE_THROWS(LoadBalancerBase::partition(problems, {3,3,3}));
-
-
-}
-
 
 
 TEST_CASE("LoadBalancerBase sendRecv() swap test"){
@@ -169,12 +125,13 @@ TEST_CASE("LoadBalancerBase sendRecv() swap test"){
     }
 
   
+    using send_buffer_t = DynamicList<DynamicList<ChemistryProblem>>;
 
-    DynamicList<DynamicList<ChemistryProblem>> send_buffer;
+    send_buffer_t send_buffer;
     send_buffer.setSize(1);
     send_buffer[0] = create_problems(10);
 
-    auto recv_buffer = testableLoadBalancing::test_sendRecv<ChemistryProblem, Pstream::commsTypes::nonBlocking>(
+    auto recv_buffer = testableLoadBalancing::sendRecv<ChemistryProblem, send_buffer_t>(
         send_buffer, sources, destinations);
 
     if (Pstream::myProcNo() == 1) {
@@ -190,59 +147,6 @@ TEST_CASE("LoadBalancerBase sendRecv() swap test"){
     
 }
 
-TEST_CASE("LoadBalancerBase sendRecv() self send") {
-
-    using namespace Foam;
-
-    auto problems = create_problems(10);
-
-    std::vector<int> sources      = {Pstream::myProcNo()};
-    std::vector<int> destinations = {Pstream::myProcNo()};
-    std::vector<int> counts       = {10};
-
-    auto send_buffer = LoadBalancerBase::partition(problems, counts);
-
-    auto recv_buffer = testableLoadBalancing::test_sendRecv<ChemistryProblem,
-         Pstream::commsTypes::nonBlocking>(send_buffer, sources, destinations);
-
-
-    CHECK(recv_buffer.size() == 1);
-    
-    auto recv_problems = recv_buffer[0];
-
-    for (size_t i = 0; i < 10; ++i){
-        CHECK(recv_problems[i].cellid == i);
-    }
-
-
-}
-
-TEST_CASE("LoadBalancerBase sendRecv() self send 2") {
-
-    using namespace Foam;
-
-    auto problems = create_problems(1);
-
-    std::vector<int> sources      = {Pstream::myProcNo()};
-    std::vector<int> destinations = {Pstream::myProcNo()};
-    std::vector<int> counts       = {1};
-
-    auto send_buffer = LoadBalancerBase::partition(problems, counts);
-
-    auto recv_buffer = testableLoadBalancing::test_sendRecv<ChemistryProblem,
-         Pstream::commsTypes::nonBlocking>(send_buffer, sources, destinations);
-
-
-    CHECK(recv_buffer.size() == 1);
-    
-    auto recv_problems = recv_buffer[0];
-
-    for (size_t i = 0; i < 1; ++i){
-        CHECK(recv_problems[i].cellid == i);
-    }
-
-
-}
 
 /*
 

@@ -118,25 +118,25 @@ void LoadBalancerBase::printState() const
 {
 
     // receiver
-    if(state_.sources.size() > 1)
+    if(state_.sources.size() > 0)
     {
         Pout << "Receiver rank: " << Pstream::myProcNo() << " receives from "
              << vectorToString(state_.sources) << " own problems "
-             << vectorToString(state_.nProblems) << endl;
+             << state_.nRemaining << endl;
     }
     // sender
-    else if(state_.destinations.size() > 1)
+    else if(state_.destinations.size() > 0)
     {
         Pout << "Sender rank: " << Pstream::myProcNo()
              << " sends to: " << vectorToString(state_.destinations)
              << " counts: " << vectorToString(state_.nProblems)
-             << " remaining problems:  " << state_.nProblems.back() << endl;
+             << " remaining problems:  " << state_.nRemaining << endl;
     }
 
     else
     {
         Pout << "Rank: " << Pstream::myProcNo()
-             << " does not take part in balancing.";
+             << " does not take part in balancing. Solves " << state_.nRemaining << " problems itself.";
     }
 }
 

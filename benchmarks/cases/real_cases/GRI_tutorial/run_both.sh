@@ -1,4 +1,3 @@
-
 cd ./balanced
 ./Allrun
 cd ..
