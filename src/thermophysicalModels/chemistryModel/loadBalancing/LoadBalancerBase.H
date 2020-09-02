@@ -51,21 +51,13 @@ class LoadBalancerBase
 {
 
 public:
-    struct BalancerState
-    {
-
-        std::vector<label> sources;      // ranks which send to this process
-        std::vector<label> destinations; // ranks to which this process sends to
-        std::vector<label>
-            nProblems; // number of problems which this rank sends/receives
-    };
 
 
-    struct BalancerStateNew{
-        std::vector<label> sources;
-        std::vector<label> destinations;
-        std::vector<label> nProblems;
-        label nRemaining;
+    struct BalancerState{
+        std::vector<label> sources; //ranks which send to this process
+        std::vector<label> destinations; //ranks to which this process sends to
+        std::vector<label> nProblems; //counts which this process sends/receivs
+        label nRemaining; //own problems / solutions
 
     };
 
@@ -75,7 +67,6 @@ public:
 
 private:
     BalancerState state_; // the current state of the object
-    BalancerStateNew stateNew_;
 
 public:
     LoadBalancerBase() = default;
@@ -91,31 +82,6 @@ public:
     virtual void updateState(const DynamicList<ChemistryProblem>& problems) = 0;
 
 
-    void convertNew(){
-
-        std::vector<label> sources;
-        for (size_t i = 0; i < state_.sources.size() - 1; ++i){
-            sources.push_back(state_.sources[i]);
-        }
-
-        std::vector<label> destinations;
-        for (size_t i = 0; i < state_.destinations.size() - 1; ++i){
-            destinations.push_back(state_.destinations[i]);
-        }
-
-        std::vector<label> nProblems;
-        for (size_t i = 0; i < state_.nProblems.size() - 1; ++i){
-            nProblems.push_back(state_.nProblems[i]);
-        }
-
-        label nRemaining = state_.nProblems.back(); 
-
-        stateNew_.sources = sources;
-        stateNew_.destinations = destinations;
-        stateNew_.nProblems = nProblems;
-        stateNew_.nRemaining = nRemaining;
-
-    }
 
     ///
     ///@brief Computes the mean of the input loads
@@ -178,10 +144,6 @@ public:
         return state_;
     }
 
-    const BalancerStateNew& getStateNew() const
-    {
-        return stateNew_;
-    }
 
 
 
@@ -351,9 +313,10 @@ public:
 
     template<class T>
     DynamicList<T> getRemaining(const DynamicList<T>& values) {
-        DynamicList<T> remaining(stateNew_.nRemaining, T());
     
-        std::copy(values.end() - stateNew_.nRemaining,
+        DynamicList<T> remaining(state_.nRemaining, T());
+    
+        std::copy(values.end() - state_.nRemaining,
              values.end(),
              remaining.begin()
         );
@@ -383,10 +346,10 @@ LoadBalancerBase::buffer_t<T>
 LoadBalancerBase::balance(const DynamicList<T>& values) const
 {
 
-    auto sendBuffer = partition(values, stateNew_.nProblems);
+    auto sendBuffer = partition(values, state_.nProblems);
 
     auto recvBuffer = sendRecv<T, Pstream::commsTypes::nonBlocking>(
-        sendBuffer, stateNew_.sources, stateNew_.destinations);
+        sendBuffer, state_.sources, state_.destinations);
 
     return recvBuffer;
     
@@ -406,14 +369,14 @@ LoadBalancerBase::unbalance(const buffer_t<T>& values) const
     
      
     return sendRecv<T, Pstream::commsTypes::nonBlocking>(
-        values, stateNew_.destinations, stateNew_.sources);
+        values, state_.destinations, state_.sources);
 }
 
 template <class T>
 LoadBalancerBase::buffer_t<T>
 LoadBalancerBase::getSendBuffer(const DynamicList<T>& values) const
 {
-    return partition(values, stateNew_.nProblems);
+    return partition(values, state_.nProblems);
 }
 
 template <class T>
@@ -436,41 +399,12 @@ LoadBalancerBase::partition(
             std::begin(slice)
         );
         ret.append(slice);
+        start = end;
     }
+
 
     return ret;
 
-    /*
-
-    runtime_assert(
-        checkSizes(bigArray, subsizes),
-        "Total send count not matching the problem count!");
-
-    // allocate storage based on the first element
-    T element_copy;
-    if(bigArray.size() > 0)
-    {
-        element_copy = bigArray[0];
-    }
-
-    DynamicList<DynamicList<T>> ret;
-
-    for(auto s : subsizes)
-    {
-        ret.append(DynamicList<T>(s, element_copy));
-    }
-
-    label start = 0;
-    for(label i = 0; i < label(subsizes.size()); ++i)
-    {
-        label end = start + subsizes[i];
-        std::copy(
-            std::begin(bigArray) + start,
-            std::begin(bigArray) + end,
-            std::begin(ret[i]));
-        start = end;
-    }
-    */
 
 }
 

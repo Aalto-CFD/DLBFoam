@@ -102,38 +102,22 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
 
     balancer_.updateState(allProblems);
     
+    balancer_.printState();
 
-    auto state = balancer_.getStateNew();
 
-    problem_buffer_t problemsIWillSend = balancer_.getSendBuffer(allProblems);
-
-    PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
-    balancer_.sendCall(problemsIWillSend, state.destinations, pBufs);
-    pBufs.finishedSends(false); //this doesnt wait 
-    
+    problem_buffer_t guestProblems = balancer_.balance(allProblems);
     DynamicList<ChemistryProblem> ownProblems = balancer_.getRemaining(allProblems);
-    problem_buffer_t ownBuffer; ownBuffer.append(ownProblems);
-    solution_buffer_t ownSolutions = solveBuffer(ownBuffer); //solve call
     
-    Pstream::waitRequests();
-    problem_buffer_t guestProblems;
-    balancer_.recvCall(guestProblems, state.sources, pBufs);
-    
+
     solution_buffer_t guestSolutions = solveBuffer(guestProblems); //Solve call
+    DynamicList<ChemistrySolution> ownSolutions = solveList(ownProblems);
 
-    solution_buffer_t incomingSolutions;
 
-    PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
-    balancer_.sendCall(guestSolutions, state.sources, pBufs2); //block
-    pBufs2.finishedSends(true);
-    
-    balancer_.recvCall(incomingSolutions, state.destinations, pBufs2);
-    
-    
-    
+    solution_buffer_t incomingSolutions = balancer_.unbalance(guestSolutions);
+    //stream::waitRequests();
     incomingSolutions.append(ownSolutions);
 
-    balancer_.printState();
+    
     return updateReactionRates(incomingSolutions);
 
     
@@ -232,23 +216,25 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveBuffer(
 
     // allocate the solutions buffer
     LoadBalancerBase::buffer_t<ChemistrySolution> solutions;
-    for(label i = 0; i < problems.size(); ++i)
-    {
-        DynamicList<ChemistrySolution> sublist(
-            problems[i].size(), ChemistrySolution(this->nSpecie_));
-        solutions.append(sublist);
+    for (auto& p : problems){
+        solutions.append(solveList(p));
     }
-
-    for(label i = 0; i < solutions.size(); ++i)
-    {
-        for(label j = 0; j < solutions[i].size(); ++j)
-        {
-
-            solveSingle(problems[i][j], solutions[i][j]);
-        }
-    }
-
     return solutions;
+    
+}
+
+template <class ReactionThermo, class ThermoType>
+DynamicList<ChemistrySolution>
+LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList(DynamicList<ChemistryProblem>& problems) const{
+
+    DynamicList<ChemistrySolution> solutions(problems.size(), ChemistrySolution(this->nSpecie_));
+
+    for (label i = 0; i < problems.size(); ++i){
+        solveSingle(problems[i], solutions[i]);
+    }
+    return solutions;
+
+
 }
 
 template <class ReactionThermo, class ThermoType>

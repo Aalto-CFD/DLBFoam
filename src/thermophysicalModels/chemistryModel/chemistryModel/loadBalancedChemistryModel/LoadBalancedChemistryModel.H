@@ -148,6 +148,17 @@ private:
     //TODO: remove
     static mixtureFractionRefMapper createMapper(const ReactionThermo& thermo);
 
+
+    ///
+    ///@brief Solves a list
+    ///
+    ///@param problems 
+    ///@return DynamicList<ChemistrySolution> A list of solutions
+    ///
+    DynamicList<ChemistrySolution>
+    solveList(DynamicList<ChemistryProblem>& problems) const;
+
+
     ///
     ///@brief Solves the whole buffer coming from the balancer
     ///
@@ -156,6 +167,7 @@ private:
     ///
     LoadBalancerBase::buffer_t<ChemistrySolution>
     solveBuffer(LoadBalancerBase::buffer_t<ChemistryProblem>& problems) const;
+
 
     ///
     ///@brief Get the problems of this process

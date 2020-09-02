@@ -39,7 +39,7 @@ LoadBalancer::updateState(
 
     setState(info);
 
-    convertNew();
+    //convertNew();
 }
 
 LoadBalancerBase::BalancerState
@@ -62,6 +62,9 @@ LoadBalancer::operationsToInfo(
             times.push_back(op.value);
         }
         info.nProblems = timesToProblemCounts(times, problems);
+
+        label total = std::accumulate(info.nProblems.begin(), info.nProblems.end(), 0);
+        info.nRemaining = problems.size() - total;
     }
 
     // receiver
@@ -72,11 +75,10 @@ LoadBalancer::operationsToInfo(
         {
             info.sources.push_back(op.from);
         }
-        info.nProblems = {problems.size()};
+        info.nProblems = {};
+        info.nRemaining = {problems.size()};
     }
 
-    info.destinations.push_back(Pstream::myProcNo());
-    info.sources.push_back(Pstream::myProcNo());
 
     return info;
 }
@@ -104,9 +106,6 @@ LoadBalancer::timesToProblemCounts(
         counts.push_back(count);
     }
 
-    int remaining =
-        problems.size() - std::accumulate(counts.begin(), counts.end(), 0);
-    counts.push_back(remaining);
 
     return counts;
 }
