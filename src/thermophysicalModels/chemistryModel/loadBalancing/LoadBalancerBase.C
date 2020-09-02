@@ -136,7 +136,7 @@ void LoadBalancerBase::printState() const
     else
     {
         Pout << "Rank: " << Pstream::myProcNo()
-             << " does not take part in balancing. Solves " << state_.nRemaining << " problems itself.";
+             << " does not take part in balancing. Solves " << state_.nRemaining << " problems itself." << endl;
     }
 }
 
