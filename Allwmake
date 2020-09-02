@@ -6,12 +6,12 @@ cd src/thermophysicalModels/chemistryModel
 wmake libso
 cd ../../../
 
-#cd ./unittests
-#wmake
-#cd ..
+cd ./unittests
+wmake
+cd ..
 
 
 
-#cd ./benchmarks
-#wmake
+cd ./benchmarks
+wmake
 

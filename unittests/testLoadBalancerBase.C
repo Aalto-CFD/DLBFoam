@@ -37,6 +37,8 @@ class testableLoadBalancing : public LoadBalancerBase{
 public:
 
 
+    using LoadBalancerBase::sendRecv;
+
     //handy for testing
     void set_test_state(const std::vector<int>& sources, const std::vector<int>& destinations, const std::vector<int>& n_probs) {
 
@@ -54,20 +56,9 @@ public:
         /*empty*/
     }
 
-    template<class ET, Pstream::commsTypes CT>
-    static RecvBuffer<ET> test_sendRecv(const RecvBuffer<ET>& buffer, std::vector<int> sources, std::vector<int> dests){
-        return LoadBalancerBase::sendRecv<ET, CT>(buffer, sources, dests);
-    }
+    
    
 
-   /* void update() {
-
-        auto loads = get_loads();
-        auto state = determine_state(loads);
-        this->setState(state);
-    }
-
-    */
 };
 
 } //namespace Foam
@@ -134,12 +125,13 @@ TEST_CASE("LoadBalancerBase sendRecv() swap test"){
     }
 
   
+    using send_buffer_t = DynamicList<DynamicList<ChemistryProblem>>;
 
-    DynamicList<DynamicList<ChemistryProblem>> send_buffer;
+    send_buffer_t send_buffer;
     send_buffer.setSize(1);
     send_buffer[0] = create_problems(10);
 
-    auto recv_buffer = testableLoadBalancing::test_sendRecv<ChemistryProblem, Pstream::commsTypes::nonBlocking>(
+    auto recv_buffer = testableLoadBalancing::sendRecv<ChemistryProblem, send_buffer_t>(
         send_buffer, sources, destinations);
 
     if (Pstream::myProcNo() == 1) {

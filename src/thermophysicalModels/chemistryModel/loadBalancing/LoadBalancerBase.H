@@ -223,7 +223,7 @@ public:
     /// from destinations.
     ///
     ///@tparam ET element type of the send and receive buffers
-    ///@tparam CT mpi communication type blocking/nonBlocking
+    ///@tparam Indexable an indexable send buffer type
     ///@param send_buffer the buffer to send
     ///@param sources the ranks to receive from
     ///@param destinations the ranks to send to
@@ -232,14 +232,19 @@ public:
     template <class ET, class Indexable>
     static RecvBuffer<ET> sendRecv(
         const Indexable& send_buffer,
-        //const DynamicList<UList<ET>>&       send_buffer,
         const std::vector<label>& sources,
         const std::vector<label>& destinations);
 
 
 
 
-
+    ///
+    ///@brief Slices an nRemaining size portion from the _end_ of the values
+    ///
+    ///@tparam T element type of the input list
+    ///@param values the input list to slice
+    ///@return SubList<T> the sliced list
+    ///
     template<class T>
     SubList<T> getRemaining(const DynamicList<T>& values) {
         
