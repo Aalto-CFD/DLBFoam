@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 8-1ac1210412fb
 Exec   : decomposePar
-Date   : Aug 27 2020
-Time   : 14:24:24
+Date   : Sep 02 2020
+Time   : 17:50:37
 Host   : "peltonp1-All-Series"
-PID    : 30265
+PID    : 17017
 I/O    : uncollated
 Case   : /home/peltonp1/projects/OpenFOAM-Aalto/benchmarks/cases/small
 nProcs : 1

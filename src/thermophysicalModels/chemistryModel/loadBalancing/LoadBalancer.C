@@ -76,7 +76,7 @@ LoadBalancer::operationsToInfo(
             info.sources.push_back(op.from);
         }
         info.nProblems = {};
-        info.nRemaining = {problems.size()};
+        info.nRemaining = problems.size();
     }
 
 
