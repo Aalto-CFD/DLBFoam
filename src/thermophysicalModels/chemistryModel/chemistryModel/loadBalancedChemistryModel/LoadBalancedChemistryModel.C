@@ -85,8 +85,6 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
     const DeltaTType& deltaT)
 {
 
-    using problem_RecvBuffer  = RecvBuffer<ChemistryProblem>;
-    using solution_RecvBuffer = RecvBuffer<ChemistrySolution>;
 
     BasicChemistryModel<ReactionThermo>::correct();
 
@@ -105,13 +103,11 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
     balancer_.printState();
 
 
-    problem_RecvBuffer guestProblems = balancer_.balance(allProblems);
-    SubList<ChemistryProblem> ownProblems = balancer_.getRemaining(allProblems);
-    DynamicList<ChemistrySolution> ownSolutions = solveList(ownProblems);
-
-    solution_RecvBuffer guestSolutions = solveBuffer(guestProblems); //Solve call
-
-    solution_RecvBuffer incomingSolutions = balancer_.unbalance(guestSolutions);
+    auto guestProblems = balancer_.balance(allProblems);
+    auto ownProblems = balancer_.getRemaining(allProblems);
+    auto ownSolutions = solveList(ownProblems);
+    auto guestSolutions = solveBuffer(guestProblems); 
+    auto incomingSolutions = balancer_.unbalance(guestSolutions);
 
     
 
