@@ -102,7 +102,6 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
 
     balancer_.updateState(allProblems);
     
-    balancer_.printState();
 
     auto state = balancer_.getStateNew();
 
@@ -110,108 +109,33 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
 
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
     balancer_.sendCall(problemsIWillSend, state.destinations, pBufs);
-
+    pBufs.finishedSends(false); //this doesnt wait 
+    
     DynamicList<ChemistryProblem> ownProblems = balancer_.getRemaining(allProblems);
     problem_buffer_t ownBuffer; ownBuffer.append(ownProblems);
-    solution_buffer_t ownSolutions = solveBuffer(ownBuffer);
+    solution_buffer_t ownSolutions = solveBuffer(ownBuffer); //solve call
     
+    Pstream::waitRequests();
     problem_buffer_t guestProblems;
     balancer_.recvCall(guestProblems, state.sources, pBufs);
     
-    solution_buffer_t guestSolutions = solveBuffer(guestProblems);
-
-    PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
-    balancer_.sendCall(guestSolutions, state.sources, pBufs2);
+    solution_buffer_t guestSolutions = solveBuffer(guestProblems); //Solve call
 
     solution_buffer_t incomingSolutions;
+
+    PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
+    balancer_.sendCall(guestSolutions, state.sources, pBufs2); //block
+    pBufs2.finishedSends(true);
+    
     balancer_.recvCall(incomingSolutions, state.destinations, pBufs2);
-
-
-
+    
+    
+    
     incomingSolutions.append(ownSolutions);
 
-    return updateReactionRates(incomingSolutions);
-
-
-    /*
-    template <class ET>
-    static void sendCall(
-        const buffer_t<ET>&       send_buffer,
-        const std::vector<label>& destinations,
-        PstreamBuffers& pBufs)
-    */
-
-    //sendBuffer = slice_sendProblems(allProblems)
-    //callSends()
-    //myProblems = getMyProblems(allProblems)
-    //mySolutions = solveMyProblems(myProblems)
-    //updateReactionRates(mySolutions)
-    //guestProblems = callReceive()
-    //guestSolutions = solveGuest(guestProblems)
-    //callSends(guestSolutions)
-    //IS THERE ANY WORK THAT COULD BE DONE HERE?
-    //myIncomingSolutions = callReceives(guestSolutions)
-    //updateReactionRates(myIncomingSolutions)
-
-
-    /*
-    problem_buffer_t guestProblems = balancer_.balance(allProblems);
-
-    DynamicList<ChemistryProblem> ownProblems = balancer_.getRemaining(allProblems);
-    solution_buffer_t guestSolutions = solveBuffer(guestProblems);
-
-    problem_buffer_t ownBuffer; ownBuffer.append(ownProblems);
-    solution_buffer_t ownSolutions = solveBuffer(ownBuffer);
-
-
-    solution_buffer_t incomingSolutions = balancer_.unbalance(guestSolutions);
-
-
-
-
-
-    incomingSolutions.append(ownSolutions[0]);
-
-    return updateReactionRates(incomingSolutions);
-    */
-
-
-    /*
-
-    clockTime timer;
-
-    timer.timeIncrement();
-    DynamicList<ChemistryProblem> all_problems = getProblems(deltaT);
-    scalar                        get_problem  = timer.timeIncrement();
-
-    timer.timeIncrement();
-    balancer_.updateState(all_problems);
-    scalar updateState = timer.timeIncrement();
-
     balancer_.printState();
+    return updateReactionRates(incomingSolutions);
 
-    timer.timeIncrement();
-    problem_buffer_t balanced_problems = balancer_.balance(all_problems);
-    scalar           balance           = timer.timeIncrement();
-
-    timer.timeIncrement();
-    solution_buffer_t balanced_solutions = solveBuffer(balanced_problems);
-    scalar            solveBuffer        = timer.timeIncrement();
-
-    timer.timeIncrement();
-    solution_buffer_t my_solutions = balancer_.unbalance(balanced_solutions);
-    scalar            unbalance    = timer.timeIncrement();
-
-    cpuSolveFile_() << this->time().timeOutputValue() << "    " << get_problem
-                    << "    " << updateState << "    " << balance << "    "
-                    << solveBuffer << "    " << unbalance << "    "
-                    << Pstream::myProcNo() << endl;
-
-    Pstream::waitRequests();
-
-    return updateReactionRates(my_solutions);
-
-    */
     
 }
 

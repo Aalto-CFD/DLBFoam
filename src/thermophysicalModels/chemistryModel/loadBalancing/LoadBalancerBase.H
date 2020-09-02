@@ -319,7 +319,7 @@ public:
                 UOPstream send(destinations[i], pBufs);
                 send << send_buffer[i];
             }
-            pBufs.finishedSends();
+            //pBufs.finishedSends();
         }    
 
 
@@ -333,7 +333,9 @@ public:
         PstreamBuffers& pBufs)
     {
         if(Pstream::parRun()){
-            
+
+            //pBufs.finishedSends();
+             
             recv_buffer.setSize(sources.size());
             for(label i = 0; i < label(sources.size()); ++i)
             {
