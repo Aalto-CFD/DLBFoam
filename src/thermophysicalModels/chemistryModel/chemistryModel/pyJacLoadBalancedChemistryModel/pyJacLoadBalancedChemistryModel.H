@@ -130,7 +130,7 @@ private:
     ///@param problem
     ///@return scalarField
     ///
-    scalarField getMassFraction(const ChemistryProblem& problem) const;
+    ChemistryProblem getMassFraction(const ChemistryProblem& problem) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

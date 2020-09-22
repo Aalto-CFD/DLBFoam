@@ -225,7 +225,7 @@ private:
     ///@param problem problem to compute the mass fraction for
     ///@return scalarField field of mass fractions of individual species
     ///
-    virtual scalarField getMassFraction(const ChemistryProblem& problem) const;
+    virtual ChemistryProblem getMassFraction(const ChemistryProblem& problem) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

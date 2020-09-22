@@ -85,7 +85,6 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
     const DeltaTType& deltaT)
 {
 
-
     BasicChemistryModel<ReactionThermo>::correct();
 
     if(!this->chemistry_)
@@ -93,31 +92,21 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
         return great;
     }
 
-    
-
     DynamicList<ChemistryProblem> allProblems = getProblems(deltaT);
 
-
     balancer_.updateState(allProblems);
-    
+
     balancer_.printState();
 
-
-    auto guestProblems = balancer_.balance(allProblems);
-    auto ownProblems = balancer_.getRemaining(allProblems);
-    auto ownSolutions = solveList(ownProblems);
-    auto guestSolutions = solveBuffer(guestProblems); 
+    auto guestProblems     = balancer_.balance(allProblems);
+    auto ownProblems       = balancer_.getRemaining(allProblems);
+    auto ownSolutions      = solveList(ownProblems);
+    auto guestSolutions    = solveBuffer(guestProblems);
     auto incomingSolutions = balancer_.unbalance(guestSolutions);
-
-    
-
 
     incomingSolutions.append(ownSolutions);
 
-        
     return updateReactionRates(incomingSolutions);
-
-    
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -213,25 +202,27 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveBuffer(
 
     // allocate the solutions buffer
     RecvBuffer<ChemistrySolution> solutions;
-    for (auto& p : problems){
+    for(auto& p : problems)
+    {
         solutions.append(solveList(p));
     }
     return solutions;
-    
 }
 
 template <class ReactionThermo, class ThermoType>
 DynamicList<ChemistrySolution>
-LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList(UList<ChemistryProblem>& problems) const{
+LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList(
+    UList<ChemistryProblem>& problems) const
+{
 
-    DynamicList<ChemistrySolution> solutions(problems.size(), ChemistrySolution(this->nSpecie_));
+    DynamicList<ChemistrySolution> solutions(
+        problems.size(), ChemistrySolution(this->nSpecie_));
 
-    for (label i = 0; i < problems.size(); ++i){
+    for(label i = 0; i < problems.size(); ++i)
+    {
         solveSingle(problems[i], solutions[i]);
     }
     return solutions;
-
-
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -278,8 +269,8 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems(
             problem.cpuTime    = this->cpuTimes_[celli];
             problem.cellid     = celli;
 
-            // First reference cell is found and solved, following reference cells 
-            // are mapped from the first reference cell found
+            // First reference cell is found and solved, following reference
+            // cells are mapped from the first reference cell found
             if(mapper_.active() && mapper_.shouldMap(getMassFraction(problem)))
             {
 
@@ -344,15 +335,14 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::computeReactionRate(
 }
 
 template <class ReactionThermo, class ThermoType>
-scalarField
+ChemistryProblem
 LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getMassFraction(
     const ChemistryProblem& problem) const
 {
-
-    scalarField tmp(this->nSpecie_);
+    ChemistryProblem tmp = problem;
     for(label i = 0; i < this->nSpecie_; i++)
     {
-        tmp[i] = this->Y_[i][problem.cellid];
+        tmp.c[i] = this->Y_[i][problem.cellid];
     }
 
     return (tmp);

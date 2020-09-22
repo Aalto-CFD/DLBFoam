@@ -84,7 +84,7 @@ public:
         mixture_fraction_.update(composition);
     }
 
-    bool shouldMap(const scalarField& mass_fraction) const;
+    bool shouldMap(const ChemistryProblem& problem) const;
 
     bool active() const
     {
@@ -107,7 +107,7 @@ private:
 
     mixtureFraction mixture_fraction_;
 
-    bool check_if_refcell(const scalarField& mass_fraction) const;
+    bool check_if_refcell(const ChemistryProblem& mass_fraction) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
