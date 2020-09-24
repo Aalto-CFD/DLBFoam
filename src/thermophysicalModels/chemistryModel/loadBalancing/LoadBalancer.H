@@ -29,11 +29,11 @@ SourceFiles
 #ifndef LoadBalancer_H
 #define LoadBalancer_H
 
+#include "ChemistryProblem.H"
 #include "IOdictionary.H"
+#include "LoadBalancerBase.H"
 #include "Switch.H"
 #include "algorithms_aalto.H"
-#include "LoadBalancerBase.H"
-#include "ChemistryProblem.H"
 #include "runTimeSelectionTables.H"
 #include "scalarField.H"
 
@@ -60,6 +60,13 @@ public:
 public:
     LoadBalancer() = default;
 
+    LoadBalancer(const dictionary& dict)
+        : LoadBalancerBase(), dict_(dict),
+          coeffsDict_(dict.subDict("loadbalancing")),
+          active_(coeffsDict_.lookupOrDefault<Switch>("active", true))
+    {
+    }
+
     virtual ~LoadBalancer() = default;
 
     ///
@@ -69,28 +76,39 @@ public:
     ///
     virtual void updateState(const DynamicList<ChemistryProblem>& problems);
 
+    ///
+    ///@brief Return load balancing status
+    ///
+    ///@return true
+    ///@return false
+    ///
+    bool active() const
+    {
+        return active_;
+    }
+
 protected:
     ///
     ///@brief Get the operations of this process which minimize the deviation
-    ///from global mean
+    /// from global mean
     ///
     ///@param loads Loads on all processes
     ///@param myLoad Load on this process
     ///@return std::vector<LoadBalancer::Operation> Operations of this
-    ///rank
+    /// rank
     ///
     static std::vector<LoadBalancer::Operation> getOperations(
         DynamicList<ChemistryLoad>& loads, const ChemistryLoad& myLoad);
 
     ///
     ///@brief Converts the operations to send and receive info for the base
-    ///class to handle balancing
+    /// class to handle balancing
     ///
     ///@param operations Operations of this process
     ///@param problems Problems of this process
     ///@param myLoad   Load on this process
     ///@return BalancerState An object describing how many problems to send/recv
-    ///from different ranks
+    /// from different ranks
     ///
     static BalancerState operationsToInfo(
         const std::vector<Operation>&        operations,
@@ -109,22 +127,28 @@ protected:
         const DynamicList<ChemistryProblem>& problems);
 
 private:
+    const dictionary dict_;
+    const dictionary coeffsDict_;
+
+    //- Is load balancing active?
+    Switch active_;
+
     ///
     ///@brief Based on the given operations checks if a process is a sender or
-    ///receiver.
+    /// receiver.
     ///       Zero operations are marked as a receiver rank.
     ///
     ///@param operations Operations to check.
     ///@param rank       Rank to check.
     ///@return true      If all operations have a from = rank
     ///@return false     If operations are null or any of the operations from !=
-    ///rank
+    /// rank
     ///
     static bool isSender(const std::vector<Operation>& operations, int rank);
 
     ///
     ///@brief Based on the given operations checks if a process is a sender or
-    ///receiver.
+    /// receiver.
     ///       Zero operations are marked as a receiver rank.
     ///
     ///@param operations Operations to check

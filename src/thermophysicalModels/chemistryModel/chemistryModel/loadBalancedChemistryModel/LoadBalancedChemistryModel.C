@@ -34,7 +34,7 @@ template <class ReactionThermo, class ThermoType>
 LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
     LoadBalancedChemistryModel(const ReactionThermo& thermo)
     : StandardChemistryModel<ReactionThermo, ThermoType>(thermo),
-      cpuTimes_(this->mesh().cells().size(), 0.0), balancer_(LoadBalancer()),
+      cpuTimes_(this->mesh().cells().size(), 0.0), balancer_(createBalancer()),
       mapper_(createMapper(this->thermo()))
 {
 
@@ -76,7 +76,21 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createMapper(
         IOobject::NO_WRITE,
         false));
     return mixtureFractionRefMapper(chemistryDict_tmp, thermo.composition());
-    // return balancer_ptr(new bulutLoadBalancing());
+}
+
+template <class ReactionThermo, class ThermoType>
+LoadBalancer
+LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createBalancer()
+{
+
+    const IOdictionary chemistryDict_tmp(IOobject(
+        this->thermo().phasePropertyName("chemistryProperties"),
+        this->thermo().db().time().constant(),
+        this->thermo().db(),
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE,
+        false));
+    return LoadBalancer(chemistryDict_tmp);
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -94,17 +108,28 @@ scalar LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve(
 
     DynamicList<ChemistryProblem> allProblems = getProblems(deltaT);
 
-    balancer_.updateState(allProblems);
+    RecvBuffer<ChemistrySolution> incomingSolutions;
 
-    balancer_.printState();
+    if(balancer_.active())
+    {
 
-    auto guestProblems     = balancer_.balance(allProblems);
-    auto ownProblems       = balancer_.getRemaining(allProblems);
-    auto ownSolutions      = solveList(ownProblems);
-    auto guestSolutions    = solveBuffer(guestProblems);
-    auto incomingSolutions = balancer_.unbalance(guestSolutions);
+        balancer_.updateState(allProblems);
 
-    incomingSolutions.append(ownSolutions);
+        balancer_.printState();
+
+        auto guestProblems  = balancer_.balance(allProblems);
+        auto ownProblems    = balancer_.getRemaining(allProblems);
+        auto ownSolutions   = solveList(ownProblems);
+        auto guestSolutions = solveBuffer(guestProblems);
+        incomingSolutions   = balancer_.unbalance(guestSolutions);
+
+        incomingSolutions.append(ownSolutions);
+    }
+
+    else
+    {
+        incomingSolutions.append(solveList(allProblems));
+    }
 
     return updateReactionRates(incomingSolutions);
 }

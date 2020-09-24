@@ -38,9 +38,9 @@ SourceFiles
 #include "ChemistryLoad.H"
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
-#include "runtime_assert.H"
-#include "SendBuffer.H"
 #include "RecvBuffer.H"
+#include "SendBuffer.H"
+#include "runtime_assert.H"
 
 #include <algorithm> //std::min/max element
 #include <numeric>   //std::accumulate
@@ -49,25 +49,17 @@ SourceFiles
 namespace Foam
 {
 
-
-
-
-
-
 class LoadBalancerBase
 {
 
 public:
-
-
-    struct BalancerState{
-        std::vector<label> sources; //ranks which send to this process
-        std::vector<label> destinations; //ranks to which this process sends to
-        std::vector<label> nProblems; //counts which this process sends/receivs
-        label nRemaining; //own problems / solutions
-
+    struct BalancerState
+    {
+        std::vector<label> sources;      // ranks which send to this process
+        std::vector<label> destinations; // ranks to which this process sends to
+        std::vector<label> nProblems; // counts which this process sends/receivs
+        label nRemaining;             // own problems / solutions
     };
-
 
 private:
     BalancerState state_; // the current state of the object
@@ -79,13 +71,19 @@ public:
 
 public:
     ///
+    ///@brief Check whether load balancing is active or not
+    ///
+    ///@return true
+    ///@return false
+    ///
+    virtual bool active() const = 0;
+
+    ///
     ///@brief The load balancing algorithm which each derived class must define
     ///
     ///@param problems Problems of this process
     ///
     virtual void updateState(const DynamicList<ChemistryProblem>& problems) = 0;
-
-
 
     ///
     ///@brief Computes the mean of the input loads
@@ -148,9 +146,6 @@ public:
         return state_;
     }
 
-
-
-
     ///
     ///@brief Given a list of values splits them evenly between the
     /// mpi-processes.
@@ -172,17 +167,6 @@ public:
     ///
     template <class T>
     RecvBuffer<T> unbalance(const RecvBuffer<T>& values) const;
-
-
-    ///
-    ///@brief Check whether the load balancer is active or not.
-    ///
-    ///@return true
-    ///@return false
-    ///
-    bool active() const;
-
-
 
     ///
     ///@brief Prints the current state information.
@@ -231,12 +215,9 @@ public:
     ///
     template <class ET, class Indexable>
     static RecvBuffer<ET> sendRecv(
-        const Indexable& send_buffer,
+        const Indexable&          send_buffer,
         const std::vector<label>& sources,
         const std::vector<label>& destinations);
-
-
-
 
     ///
     ///@brief Slices an nRemaining size portion from the _end_ of the values
@@ -245,15 +226,13 @@ public:
     ///@param values the input list to slice
     ///@return SubList<T> the sliced list
     ///
-    template<class T>
-    SubList<T> getRemaining(const DynamicList<T>& values) {
-        
-        return SubList<T>(values, state_.nRemaining, values.size() - state_.nRemaining);
+    template <class T>
+    SubList<T> getRemaining(const DynamicList<T>& values)
+    {
 
+        return SubList<T>(
+            values, state_.nRemaining, values.size() - state_.nRemaining);
     }
-
-
-
 };
 
 template <class T>
@@ -271,41 +250,25 @@ DynamicList<T> LoadBalancerBase::allGather(const T& myData)
 }
 
 template <class T>
-RecvBuffer<T>
-LoadBalancerBase::balance(const DynamicList<T>& values) const
+RecvBuffer<T> LoadBalancerBase::balance(const DynamicList<T>& values) const
 {
 
-    
-    return sendRecv<T, SendBuffer<T>>( SendBuffer<T>(values, state_.nProblems),
-        state_.sources, state_.destinations);
-    
-    
+    return sendRecv<T, SendBuffer<T>>(
+        SendBuffer<T>(values, state_.nProblems),
+        state_.sources,
+        state_.destinations);
 }
 
-
-
-
-
 template <class T>
-RecvBuffer<T>
-LoadBalancerBase::unbalance(const RecvBuffer<T>& values) const
+RecvBuffer<T> LoadBalancerBase::unbalance(const RecvBuffer<T>& values) const
 {
-
 
     return sendRecv<T, RecvBuffer<T>>(
         values, state_.destinations, state_.sources);
-
 }
 
-
-
-
-
-
-
 template <class T>
-std::string
-LoadBalancerBase::vectorToString(const std::vector<T>& vec)
+std::string LoadBalancerBase::vectorToString(const std::vector<T>& vec)
 {
 
     std::string ret = "(";
@@ -318,22 +281,17 @@ LoadBalancerBase::vectorToString(const std::vector<T>& vec)
     return ret;
 }
 
-
-
-
 template <class ET, class Indexable>
-RecvBuffer<ET>
-LoadBalancerBase::sendRecv(
-    const Indexable& send_buffer,
-    const std::vector<label>&                         sources,
-    const std::vector<label>&                         destinations)
+RecvBuffer<ET> LoadBalancerBase::sendRecv(
+    const Indexable&          send_buffer,
+    const std::vector<label>& sources,
+    const std::vector<label>& destinations)
 {
 
     RecvBuffer<ET> ret;
 
     if(Pstream::parRun())
     {
-
 
         PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
 
@@ -343,7 +301,6 @@ LoadBalancerBase::sendRecv(
             send << send_buffer[i];
         }
 
-        
         pBufs.finishedSends();
 
         ret.setSize(sources.size());
@@ -352,12 +309,10 @@ LoadBalancerBase::sendRecv(
             UIPstream recv(sources[i], pBufs);
             recv >> ret[i];
         }
-    
     }
 
     return ret;
 }
-
 
 } // namespace Foam
 

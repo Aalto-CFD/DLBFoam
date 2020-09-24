@@ -43,8 +43,8 @@ void LoadBalancerBase::setState(const BalancerState& state)
     }
 }
 
-ChemistryLoad LoadBalancerBase::computeLoad(
-    const DynamicList<ChemistryProblem>& problems)
+ChemistryLoad
+LoadBalancerBase::computeLoad(const DynamicList<ChemistryProblem>& problems)
 {
     auto lambda = [](scalar sum, const ChemistryProblem& rhs) {
         return sum + rhs.cpuTime;
@@ -54,8 +54,7 @@ ChemistryLoad LoadBalancerBase::computeLoad(
     return ChemistryLoad(Pstream::myProcNo(), sum);
 }
 
-scalar
-LoadBalancerBase::getMean(const DynamicList<ChemistryLoad>& loads)
+scalar LoadBalancerBase::getMean(const DynamicList<ChemistryLoad>& loads)
 {
 
     auto op = [](scalar sum, const ChemistryLoad& load) {
@@ -63,8 +62,7 @@ LoadBalancerBase::getMean(const DynamicList<ChemistryLoad>& loads)
     };
     return std::accumulate(loads.begin(), loads.end(), 0.0, op) / loads.size();
 }
-ChemistryLoad
-LoadBalancerBase::getMin(const DynamicList<ChemistryLoad>& vec)
+ChemistryLoad LoadBalancerBase::getMin(const DynamicList<ChemistryLoad>& vec)
 {
 
     auto comp = [](const ChemistryLoad& lhs, const ChemistryLoad& rhs) {
@@ -73,8 +71,7 @@ LoadBalancerBase::getMin(const DynamicList<ChemistryLoad>& vec)
     return *std::min_element(vec.begin(), vec.end(), comp);
 }
 
-ChemistryLoad
-LoadBalancerBase::getMax(const DynamicList<ChemistryLoad>& vec)
+ChemistryLoad LoadBalancerBase::getMax(const DynamicList<ChemistryLoad>& vec)
 {
     auto comp = [](const ChemistryLoad& lhs, const ChemistryLoad& rhs) {
         return lhs.value < rhs.value;
@@ -136,7 +133,8 @@ void LoadBalancerBase::printState() const
     else
     {
         Pout << "Rank: " << Pstream::myProcNo()
-             << " does not take part in balancing. Solves " << state_.nRemaining << " problems itself." << endl;
+             << " does not take part in balancing. Solves " << state_.nRemaining
+             << " problems itself." << endl;
     }
 }
 

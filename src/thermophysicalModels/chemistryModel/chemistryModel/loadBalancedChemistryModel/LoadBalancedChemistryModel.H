@@ -148,6 +148,8 @@ private:
     //TODO: remove
     static mixtureFractionRefMapper createMapper(const ReactionThermo& thermo);
 
+    LoadBalancer createBalancer();
+
 
     ///
     ///@brief Solves a list
