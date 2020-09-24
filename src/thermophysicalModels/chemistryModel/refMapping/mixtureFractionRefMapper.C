@@ -24,8 +24,7 @@ License
 namespace Foam
 {
 
-bool mixtureFractionRefMapper::check_if_refcell(
-    const ChemistryProblem& problem) const
+bool mixtureFractionRefMapper::check_if_refcell(const ChemistryProblem& problem)
 {
     // Note this assumes that mixture_fraction.update() has been called!
     auto beta_of = mixture_fraction_.get_beta();
@@ -38,17 +37,35 @@ bool mixtureFractionRefMapper::check_if_refcell(
     }
 
     scalar Z = (beta - beta_of[0]) / (beta_of[1] - beta_of[0]);
-    if(Z > tolerance_)
+
+    if(!refCellFound_)
     {
-        return false;
+        if(Z > tolerance_)
+        {
+            return false;
+        }
+        else
+        {
+            Tref_         = problem.Ti;
+            refCellFound_ = true;
+            return true;
+        }
     }
     else
     {
-        return true;
+        if((Z > tolerance_) ||
+           (abs(problem.Ti - Tref_) > temperature_tolerance_ && temp_active_))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
 
-bool mixtureFractionRefMapper::shouldMap(const ChemistryProblem& problem) const
+bool mixtureFractionRefMapper::shouldMap(const ChemistryProblem& problem)
 {
     return check_if_refcell(problem);
 }

@@ -63,7 +63,7 @@ public:
     // Constructors
     RefMapperBase() = default;
 
-    virtual bool shouldMap(const ChemistryProblem& problem) const = 0;
+    virtual bool shouldMap(const ChemistryProblem& problem) = 0;
 
     virtual bool active() const = 0;
 
