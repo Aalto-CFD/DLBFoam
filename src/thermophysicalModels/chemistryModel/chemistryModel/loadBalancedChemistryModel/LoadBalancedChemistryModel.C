@@ -34,8 +34,16 @@ template <class ReactionThermo, class ThermoType>
 LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
     LoadBalancedChemistryModel(const ReactionThermo& thermo)
     : StandardChemistryModel<ReactionThermo, ThermoType>(thermo),
-      cpuTimes_(this->mesh().cells().size(), 0.0), balancer_(createBalancer()),
-      mapper_(createMapper(this->thermo()))
+      balancer_(createBalancer()), mapper_(createMapper(this->thermo())),
+      cpuTimes_(
+          IOobject(
+              thermo.phasePropertyName("cellCpuTimes"),
+              this->time().timeName(),
+              this->mesh(),
+              IOobject::NO_READ,
+              IOobject::AUTO_WRITE),
+          this->mesh(),
+          scalar(0))
 {
 
     Info << "Running with a load balanced" << endl;

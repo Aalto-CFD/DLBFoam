@@ -64,10 +64,10 @@ class LoadBalancedChemistryModel
 {
 
 private:
-    scalarField            cpuTimes_;
-    LoadBalancer           balancer_;
+    volScalarField           cpuTimes_;
+    LoadBalancer             balancer_;
     mixtureFractionRefMapper mapper_;
-    autoPtr<OFstream>      cpuSolveFile_;
+    autoPtr<OFstream>        cpuSolveFile_;
 
 public:
     //- Runtime type information
@@ -144,22 +144,19 @@ public:
     inline autoPtr<OFstream> logFile(const word& name) const;
 
 private:
-
-    //TODO: remove
+    // TODO: remove
     static mixtureFractionRefMapper createMapper(const ReactionThermo& thermo);
 
     LoadBalancer createBalancer();
 
-
     ///
     ///@brief Solves a list
     ///
-    ///@param problems 
+    ///@param problems
     ///@return DynamicList<ChemistrySolution> A list of solutions
     ///
     DynamicList<ChemistrySolution>
     solveList(UList<ChemistryProblem>& problems) const;
-
 
     ///
     ///@brief Solves the whole buffer coming from the balancer
@@ -170,17 +167,15 @@ private:
     RecvBuffer<ChemistrySolution>
     solveBuffer(RecvBuffer<ChemistryProblem>& problems) const;
 
-
     ///
     ///@brief Get the problems of this process
     ///
-    ///@tparam DeltaTType unnecessary template, should be a field 
+    ///@tparam DeltaTType unnecessary template, should be a field
     ///@param deltaT Flow time step
     ///@return DynamicList<ChemistryProblem> List of problems of this process
     ///
     template <class DeltaTType>
     DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
-
 
     ///
     ///@brief Updates the reaction rates for the solution buffer
@@ -188,8 +183,7 @@ private:
     ///@param solutions all solutions of this process
     ///@return scalar minimum chemistry time step
     ///
-    scalar updateReactionRates(
-        const RecvBuffer<ChemistrySolution>& solutions);
+    scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
 
     ///
     ///@brief Updates the reaction rate for cell i
@@ -227,7 +221,8 @@ private:
     ///@param problem problem to compute the mass fraction for
     ///@return scalarField field of mass fractions of individual species
     ///
-    virtual ChemistryProblem getMassFraction(const ChemistryProblem& problem) const;
+    virtual ChemistryProblem
+    getMassFraction(const ChemistryProblem& problem) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -34,9 +34,10 @@ refmapping
 
         #include "$FOAM_CASE/constant/thermo.compressibleGasGRI"
     }
+    temperatureChecker{}
     tolerance	1e-4;
 }
-
+loadbalancing{}
 
 chemistryType
 {
