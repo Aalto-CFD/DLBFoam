@@ -32,48 +32,11 @@ DynamicList<ChemistryProblem> create_problems(int count){
 }
 
 
-class testableLoadBalancing : public LoadBalancerBase{
-
-public:
-
-
-    using LoadBalancerBase::sendRecv;
-
-    //handy for testing
-    void set_test_state(const std::vector<int>& sources, const std::vector<int>& destinations, const std::vector<int>& n_probs) {
-
-        BalancerState i;
-
-        i.sources = sources;
-        i.destinations = destinations;
-        i.nProblems = n_probs;
-
-        this->setState(i);
-  
-    }
-    
-    void updateState(const DynamicList<ChemistryProblem>& problems) {
-        /*empty*/
-    }
-
-    
-   
-
-};
-
 } //namespace Foam
 
 
 
 
-TEST_CASE("LoadBalancerBase constructors"){
-
-
-    using namespace Foam;
-
-    REQUIRE_NOTHROW(testableLoadBalancing());
-
-}
 
 TEST_CASE("LoadBalancerBase allGather()"){
 
@@ -131,7 +94,7 @@ TEST_CASE("LoadBalancerBase sendRecv() swap test"){
     send_buffer.setSize(1);
     send_buffer[0] = create_problems(10);
 
-    auto recv_buffer = testableLoadBalancing::sendRecv<ChemistryProblem, send_buffer_t>(
+    auto recv_buffer = LoadBalancerBase::sendRecv<ChemistryProblem, send_buffer_t>(
         send_buffer, sources, destinations);
 
     if (Pstream::myProcNo() == 1) {
@@ -147,60 +110,3 @@ TEST_CASE("LoadBalancerBase sendRecv() swap test"){
     
 }
 
-
-/*
-
-
-
-TEST_CASE("LoadBalancerBase balance() / unbalance()"){
-
-    
-
-    
-    using namespace Foam;
-
-    
-
-    testableLoadBalancing l;
-
-    auto problems = create_problems(50);
-    l.updateState(problems);
-
-    
-
-
-    for (const auto& p : problems ){
-
-    }
-
-    //l.setState(l.determine_state(loads));
-
-    label startOfRequests = Pstream::nRequests();
-    auto buffer = l.balance(problems);
-
-    if (Pstream::myProcNo() == Pstream::master()){
-        CHECK(buffer.size() == Pstream::nProcs() - 1);
-    }
-
-    else{
-        CHECK(buffer.size() == 0);
-    }
-        
-    
-    //Pstream::waitRequests(startOfRequests);
-
-    if (buffer.size() > 0){
-        auto buffer2 = l.unbalance(buffer);
-    }
-
-    
-    
-    
-    
-    
-
-
-
-}
-
-*/
