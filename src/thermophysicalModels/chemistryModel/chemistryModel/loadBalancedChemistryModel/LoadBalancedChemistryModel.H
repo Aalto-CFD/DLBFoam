@@ -64,9 +64,9 @@ class LoadBalancedChemistryModel
 {
 
 private:
-    volScalarField           cpuTimes_;
     LoadBalancer             balancer_;
     mixtureFractionRefMapper mapper_;
+    volScalarField           cpuTimes_;
     autoPtr<OFstream>        cpuSolveFile_;
 
 public:

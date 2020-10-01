@@ -104,16 +104,17 @@ private:
     // TODO: for runtime switching, these need to be references
     const dictionary dict_;
     const dictionary coeffsDict_;
-    const dictionary temperatureDict_;
 
     //- Is reference mapping active?
     Switch active_;
 
+    //- Tolerance for reference mapping
+    scalar           tolerance_;
+    
+    const dictionary temperatureDict_;
+
     //- Is temperature checking active?
     Switch temp_active_;
-
-    //- Tolerance for reference mapping
-    scalar tolerance_;
 
     //- Tolerance for temperature checking (in Kelvins)
     scalar temperature_tolerance_;
