@@ -21,6 +21,14 @@ public:
 };
 
 
+TEST_CASE("LoadBalancer constructors"){
+
+    REQUIRE_NOTHROW(LoadBalancer());
+
+
+}
+
+
 TEST_CASE("simpleBalancingMethod getMin()/getMax()"){
 
     DynamicList<ChemistryLoad> loads;
