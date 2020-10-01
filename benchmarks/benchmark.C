@@ -60,9 +60,7 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createControl.H"
     #include "createTimeControls.H"
-    #include "initContinuityErrs.H"
     #include "createFields.H"
-    #include "createFieldRefs.H"
 
 
     #include "compressibleCourantNo.H"

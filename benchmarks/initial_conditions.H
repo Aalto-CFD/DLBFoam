@@ -31,7 +31,7 @@ namespace detail{
         return min + f * (max - min);
     }
 
-    static constexpr size_t n_species = 53;
+    static constexpr int n_species = 53;
     static constexpr double FLOWTIMESTEP = 1E-7;
     static constexpr double HEAVY_Y_VALUE = 0.001;
     static constexpr double LIGHT_Y_VALUE = 0.0001;

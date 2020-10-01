@@ -10,8 +10,8 @@ cd ./unittests
 wmake
 cd ..
 
-
-
 cd ./benchmarks
 wmake
 
+cd ..
+./test.sh
