@@ -110,7 +110,7 @@ private:
 
     //- Tolerance for reference mapping
     scalar           tolerance_;
-    
+
     const dictionary temperatureDict_;
 
     //- Is temperature checking active?

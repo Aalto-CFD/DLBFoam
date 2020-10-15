@@ -63,7 +63,7 @@ License
         pyJacLoadBalancedChemistryModel,                                       \
         ReactionThermo,                                                        \
         ThermoPhysics                                                          \
-    )  
+    )
 
 #define makeChemistrySolversPyjac(Solver, ReactionThermo, ThermoPhysics)            \
     makeChemistrySolver                                                        \
@@ -91,7 +91,7 @@ namespace Foam
     forCommonGases(makeChemistrySolvers, ode, psiReactionThermo);
     forCommonGases(makeChemistrySolvers, ode, rhoReactionThermo);
 
-    
+
     //liquids
     forCommonLiquids(defineChemistrySolvers, rhoReactionThermo);
 
@@ -106,7 +106,7 @@ namespace Foam
     forPolynomials(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
     forPolynomials(makeChemistrySolvers, ode, rhoReactionThermo);
 
-    
+
 
 
 

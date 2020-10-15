@@ -18,8 +18,8 @@ void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField
 
 
     for (label i = 0; i < model1->nSpecie(); ++i){
-        
-        
+
+
         const scalarField& r1 = model1->RR(i);
         const scalarField& r2 = model2->RR(i);
 
@@ -39,7 +39,7 @@ void sanity_check(volScalarField& p, volScalarField& rho, PtrList<volScalarField
         }
 
     }
-    
+
 
     delete model1; delete model2;
 

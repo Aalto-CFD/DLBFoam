@@ -24,7 +24,7 @@ scalarField c;
 
 namespace detail{
 
-   
+
 
     static double random_double(double min, double max) {
         double f = double(rand()) / RAND_MAX;
@@ -36,7 +36,7 @@ namespace detail{
     static constexpr double HEAVY_Y_VALUE = 0.001;
     static constexpr double LIGHT_Y_VALUE = 0.0001;
 
-    
+
     ChemistryProblem create_heavy_problem() {
 
 
@@ -44,7 +44,7 @@ namespace detail{
         p.c = 0.1;
 
         p.Ti = 1800;
-        p.pi = 100000; 
+        p.pi = 100000;
         p.rhoi = 0.1824236;
         p.deltaTChem = 0.000841043;
         p.deltaT = 0.000847458;
@@ -68,7 +68,7 @@ namespace detail{
 
         for (size_t i = 0; i < n;  ++i){
             p.push_back(create_heavy_problem());
-        } 
+        }
         return p;
     }
 
@@ -78,7 +78,7 @@ namespace detail{
 
         for (size_t i = 0; i < n;  ++i){
             p.push_back(create_light_problem());
-        } 
+        }
         return p;
     }
 
@@ -98,11 +98,11 @@ void generic_assign_all(volScalarField& rho, psiReactionThermo& thermo, scalar T
             p[celli] = pv;
             rho[celli] = rhov;
             T[celli] = Tv;
-            
-            for (label i = 0; i < n_species; i++) { 
+
+            for (label i = 0; i < n_species; i++) {
                 Y[i][celli] = Yv; //detail::random_double(0.05, 0.1);
             }
-            
+
     }
 
 
@@ -121,11 +121,11 @@ void generic_assign_all_random(volScalarField& rho, psiReactionThermo& thermo, s
             p[celli] = pv;
             rho[celli] = rhov;
             T[celli] = Tv;
-            
-            for (label i = 0; i < n_species; i++) { 
+
+            for (label i = 0; i < n_species; i++) {
                 Y[i][celli] = Yv(); //detail::random_double(0.05, 0.1);
             }
-            
+
     }
 
 
@@ -142,7 +142,7 @@ void set_all_heavy(volScalarField& rho,  psiReactionThermo& thermo) {
 
     detail::generic_assign_all(rho, thermo, problem.Ti, problem.pi, problem.rhoi, detail::HEAVY_Y_VALUE);
 
-} 
+}
 
 
 void set_all_light( volScalarField& rho,  psiReactionThermo& thermo) {
@@ -188,14 +188,14 @@ void set_every_n_random_heavy( volScalarField& rho,  psiReactionThermo& thermo, 
     auto problem = detail::create_light_problem();
 
     struct randomizer_heavy {
-        
+
         scalar operator()() const{
             return detail::random_double(detail::HEAVY_Y_VALUE*0.5, detail::HEAVY_Y_VALUE*1.5);
         }
     };
 
     struct randomizer_light {
-        
+
         scalar operator()() const{
             return detail::random_double(detail::LIGHT_Y_VALUE*0.5, detail::LIGHT_Y_VALUE*1.5);
         }
@@ -219,17 +219,17 @@ void set_all_random( volScalarField& rho,  psiReactionThermo& thermo) {
     auto problem = detail::create_light_problem();
 
     struct randomizer {
-        
+
         scalar operator()() const{
             return detail::random_double(detail::LIGHT_Y_VALUE, detail::HEAVY_Y_VALUE);
         }
     };
 
-    
+
 
     detail::generic_assign_all_random(rho, thermo, problem.Ti, problem.pi, problem.rhoi, randomizer());
 
 
-    
+
 
 }

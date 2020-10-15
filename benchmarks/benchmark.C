@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     #include "setDeltaT.H"
 
 
-    thermo.correct(); 
+    thermo.correct();
 
     std::vector<Result> results;
 
@@ -77,14 +77,14 @@ int main(int argc, char *argv[])
     ///
     sanity_check(p, rho, Y, thermo);
 
-    
+
 
     ///
     ///@brief Benchmark the load balanced solver for light and heavy problems
     ///
     ///
     /*
-     
+
     results.push_back(
         Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solveSingle()",  "simple", "all heavy"}, thermo, false), 50 )
                     );
@@ -93,17 +93,17 @@ int main(int argc, char *argv[])
         Runner::run( BenchmarkSolveSingle( {"loadBalanced", "solveSingle()",  "simple", "all light"}, thermo, true), 50 )
                     );
 
-    */    
+    */
 
 
     /////////////////////////
-    ///@brief All heavy problems on all ranks 
+    ///@brief All heavy problems on all ranks
     ///
     ///
 
-    
+
     set_all_heavy(rho, thermo);
-    
+
     results.push_back(
         Runner::run(
             BenchmarkSolve({"Standard", "solve()","none", "all heavy"}, ModelType::standard, thermo),
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
             10
         )
     );
-    
+
 
     results.push_back(
         Runner::run(
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     ///
     ///
     set_master_heavy(rho, thermo);
-    
+
 
     results.push_back(
         Runner::run(
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
             10
         )
     );
-    
+
 
     results.push_back(
         Runner::run(
@@ -169,14 +169,14 @@ int main(int argc, char *argv[])
     ///
     ///
     set_every_n_heavy(rho, thermo, 2);
-    
+
     results.push_back(
         Runner::run(
             BenchmarkSolve({"Standard", "solve()","none", "every 2nd heavy"}, ModelType::standard, thermo),
             10
         )
     );
-    
+
 
     results.push_back(
         Runner::run(
@@ -191,14 +191,14 @@ int main(int argc, char *argv[])
     ///
     ///
     set_every_n_heavy(rho, thermo, 4);
-    
+
     results.push_back(
         Runner::run(
             BenchmarkSolve({"Standard", "solve()","none", "every 4th heavy"}, ModelType::standard, thermo),
             10
         )
     );
-    
+
 
     results.push_back(
         Runner::run(
@@ -213,14 +213,14 @@ int main(int argc, char *argv[])
     ///
     ///
     set_every_n_heavy(rho, thermo, 10);
-    
+
     results.push_back(
         Runner::run(
             BenchmarkSolve({"Standard", "solve()","none", "every 10th heavy"}, ModelType::standard, thermo),
             10
         )
     );
-    
+
 
     results.push_back(
         Runner::run(
@@ -234,14 +234,14 @@ int main(int argc, char *argv[])
     ///
     ///
     set_every_n_random_heavy(rho, thermo, 4);
-    
+
     results.push_back(
         Runner::run(
             BenchmarkSolve({"Standard", "solve()","none", "every 3rd rnd heavy"}, ModelType::standard, thermo),
             10
         )
     );
-    
+
 
     results.push_back(
         Runner::run(
@@ -256,14 +256,14 @@ int main(int argc, char *argv[])
     ///
     ///
     set_all_random(rho, thermo);
-    
+
     results.push_back(
         Runner::run(
             BenchmarkSolve({"Standard", "solve()","none", "all random"}, ModelType::standard, thermo),
             10
         )
     );
-    
+
 
     results.push_back(
         Runner::run(
@@ -274,15 +274,15 @@ int main(int argc, char *argv[])
 
     dump_results(results);
 
-    
+
 
     Info << Result::get_header() << endl;
 
     for (auto r : results) {
-        
+
         Info << r << endl;
     }
-    
+
     return 0;
 
 

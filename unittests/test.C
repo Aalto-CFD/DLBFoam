@@ -16,18 +16,18 @@ int main(int argc, char* argv[])
     //    bool ok = UPstream::init(argc, argv, true);
     //}
     UPstream::init(argc, argv, true);
-    
+
     Catch::Session session;
-  
+
     const int result = session.run(argc, argv);
 
-    
+
     //if (Pstream::parRun()){
         UPstream::exit(0);
    // }
     //MPI_Finalize();
 
     return result;
-    
-    
+
+
 }

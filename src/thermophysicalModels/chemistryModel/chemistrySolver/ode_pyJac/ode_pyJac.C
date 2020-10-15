@@ -21,7 +21,7 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955 
+Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955
 Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/ode/ode.C
 
 \*---------------------------------------------------------------------------*/
@@ -92,7 +92,7 @@ void Foam::ode_pyJac<ChemistryModel>::solve
     /* pyJac implementation:                                                            */
     /* Because pyJac does not consider the last specie in the system, it is not part of */
     /* the RHS and Jacobian and thus we need here the inert = 1.0-csum functionality    */
-    else 
+    else
     {
         // Copy the concentration, T and P to the total solve-vector
         cTp_[0] = T;
@@ -115,7 +115,7 @@ void Foam::ode_pyJac<ChemistryModel>::solve
     	    csum += c[i];
         }
         //The last specie:
-        c[nSpecie-1] = 1.0 - csum; 
+        c[nSpecie-1] = 1.0 - csum;
     }
 }
 

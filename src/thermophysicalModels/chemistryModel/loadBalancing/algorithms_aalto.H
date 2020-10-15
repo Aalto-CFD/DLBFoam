@@ -10,11 +10,11 @@ namespace Foam{
 
 
 ///
-///@brief Converts an iterator to a reverse iterator 
+///@brief Converts an iterator to a reverse iterator
 ///
 ///@tparam InputIt input iterator type
 ///@param i the iterator to convert
-///@return std::reverse_iterator<Iter> a reverse iterator 
+///@return std::reverse_iterator<Iter> a reverse iterator
 ///        with ++ and -- operators shifting to left and right, respectively.
 ///
 template<class InputIt>
@@ -40,7 +40,7 @@ typename std::iterator_traits<InputIt>::difference_type count_while(InputIt firs
       if(!predicate(*first)){
           break;
       }
-      ret++; 
+      ret++;
   }
   return ret;
 

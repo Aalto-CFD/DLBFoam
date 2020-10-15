@@ -30,7 +30,7 @@ Description
 SourceFiles
     ode.C
 
-Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955 
+Base OF-dev git commit : 3c643bf2f8eb50b0531f40ba93be6ecb2364c955
 Base OF-dev file path : src/thermophysicalModels/chemistryModel/chemistrySolver/ode/ode.H
 
 \*---------------------------------------------------------------------------*/

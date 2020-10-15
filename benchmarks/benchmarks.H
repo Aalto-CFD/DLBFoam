@@ -19,7 +19,7 @@ struct Benchmark{
     :
     m_info(info)
     {
-        
+
         if (model_type == ModelType::standard){
             m_model = new ode<StandardChemistryModel<psiReactionThermo, ThermoType>>(thermo);
         }
@@ -40,7 +40,7 @@ struct Benchmark{
 
 private:
     BenchmarkInfo m_info;
-    basicChemistryModel* m_model;    
+    basicChemistryModel* m_model;
 
 };
 
@@ -65,7 +65,7 @@ struct BenchmarkSolveSingle{
 
     static constexpr size_t n_problems = 10;
 
-    BenchmarkSolveSingle(BenchmarkInfo info, psiReactionThermo& thermo, bool heavy=true) 
+    BenchmarkSolveSingle(BenchmarkInfo info, psiReactionThermo& thermo, bool heavy=true)
     : m_info(info), m_problems(create_problems(heavy)), m_solutions(create_solutions())
     {
         m_model = new ode<LoadBalancedChemistryModel<psiReactionThermo, ThermoType>>(thermo);

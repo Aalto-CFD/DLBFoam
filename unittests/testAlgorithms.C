@@ -24,7 +24,7 @@ TEST_CASE("Algorithms count_while for vector"){
     sum = 0;
     max = 4;
     CHECK(count_while(v.begin(), v.end(), sum_upto) == 1);
-    
+
     sum = 0;
     max = 11;
     CHECK(count_while(v.begin(), v.end(), sum_upto) == 2);
@@ -69,7 +69,7 @@ TEST_CASE("Algorithms count_while for list of problems (forward iterators)"){
     v[1].cpuTime = 10.0;
     v[2].cpuTime = 3.0;
     v[3].cpuTime = 5.0;
-    
+
 
 
     double sum;
@@ -113,7 +113,7 @@ TEST_CASE("Algorithms count_while for list of problems (reverse iterators)"){
     v[1].cpuTime = 10.0;
     v[2].cpuTime = 3.0;
     v[3].cpuTime = 5.0;
-    
+
 
 
     double sum;
@@ -122,8 +122,8 @@ TEST_CASE("Algorithms count_while for list of problems (reverse iterators)"){
         sum += p.cpuTime;
         return sum <= max;
     };
-    
-     
+
+
     //reverse iterators
     sum = 0;
     max = 5;

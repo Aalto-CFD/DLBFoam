@@ -71,7 +71,7 @@ TEST_CASE("LoadBalancer timesToProblemCounts"){
     CHECK(counts.size() == 2);
     CHECK(counts[0] == 2);
     CHECK(counts[1] == 0);
-    
+
 
 
 }
@@ -86,7 +86,7 @@ TEST_CASE("LoadBalancer getOperations"){
         for (size_t j = 0; j < i; ++j){
             REQUIRE_NOTHROW(globalTest::getOperations(loads, loads[i]));
         }
-            
+
     }
 
 

@@ -41,10 +41,10 @@ struct Result{
     }
 
     static std::string get_header_csv() {
-    
+
 
         std::ostringstream ss;
-        ss << "Model," << "Function," << "Balancer," << "Init. Condition," << "N samples," << "Mean," << "Stdev"; 
+        ss << "Model," << "Function," << "Balancer," << "Init. Condition," << "N samples," << "Mean," << "Stdev";
         return ss.str();
 
     }
@@ -68,7 +68,7 @@ struct Result{
     std::string to_csv() const{
 
         std::ostringstream ss;
-        ss << info.chem_model_name; 
+        ss << info.chem_model_name;
         ss << ",";
         ss << info.benchmarked_function;
         ss << ",";
@@ -81,7 +81,7 @@ struct Result{
         ss << average;
         ss << ",";
         ss << standard_dev;
-        
+
         return ss.str();
 
 
