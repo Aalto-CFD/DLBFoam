@@ -45,22 +45,6 @@ LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
           this->mesh(),
           scalar(0))
 {
-
-    Info << "Running with a load balanced" << endl;
-    cpuSolveFile_ = logFile("cpu_solve.out");
-    cpuSolveFile_() << "time"
-                    << "    "
-                    << "get_problem"
-                    << "    "
-                    << "updateState"
-                    << "    "
-                    << "balance"
-                    << "    "
-                    << "solveBuffer"
-                    << "    "
-                    << "unbalance"
-                    << "    "
-                    << "rank ID" << endl;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
