@@ -30,7 +30,6 @@ Description
     terms.
 
 SourceFiles
-    LoadBalancedChemistryModelI.H
     LoadBalancedChemistryModel.C
 
 \*---------------------------------------------------------------------------*/
@@ -140,8 +139,6 @@ public:
     //- Disallow default bitwise assignment
     void operator=(const LoadBalancedChemistryModel&) = delete;
 
-    //- Create and return a loadbal log file of the given name
-    inline autoPtr<OFstream> logFile(const word& name) const;
 
 private:
     // TODO: remove
