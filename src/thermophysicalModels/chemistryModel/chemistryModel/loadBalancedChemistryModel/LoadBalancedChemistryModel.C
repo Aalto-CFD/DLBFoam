@@ -377,14 +377,15 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
     }
 
-
+    //the real size is set here
     problems.setSize(counter);
 
 
     runtime_assert(problems.size() + mapped_problems.size() == p.size(), "getProblems fails");
 
 
-    //map the solution to reference cells TODO: make a separate function
+    //map the solution to reference cells 
+    //TODO: make a separate function
     if (mapped_problems.size() > 0)
     {
 
