@@ -29,7 +29,8 @@ License
 
 // Constructor
 Foam::mixtureFraction::mixtureFraction(const dictionary& mixFracDict, const basicSpecieMixture& composition)
-    : mixFracDict_(mixFracDict), species_(composition.species()) 
+    : mixFracDict_(mixFracDict), species_(composition.species()), alpha_(composition.species().size(), 0.0),
+      beta_(2, 0.0) 
 {
     initialize(composition);
 }
