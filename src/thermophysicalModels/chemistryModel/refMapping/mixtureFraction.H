@@ -109,6 +109,8 @@ public:
     //- Calculate mixture fraction of the given problem
     scalar getZ(const ChemistryProblem& problem);
 
+    scalar getZ(const scalarField& concentration) const;
+
 
 private:
 

@@ -86,9 +86,14 @@ private:
         //- Create a load balancer object
         LoadBalancer createBalancer();
 
-        //- Get the list of problems to be balanced
-        template <class DeltaTType>
+        //- Get the list of problems to be solved
+        template<class DeltaTType>
         DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
+
+        //- Get a problem for cell i
+        virtual ChemistryProblem getProblem(scalar deltaT, label celli) const;
+
+
 
         //- Solve a list of chemistry problems and return a list of solutions
         DynamicList<ChemistrySolution> 
@@ -108,7 +113,11 @@ private:
         //- Compute the mass fraction from concentration
         virtual ChemistryProblem
         getMassFraction(const ChemistryProblem& problem) const;
-            
+
+
+
+
+
         //- Solve the reaction system for the given time step
         //  of given type and return the characteristic time
         template<class DeltaTType>

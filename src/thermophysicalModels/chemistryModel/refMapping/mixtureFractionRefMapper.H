@@ -91,6 +91,9 @@ public:
     //- Check if the cell is a mapping candidate
     bool shouldMap(const ChemistryProblem& problem);
 
+    bool shouldMap(const scalarField& concentration, scalar T);
+
+
     //- Is reference mapping active?
     bool active() const
     {
@@ -104,10 +107,15 @@ public:
         refCellFound_ = false;
     }
 
+    //virtual void update(const scalarField& T, const PtrList<volScalarField>& Y) override;
 
 private:
     const dictionary dict_;
     const dictionary coeffsDict_;
+
+    // The reference problem
+    //ChemistryProblem refProblem_;
+
 
     // Is reference mapping active?
     Switch active_;
@@ -124,8 +132,6 @@ private:
     // Reference temperature to be checked
     scalar Tref_;
 
-    // Mixture fraction value
-    scalar Z;
 
     // Mixture fraction object
     mixtureFraction mixture_fraction_;

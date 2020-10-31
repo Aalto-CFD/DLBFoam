@@ -98,3 +98,18 @@ Foam::scalar Foam::mixtureFraction::getZ(const ChemistryProblem& problem)
 
     return (beta - beta_[0]) / (beta_[1] - beta_[0]);
 }
+
+Foam::scalar Foam::mixtureFraction::getZ(const scalarField& concentration) const
+{
+
+    scalar beta = 0.0; 
+    forAll(concentration, iField)
+    {
+        beta += alpha_[iField] * concentration[iField];
+    }
+
+    return (beta - beta_[0]) / (beta_[1] - beta_[0]);
+
+
+
+}

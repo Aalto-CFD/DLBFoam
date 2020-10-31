@@ -62,6 +62,11 @@ public:
     // Constructors
     RefMapperBase() = default;
 
+
+    //virtual void update(const scalarField& T, const PtrList<volScalarField>& Y) = 0;
+
+
+
     virtual bool shouldMap(const ChemistryProblem& problem) = 0;
 
     virtual bool active() const = 0;

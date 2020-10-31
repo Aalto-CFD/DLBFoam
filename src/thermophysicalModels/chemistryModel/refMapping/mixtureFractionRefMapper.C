@@ -27,7 +27,7 @@ License
 
 bool Foam::mixtureFractionRefMapper::shouldMap(const ChemistryProblem& problem)
 {
-    Z = mixture_fraction_.getZ(problem);
+    scalar Z = mixture_fraction_.getZ(problem);
 
     if(!refCellFound_)
     {
@@ -53,4 +53,38 @@ bool Foam::mixtureFractionRefMapper::shouldMap(const ChemistryProblem& problem)
             return true;
         }
     }
+}
+
+bool Foam::mixtureFractionRefMapper::shouldMap(const scalarField& concentration, scalar T)
+{
+
+
+    scalar Z = mixture_fraction_.getZ(concentration);
+
+    if(!refCellFound_)
+    {
+        if(Z > tolerance_)
+        {
+            return false;
+        }
+        else
+        {
+            Tref_         = T; 
+            refCellFound_ = true;
+            return true;
+        }
+    }
+    else
+    {
+        if((Z > tolerance_) || (abs(T - Tref_) > deltaT_))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+
 }

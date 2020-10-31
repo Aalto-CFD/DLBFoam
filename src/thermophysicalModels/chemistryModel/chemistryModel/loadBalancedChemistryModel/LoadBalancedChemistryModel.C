@@ -306,7 +306,39 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList
 
 
 template <class ReactionThermo, class ThermoType>
-template <class DeltaTType>
+Foam::ChemistryProblem Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblem
+(
+    scalar deltaT,
+    label celli
+
+) const
+{
+
+    const scalarField& T = this->thermo().T();
+    const scalarField& p = this->thermo().p();
+    tmp<volScalarField> trho(this->thermo().rho());
+    const scalarField& rho = trho();
+
+    ChemistryProblem problem(this->nSpecie_);
+
+    for(label i = 0; i < this->nSpecie_; i++)
+    {
+        problem.c[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
+    }
+    problem.Ti = T[celli];
+    problem.pi = p[celli];
+    problem.rhoi = rho[celli];
+    problem.deltaTChem = this->deltaTChem_[celli];
+    problem.deltaT = deltaT;
+    problem.cpuTime = cpuTimes_[celli];
+    problem.cellid = celli;
+
+    return problem;
+
+}
+
+template <class ReactionThermo, class ThermoType>
+template<class DeltaTType>
 Foam::DynamicList<Foam::ChemistryProblem>
 Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 (
@@ -314,61 +346,75 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 )
 {
 
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-    tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField& rho = trho();
-    bool refCellFound = false;
-    DynamicList<ChemistryProblem> chem_problems;
-    ChemistrySolution ref_solution(this->nSpecie_);
-    mapper_.clear();
     
-    forAll(p, celli)
+    const scalarField& T = this->thermo().T();
+    
+    
+    mapper_.clear();
+
+
+    scalarField concentration(this->nSpecie_);
+
+    
+    ChemistrySolution refSolution;
+    bool foundReferenceCell = false;
+    forAll(T, celli)
     {
+
+
         for(label i = 0; i < this->nSpecie_; i++)
         {
-            this->c_[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
+            concentration[i] = this->Y_[i][celli];
         }
 
-        scalar Ti = T[celli];
-
-        if(Ti > this->Treact())
+        if (mapper_.shouldMap(concentration, T[celli]))
         {
-            // Create and populate the chemisty problem for celli
-            ChemistryProblem problem;
-            problem.c = this->c_;
-            problem.Ti = T[celli];
-            problem.pi = p[celli];
-            problem.rhoi = rho[celli];
-            problem.deltaTChem = this->deltaTChem_[celli];
-            problem.deltaT = deltaT[celli];
-            problem.cpuTime = cpuTimes_[celli];
-            problem.cellid = celli;
 
-            // First reference cell is found and solved, following reference
-            // cells are mapped from the first reference cell found
-            if(mapper_.active() && mapper_.shouldMap(getMassFraction(problem)))
+            foundReferenceCell = true;
+
+            auto refProblem = getProblem(deltaT[celli], celli);
+
+            solveSingle(refProblem, refSolution);
+
+            refMap_[celli] = 0;
+
+            //not ok...
+            break;
+
+        }     
+        
+
+    }
+
+    DynamicList<ChemistryProblem> problems;
+
+    forAll(T, celli)
+    {
+
+        if(T[celli] > this->Treact())
+        {
+
+
+            for(label i = 0; i < this->nSpecie_; i++)
             {
-                if(!refCellFound)
-                {
-                    solveSingle(problem, ref_solution);
-                    refCellFound = true;
-                    refMap_[celli] = 0;
-                }
-                else
-                {
-                    updateReactionRate(ref_solution, celli);
-                    refMap_[celli] = 1;
-                }
-                cpuTimes_[celli] = ref_solution.cpuTime;
-                updateReactionRate(ref_solution, celli);
-
+                concentration[i] = this->Y_[i][celli];
             }
+
+            if (mapper_.shouldMap(concentration, T[celli]) && foundReferenceCell)
+            {
+                refMap_[celli] = 1; //this overwrites the first one
+                updateReactionRate(refSolution, celli);
+                cpuTimes_[celli] = refSolution.cpuTime;
+            }
+
             else
             {
-                chem_problems.append(problem);
                 refMap_[celli] = 2;
+                problems.append(this->getProblem(deltaT[celli], celli));
+
             }
+    
+
         }
         else
         {
@@ -377,8 +423,11 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
                 this->RR_[i][celli] = 0;
             }
         }
+
     }
-    return chem_problems;
+
+
+    return problems;
 }
 
 
