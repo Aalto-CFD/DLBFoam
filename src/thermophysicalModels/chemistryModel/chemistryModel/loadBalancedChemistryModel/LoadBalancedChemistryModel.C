@@ -371,7 +371,6 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
     }
 
-    Pout << "Num reference cells: " << mapped_problems.size() << endl;
 
     //map the solution to reference cells TODO: make a separate function
     if (mapped_problems.size() > 0)
