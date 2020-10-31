@@ -69,7 +69,8 @@ public:
     LoadBalancer(const dictionary& dict)
         : LoadBalancerBase(), dict_(dict),
           coeffsDict_(dict.subDict("loadbalancing")),
-          active_(coeffsDict_.lookupOrDefault<Switch>("active", true))
+          active_(coeffsDict_.lookupOrDefault<Switch>("active", true)),
+          log_(coeffsDict_.lookupOrDefault<Switch>("log", false))
     {
     }
 
@@ -85,6 +86,13 @@ public:
         return active_;
     }
 
+    //- Is load balancing logged?
+    bool log() const
+    {
+        return log_;
+    }
+
+
 
 protected:
 
@@ -93,14 +101,14 @@ protected:
     static std::vector<LoadBalancer::Operation> getOperations(
         DynamicList<ChemistryLoad>& loads, const ChemistryLoad& myLoad);
 
-    //- Conver the operations to send and receive info to handle balancing
+    //- Convert the operations to send and receive info to handle balancing
     static BalancerState operationsToInfo(
         const std::vector<Operation>&        operations,
         const DynamicList<ChemistryProblem>& problems,
         const ChemistryLoad&                 myLoad);
 
 
-    //- Conver the vector of cpu times to number of problems for the rank
+    //- Convert the vector of cpu times to number of problems for the rank
     static std::vector<label> timesToProblemCounts(
         const std::vector<scalar>&           times,
         const DynamicList<ChemistryProblem>& problems);
@@ -112,8 +120,11 @@ private:
 
     const dictionary coeffsDict_;
 
-    //- Is load balancing active?
+    // Is load balancing active?
     Switch active_;
+
+    // Is load balancing logged?
+    Switch  log_;
 
     //- Check if the rank is a sender
     static bool isSender(const std::vector<Operation>& operations, int rank);

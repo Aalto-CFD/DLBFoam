@@ -38,7 +38,10 @@ refmapping
     deltaT	2; //optional
 }
 
-loadbalancing{}
+loadbalancing
+{
+    log	true;
+}
 
 chemistryType
 {

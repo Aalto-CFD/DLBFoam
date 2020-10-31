@@ -144,8 +144,11 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
     {
 
         balancer_.updateState(allProblems);
-
-        balancer_.printState();
+        
+        if(balancer_.log())
+        {
+            balancer_.printState();
+        }
 
         auto guestProblems = balancer_.balance(allProblems);
         auto ownProblems = balancer_.getRemaining(allProblems);
