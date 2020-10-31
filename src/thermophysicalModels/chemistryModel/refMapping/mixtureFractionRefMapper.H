@@ -82,9 +82,8 @@ public:
           Ttolerance_(coeffsDict_.lookupOrDefault<scalar>("deltaT", VGREAT)),
           mixture_fraction_(
               coeffsDict_.subDict("mixtureFractionProperties"),
-              composition.species())
+              composition)
     {
-        mixture_fraction_.initialize(composition);
     }
 
 

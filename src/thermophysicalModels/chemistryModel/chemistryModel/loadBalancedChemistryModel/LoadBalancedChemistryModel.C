@@ -348,7 +348,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
             problem.cpuTime = cpuTimes_[celli];
             problem.cellid = celli;
 
-            if (mapper_.shouldMap(concentration)){ //this check can only be done based on the concentration
+            //this check can only be done based on the concentration as the reference temperature is not known
+            if (mapper_.shouldMap(concentration)){ 
                 
                 mapped_problems.append(problem);
                 refMap_[celli] = 1;
@@ -370,6 +371,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
     }
 
+    Pout << "Num reference cells: " << mapped_problems.size() << endl;
 
     //map the solution to reference cells TODO: make a separate function
     if (mapped_problems.size() > 0)

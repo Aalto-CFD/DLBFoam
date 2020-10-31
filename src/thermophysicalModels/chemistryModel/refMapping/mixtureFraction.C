@@ -25,12 +25,13 @@ License
 
 #include "mixtureFraction.H"
 
+
+
 // Constructor
-Foam::mixtureFraction::mixtureFraction(
-    const dictionary& mixFracDict, const wordList& species)
-    : mixFracDict_(mixFracDict), species_(species), alpha_(species.size(), 0.0),
-      beta_(2, 0.0)
+Foam::mixtureFraction::mixtureFraction(const dictionary& mixFracDict, const basicSpecieMixture& composition)
+    : mixFracDict_(mixFracDict), species_(composition.species()) 
 {
+    initialize(composition);
 }
 
 void Foam::mixtureFraction::initialize(const basicSpecieMixture& composition)

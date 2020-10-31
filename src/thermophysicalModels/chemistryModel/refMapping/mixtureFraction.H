@@ -100,11 +100,8 @@ class mixtureFraction
 public:
     mixtureFraction() = default;
 
-    mixtureFraction(const dictionary& mixFracDict, const wordList& species);
-   
-    //- Initialize the alpha and beta values needed for 
-    // mixture fraction calculation
-    void initialize(const basicSpecieMixture& composition);
+    // Construct from dict and composition 
+    mixtureFraction(const dictionary& mixFracDict, const basicSpecieMixture& composition);
 
 
     scalar getZ(const scalarField& concentration) const;
@@ -116,7 +113,15 @@ private:
     wordList     species_;
     List<scalar> alpha_;
     List<scalar> beta_;
+
+
+
     
+    //- Initialize the alpha and beta values needed for 
+    // mixture fraction calculation
+    void initialize(const basicSpecieMixture& composition);
+
+
 };
 
 } // namespace Foam
