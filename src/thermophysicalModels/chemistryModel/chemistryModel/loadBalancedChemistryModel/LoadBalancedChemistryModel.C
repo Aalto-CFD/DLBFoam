@@ -325,21 +325,26 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
     DynamicList<ChemistryProblem> problems;
     DynamicList<ChemistryProblem> mapped_problems;
 
-    scalarField concentration(this->nSpecie_);
+    problems.resize(p.size(), ChemistryProblem(this->nSpecie_));
 
+    scalarField concentration(this->nSpecie_);
+    scalarField something_other_than_concentration(this->nSpecie_); //TODO: rename
+
+    label counter = 0;
     forAll(T, celli)
     {
 
         if(T[celli] > this->Treact())
         {
 
-            ChemistryProblem problem(this->nSpecie_);
 
             for(label i = 0; i < this->nSpecie_; i++)
             {
-                problem.c[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
+                something_other_than_concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
                 concentration[i] = this->Y_[i][celli]; //apparently shouldMap wants the concentration...
             }
+            ChemistryProblem problem;
+            problem.c = something_other_than_concentration;
             problem.Ti = T[celli];
             problem.pi = p[celli];
             problem.rhoi = rho[celli];
@@ -356,7 +361,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
             }
 
             else {
-                problems.append(problem);
+                problems[counter] = problem;
+                counter++;
                 refMap_[celli] = 2;
             }
 
@@ -370,6 +376,12 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
         }
 
     }
+
+
+    problems.setSize(counter);
+
+
+    runtime_assert(problems.size() + mapped_problems.size() == p.size(), "getProblems fails");
 
 
     //map the solution to reference cells TODO: make a separate function
