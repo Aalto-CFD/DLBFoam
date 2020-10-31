@@ -6,7 +6,10 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
+
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,26 +20,14 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+    
 \*---------------------------------------------------------------------------*/
 
 #include "mixtureFractionRefMapper.H"
 
-namespace Foam
+bool Foam::mixtureFractionRefMapper::shouldMap(const ChemistryProblem& problem)
 {
-
-bool mixtureFractionRefMapper::check_if_refcell(const ChemistryProblem& problem)
-{
-    // Note this assumes that mixture_fraction.update() has been called!
-    auto beta_of = mixture_fraction_.get_beta();
-    auto alpha   = mixture_fraction_.get_alpha();
-
-    scalar beta = 0.0; // TODO: rename!
-    forAll(problem.c, iField)
-    {
-        beta += alpha[iField] * problem.c[iField];
-    }
-
-    scalar Z = (beta - beta_of[0]) / (beta_of[1] - beta_of[0]);
+    Z = mixture_fraction_.getZ(problem);
 
     if(!refCellFound_)
     {
@@ -53,8 +44,7 @@ bool mixtureFractionRefMapper::check_if_refcell(const ChemistryProblem& problem)
     }
     else
     {
-        if((Z > tolerance_) ||
-           (abs(problem.Ti - Tref_) > temperature_tolerance_ && temp_active_))
+        if((Z > tolerance_) || (abs(problem.Ti - Tref_) > deltaT_))
         {
             return false;
         }
@@ -64,10 +54,3 @@ bool mixtureFractionRefMapper::check_if_refcell(const ChemistryProblem& problem)
         }
     }
 }
-
-bool mixtureFractionRefMapper::shouldMap(const ChemistryProblem& problem)
-{
-    return check_if_refcell(problem);
-}
-
-} // namespace Foam

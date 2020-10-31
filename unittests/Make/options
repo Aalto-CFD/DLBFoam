@@ -21,6 +21,6 @@ EXE_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -lchemistryModel \
-    -lchemistryModel_pex 
+    -lchemistryModel_Aalto
     
 

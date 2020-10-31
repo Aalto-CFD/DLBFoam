@@ -6,7 +6,9 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -61,171 +63,79 @@ public:
         label nRemaining;             // own problems / solutions
     };
 
+
 private:
     BalancerState state_; // the current state of the object
+
 
 public:
     LoadBalancerBase() = default;
 
     virtual ~LoadBalancerBase() = default;
 
-public:
-    ///
-    ///@brief Check whether load balancing is active or not
-    ///
-    ///@return true
-    ///@return false
-    ///
+    //- Check if load balancing is active
     virtual bool active() const = 0;
 
-    ///
-    ///@brief The load balancing algorithm which each derived class must define
-    ///
-    ///@param problems Problems of this process
-    ///
+    //- The load balancing algorithm which each derived class must define
     virtual void updateState(const DynamicList<ChemistryProblem>& problems) = 0;
 
-    ///
-    ///@brief Computes the mean of the input loads
-    ///
-    ///@param loads Loads to compute the means from
-    ///@return double mean load
-    ///
+    //- Calculate the mean of the given list of loads
     static double getMean(const DynamicList<ChemistryLoad>& loads);
 
-    ///
-    ///@brief Finds the minimum of the input loads
-    ///
-    ///@param loads Loads to find the min from
-    ///@return ChemistryLoad Minimum load
-    ///
+    //- Find the minimum value of the given list of loads
     static ChemistryLoad getMin(const DynamicList<ChemistryLoad>& loads);
 
-    ///
-    ///@brief Finds the maximum of the input loads
-    ///
-    ///@param loads Loads to find the max from
-    ///@return ChemistryLoad Maximum load
-    ///
+    //- Find the maximum value of the given list of loads
     static ChemistryLoad getMax(const DynamicList<ChemistryLoad>& loads);
 
-    ///
-    ///@brief Computes the load based on the input problems
-    ///
-    ///@param problems Problems to compute the load from
-    ///@return ChemistryLoad The (rank specific) load of the list of problems
-    ///
+    //- Compute the load based on the given list of chemistry problems
     static ChemistryLoad
     computeLoad(const DynamicList<ChemistryProblem>& problems);
 
-    ///
-    ///@brief Gathers the data from all processes
-    ///
-    ///@tparam T a serializable type
-    ///@param myData Data from this process
-    ///@return DynamicList<T> List of datas from all processes with List[i]
-    /// corresponding to the data from rank i
-    ///
+    //- Gather the data from all ranks
     template <class T>
     static DynamicList<T> allGather(const T& myData);
 
-    ///
-    ///@brief Sets the current state to the input state
-    ///
-    ///@param state State to set to
-    ///
+    //- Set the current state of the rank
     void setState(const BalancerState& state);
 
-    ///
-    ///@brief Get the current state
-    ///
-    ///@return const BalancerState& current state
-    ///
+    //- Get the current state of the rank
     const BalancerState& getState() const
     {
         return state_;
     }
 
-    ///
-    ///@brief Given a list of values splits them evenly between the
-    /// mpi-processes.
-    ///
-    ///@tparam T type of value (typically a ChemistryProblem)
-    ///@param values values to split
-    ///@return RecvBuffer<T> additional values coming to the current process
-    ///
+    //- Given a list of values, split them evenly between MPI processes
     template <class T>
     RecvBuffer<T> balance(const DynamicList<T>& values) const;
 
-    ///
-    ///@brief Given a buffer of values, sends the values back to their rightful
-    /// owner processes.
-    ///
-    ///@tparam T type of value (typically a ChemistrySolution)
-    ///@param values values to send back
-    ///@return RecvBuffer<T> values coming back to this process
-    ///
+    //- Given a buffer of values, send the values back to their owner ranks
     template <class T>
     RecvBuffer<T> unbalance(const RecvBuffer<T>& values) const;
 
-    ///
-    ///@brief Prints the current state information.
-    ///
-    ///
+    //- Print the current state information
     void printState() const;
 
-    ///
-    ///@brief Converts a vector to std::string for printing
-    ///
-    ///@tparam type satisfying std::to_string(T)
-    ///@param vec Vector to convert
-    ///@return std::string String representation of the vector
-    ///
+    //- Convert a vector of std::string for printing purposes
     template <class T>
     static std::string vectorToString(const std::vector<T>& vec);
 
-    ///
-    ///@brief Finds the index of the load having a load.rank = rank
-    ///
-    ///@param loads Loads to find the rank from
-    ///@param rank  Rank to find
-    ///@return label Index of the rank
-    ///
+    //- Find the index of the load having a load.rank = rank
     label
     rankToLoadIdx(const DynamicList<ChemistryLoad>& loads, label rank) const;
 
-    ///
-    ///@brief
-    ///
-    ///@return true
-    ///@return false
-    ///
+    //- Check if the load state is valid
     bool validState() const;
 
-    ///
-    ///@brief Sends the split send_buffer to sources and receives everything
-    /// from destinations.
-    ///
-    ///@tparam ET element type of the send and receive buffers
-    ///@tparam Indexable an indexable send buffer type
-    ///@param send_buffer the buffer to send
-    ///@param sources the ranks to receive from
-    ///@param destinations the ranks to send to
-    ///@return RecvBuffer<ET> the received buffer
-    ///
+    //- Send the split send_buffer to sources and receive everything from
+    //  destinations
     template <class ET, class Indexable>
     static RecvBuffer<ET> sendRecv(
         const Indexable&          send_buffer,
         const std::vector<label>& sources,
         const std::vector<label>& destinations);
 
-    ///
-    ///@brief Slices an nRemaining size portion from the _end_ of the values
-    ///
-    ///@tparam T element type of the input list
-    ///@param values the input list to slice
-    ///@return SubList<T> the sliced list
-    ///
+    //- Slice an nRemaining size portion from the _end_ of the values
     template <class T>
     SubList<T> getRemaining(const DynamicList<T>& values)
     {

@@ -10,8 +10,8 @@ refMapping/mixtureFraction.C
 refMapping/RefMapperBase.C
 refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
-chemistrySolver/pexChemistrySolvers.C
+chemistrySolver/AaltoChemistrySolvers.C
 
 
 
-LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_pex
+LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_Aalto

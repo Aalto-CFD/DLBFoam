@@ -33,4 +33,4 @@ EXE_LIBS = \
     -lODE \
     -lcombustionModels \
     -L$(FOAM_USER_LIBBIN) \
-    -lchemistryModel_pex 
+    -lchemistryModel_Aalto

@@ -2,11 +2,14 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2019 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
+
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,14 +20,14 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
 Class
     Foam::ChemistryProblem
+    
 Description
     A small object containing everything required for solving the reaction rate
-    using the ODE. These are passed around in the load balancer.
+    using the ODE solver. These are passed around in the load balancer.
 
-SourceFiles
-    ChemistryProblem.C
 \*---------------------------------------------------------------------------*/
 
 #ifndef ChemistryProblem_H
@@ -45,13 +48,13 @@ struct ChemistryProblem
     }
 
     scalarField c;
-    scalar      Ti;
-    scalar      pi;
-    scalar      rhoi;
-    scalar      deltaTChem;
-    scalar      deltaT;
-    scalar      cpuTime;
-    label       cellid;
+    scalar Ti;
+    scalar pi;
+    scalar rhoi;
+    scalar deltaTChem;
+    scalar deltaT;
+    scalar cpuTime;
+    label cellid;
 
     // TODO: implement!
     bool operator==(const ChemistryProblem& rhs) const
@@ -65,13 +68,7 @@ struct ChemistryProblem
     }
 };
 
-///
-///@brief Serialization for send
-///
-///@param os Buffer to serialize to
-///@param p Problem to serialize
-///@return Ostream& A buffer with p
-///
+//- Serialization for send
 static inline Ostream& operator<<(Ostream& os, const ChemistryProblem& p)
 {
 
@@ -87,13 +84,7 @@ static inline Ostream& operator<<(Ostream& os, const ChemistryProblem& p)
     return os;
 }
 
-///
-///@brief Gets a serialized problem from Istream
-///
-///@param is The buffer to get the object from
-///@param p  The problem to store the data
-///@return Istream& A buffer without p
-///
+//- Get a serialized problem from IStream
 static inline Istream& operator>>(Istream& is, ChemistryProblem& p)
 {
 

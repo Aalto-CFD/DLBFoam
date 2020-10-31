@@ -51,6 +51,6 @@ maxCo           0.4;
 
 libs
 (
-	"libchemistryModel_pex.so" 
+	"libchemistryModel_Aalto.so" 
 );
 // ************************************************************************* //

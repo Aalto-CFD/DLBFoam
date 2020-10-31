@@ -6,7 +6,9 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -27,9 +29,6 @@ Class
 Description
     Currently just a typedef to DynamicList<DynamicList>. Could possibly be made
     constant size at some point to avoid allocations during runtime.
-
-SourceFiles
-    RecvBuffer.C
 
 \*---------------------------------------------------------------------------*/
 

@@ -6,7 +6,10 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
+
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,33 +20,26 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+    
 \*---------------------------------------------------------------------------*/
 
 #include "LoadBalancer.H"
 
-namespace Foam
-{
-
 void
-LoadBalancer::updateState(
+Foam::LoadBalancer::updateState(
     const DynamicList<ChemistryProblem>& problems)
 {
 
-    auto myLoad   = computeLoad(problems);
+    auto myLoad = computeLoad(problems);
     auto allLoads = allGather(myLoad);
-
-    // Info << globalMean << endl;
-
     auto operations = getOperations(allLoads, myLoad);
-    auto info       = operationsToInfo(operations, problems, myLoad);
+    auto info = operationsToInfo(operations, problems, myLoad);
 
     setState(info);
-
-    //convertNew();
 }
 
-LoadBalancerBase::BalancerState
-LoadBalancer::operationsToInfo(
+Foam::LoadBalancerBase::BalancerState
+Foam::LoadBalancer::operationsToInfo(
     const std::vector<Operation>&        operations,
     const DynamicList<ChemistryProblem>& problems,
     const ChemistryLoad&                 myLoad)
@@ -53,7 +49,7 @@ LoadBalancer::operationsToInfo(
 
     if(isSender(operations, myLoad.rank))
     {
-        double              sum = 0.0;
+        double sum = 0.0;
         std::vector<double> times;
         for(const auto& op : operations)
         {
@@ -83,8 +79,8 @@ LoadBalancer::operationsToInfo(
     return info;
 }
 
-std::vector<label>
-LoadBalancer::timesToProblemCounts(
+std::vector<Foam::label>
+Foam::LoadBalancer::timesToProblemCounts(
     const std::vector<scalar>&           times,
     const DynamicList<ChemistryProblem>& problems)
 {
@@ -97,7 +93,8 @@ LoadBalancer::timesToProblemCounts(
     {
 
         scalar sum(0);
-        auto   operation = [&](const ChemistryProblem& problem) {
+        auto operation = [&](const ChemistryProblem& problem) 
+        {
             sum += problem.cpuTime;
             return sum <= time;
         };
@@ -110,8 +107,8 @@ LoadBalancer::timesToProblemCounts(
     return counts;
 }
 
-std::vector<LoadBalancer::Operation>
-LoadBalancer::getOperations(
+std::vector<Foam::LoadBalancer::Operation>
+Foam::LoadBalancer::getOperations(
     DynamicList<ChemistryLoad>& loads, const ChemistryLoad& myLoad)
 {
 
@@ -121,7 +118,7 @@ LoadBalancer::getOperations(
 
     std::sort(loads.begin(), loads.end());
 
-    auto sender   = loads.end() - 1;
+    auto sender = loads.end() - 1;
     auto receiver = loads.begin();
 
     while(sender != receiver)
@@ -129,6 +126,7 @@ LoadBalancer::getOperations(
 
         double send_value = std::min(
             sender->value - globalMean, globalMean - receiver->value);
+
         Operation operation{sender->rank, receiver->rank, send_value};
         if(sender->rank == myLoad.rank || receiver->rank == myLoad.rank)
         {
@@ -167,12 +165,10 @@ LoadBalancer::getOperations(
         std::abs(getMean(loads) - globalMean) < 1E-7, "Vanishing load");
 
     return large;
-
-    // return operations;
 }
 
 bool
-LoadBalancer::isSender(
+Foam::LoadBalancer::isSender(
     const std::vector<Operation>& operations, int rank)
 {
 
@@ -192,7 +188,7 @@ LoadBalancer::isSender(
 }
 
 bool
-LoadBalancer::isReceiver(
+Foam::LoadBalancer::isReceiver(
     const std::vector<Operation>& operations, int rank)
 {
 
@@ -206,4 +202,3 @@ LoadBalancer::isReceiver(
     return true;
 }
 
-} // namespace Foam

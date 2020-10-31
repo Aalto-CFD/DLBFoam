@@ -34,17 +34,16 @@ refmapping
 
         #include "$FOAM_CASE/constant/thermo.compressibleGasGRI"
     }
-    temperatureChecker{}
     tolerance	1e-4;
+    deltaT	2; //optional
 }
+
 loadbalancing{}
 
 chemistryType
 {
     solver          ode;
     method          loadBalanced;
-    //solver            ode_pyJac;
-    //method            loadBalanced_pyJac;
 }
 
 chemistry       on;

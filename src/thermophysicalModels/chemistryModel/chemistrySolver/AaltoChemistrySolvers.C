@@ -6,7 +6,10 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
+
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,14 +20,13 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+    
 \*---------------------------------------------------------------------------*/
 
 #include "noChemistrySolver.H"
 #include "EulerImplicit.H"
 #include "ode.H"
-//#include "./ode_pyJac/ode_pyJac.H"
 #include "LoadBalancedChemistryModel.H"
-//#include "pyJacLoadBalancedChemistryModel.H"
 
 #include "psiReactionThermo.H"
 #include "rhoReactionThermo.H"
@@ -54,26 +56,6 @@ License
         ThermoPhysics                                                          \
     );                                                                         \
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-/*
-
-#define defineChemistrySolversPyjac(ReactionThermo, ThermoPhysics)                  \
-    defineChemistrySolver                                                      \
-    (                                                                          \
-        pyJacLoadBalancedChemistryModel,                                       \
-        ReactionThermo,                                                        \
-        ThermoPhysics                                                          \
-    )
-
-#define makeChemistrySolversPyjac(Solver, ReactionThermo, ThermoPhysics)            \
-    makeChemistrySolver                                                        \
-    (                                                                          \
-        Solver,                                                                \
-        pyJacLoadBalancedChemistryModel,                                       \
-        ReactionThermo,                                                        \
-        ThermoPhysics                                                          \
-    )
-*/
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -105,29 +87,6 @@ namespace Foam
     forPolynomials(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
     forPolynomials(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
     forPolynomials(makeChemistrySolvers, ode, rhoReactionThermo);
-
-
-
-
-
-    /*
-    //using pyjac ode
-    //gasses
-    forCommonGases(defineChemistrySolversPyjac, psiReactionThermo);
-    forCommonGases(defineChemistrySolversPyjac, rhoReactionThermo);
-
-    forCommonGases(makeChemistrySolversPyjac, ode_pyJac, psiReactionThermo);
-    forCommonGases(makeChemistrySolversPyjac, ode_pyJac, rhoReactionThermo);
-
-    //liquids
-    forCommonLiquids(defineChemistrySolversPyjac, rhoReactionThermo);
-    forCommonLiquids(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
-
-    //polynomials
-    forPolynomials(defineChemistrySolversPyjac, rhoReactionThermo);
-    forPolynomials(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
-    */
-
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

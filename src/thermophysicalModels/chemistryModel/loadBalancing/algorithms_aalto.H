@@ -1,49 +1,70 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    Foam::algorithms_aalto.H
+
+Description
+    Converts an iterator to a reverse iterator, since UList:: reverse iterator
+    does not behave like one.
+    
+    See bug report on: https://bugs.openfoam.org/view.php?id=3534
+
+    The issue is resolved in OpenFOAM-dev in commit 17c40d2aa57b1f922cdddc315d8cf3471c9bc600 
+    
+\*---------------------------------------------------------------------------*/
+
 #pragma once
 
 #include <iterator>
+namespace Foam
+{
 
-
-
-
-
-namespace Foam{
-
-
-///
-///@brief Converts an iterator to a reverse iterator
-///
-///@tparam InputIt input iterator type
-///@param i the iterator to convert
-///@return std::reverse_iterator<Iter> a reverse iterator
-///        with ++ and -- operators shifting to left and right, respectively.
-///
-template<class InputIt>
-std::reverse_iterator<InputIt> make_reverse(InputIt i){
+//- Convert an iterator to a reverse iterator
+template <class InputIt>
+std::reverse_iterator<InputIt> make_reverse(InputIt i)
+{
     return std::reverse_iterator<InputIt>(i);
 }
 
-///
-///@brief Computest the number of sequential elements for which the predicate is true.
-///
-///@tparam InputIt Random access iterator
-///@tparam UnaryPredicate Unary predicate type
-///@param first iterator to the first element to test
-///@param last  iterator to the last element to test
-///@param predicate the predicate to test
-///@return std::iterator_traits<InputIt>::difference_type the number of sequential elements
-///
-template<class InputIt, class UnaryPredicate>
-typename std::iterator_traits<InputIt>::difference_type count_while(InputIt first, InputIt last, UnaryPredicate predicate){
+//- Compute the number of sequential elements for which the predicate is true
+template <class InputIt, class UnaryPredicate>
+typename std::iterator_traits<InputIt>::difference_type
+count_while(InputIt first, InputIt last, UnaryPredicate predicate)
+{
 
     typename std::iterator_traits<InputIt>::difference_type ret = 0;
-    for (; first != last; ++first){
-      if(!predicate(*first)){
-          break;
-      }
-      ret++;
-  }
-  return ret;
-
+    for(; first != last; ++first)
+    {
+        if(!predicate(*first))
+        {
+            break;
+        }
+        ret++;
+    }
+    return ret;
 }
 
-}
+} // namespace Foam

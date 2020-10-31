@@ -2,11 +2,14 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2019 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
+
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,15 +20,14 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
 Class
     Foam::ChemistryLoad
 
 Description
     A generic load object that stores a rank and a value and enables comparison
-as well as serialization through the ostream and istream operators.
+    as well as serialization through the OStream and IStream operators.
 
-SourceFiles
-    ChemistryLoad.C
 \*---------------------------------------------------------------------------*/
 
 #ifndef ChemistryLoad_H
@@ -37,10 +39,14 @@ SourceFiles
 namespace Foam
 {
 
+// A struct containing rank and load value of each processor
 struct ChemistryLoad
 {
-    label  rank;  // rank of the process
-    scalar value; // an indicator how busy the processor is
+    // rank ID of the process
+    label rank; 
+
+    // the load value indicating how busy the processor is
+    scalar value;
 
     ChemistryLoad() = default;
 
@@ -74,13 +80,8 @@ struct ChemistryLoad
         return value > rhs.value;
     }
 };
-///
-///@brief Serialization for send ostream
-///
-///@param os Buffer to serialize to
-///@param l  Load to serialize
-///@return Ostream& Buffer with the object l
-///
+
+//- Serialization for send OStream
 static inline Ostream& operator<<(Ostream& os, const ChemistryLoad& l)
 {
 
@@ -90,13 +91,7 @@ static inline Ostream& operator<<(Ostream& os, const ChemistryLoad& l)
     return os;
 }
 
-///
-///@brief Gets a serialized load from istream
-///
-///@param is Buffer to get from
-///@param l  Load to which to assign
-///@return Istream& Buffer without l
-///
+//- Get a serialized load from Istream
 static inline Istream& operator>>(Istream& is, ChemistryLoad& l)
 {
 

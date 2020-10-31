@@ -2,11 +2,13 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -25,9 +27,7 @@ Class
     Foam::LoadBalancedChemistryModel
 
 Description
-    Extends base chemistry model by adding a thermo package, and ODE functions.
-    Introduces chemistry equation system and evaluation of chemical source
-    terms.
+    Extends standardChemistryModel model by adding a load balancing algorithm.
 
 SourceFiles
     LoadBalancedChemistryModel.C
@@ -40,7 +40,6 @@ SourceFiles
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
 #include "LoadBalancer.H"
-#include "OFstream.H"
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
 #include "mixtureFractionRefMapper.H"
@@ -50,183 +49,131 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of classes
-class fvMesh;
-
 /*---------------------------------------------------------------------------*\
-                      Class LoadBalancedChemistryModel Declaration
+                Class LoadBalancedChemistryModel Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class ReactionThermo, class ThermoType>
+template<class ReactionThermo, class ThermoType>
 class LoadBalancedChemistryModel
-    : public StandardChemistryModel<ReactionThermo, ThermoType>
+: 
+    public StandardChemistryModel<ReactionThermo, ThermoType>
 {
 
 private:
-    LoadBalancer             balancer_;
-    mixtureFractionRefMapper mapper_;
-    volScalarField           cpuTimes_;
-    autoPtr<OFstream>        cpuSolveFile_;
+    // Private member data
+
+        // Load balancing object
+        LoadBalancer balancer_;
+
+        // Reference mapping object
+        mixtureFractionRefMapper mapper_;
+
+        // Field containing chemistry CPU time information    
+        volScalarField cpuTimes_;
+
+        // Field containing reference mapping information   
+        // 0 -> reference solution
+        // 1 -> mapped from reference solution
+        // 2 -> solved explicitly
+        volScalarField refMap_;
+
+
+    // Private Member Functions
+
+        //- Create a reference mapper object
+        static mixtureFractionRefMapper createMapper(const ReactionThermo& thermo);
+
+        //- Create a load balancer object
+        LoadBalancer createBalancer();
+
+        //- Get the list of problems to be balanced
+        template <class DeltaTType>
+        DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
+
+        //- Solve a list of chemistry problems and return a list of solutions
+        DynamicList<ChemistrySolution> 
+        solveList(UList<ChemistryProblem>& problems) const;
+
+        //- Solve the problem buffer coming from the balancer
+        RecvBuffer<ChemistrySolution> 
+        solveBuffer(RecvBuffer<ChemistryProblem>& problems) const;
+
+        //- Update the reaction rate of cell i
+        virtual void
+        updateReactionRate(const ChemistrySolution& solution, const label& i);
+
+        //- Update the reaction rates from a list of solutions
+        scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
+
+        //- Compute the mass fraction from concentration
+        virtual ChemistryProblem
+        getMassFraction(const ChemistryProblem& problem) const;
+            
+        //- Solve the reaction system for the given time step
+        //  of given type and return the characteristic time
+        template<class DeltaTType>
+        scalar solve(const DeltaTType& deltaT);
+
 
 public:
+
     //- Runtime type information
     TypeName("loadBalanced");
 
+
     // Constructors
 
-    //- Construct from thermo
-    LoadBalancedChemistryModel(const ReactionThermo& thermo);
+        //- Construct from thermo
+        LoadBalancedChemistryModel(const ReactionThermo& thermo);
+
+        //- Disallow default bitwise copy construction
+        LoadBalancedChemistryModel(const LoadBalancedChemistryModel&);
+
 
     //- Destructor
     virtual ~LoadBalancedChemistryModel();
 
-    //- Disallow default bitwise copy construction
-    LoadBalancedChemistryModel(const LoadBalancedChemistryModel&);
 
-    ///
-    ///@brief This is injected with the ODE
-    ///
-    ///@param p pressure
-    ///@param T temperature
-    ///@param c concentrations
-    ///@param li some cell index, no idea why this is required
-    ///@param deltaT flow time step
-    ///@param subDeltaT ODE time step
-    ///
-    virtual void solve(
-        scalar&      p,
-        scalar&      T,
-        scalarField& c,
-        const label  li,
-        scalar&      deltaT,
-        scalar&      subDeltaT) const = 0;
+    // Member Functions
 
-    ///
-    ///@brief Solve for generic DeltaTType
-    ///
-    ///@tparam DeltaTType either field or scalar
-    ///@param deltaT flow time step
-    ///@return scalar min chemistry time step
-    ///
-    template <class DeltaTType>
-    scalar solve(const DeltaTType& deltaT);
+        //- Solve a single ChemistryProblem and put the solution to ChemistrySolution 
+        void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution) const;
 
-    ///
-    ///@brief Specialization for scalar deltaT
-    ///
-    ///@param deltaT flow time step
-    ///@return scalar min chemistry time step
-    ///
-    virtual scalar solve(const scalar deltaT) override;
+        // Chemistry model functions (overriding functions in
+        // StandardChemistryModel to use the private solve function)
 
-    ///
-    ///@brief Solve for a field of time steps
-    ///
-    ///@param deltaT cell specific time steps (required for LTS)
-    ///@return scalar min chemistry time step
-    ///
-    virtual scalar solve(const scalarField& deltaT) override;
+            //- Solve the reaction system for the given time step
+            //  and return the characteristic time
+            virtual scalar solve(const scalar deltaT) override;
 
-    ///
-    ///@brief Solves a single problem
-    ///
-    ///@param problem Input problems
-    ///@param solution Output solution
-    ///
-    void
-    solveSingle(ChemistryProblem& problem, ChemistrySolution& solution) const;
+            //- Solve the reaction system for the given time step
+            //  and return the characteristic time
+            virtual scalar solve(const scalarField& deltaT) override;
 
-    //- Disallow default bitwise assignment
-    void operator=(const LoadBalancedChemistryModel&) = delete;
+        // ODE functions (overriding abstract functions in ODE.H)
+        virtual void solve
+        (
+            scalar&      p,
+            scalar&      T,
+            scalarField& c,
+            const label  li,
+            scalar&      deltaT,
+            scalar&      subDeltaT
+        ) const = 0;
 
 
-private:
-    // TODO: remove
-    static mixtureFractionRefMapper createMapper(const ReactionThermo& thermo);
+    // Member Operators
 
-    LoadBalancer createBalancer();
+        //- Disallow default bitwise assignment
+        void operator=(const LoadBalancedChemistryModel&) = delete;
 
-    ///
-    ///@brief Solves a list
-    ///
-    ///@param problems
-    ///@return DynamicList<ChemistrySolution> A list of solutions
-    ///
-    DynamicList<ChemistrySolution>
-    solveList(UList<ChemistryProblem>& problems) const;
 
-    ///
-    ///@brief Solves the whole buffer coming from the balancer
-    ///
-    ///@param problems All problems this process whill solve
-    ///@return RecvBuffer<ChemistrySolution> A buffer of solutions
-    ///
-    RecvBuffer<ChemistrySolution>
-    solveBuffer(RecvBuffer<ChemistryProblem>& problems) const;
-
-    ///
-    ///@brief Get the problems of this process
-    ///
-    ///@tparam DeltaTType unnecessary template, should be a field
-    ///@param deltaT Flow time step
-    ///@return DynamicList<ChemistryProblem> List of problems of this process
-    ///
-    template <class DeltaTType>
-    DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
-
-    ///
-    ///@brief Updates the reaction rates for the solution buffer
-    ///
-    ///@param solutions all solutions of this process
-    ///@return scalar minimum chemistry time step
-    ///
-    scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
-
-    ///
-    ///@brief Updates the reaction rate for cell i
-    ///
-    ///@param solution solution of cell i
-    ///@param i cell index
-    ///
-    virtual void
-    updateReactionRate(const ChemistrySolution& solution, const label& i);
-
-    ///
-    ///@brief The concentration definition
-    ///
-    ///@param rho density
-    ///@param i TODO: WTF?
-    ///@param celli TODO: WTF?
-    ///@return scalar concentation
-    ///
-    virtual scalar computeConcentration(
-        const scalar& rho, const label& i, const label& celli) const;
-
-    ///
-    ///@brief Computes the reaction rate
-    ///
-    ///@param j TODO: WTF?
-    ///@param solution the solution for an individual cell
-    ///@return scalar reaction rate
-    ///
-    virtual scalar computeReactionRate(
-        const label& j, const ChemistrySolution& solution) const;
-
-    ///
-    ///@brief Computes the mass fractions for a given problem
-    ///
-    ///@param problem problem to compute the mass fraction for
-    ///@return scalarField field of mass fractions of individual species
-    ///
-    virtual ChemistryProblem
-    getMassFraction(const ChemistryProblem& problem) const;
 };
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

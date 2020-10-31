@@ -6,7 +6,9 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -27,6 +29,7 @@ Class
 Description
     Calculates and outputs the mixture fraction calculated between the
     fuel and the oxidizer.
+    
     \f
         Z = (beta - beta_0)/(beta_1 - beta_0)
     \f]
@@ -82,6 +85,7 @@ SourceFiles
 #include "Switch.H"
 #include "runTimeSelectionTables.H"
 #include "scalarField.H"
+#include "ChemistryProblem.H"
 
 // Mixture fraction headers
 #include "atomicWeights.H"
@@ -97,92 +101,22 @@ public:
     mixtureFraction() = default;
 
     mixtureFraction(const dictionary& mixFracDict, const wordList& species);
+   
+    //- Initialize the alpha and beta values needed for 
+    // mixture fraction calculation
+    void initialize(const basicSpecieMixture& composition);
 
-    const List<scalar>& get_alpha() const
-    {
-        return alpha_;
-    }
-    const List<scalar>& get_beta() const
-    {
-        return beta_;
-    }
+    //- Calculate mixture fraction of the given problem
+    scalar getZ(const ChemistryProblem& problem);
 
-    ///
-    ///@brief Updates the alpha and beta parameters based on the input
-    /// composition
-    ///
-    ///@param composition
-    ///
-    void update(const basicSpecieMixture& composition);
-
-    ///
-    ///@brief Prints information on related to mixture fraction.
-    ///
-    ///@param composition
-    ///@param Yconst
-    ///
-    void print_information(
-        const basicSpecieMixture& composition,
-        const List<List<scalar>>& Yconst) const;
 
 private:
+
     dictionary   mixFracDict_;
     wordList     species_;
     List<scalar> alpha_;
     List<scalar> beta_;
-
-    ///
-    ///@brief updates alpha used in mixture fraction calculation.
-    ///
-    ///@param composition
-    ///
-    void update_alpha(const basicSpecieMixture& composition);
-
-    ///
-    ///@brief updates beta used in mixture fraction calculation.
-    ///
-    ///@param Yconst
-    ///@param alpha
-    ///
-    void
-    update_beta(const List<List<scalar>>& Yconst, const List<scalar>& alpha);
-
-    ///
-    ///@brief Sets the pure fuel and pure oxidizer stream conditions.
-    ///
-    ///@param composition
-    ///@return List<List<scalar>>
-    ///
-    List<List<scalar>>
-    compute_yconst(const basicSpecieMixture& composition) const;
-
-    ///
-    ///@brief Updates a_{k,i} for every specie in the system.
-    ///
-    ///@param composition
-    ///@return List<List<scalar>>
-    ///
-    List<List<scalar>> compute_a(const basicSpecieMixture& composition) const;
-
-    ///
-    ///@brief Computes the normalized mixture fraction at oxidizer port.
-    ///
-    ///@param a
-    ///@param Yconst
-    ///@return List<scalar>
-    ///
-    List<scalar> compute_Zox(
-        const List<List<scalar>>& a, const List<List<scalar>>& Yconst) const;
-
-    ///
-    ///@brief Computes the normalized mixture fraction at fuel port.
-    ///
-    ///@param a
-    ///@param Yconst
-    ///@return List<scalar>
-    ///
-    List<scalar> compute_Zfu(
-        const List<List<scalar>>& a, const List<List<scalar>>& Yconst) const;
+    
 };
 
 } // namespace Foam

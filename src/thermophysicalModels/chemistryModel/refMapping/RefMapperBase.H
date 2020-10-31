@@ -6,7 +6,9 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -22,13 +24,10 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::RefMapperBased
+    Foam::RefMapperBase
 
 Description
     An abstract class for all reference mapping methods.
-
-SourceFiles
-    RefMapperBase.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -53,7 +52,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /*---------------------------------------------------------------------------*\
-                           Class RefMapperBased Declaration
+                    Class RefMapperBased Declaration
 \*---------------------------------------------------------------------------*/
 
 class RefMapperBase

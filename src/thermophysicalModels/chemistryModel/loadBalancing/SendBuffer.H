@@ -6,7 +6,9 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -26,10 +28,7 @@ Class
 
 Description
     Wrapper around Foam::DynamicList which is used to slice subsets to avoid
-unnecessary copies when sending data.
-
-SourceFiles
-    SendBuffer.C
+    unnecessary copies when sending data.
 
 \*---------------------------------------------------------------------------*/
 
@@ -48,7 +47,8 @@ template <class T>
 struct SendBuffer
 {
     SendBuffer(const DynamicList<T>& values, const std::vector<label>& counts)
-        : m_values(values), m_counts(counts)
+        : 
+            m_values(values), m_counts(counts)
     {
     }
 

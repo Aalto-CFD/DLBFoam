@@ -54,7 +54,7 @@ DebugSwitches
 
 libs
 (
-	"libchemistryModel_pex.so" 
+	"libchemistryModel_Aalto.so" 
 );
 
 // ************************************************************************* //

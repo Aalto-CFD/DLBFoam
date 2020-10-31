@@ -1,37 +1,47 @@
-# TODO: model name, restructuring the README.
+# Foam-Aalto: LoadBalancedChemistryModel
 ![OpenFOAM 8](https://img.shields.io/badge/OpenFOAM-8-brightgreen)
 
-An OpenFOAM chemistry model utilizing analytical Jacobian formulation, using [pyJac](https://github.com/SLACKHA/pyJac).
+An OpenFOAM chemistry model introducing dynamic load balancing for chemistry calculation
+in parallel simulations.
 
-## pyJac Library Generation
+## Why do I need this?
 
-install [pyJac](https://github.com/SLACKHA/pyJac).
+Load imbalance in parallel reactive simulations is an issue that causes very long
+simulation times in OpenFOAM simulations utilizing finite-rate chemistry.
 
-We will generate the jacobian library for the GRI mechanism, using an OpenFOAM tutorial.
+LoadBalancedChemistryModel introduces runtime load balancing through MPI routines
+to minimize the load imbalance between ranks and gain speed-up. The implementation
+details can be found in [[1]](#1).
 
-### In OpenFOAM-6 environment, do the following:
 
-```
-cd $WM_PROJECT_USER_DIR
-mkdir pyJac
-cp $FOAM_TUTORIALS/combustion/chemFoam/gri/chemkin/chem.inp pyJac
-cp $FOAM_TUTORIALS/combustion/chemFoam/gri/chemkin/therm.dat pyJac
-cd pyJac
-python -m pyjac --lang c --last_species N2 --input chem.inp --thermo therm.dat
-```
+<p align="center">
+    <img src="third_party/rankbased_solve.png" alt="drawing" width="600"/>
+    <br>
+    <em>Figure: A demonstration of how load balancing model works compared to standard model.</em>
+</p>
 
-### Generate the library
 
-```
-python -m pyjac.libgen --source_dir ./out --lang c -out $FOAM_USER_LIBBIN
-```
+## Compilation
 
-### Compile the pyJac chemistry model inside src/thermophysicalModels/chemistryModel
+LoadBalancedChemistryModel does not require any third-party dependency.
+After sourcing OpenFOAM-8, simply execute:
 
 ```
-wmake libso
+./Allwmake
 ```
 
 ## Usage
 
 Check the tutorials given in tutorials folder.
+
+## Citation
+
+If you use our model, please cite the publication describing its implementation [[1]](#1). 
+
+## References
+<a id="1">[1]</a> 
+Tekgul, Peltonen, Kahila, Vuorinen (2020). 
+[A very cool paper name for this repository](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+Somejournal, xx-xx.
+
+

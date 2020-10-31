@@ -6,7 +6,10 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/OpenFOAM-Aalto
+
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,19 +20,10 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-Class
-    Foam::ChemistryProblem
-Description
-    A small object containing everything required for solving the reaction rate
-    using the ODE. These are passed around in the load balancer.
-
-SourceFiles
-    ChemistryProblem.C
+    
 \*---------------------------------------------------------------------------*/
 
 #include "ChemistrySolution.H"
+namespace Foam{
 
-namespace Foam {
-
-
-} // namespace Foam
+}

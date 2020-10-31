@@ -15,35 +15,11 @@ FoamFile
 }
 
 
-refmapping
-{
-    active  false;
-    
-    mixtureFractionProperties
-    {
-        oxidizerMassFractions
-        {
-            N2       0.77;
-            O2       0.23;
-        }
-
-        fuelMassFractions
-        {
-            CH4       1.0;
-        }
-
-        #include "$FOAM_CASE/constant/thermo.compressibleGasGRI"
-    }
-    tolerance	1e-4;
-}
-
 
 chemistryType
 {
     solver          ode;
     method          standard;
-    //solver            ode_pyJac;
-    //method            loadBalanced_pyJac;
 }
 
 chemistry       on;
