@@ -305,37 +305,6 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList
 }
 
 
-template <class ReactionThermo, class ThermoType>
-Foam::ChemistryProblem Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblem
-(
-    scalar deltaT,
-    label celli
-
-) const
-{
-
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-    tmp<volScalarField> trho(this->thermo().rho());
-    const scalarField& rho = trho();
-
-    ChemistryProblem problem(this->nSpecie_);
-
-    for(label i = 0; i < this->nSpecie_; i++)
-    {
-        problem.c[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
-    }
-    problem.Ti = T[celli];
-    problem.pi = p[celli];
-    problem.rhoi = rho[celli];
-    problem.deltaTChem = this->deltaTChem_[celli];
-    problem.deltaT = deltaT;
-    problem.cpuTime = cpuTimes_[celli];
-    problem.cellid = celli;
-
-    return problem;
-
-}
 
 template <class ReactionThermo, class ThermoType>
 template<class DeltaTType>
@@ -346,47 +315,17 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 )
 {
 
-    
     const scalarField& T = this->thermo().T();
+    const scalarField& p = this->thermo().p();
+    tmp<volScalarField> trho(this->thermo().rho());
+    const scalarField& rho = trho();
     
-    
-    mapper_.clear();
 
-
-    scalarField concentration(this->nSpecie_);
-
-    
-    ChemistrySolution refSolution;
-    bool foundReferenceCell = false;
-    forAll(T, celli)
-    {
-
-
-        for(label i = 0; i < this->nSpecie_; i++)
-        {
-            concentration[i] = this->Y_[i][celli];
-        }
-
-        if (mapper_.shouldMap(concentration, T[celli]))
-        {
-
-            foundReferenceCell = true;
-
-            auto refProblem = getProblem(deltaT[celli], celli);
-
-            solveSingle(refProblem, refSolution);
-
-            refMap_[celli] = 0;
-
-            //not ok...
-            break;
-
-        }     
-        
-
-    }
 
     DynamicList<ChemistryProblem> problems;
+    DynamicList<ChemistryProblem> mapped_problems;
+
+    scalarField concentration(this->nSpecie_);
 
     forAll(T, celli)
     {
@@ -394,26 +333,31 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
         if(T[celli] > this->Treact())
         {
 
+            ChemistryProblem problem(this->nSpecie_);
 
             for(label i = 0; i < this->nSpecie_; i++)
             {
-                concentration[i] = this->Y_[i][celli];
+                problem.c[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
+                concentration[i] = this->Y_[i][celli]; //apparently shouldMap wants the concentration...
+            }
+            problem.Ti = T[celli];
+            problem.pi = p[celli];
+            problem.rhoi = rho[celli];
+            problem.deltaTChem = this->deltaTChem_[celli];
+            problem.deltaT = deltaT[celli];
+            problem.cpuTime = cpuTimes_[celli];
+            problem.cellid = celli;
+
+            if (mapper_.shouldMap(concentration)){ //this check can only be done based on the concentration
+                
+                mapped_problems.append(problem);
+                refMap_[celli] = 1;
             }
 
-            if (mapper_.shouldMap(concentration, T[celli]) && foundReferenceCell)
-            {
-                refMap_[celli] = 1; //this overwrites the first one
-                updateReactionRate(refSolution, celli);
-                cpuTimes_[celli] = refSolution.cpuTime;
-            }
-
-            else
-            {
+            else {
+                problems.append(problem);
                 refMap_[celli] = 2;
-                problems.append(this->getProblem(deltaT[celli], celli));
-
             }
-    
 
         }
         else
@@ -425,6 +369,40 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
         }
 
     }
+
+
+    //map the solution to reference cells TODO: make a separate function
+    if (mapped_problems.size() > 0)
+    {
+
+        //I dont think this makes sense at all. We could very well pick any
+        //of the problems as a reference
+        ChemistryProblem refProblem = mapped_problems[0];
+        scalar refTemperature = refProblem.Ti;
+
+        ChemistrySolution refSolution(this->nSpecie_);
+        solveSingle(refProblem, refSolution);
+        refMap_[refProblem.cellid] = 0;
+
+        for (auto& problem : mapped_problems){
+
+            //further filter based on temperature
+            if (mapper_.temperatureWithinRange(problem.Ti, refTemperature))
+            {
+                updateReactionRate(refSolution, problem.cellid);
+                cpuTimes_[problem.cellid] = refSolution.cpuTime;
+            }
+
+            else 
+            {
+                problems.append(problem);
+                refMap_[problem.cellid] = 2;
+            }
+        }
+
+
+    }
+
 
 
     return problems;

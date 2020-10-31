@@ -78,9 +78,8 @@ public:
         const dictionary& dict, const basicSpecieMixture& composition)
         : RefMapperBase(), dict_(dict), coeffsDict_(dict.subDict("refmapping")),
           active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
-          tolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance", 1e-4)),
-          deltaT_(coeffsDict_.lookupOrDefault<scalar>("deltaT", VGREAT)),
-          refCellFound_(false), Tref_(0.0),
+          Ztolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance", 1e-4)),
+          Ttolerance_(coeffsDict_.lookupOrDefault<scalar>("deltaT", VGREAT)),
           mixture_fraction_(
               coeffsDict_.subDict("mixtureFractionProperties"),
               composition.species())
@@ -88,10 +87,14 @@ public:
         mixture_fraction_.initialize(composition);
     }
 
-    //- Check if the cell is a mapping candidate
-    bool shouldMap(const ChemistryProblem& problem);
 
-    bool shouldMap(const scalarField& concentration, scalar T);
+
+    //- Check if the concentration is within Ztolerance_
+    bool shouldMap(const scalarField& concentration) const;
+
+
+    //Check if the temperature is within Ttolerance_
+    bool temperatureWithinRange(scalar Ti, scalar Tref) const;
 
 
     //- Is reference mapping active?
@@ -100,39 +103,20 @@ public:
         return active_;
     }
 
-    //- Re-initialize the refCellFound_ for 
-    // next iteration
-    void clear()
-    {
-        refCellFound_ = false;
-    }
-
-    //virtual void update(const scalarField& T, const PtrList<volScalarField>& Y) override;
 
 private:
     const dictionary dict_;
     const dictionary coeffsDict_;
 
-    // The reference problem
-    //ChemistryProblem refProblem_;
-
-
     // Is reference mapping active?
     Switch active_;
 
     // Tolerance for reference mapping
-    scalar tolerance_;
+    scalar Ztolerance_;
 
     // Tolerance for temperature checking (in Kelvins)
-    scalar deltaT_;
+    scalar Ttolerance_;
     
-    // Is first ref cell found?
-    bool   refCellFound_;
-
-    // Reference temperature to be checked
-    scalar Tref_;
-
-
     // Mixture fraction object
     mixtureFraction mixture_fraction_;
 };

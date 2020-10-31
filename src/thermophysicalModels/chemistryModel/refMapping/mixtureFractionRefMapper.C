@@ -25,66 +25,24 @@ License
 
 #include "mixtureFractionRefMapper.H"
 
-bool Foam::mixtureFractionRefMapper::shouldMap(const ChemistryProblem& problem)
-{
-    scalar Z = mixture_fraction_.getZ(problem);
 
-    if(!refCellFound_)
-    {
-        if(Z > tolerance_)
-        {
-            return false;
-        }
-        else
-        {
-            Tref_         = problem.Ti;
-            refCellFound_ = true;
-            return true;
-        }
-    }
-    else
-    {
-        if((Z > tolerance_) || (abs(problem.Ti - Tref_) > deltaT_))
-        {
-            return false;
-        }
-        else
+bool Foam::mixtureFractionRefMapper::shouldMap(const scalarField& concentration) const
+{
+    if (active()){
+
+        scalar Z = mixture_fraction_.getZ(concentration);
+
+        if(Z < Ztolerance_)
         {
             return true;
         }
     }
+    return false;
 }
 
-bool Foam::mixtureFractionRefMapper::shouldMap(const scalarField& concentration, scalar T)
+
+
+bool Foam::mixtureFractionRefMapper::temperatureWithinRange(scalar Ti, scalar Tref) const
 {
-
-
-    scalar Z = mixture_fraction_.getZ(concentration);
-
-    if(!refCellFound_)
-    {
-        if(Z > tolerance_)
-        {
-            return false;
-        }
-        else
-        {
-            Tref_         = T; 
-            refCellFound_ = true;
-            return true;
-        }
-    }
-    else
-    {
-        if((Z > tolerance_) || (abs(T - Tref_) > deltaT_))
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-
+    return (abs(Ti-Tref) < Ttolerance_);
 }

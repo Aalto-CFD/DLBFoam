@@ -106,8 +106,6 @@ public:
     // mixture fraction calculation
     void initialize(const basicSpecieMixture& composition);
 
-    //- Calculate mixture fraction of the given problem
-    scalar getZ(const ChemistryProblem& problem);
 
     scalar getZ(const scalarField& concentration) const;
 

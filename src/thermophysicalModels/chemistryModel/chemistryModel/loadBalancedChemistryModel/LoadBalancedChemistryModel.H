@@ -90,11 +90,6 @@ private:
         template<class DeltaTType>
         DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
 
-        //- Get a problem for cell i
-        virtual ChemistryProblem getProblem(scalar deltaT, label celli) const;
-
-
-
         //- Solve a list of chemistry problems and return a list of solutions
         DynamicList<ChemistrySolution> 
         solveList(UList<ChemistryProblem>& problems) const;
