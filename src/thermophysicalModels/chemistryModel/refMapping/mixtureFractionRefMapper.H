@@ -88,8 +88,8 @@ public:
 
 
 
-    //- Check if the concentration is within Ztolerance_
-    bool shouldMap(const scalarField& concentration) const;
+    //- Check if the massFraction is within Ztolerance_
+    bool shouldMap(const scalarField& massFraction) const;
 
 
     //Check if the temperature is within Ttolerance_

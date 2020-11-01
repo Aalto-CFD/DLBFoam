@@ -26,11 +26,11 @@ License
 #include "mixtureFractionRefMapper.H"
 
 
-bool Foam::mixtureFractionRefMapper::shouldMap(const scalarField& concentration) const
+bool Foam::mixtureFractionRefMapper::shouldMap(const scalarField& massFraction) const
 {
     if (active()){
 
-        scalar Z = mixture_fraction_.getZ(concentration);
+        scalar Z = mixture_fraction_.getZ(massFraction);
 
         if(Z < Ztolerance_)
         {
