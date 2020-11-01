@@ -327,8 +327,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
     problems.resize(p.size(), ChemistryProblem(this->nSpecie_));
 
+    scalarField massFraction(this->nSpecie_);
     scalarField concentration(this->nSpecie_);
-    scalarField something_other_than_concentration(this->nSpecie_); //TODO: rename
 
     label counter = 0;
     forAll(T, celli)
@@ -340,11 +340,11 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
             for(label i = 0; i < this->nSpecie_; i++)
             {
-                something_other_than_concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
-                concentration[i] = this->Y_[i][celli]; //apparently shouldMap wants the concentration...
+                concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
+                massFraction[i] = this->Y_[i][celli];
             }
             ChemistryProblem problem;
-            problem.c = something_other_than_concentration;
+            problem.c = concentration;
             problem.Ti = T[celli];
             problem.pi = p[celli];
             problem.rhoi = rho[celli];
@@ -354,7 +354,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
             problem.cellid = celli;
 
             //this check can only be done based on the concentration as the reference temperature is not known
-            if (mapper_.shouldMap(concentration)){ 
+            if (mapper_.shouldMap(massFraction)){ 
                 
                 mapped_problems.append(problem);
                 refMap_[celli] = 1;
