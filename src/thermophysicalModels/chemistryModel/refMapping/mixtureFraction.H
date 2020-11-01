@@ -104,7 +104,7 @@ public:
     mixtureFraction(const dictionary& mixFracDict, const basicSpecieMixture& composition);
 
 
-    scalar getZ(const scalarField& massFraction) const;
+    scalar massFractionToMixtureFraction(const scalarField& massFraction) const;
 
 
 private:

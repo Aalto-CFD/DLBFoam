@@ -90,7 +90,7 @@ void Foam::mixtureFraction::initialize(const basicSpecieMixture& composition)
 
 
 
-Foam::scalar Foam::mixtureFraction::getZ(const scalarField& massFraction) const
+Foam::scalar Foam::mixtureFraction::massFractionToMixtureFraction(const scalarField& massFraction) const
 {
 
     scalar beta = 0.0; 

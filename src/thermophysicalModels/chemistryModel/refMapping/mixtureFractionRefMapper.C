@@ -30,7 +30,7 @@ bool Foam::mixtureFractionRefMapper::shouldMap(const scalarField& massFraction) 
 {
     if (active()){
 
-        scalar Z = mixture_fraction_.getZ(massFraction);
+        scalar Z = mixture_fraction_.massFractionToMixtureFraction(massFraction);
 
         if(Z < Ztolerance_)
         {
