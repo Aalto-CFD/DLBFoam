@@ -62,8 +62,20 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
             this->mesh(),
             scalar(0.0)
         )
-{}
+{
+        if(balancer_.log())
+        {
+            cpuSolveFile_ = logFile("cpu_solve.out");
+            cpuSolveFile_() << "                  time" << tab
+                            << "           getProblems" << tab  
+                            << "           updateState" << tab
+                            << "               balance" << tab
+                            << "           solveBuffer" << tab
+                            << "             unbalance" << tab
+                            << "               rank ID" << endl;
+        }
 
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -129,6 +141,14 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
 )
 {
 
+    // CPU time analysis
+    clockTime timer;
+    scalar t_getProblems(0);
+    scalar t_updateState(0);
+    scalar t_balance(0);
+    scalar t_solveBuffer(0);
+    scalar t_unbalance(0);
+
     BasicChemistryModel<ReactionThermo>::correct();
 
     if(!this->chemistry_)
@@ -136,31 +156,52 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
         return great;
     }
 
+    timer.timeIncrement();
     DynamicList<ChemistryProblem> allProblems = getProblems(deltaT);
+    t_getProblems = timer.timeIncrement();
 
     RecvBuffer<ChemistrySolution> incomingSolutions;
 
     if(balancer_.active())
     {
-
+        timer.timeIncrement();
         balancer_.updateState(allProblems);
-        
-        if(balancer_.log())
-        {
-            balancer_.printState();
-        }
+        t_updateState = timer.timeIncrement();
 
+        timer.timeIncrement();
         auto guestProblems = balancer_.balance(allProblems);
         auto ownProblems = balancer_.getRemaining(allProblems);
+        t_balance          = timer.timeIncrement();
+
+        timer.timeIncrement();
         auto ownSolutions = solveList(ownProblems);
         auto guestSolutions = solveBuffer(guestProblems);
-        incomingSolutions = balancer_.unbalance(guestSolutions);
+        t_solveBuffer       = timer.timeIncrement();
 
+        timer.timeIncrement();      
+        incomingSolutions = balancer_.unbalance(guestSolutions);
         incomingSolutions.append(ownSolutions);
+        t_unbalance = timer.timeIncrement();
     }
     else
     {
+        timer.timeIncrement();
         incomingSolutions.append(solveList(allProblems));
+        t_solveBuffer = timer.timeIncrement();
+    }
+        
+    if(balancer_.log())
+    {
+        balancer_.printState();
+        cpuSolveFile_() << setw(22)
+                        << this->time().timeOutputValue()<<tab
+                        << setw(22) << t_getProblems<<tab
+                        << setw(22) << t_updateState<<tab
+                        << setw(22) << t_balance<<tab
+                        << setw(22) << t_solveBuffer<<tab
+                        << setw(22) << t_unbalance<<tab
+                        << setw(22) << Pstream::myProcNo()
+                        << endl;
     }
 
     return updateReactionRates(incomingSolutions);

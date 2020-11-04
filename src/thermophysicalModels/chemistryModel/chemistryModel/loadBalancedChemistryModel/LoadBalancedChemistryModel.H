@@ -40,6 +40,8 @@ SourceFiles
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
 #include "LoadBalancer.H"
+#include "OFstream.H"
+#include "IOmanip.H"
 #include "StandardChemistryModel.H"
 #include "clockTime.H"
 #include "mixtureFractionRefMapper.H"
@@ -76,6 +78,9 @@ private:
         // 1 -> mapped from reference solution
         // 2 -> solved explicitly
         volScalarField refMap_;
+
+        // A file to output the balancing stats
+        autoPtr<OFstream>        cpuSolveFile_;
 
 
     // Private Member Functions
@@ -165,6 +170,9 @@ public:
             scalar&      subDeltaT
         ) const = 0;
 
+        //- Create and return a log file of the given name
+        inline autoPtr<OFstream> logFile(const word& name) const;
+
 
     // Member Operators
 
@@ -178,7 +186,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
+#include "LoadBalancedChemistryModelI.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
