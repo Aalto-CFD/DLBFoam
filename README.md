@@ -1,8 +1,8 @@
 # Foam-Aalto: LoadBalancedChemistryModel
 ![OpenFOAM 8](https://img.shields.io/badge/OpenFOAM-8-brightgreen)
 
-An OpenFOAM chemistry model introducing dynamic load balancing for chemistry calculation
-in parallel simulations.
+An OpenFOAM chemistry model introducing dynamic load balancing and a zonal reference mapping
+filter for chemistry calculation in parallel simulations.
 
 ## Why do I need this?
 
@@ -33,7 +33,68 @@ After sourcing OpenFOAM-8, simply execute:
 
 ## Usage
 
-Check the tutorials given in tutorials folder.
+Once the compilation is successful, any case running with standard OpenFOAM can be easily converted to
+use LoadBalancedChemistryModel, following these steps:
+
+* The LoadBalancedChemistryModel should be linked to the solver. Add the following to your system/controlDict file:
+
+```
+libs
+(
+    "libchemistryModel_Aalto.so" 
+);
+```
+
+* Select chemistry solver method as loadBalanced in constant/chemistryProperties:
+
+```
+chemistryType
+{
+    solver          ode;
+    method          loadBalanced;
+}
+```
+
+* Add the loadbalancing subdictionary to the same chemistryProperties file:
+
+```
+loadbalancing
+{
+    active true;
+    log	true;
+}
+```
+
+* (Optional) Add the refmapping subdictionary to chemistryProperties file if you want to 
+    use the reference mapping method:
+
+```
+refmapping
+{
+    active  true;
+    
+    mixtureFractionProperties
+    {
+        oxidizerMassFractions
+        {
+            N2       0.77;
+            O2       0.23;
+        }
+
+        fuelMassFractions
+        {
+            CH4       1.0;
+        }
+
+        #include "$FOAM_CASE/constant/thermo.compressibleGasGRI"
+    }
+    tolerance	1e-4;  // mixture fraction tolerance
+    deltaT	2; // temperature tolerance
+}
+```
+* Run the case with normally with OpenFOAM's reactive solvers.
+
+For a working example, check the tutorials given in tutorials folder.
 
 ## Citation
 
