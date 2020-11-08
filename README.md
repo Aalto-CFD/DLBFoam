@@ -11,7 +11,8 @@ simulation times in OpenFOAM simulations utilizing finite-rate chemistry.
 
 LoadBalancedChemistryModel introduces runtime load balancing through MPI routines
 to minimize the load imbalance between ranks and gain speed-up. The implementation
-details can be found in [[1]](#1).
+details can be found in our paper [[1]](#1).
+
 
 
 <p align="center">
