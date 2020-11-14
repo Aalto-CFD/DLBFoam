@@ -92,8 +92,8 @@ refmapping
     deltaT	2; // temperature tolerance
 }
 ```
-Reference mapping uses mixture fraction (Z) and maps a reference solution
-with small Z to other cells with small Z.
+Reference mapping uses mixture fraction (Z) and maps a reference solution to reference
+cells satisfying a condition.
 
 The entry above sets the Z=0 and Z=1 conditions from given mass fractions. For each
 CFD iteration it finds a reference solution where Z<tolerance and solves the chemistry.
