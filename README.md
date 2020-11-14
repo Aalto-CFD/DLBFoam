@@ -16,7 +16,7 @@ details can be found in our paper [[1]](#1).
 
 
 <p align="center">
-    <img src="third_party/rankbased_solve.png" alt="drawing" width="600"/>
+    <img src="rankbased_solve.png" alt="drawing" width="600"/>
     <br>
     <em>Figure: A demonstration of how load balancing model works compared to standard model.</em>
 </p>
