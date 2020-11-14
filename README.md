@@ -104,7 +104,7 @@ between reference solution and other reference cells and ensures:
 abs(T<sub>cell</sub>-T<sub>ref</sub>)<deltaT.
 
 
-* Run the case with normally with OpenFOAM's reactive solvers.
+* Run the case normally with OpenFOAM's reactive solvers.
 
 For a working example, check the tutorials given in tutorials folder.
 
