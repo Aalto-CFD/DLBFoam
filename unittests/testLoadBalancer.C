@@ -1,4 +1,4 @@
-#include "../third_party/catch.hpp"
+#include "catch.hpp"
 
 #include "helpers.H"
 #include "LoadBalancer.H"

@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_RUNNER
 
-#include "../third_party/catch.hpp"
+#include "catch.hpp"
 
 #include "IPstream.H"
 #include "OPstream.H"
