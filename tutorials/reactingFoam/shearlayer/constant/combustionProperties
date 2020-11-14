@@ -15,13 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-combustionModel  laminar<psiChemistryCombustion>;
-
-active  true;
-
-laminarCoeffs
-{
-}
+combustionModel  laminar; 
 
 
 // ************************************************************************* //

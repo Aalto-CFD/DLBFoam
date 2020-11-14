@@ -1,4 +1,4 @@
-# Foam-Aalto: LoadBalancedChemistryModel
+# DLBFoam: LoadBalancedChemistryModel
 ![OpenFOAM 8](https://img.shields.io/badge/OpenFOAM-8-brightgreen)
 
 An OpenFOAM chemistry model introducing dynamic load balancing and a zonal reference mapping
@@ -41,7 +41,7 @@ use LoadBalancedChemistryModel, following these steps:
 ```
 libs
 (
-    "libchemistryModel_Aalto.so" 
+    "libchemistryModel_DLB.so" 
 );
 ```
 

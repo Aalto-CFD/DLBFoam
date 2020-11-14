@@ -6,9 +6,9 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM-Aalto library, derived from OpenFOAM.
+    This file is part of DLBFoam library, derived from OpenFOAM.
 
-    https://github.com/blttkgl/OpenFOAM-Aalto
+    https://github.com/blttkgl/DLBFoam
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ License
     
 \*---------------------------------------------------------------------------*/
 
-#include "algorithms_aalto.H"
+#include "algorithms_DLB.H"
 namespace Foam{
 
 }

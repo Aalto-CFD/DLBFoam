@@ -4,14 +4,14 @@ loadBalancing/ChemistryLoad.C
 loadBalancing/LoadBalancerBase.C
 loadBalancing/SendBuffer.C
 loadBalancing/RecvBuffer.C
-loadBalancing/algorithms_aalto.C
+loadBalancing/algorithms_DLB.C
 loadBalancing/runtime_assert.C
 refMapping/mixtureFraction.C
 refMapping/RefMapperBase.C
 refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
-chemistrySolver/AaltoChemistrySolvers.C
+chemistrySolver/DLBChemistrySolvers.C
 
 
 
-LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_Aalto
+LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_DLB

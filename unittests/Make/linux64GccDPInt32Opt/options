@@ -57,7 +57,7 @@ EXE_INC = -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude -I$(LIB_SRC
 # 13 "Make/options"
 
 
-EXE_LIBS = -L$(FOAM_USER_LIBBIN) -lfluidThermophysicalModels -lreactionThermophysicalModels -lspecie -lODE -lfiniteVolume -lmeshTools -lchemistryModel -lchemistryModel_Aalto
+EXE_LIBS = -L$(FOAM_USER_LIBBIN) -lfluidThermophysicalModels -lreactionThermophysicalModels -lspecie -lODE -lfiniteVolume -lmeshTools -lchemistryModel -lchemistryModel_DLB
 # 25 "Make/options"
  
 

@@ -56,7 +56,7 @@ functions
 
 libs
 (
-        "libchemistryModel_Aalto.so"
+        "libchemistryModel_DLB.so" 
 );
 
 
