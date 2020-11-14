@@ -83,7 +83,7 @@ refmapping
 
         fuelMassFractions
         {
-            CH4       1.0;
+            NC12H26       1.0;
         }
 
         #include "$FOAM_CASE/constant/thermo.compressibleGasGRI"
@@ -92,6 +92,18 @@ refmapping
     deltaT	2; // temperature tolerance
 }
 ```
+Reference mapping uses mixture fraction (Z) and maps a reference solution
+with small Z to other cells with small Z.
+
+The entry below ets the Z=0 and Z=1 conditions from given mass fractions. For each
+CFD iteration it finds a reference solution where Z<tolerance and solves the chemistry.
+Subsequent cells following the same condition are mapped from this reference solution.
+
+Optional: When deltaT is explicitly set, the mapper also checks the temperature
+between reference solution and other reference cells and ensures:
+abs(T<sub>cell</sub>-T<sub>ref</sub>)<deltaT.
+
+
 * Run the case with normally with OpenFOAM's reactive solvers.
 
 For a working example, check the tutorials given in tutorials folder.
