@@ -95,7 +95,7 @@ refmapping
 Reference mapping uses mixture fraction (Z) and maps a reference solution
 with small Z to other cells with small Z.
 
-The entry below ets the Z=0 and Z=1 conditions from given mass fractions. For each
+The entry above sets the Z=0 and Z=1 conditions from given mass fractions. For each
 CFD iteration it finds a reference solution where Z<tolerance and solves the chemistry.
 Subsequent cells following the same condition are mapped from this reference solution.
 
