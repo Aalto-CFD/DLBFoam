@@ -8,6 +8,4 @@ cd ../../../
 
 cd ./unittests
 wmake
-cd ..
-
 ./test.sh
