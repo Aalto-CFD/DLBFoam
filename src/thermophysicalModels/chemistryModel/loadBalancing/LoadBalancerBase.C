@@ -35,13 +35,7 @@ void Foam::LoadBalancerBase::setState(const BalancerState& state)
 
     state_ = state;
 
-    if(!validState())
-    {
-
-        printState();
-
-        throw error("Invalid balance state in ChemistryLoadBalancing.");
-    }
+    runtime_assert(validState(), "Invalid state in load balancer");
 }
 
 Foam::ChemistryLoad
@@ -95,20 +89,13 @@ Foam::label Foam::LoadBalancerBase::rankToLoadIdx(
 
 bool Foam::LoadBalancerBase::validState() const
 {
-
-    /*
-    auto sources      = state_.sources;
+    
+    auto sources = state_.sources;
     auto destinations = state_.destinations;
 
-    if (sources.size() < 1) return false;
-    if (destinations.size() < 1) return false;
     if (sources.size() > size_t(Pstream::nProcs())) return false;
     if (destinations.size() > size_t(Pstream::nProcs())) return false;
-    if (sources[0] != Pstream::myProcNo())
-        return false; // the first index must always be this process
-    if (sources[0] != destinations[0]) return false;
-    */
-    // TODO: enable
+
     return true;
 }
 
@@ -118,8 +105,8 @@ void Foam::LoadBalancerBase::printState() const
     // receiver
     if(state_.sources.size() > 0)
     {
-        Pout << "Receiver rank: " << Pstream::myProcNo() << " receives from "
-             << vectorToString(state_.sources) << " own problems "
+        Pout << "Receiver rank: " << Pstream::myProcNo() << " receives from: "
+             << vectorToString(state_.sources) << " own problems: "
              << state_.nRemaining << endl;
     }
     // sender
