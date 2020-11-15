@@ -485,19 +485,3 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactio
     this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }
 
-
-template <class ReactionThermo, class ThermoType>
-Foam::ChemistryProblem
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getMassFraction
-(
-    const ChemistryProblem& problem
-) const
-{
-    ChemistryProblem tmp = problem;
-    for(label i = 0; i < this->nSpecie_; i++)
-    {
-        tmp.c[i] = this->Y_[i][problem.cellid];
-    }
-
-    return (tmp);
-}

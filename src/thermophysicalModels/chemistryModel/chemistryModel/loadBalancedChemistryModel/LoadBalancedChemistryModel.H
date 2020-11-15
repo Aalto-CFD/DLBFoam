@@ -110,10 +110,6 @@ private:
         //- Update the reaction rates from a list of solutions
         scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
 
-        //- Compute the mass fraction from concentration
-        virtual ChemistryProblem
-        getMassFraction(const ChemistryProblem& problem) const;
-
         //- Solve the reaction system for the given time step
         //  of given type and return the characteristic time
         template<class DeltaTType>
