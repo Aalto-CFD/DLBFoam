@@ -397,7 +397,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
             //this check can only be done based on the concentration as the reference temperature is not known
             if (mapper_.shouldMap(massFraction)){ 
                 
-                solved_problems.append(problem);
+                mapped_problems.append(problem);
                 refMap_[celli] = 1;
             }
 
