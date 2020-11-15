@@ -363,10 +363,10 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
     
 
 
-    DynamicList<ChemistryProblem> problems;
+    DynamicList<ChemistryProblem> solved_problems;
     DynamicList<ChemistryProblem> mapped_problems;
 
-    problems.resize(p.size(), ChemistryProblem(this->nSpecie_));
+    solved_problems.resize(p.size(), ChemistryProblem(this->nSpecie_));
 
     scalarField massFraction(this->nSpecie_);
     scalarField concentration(this->nSpecie_);
@@ -397,12 +397,12 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
             //this check can only be done based on the concentration as the reference temperature is not known
             if (mapper_.shouldMap(massFraction)){ 
                 
-                mapped_problems.append(problem);
+                solved_problems.append(problem);
                 refMap_[celli] = 1;
             }
 
             else {
-                problems[counter] = problem;
+                solved_problems[counter] = problem;
                 counter++;
                 refMap_[celli] = 2;
             }
@@ -419,11 +419,25 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
     }
 
     //the real size is set here
-    problems.setSize(counter);
+    solved_problems.setSize(counter);
 
 
-    runtime_assert(problems.size() + mapped_problems.size() == p.size(), "getProblems fails");
+    runtime_assert(solved_problems.size() + mapped_problems.size() == p.size(), "getProblems fails");
 
+    this->map(mapped_problems, solved_problems);
+    
+
+    return solved_problems;
+}
+
+
+template <class ReactionThermo, class ThermoType>
+void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
+(
+    DynamicList<ChemistryProblem>& mapped_problems, 
+    DynamicList<ChemistryProblem>& solved_problems
+)
+{
 
     //map the solution to reference cells 
     //TODO: make a separate function
@@ -450,7 +464,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
             else 
             {
-                problems.append(problem);
+                solved_problems.append(problem);
                 refMap_[problem.cellid] = 2;
             }
         }
@@ -458,11 +472,9 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
     }
 
+    
 
-
-    return problems;
 }
-
 
 template <class ReactionThermo, class ThermoType>
 void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
