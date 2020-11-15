@@ -439,13 +439,9 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
 )
 {
 
-    //map the solution to reference cells 
-    //TODO: make a separate function
     if (mapped_problems.size() > 0)
     {
 
-        //I dont think this makes sense at all. We could very well pick any
-        //of the problems as a reference
         ChemistryProblem refProblem = mapped_problems[0];
         scalar refTemperature = refProblem.Ti;
 
@@ -455,13 +451,13 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
 
         for (auto& problem : mapped_problems){
 
-            //further filter based on temperature
+            //Check that the temperature condition is also fullfilled.
             if (mapper_.temperatureWithinRange(problem.Ti, refTemperature))
             {
                 updateReactionRate(refSolution, problem.cellid);
                 cpuTimes_[problem.cellid] = refSolution.cpuTime;
             }
-
+            //Otherwise solve...
             else 
             {
                 solved_problems.append(problem);
