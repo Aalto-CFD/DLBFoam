@@ -56,11 +56,12 @@ See also
 #define mixtureFractionRefMapper_H
 
 #include "IOdictionary.H"
-#include "RefMapperBase.H"
 #include "Switch.H"
 #include "runTimeSelectionTables.H"
 #include "scalarField.H"
+#include "psiReactionThermo.H"
 
+#include "mixtureFraction.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -68,7 +69,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class mixtureFractionRefMapper : public RefMapperBase
+class mixtureFractionRefMapper 
 {
 
 public:
@@ -76,7 +77,7 @@ public:
 
     mixtureFractionRefMapper(
         const dictionary& dict, const basicSpecieMixture& composition)
-        : RefMapperBase(), dict_(dict), coeffsDict_(dict.subDict("refmapping")),
+        : dict_(dict), coeffsDict_(dict.subDict("refmapping")),
           active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
           Ztolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance", 1e-4)),
           Ttolerance_(coeffsDict_.lookupOrDefault<scalar>("deltaT", VGREAT)),

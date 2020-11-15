@@ -7,7 +7,6 @@ loadBalancing/RecvBuffer.C
 loadBalancing/algorithms_DLB.C
 loadBalancing/runtime_assert.C
 refMapping/mixtureFraction.C
-refMapping/RefMapperBase.C
 refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
 chemistrySolver/DLBChemistrySolvers.C
