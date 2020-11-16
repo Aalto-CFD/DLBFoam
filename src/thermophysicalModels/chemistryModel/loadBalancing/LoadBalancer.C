@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
-   \\    /   O peration     | for faster reactive simulations
+   \\    /   O peration     | for fast reactive simulations
     \\  /    A nd           | 
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
@@ -165,7 +165,6 @@ bool
 Foam::LoadBalancer::isSender(
     const std::vector<Operation>& operations, int rank)
 {
-
     if(operations.size() == 0)
     {
         return false;
@@ -185,7 +184,6 @@ bool
 Foam::LoadBalancer::isReceiver(
     const std::vector<Operation>& operations, int rank)
 {
-
     for(const auto& op : operations)
     {
         if(op.to != rank)
