@@ -2,7 +2,7 @@
 ![OpenFOAM 8](https://img.shields.io/badge/OpenFOAM-8-brightgreen)
 
 DLBFoam is an open-source library for OpenFOAM. It introduces dynamic load balancing and a zonal reference mapping model 
-for faster chemistry calculation in parallel simulations.
+for fast chemistry calculation in parallel simulations.
 
 ## Why do I need this?
 
@@ -120,8 +120,7 @@ If you use our model, please cite the publication describing its implementation 
 ## References
 
 <a id="1">[1]</a> 
-Tekgul, Peltonen, Kahila, Kaario, Vuorinen (2020). 
-[DLBFoam: An open-source dynamic load balancing model for faster reacting flow simulations in OpenFOAM](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-Somejournal, xx-xx.
+Tekgul, Peltonen, Kahila, Kaario, Vuorinen (2020). DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM.
+
 
 
