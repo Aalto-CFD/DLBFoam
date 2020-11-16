@@ -30,7 +30,6 @@ internalField  #codeStream
         vectorField U(mesh.nCells());
         scalar Umax = 40;
 
-        scalar A = 500;
         scalar L = 0.008;
         scalar ro = 0.0004;
         scalar B = 5;
