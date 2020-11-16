@@ -103,7 +103,6 @@ public:
     // Construct from dict and composition 
     mixtureFraction(const dictionary& mixFracDict, const basicSpecieMixture& composition);
 
-
     scalar massFractionToMixtureFraction(const scalarField& massFraction) const;
 
 
@@ -113,9 +112,6 @@ private:
     wordList     species_;
     List<scalar> alpha_;
     List<scalar> beta_;
-
-
-
     
     //- Initialize the alpha and beta values needed for 
     // mixture fraction calculation

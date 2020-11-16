@@ -29,7 +29,6 @@ void
 Foam::LoadBalancer::updateState(
     const DynamicList<ChemistryProblem>& problems)
 {
-
     auto myLoad = computeLoad(problems);
     auto allLoads = allGather(myLoad);
     auto operations = getOperations(allLoads, myLoad);
@@ -44,7 +43,6 @@ Foam::LoadBalancer::operationsToInfo(
     const DynamicList<ChemistryProblem>& problems,
     const ChemistryLoad&                 myLoad)
 {
-
     BalancerState info;
 
     if(isSender(operations, myLoad.rank))
@@ -66,7 +64,6 @@ Foam::LoadBalancer::operationsToInfo(
     // receiver
     else
     {
-
         for(const auto& op : operations)
         {
             info.sources.push_back(op.from);
@@ -91,7 +88,6 @@ Foam::LoadBalancer::timesToProblemCounts(
 
     for(const auto& time : times)
     {
-
         scalar sum(0);
         auto operation = [&](const ChemistryProblem& problem) 
         {
@@ -123,7 +119,6 @@ Foam::LoadBalancer::getOperations(
 
     while(sender != receiver)
     {
-
         double send_value = std::min(
             sender->value - globalMean, globalMean - receiver->value);
 
@@ -139,7 +134,6 @@ Foam::LoadBalancer::getOperations(
         {
             sender--;
         }
-
         else
         {
             receiver++;

@@ -62,7 +62,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
             this->mesh(),
             scalar(0.0)
         )
-{
+    {
         if(balancer_.log())
         {
             cpuSolveFile_ = logFile("cpu_solve.out");
@@ -75,7 +75,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
                             << "               rank ID" << endl;
         }
 
-}
+    }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -115,7 +115,6 @@ template <class ReactionThermo, class ThermoType>
 Foam::LoadBalancer
 Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createBalancer()
 {
-
     const IOdictionary chemistryDict_tmp
         (
             IOobject
@@ -140,7 +139,6 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
     const DeltaTType& deltaT
 )
 {
-
     // CPU time analysis
     clockTime timer;
     scalar t_getProblems(0);
@@ -171,12 +169,12 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
         timer.timeIncrement();
         auto guestProblems = balancer_.balance(allProblems);
         auto ownProblems = balancer_.getRemaining(allProblems);
-        t_balance          = timer.timeIncrement();
+        t_balance = timer.timeIncrement();
 
         timer.timeIncrement();
         auto ownSolutions = solveList(ownProblems);
         auto guestSolutions = solveBuffer(guestProblems);
-        t_solveBuffer       = timer.timeIncrement();
+        t_solveBuffer = timer.timeIncrement();
 
         timer.timeIncrement();      
         incomingSolutions = balancer_.unbalance(guestSolutions);
@@ -214,9 +212,7 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveSingle
     ChemistryProblem& problem, ChemistrySolution& solution
 ) const
 {
-
     scalar timeLeft = problem.deltaT;
-    // const scalarList c0       = prob.c;
     scalarField c0 = problem.c;
 
     // Timer begins
@@ -258,7 +254,6 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
     const RecvBuffer<ChemistrySolution>& solutions
 )
 {
-
     scalar deltaTMin = great;
 
     for(const auto& array : solutions)
@@ -315,7 +310,6 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveBuffer
     RecvBuffer<ChemistryProblem>& problems
 ) const
 {
-
     // allocate the solutions buffer
     RecvBuffer<ChemistrySolution> solutions;
     
@@ -334,7 +328,6 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList
     UList<ChemistryProblem>& problems
 ) const
 {
-
     DynamicList<ChemistrySolution> solutions(
         problems.size(), ChemistrySolution(this->nSpecie_));
 
@@ -355,7 +348,6 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
     const DeltaTType& deltaT
 )
 {
-
     const scalarField& T = this->thermo().T();
     const scalarField& p = this->thermo().p();
     tmp<volScalarField> trho(this->thermo().rho());
@@ -377,13 +369,12 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 
         if(T[celli] > this->Treact())
         {
-
-
             for(label i = 0; i < this->nSpecie_; i++)
             {
                 concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
                 massFraction[i] = this->Y_[i][celli];
             }
+            
             ChemistryProblem problem;
             problem.c = concentration;
             problem.Ti = T[celli];
@@ -394,14 +385,16 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
             problem.cpuTime = cpuTimes_[celli];
             problem.cellid = celli;
 
-            //this check can only be done based on the concentration as the reference temperature is not known
-            if (mapper_.shouldMap(massFraction)){ 
-                
+            // This check can only be done based on the concentration as the 
+            // reference temperature is not known
+            if (mapper_.shouldMap(massFraction))
+            {                
                 mapped_problems.append(problem);
                 refMap_[celli] = 1;
             }
 
-            else {
+            else 
+            {
                 solved_problems[counter] = problem;
                 counter++;
                 refMap_[celli] = 2;
@@ -421,7 +414,6 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
     //the real size is set here
     solved_problems.setSize(counter);
 
-
     runtime_assert(solved_problems.size() + mapped_problems.size() == p.size(), "getProblems fails");
 
     this->map(mapped_problems, solved_problems);
@@ -438,7 +430,6 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
     DynamicList<ChemistryProblem>& solved_problems
 )
 {
-
     if (mapped_problems.size() > 0)
     {
 
@@ -451,13 +442,13 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
 
         for (auto& problem : mapped_problems){
 
-            //Check that the temperature condition is also fullfilled.
+            // Check that the refmap temperature condition is also fullfilled
             if (mapper_.temperatureWithinRange(problem.Ti, refTemperature))
             {
                 updateReactionRate(refSolution, problem.cellid);
                 cpuTimes_[problem.cellid] = refSolution.cpuTime;
             }
-            //Otherwise solve...
+            // Otherwise solve
             else 
             {
                 solved_problems.append(problem);
@@ -467,9 +458,6 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
 
 
     }
-
-    
-
 }
 
 template <class ReactionThermo, class ThermoType>

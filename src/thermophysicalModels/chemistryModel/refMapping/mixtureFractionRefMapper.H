@@ -93,7 +93,7 @@ public:
     bool shouldMap(const scalarField& massFraction) const;
 
 
-    //Check if the temperature is within Ttolerance_
+    //- Check if the temperature is within Ttolerance_
     bool temperatureWithinRange(scalar Ti, scalar Tref) const;
 
 

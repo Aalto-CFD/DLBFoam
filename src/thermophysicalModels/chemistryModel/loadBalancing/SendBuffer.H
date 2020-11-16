@@ -60,7 +60,7 @@ struct SendBuffer
     }
 
     const DynamicList<T>& m_values;
-    std::vector<label>    m_counts;
+    std::vector<label> m_counts;
 };
 
 } // namespace Foam
