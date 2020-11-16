@@ -1,15 +1,15 @@
-# DLBFoam: LoadBalancedChemistryModel
+# DLBFoam: Dynamic load balancing for faster reactive simulations
 ![OpenFOAM 8](https://img.shields.io/badge/OpenFOAM-8-brightgreen)
 
-An OpenFOAM chemistry model introducing dynamic load balancing and a zonal reference mapping
-filter for chemistry calculation in parallel simulations.
+DLBFoam is an open-source library for OpenFOAM. It introduces dynamic load balancing and a zonal reference mapping model 
+for faster chemistry calculation in parallel simulations.
 
 ## Why do I need this?
 
 Load imbalance in parallel reactive simulations is an issue that causes very long
 simulation times in OpenFOAM simulations utilizing finite-rate chemistry.
 
-LoadBalancedChemistryModel introduces runtime load balancing through MPI routines
+DLBFoam introduces runtime load balancing through MPI routines
 to minimize the load imbalance between ranks and gain speed-up. The implementation
 details can be found in our paper [[1]](#1).
 
@@ -24,7 +24,7 @@ details can be found in our paper [[1]](#1).
 
 ## Compilation
 
-LoadBalancedChemistryModel does not require any third-party dependency.
+DLBFoam does not require any third-party dependency.
 After sourcing OpenFOAM-8, simply execute:
 
 ```
@@ -34,9 +34,9 @@ After sourcing OpenFOAM-8, simply execute:
 ## Usage
 
 Once the compilation is successful, any case running with standard OpenFOAM can be easily converted to
-use LoadBalancedChemistryModel, following these steps:
+use DLBFOAM, following these steps:
 
-* The LoadBalancedChemistryModel should be linked to the solver. Add the following to your system/controlDict file:
+* The DLBFoam should be linked to the solver. Add the following to your system/controlDict file:
 
 ```
 libs
@@ -65,7 +65,7 @@ loadbalancing
 }
 ```
 
-* (Optional) Add the refmapping subdictionary to chemistryProperties file if you want to 
+* (Optional) Set the refmapping as active in chemistryProperties file if you want to 
     use the reference mapping method:
 
 ```
@@ -114,8 +114,8 @@ If you use our model, please cite the publication describing its implementation 
 
 ## References
 <a id="1">[1]</a> 
-Tekgul, Peltonen, Kahila, Vuorinen (2020). 
-[A very cool paper name for this repository](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+Tekgul, Peltonen, Kahila, Kaario, Vuorinen (2020). 
+[DLBFoam: An open-source dynamic load balancing model for faster reacting flow simulations in OpenFOAM](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 Somejournal, xx-xx.
 
 
