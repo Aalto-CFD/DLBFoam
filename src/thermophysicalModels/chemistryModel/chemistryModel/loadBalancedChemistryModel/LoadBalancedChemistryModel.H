@@ -115,7 +115,7 @@ private:
         template<class DeltaTType>
         scalar solve(const DeltaTType& deltaT);
 
-        //- Applies the reference cell mapping 
+        //- Apply the reference cell mapping 
         //TODO: This doesnt belong here and should be in reference cell mapping class. 
         //      Implement a generic filter class from which the tabulation methods inherit and make 
         //      the mapping base class inherit from that. 

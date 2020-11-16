@@ -108,8 +108,8 @@ public:
 
 private:
 
-    dictionary   mixFracDict_;
-    wordList     species_;
+    dictionary mixFracDict_;
+    wordList species_;
     List<scalar> alpha_;
     List<scalar> beta_;
     

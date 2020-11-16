@@ -82,7 +82,7 @@ void Foam::mixtureFraction::initialize(const basicSpecieMixture& composition)
 
 
     // Stoichiometric mixture fraction
-    scalar Z_st =  (0.0 - beta_[0])/(beta_[1] - beta_[0]);
+    scalar Z_st = (0.0 - beta_[0])/(beta_[1] - beta_[0]);
 
     Info<<"Stoichiomentric mixture fraction Zst = " << Z_st << endl;
 

@@ -60,7 +60,7 @@ class LoadBalancer : public LoadBalancerBase
 public:
     struct Operation
     {
-        int    from, to; // ranks
+        int from, to; // ranks
         double value;
     };
 
@@ -103,14 +103,14 @@ protected:
 
     //- Convert the operations to send and receive info to handle balancing
     static BalancerState operationsToInfo(
-        const std::vector<Operation>&        operations,
+        const std::vector<Operation>& operations,
         const DynamicList<ChemistryProblem>& problems,
-        const ChemistryLoad&                 myLoad);
+        const ChemistryLoad& myLoad);
 
 
     //- Convert the vector of cpu times to number of problems for the rank
     static std::vector<label> timesToProblemCounts(
-        const std::vector<scalar>&           times,
+        const std::vector<scalar>& times,
         const DynamicList<ChemistryProblem>& problems);
 
 
@@ -124,7 +124,7 @@ private:
     Switch active_;
 
     // Is load balancing logged?
-    Switch  log_;
+    Switch log_;
 
     //- Check if the rank is a sender
     static bool isSender(const std::vector<Operation>& operations, int rank);
