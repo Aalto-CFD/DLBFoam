@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2013-2020 OpenFOAM Foundation
-     \\/     M anipulation  |
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+   \\    /   O peration     | for faster reactive simulations
+    \\  /    A nd           | 
+     \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
     This file is part of DLBFoam library, derived from OpenFOAM.
@@ -70,7 +70,7 @@ References:
 
         "Large Eddy Simulation of Fuel Spray Combustion"
         Armin Wehrfritz,
-        PhD thesis, Aalto University, Finland, 2016
+        PhD thesis, 2020, Aalto University, Finland, 2016
     \endverbatim
 
 SourceFiles
