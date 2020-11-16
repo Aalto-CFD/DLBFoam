@@ -81,10 +81,14 @@ public:
           active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
           Ztolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance", 1e-4)),
           Ttolerance_(coeffsDict_.lookupOrDefault<scalar>("deltaT", VGREAT)),
-          mixture_fraction_(
-              coeffsDict_.subDict("mixtureFractionProperties"),
-              composition)
+          mixture_fraction_()
     {
+        if (active())
+        {
+            mixture_fraction_ = mixtureFraction(
+              coeffsDict_.subDict("mixtureFractionProperties"),
+              composition);
+        }
     }
 
 
