@@ -111,7 +111,7 @@ For a working example, check the tutorials given in tutorials folder.
 ## Getting help and reporting bugs
 
 Please submit a GitHub issue if you found a bug in the program. If you need help with the software or have further questions,
-cantact bulut.tekgul@aalto.fi.
+contact bulut.tekgul@aalto.fi.
 
 ## Citation
 
