@@ -108,11 +108,17 @@ abs(T<sub>cell</sub>-T<sub>ref</sub>)<deltaT.
 
 For a working example, check the tutorials given in tutorials folder.
 
+## Getting help and reporting bugs
+
+Please submit a GitHub issue if you found a bug in the program. If you need help with the software or have further questions,
+cantact bulut.tekgul@aalto.fi.
+
 ## Citation
 
 If you use our model, please cite the publication describing its implementation [[1]](#1). 
 
 ## References
+
 <a id="1">[1]</a> 
 Tekgul, Peltonen, Kahila, Kaario, Vuorinen (2020). 
 [DLBFoam: An open-source dynamic load balancing model for faster reacting flow simulations in OpenFOAM](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
