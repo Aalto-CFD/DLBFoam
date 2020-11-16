@@ -6,8 +6,6 @@ import matplotlib
 fig,ax = plt.subplots()
 mean = 0
 for rankid,rank in enumerate(sorted(glob.glob('processor*'))):
-    # Plot add, retrieve, grow and solve
-
     get_problem = []
     update_state = []
     balance    = []
