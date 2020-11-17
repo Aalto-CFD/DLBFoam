@@ -121,7 +121,6 @@ If you use our model, please cite the publication describing its implementation 
 ## References
 
 <a id="1">[1]</a> 
-Tekgul, Peltonen, Kahila, Kaario, Vuorinen (2020). DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM.
-
+Tekgul, Peltonen, Kahila, Kaario, Vuorinen (2020). [DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM](https://arxiv.org/abs/2011.07978)
 
 
