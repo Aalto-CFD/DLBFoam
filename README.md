@@ -109,6 +109,31 @@ abs(T<sub>cell</sub>-T<sub>ref</sub>)<deltaT.
 
 For a working example, check the tutorials given in tutorials folder.
 
+## Directory structure
+```
+├── src
+└── thermophysicalModels
+│    └── chemistryModel
+│        ├── chemistryModel
+│        │   └── loadBalancedChemistryModel
+│        │       ├── LoadBalancedChemistryModel    // Main chemistry class
+│        ├── loadBalancing
+│        │   ├── algorithms_DLB                    // Some useful algorithms used
+│        │   ├── ChemistryLoad                     // Chemistry load object
+│        │   ├── ChemistryProblem                  // Chemistry problem object
+│        │   ├── ChemistrySolution                 // Chemistry solution object
+│        │   ├── LoadBalancerBase                  // Load balancer base class
+│        │   ├── LoadBalancer                      // Load balancer implementation class
+│        │   ├── RecvBuffer                        // Receive MPI buffer object
+│        │   ├── runtime_assert                    // Assert functions for debugging
+│        │   ├── SendBuffer                        // Send MPI buffer object
+│        └── refMapping
+│            ├── mixtureFraction                   // Mixture fraction implementation
+│            ├── mixtureFractionRefMapper          // Reference mapper implementation class
+│
+├── tutorials                                      // Tutorials
+└── unittests                                      // Unit tests to check if compilation is successful
+```
 ## Getting help and reporting bugs
 
 Please submit a GitHub issue if you found a bug in the program. If you need help with the software or have further questions,
@@ -122,5 +147,3 @@ If you use our model, please cite the publication describing its implementation 
 
 <a id="1">[1]</a> 
 Tekgul, Peltonen, Kahila, Kaario, Vuorinen (2020). [DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM](https://arxiv.org/abs/2011.07978)
-
-
