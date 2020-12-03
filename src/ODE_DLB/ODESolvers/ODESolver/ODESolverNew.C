@@ -25,17 +25,33 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "volFields.H"
-#include "zeroGradientFvPatchFields.H"
+#include "ODESolver.H"
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class ReactionThermo, class ThermoType>
-inline Foam::label
-Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::nEqns() const
+Foam::autoPtr<Foam::ODESolver> Foam::ODESolver::New
+(
+    const ODESystem& odes,
+    const dictionary& dict
+)
 {
-    // nEqns = number of species - 1(inert) + temperature + pressure
-    return this->nSpecie_ + 1;
+    word ODESolverTypeName(dict.lookup("solver"));
+    Info<< "Selecting ODE solver " << ODESolverTypeName << endl;
+
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(ODESolverTypeName);
+
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalErrorInFunction
+            << "Unknown ODESolver type "
+            << ODESolverTypeName << nl << nl
+            << "Valid ODESolvers are : " << endl
+            << dictionaryConstructorTablePtr_->sortedToc()
+            << exit(FatalError);
+    }
+
+    return autoPtr<ODESolver>(cstrIter()(odes, dict));
 }
 
 

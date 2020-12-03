@@ -110,6 +110,10 @@ private:
         //- Update the reaction rates from a list of solutions
         scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
 
+        //- Return the main chemistry variable
+        //  (concentration for standard, mass fraction for pyJac)
+        virtual scalarField getVariable(const scalarField& concentration, const scalarField& massFraction);
+
         //- Solve the reaction system for the given time step
         //  of given type and return the characteristic time
         template<class DeltaTType>

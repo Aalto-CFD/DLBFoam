@@ -25,17 +25,44 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "volFields.H"
-#include "zeroGradientFvPatchFields.H"
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class ReactionThermo, class ThermoType>
-inline Foam::label
-Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::nEqns() const
+
+inline Foam::label Foam::ODESolver::nEqns() const
 {
-    // nEqns = number of species - 1(inert) + temperature + pressure
-    return this->nSpecie_ + 1;
+    return n_;
+}
+
+
+inline Foam::scalarField& Foam::ODESolver::absTol()
+{
+    return absTol_;
+}
+
+
+inline Foam::scalarField& Foam::ODESolver::relTol()
+{
+    return relTol_;
+}
+
+
+template<class Type>
+inline void Foam::ODESolver::resizeField(UList<Type>& f, const label n)
+{
+    f.shallowCopy(UList<Type>(f.begin(), n));
+}
+
+
+template<class Type>
+inline void Foam::ODESolver::resizeField(UList<Type>& f) const
+{
+    resizeField(f, n_);
+}
+
+
+inline void Foam::ODESolver::resizeMatrix(scalarSquareMatrix& m) const
+{
+    m.shallowResize(n_);
 }
 
 

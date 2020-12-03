@@ -112,7 +112,7 @@ namespace Foam
 
     forCommonGases(makeChemistrySolversPyjac, ode_pyJac, psiReactionThermo);
     forCommonGases(makeChemistrySolversPyjac, ode_pyJac, rhoReactionThermo);
-/*
+
     //liquids
     forCommonLiquids(defineChemistrySolversPyjac, rhoReactionThermo);
     forCommonLiquids(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
@@ -120,7 +120,7 @@ namespace Foam
     //polynomials
     forPolynomials(defineChemistrySolversPyjac, rhoReactionThermo);
     forPolynomials(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
-*/
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -1,12 +1,14 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
-     \\/     M anipulation  |
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+   \\    /   O peration     | for fast reactive simulations
+    \\  /    A nd           | 
+     \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of DLBFoam library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/DLBFoam
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -52,19 +54,21 @@ template <class ReactionThermo, class ThermoType>
 void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
     const scalar t, const scalarField& c, const label li, scalarField& dcdt, scalarSquareMatrix& J)
     const {
+
     std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
     std::vector<scalar> jac(this->nSpecie_ * this->nSpecie_, 0.0);
 
-    J                 = Zero;
-    dcdt              = Zero;
-    const scalar T    = c[0];
-    const scalar p    = c[this->nSpecie_];
-    scalar       csum = 0.0;
+    J = Zero;
+    dcdt = Zero;
+    const scalar T = c[0];
+    const scalar p = c[this->nSpecie_];
+    scalar csum = 0.0;
 
     for (label i = 0; i < this->nSpecie_ - 1; i++) {
         this->c_[i] = max(c[i + 1], 0);
         csum += this->c_[i];
     }
+
     this->c_[this->nSpecie_ - 1] = 1.0 - csum; // The last specie
     yToPyJac[0]                  = T;
     // i=1->nSpecie are mass fractions
@@ -85,6 +89,7 @@ void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
         J[this->nSpecie_][j] = 0.0;
         J[j][this->nSpecie_] = 0.0;
     }
+
 }
 
 template <class ReactionThermo, class ThermoType>
@@ -94,9 +99,9 @@ void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::derivatives(
     std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
     std::vector<scalar> dy(this->nSpecie_, 0.0);
 
-    const scalar T    = c[0];
-    const scalar p    = c[this->nSpecie_];
-    scalar       csum = 0.0;
+    const scalar T = c[0];
+    const scalar p = c[this->nSpecie_];
+    scalar csum = 0.0;
     for (label i = 0; i < this->nSpecie_ - 1; i++) {
         this->c_[i] = max(c[i + 1], 0.0);
         csum += this->c_[i];
@@ -141,25 +146,28 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::Qdot() const {
     return tQdot;
 }
 
+// TODO: Make this work for pyjac
 template <class ReactionThermo, class ThermoType>
-scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_c(
-    const scalar& rho, const label& i, const label& celli) const {
-
-    return (this->Y_[i][celli]);
+void Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
+(
+    const ChemistrySolution& solution, const label& i
+)
+{
+    for(label j = 0; j < this->nSpecie_; j++)
+    {
+        this->RR_[j][i] = solution.c_increment[j] * solution.rhoi;
+    }
+    this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }
 
 template <class ReactionThermo, class ThermoType>
-scalar pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::compute_RR(
-    const label& j, const ChemistrySolution& solution) const {
-
-    return (solution.rhoi * solution.c_increment[j]);
+Foam::scalarField Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::getVariable
+(
+    const scalarField& concentration, const scalarField& massFraction
+)
+{
+    return massFraction;
 }
 
-template <class ReactionThermo, class ThermoType>
-scalarField pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::get_mass_fraction(
-    const ChemistryProblem& problem) const {
-
-    return problem.c;
-}
 
 } // namespace Foam

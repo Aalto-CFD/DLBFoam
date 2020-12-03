@@ -1,0 +1,15 @@
+EXE_INC = \
+    -DMKL_ILP64 \
+    -I${MKLROOT}/include \
+    -I${MKLROOT}/include/mic/ilp64 \
+    -I${MKLROOT}/include/mic/lp64
+
+LIB_LIBS = \
+    -L${MKLROOT}/lib/intel64 \
+    -Wl,--no-as-needed \
+    -lmkl_intel_ilp64 \
+    -lmkl_sequential \
+    -lmkl_core \
+    -lpthread \
+    -lm \
+    -ldl

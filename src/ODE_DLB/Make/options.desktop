@@ -1,0 +1,7 @@
+EXE_INC = \
+    -I/usr/include \
+    -DDEBUG=0 
+LIB_LIBS = \
+       -L/usr/lib -llapack -lblas -llapacke \
+       -L/usr/lib/x86_64-linux-gnu/
+

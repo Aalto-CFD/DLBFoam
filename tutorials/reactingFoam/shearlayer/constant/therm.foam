@@ -1,7 +1,6 @@
 species
 54
 (
-N2
 AR
 H
 O
@@ -55,6 +54,7 @@ C12H25O2
 C12OOH
 O2C12H24OOH
 OC12H23OOH
+N2
 )
 ;
 

@@ -1,12 +1,14 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
-     \\/     M anipulation  |
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+   \\    /   O peration     | for fast reactive simulations
+    \\  /    A nd           | 
+     \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of DLBFoam library, derived from OpenFOAM.
+
+    https://github.com/blttkgl/DLBFoam
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -25,12 +27,9 @@ Class
     Foam::pyJacLoadBalancedChemistryModel
 
 Description
-    Extends base chemistry model by adding a thermo package, and ODE functions.
-    Introduces chemistry equation system and evaluation of chemical source
-    terms.
+    Extends loadBalancedChemistryModel model by adding analytical Jacobian.
 
 SourceFiles
-    pyJacLoadBalancedChemistryModelI.H
     pyJacLoadBalancedChemistryModel.C
 
 \*---------------------------------------------------------------------------*/
@@ -105,32 +104,14 @@ private:
     ///
     scalarList sp_enth_form;
 
-    ///
-    ///@brief Compute c_ variable as mass fraction
-    ///
-    ///@param rho
-    ///@param i
-    ///@param celli
-    ///@return scalar
-    ///
-    scalar compute_c(const scalar& rho, const label& i, const label& celli) const;
+    //- Update the reaction rate of cell i
+    void
+    updateReactionRate(const ChemistrySolution& solution, const label& i);
+    
+    //- Return the main chemistry variable
+    //  (concentration for standard, mass fraction for pyJac)
+    scalarField getVariable(const scalarField& concentration, const scalarField& massFraction);
 
-    ///
-    ///@brief Compute reaction rate for mass fraction
-    ///
-    ///@param j
-    ///@param solution
-    ///@return scalar
-    ///
-    scalar compute_RR(const label& j, const ChemistrySolution& solution) const;
-
-    ///
-    ///@brief Get the mass fraction field for refmapping
-    ///
-    ///@param problem
-    ///@return scalarField
-    ///
-    scalarField get_mass_fraction(const ChemistryProblem& problem) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

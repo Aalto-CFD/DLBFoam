@@ -57,6 +57,7 @@ functions
 libs
 (
         "libchemistryModel_DLB.so" 
+        "libODE_pex.so"
 );
 
 
