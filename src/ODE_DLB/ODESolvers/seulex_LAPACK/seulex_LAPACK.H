@@ -55,8 +55,7 @@ SourceFiles
 #include "mkl_lapack.h"
 #define lapack_int long long int
 #else
-//#include "lapack.h" //Change to this after Sisu is decomissioned
-//#include "lapacke.h" // note that OF wmake compiler complains "could not found.." but the the later gcc command works as intended.
+#include "lapacke.h"
 #define lapack_int int
 #endif
 
