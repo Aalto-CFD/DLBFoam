@@ -4,7 +4,9 @@ cd ${0%/*} || exit 1    # Run from this directory
 
 cd src/thermophysicalModels/chemistryModel
 wmake libso
-cd ../../../
+cd ../../ODE_DLB
+wmake libso
+cd ../../
 
 cd ./unittests
 wmake

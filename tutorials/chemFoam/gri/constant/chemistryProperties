@@ -17,8 +17,8 @@ FoamFile
 
 chemistryType
 {
-    solver          ode_pyJac;//ode_pyJac;
-    method          loadBalanced_pyJac;//loadBalanced_pyJac;
+    solver          ode_pyJac;
+    method          loadBalanced_pyJac;
 }
 
 chemistry       on;
@@ -33,13 +33,13 @@ EulerImplicitCoeffs
 
 odeCoeffs
 {
-    solver          seulex_LAPACK;//seulex_LAPACK;
-    absTol          1e-10;
-    relTol          1e-6;
+    solver          seulex_LAPACK;
+    absTol          1e-8;
+    relTol          1e-5;
 }
 
 loadbalancing{}
 refmapping{}
-#include "reactions"
 
+#include "reactions"
 // ************************************************************************* //

@@ -18,6 +18,4 @@ LIB_LIBS = \
     -lODE \
     -lfiniteVolume \
     -lmeshTools \
-    -lchemistryModel\
-    -L$(FOAM_USER_LIBBIN) \
-    -lc_pyjac    
+    -lchemistryModel

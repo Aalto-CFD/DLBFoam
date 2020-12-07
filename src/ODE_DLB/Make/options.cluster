@@ -1,8 +1,7 @@
 EXE_INC = \
     -DMKL_ILP64 \
-    -I${MKLROOT}/include \
-    -I${MKLROOT}/include/mic/ilp64 \
-    -I${MKLROOT}/include/mic/lp64
+    -m64 \
+    -I${MKLROOT}/include
 
 LIB_LIBS = \
     -L${MKLROOT}/lib/intel64 \

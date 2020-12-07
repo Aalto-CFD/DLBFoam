@@ -29,7 +29,7 @@ refmapping
         {
             NC12H26           1;
         }
-        #include        "$FOAM_CASE/constant/specieElements_Yao.foam"
+        #include        "$FOAM_CASE/constant/foam_mech_files/thermo.foam"
     }
     tolerance       0.0001;
 }
@@ -41,13 +41,13 @@ loadbalancing
 }
 chemistryType
 {
-    solver          ode;
-    method          loadBalanced;
+    solver          ode_pyJac;
+    method          loadBalanced_pyJac;
 }
 
 chemistry       on;
 
-initialChemicalTimeStep 1e-08;
+initialChemicalTimeStep 1;
 
 odeCoeffs
 {
@@ -56,7 +56,6 @@ odeCoeffs
     relTol          1e-05;
 }
 
-#include        "reactionsYao"
-
+#include "reactionsYao"
 
 // ************************************************************************* //

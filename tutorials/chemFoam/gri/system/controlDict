@@ -56,6 +56,7 @@ libs
 (
         "libchemistryModel_DLB.so"
         "libODE_DLB.so"
+        "$FOAM_CASE/constant/foam_mech_files/libc_pyjac.so"
 );
 
 // ************************************************************************* //

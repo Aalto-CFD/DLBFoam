@@ -26,6 +26,6 @@ thermoType
     specie          specie;
 }
 
-#include "speciesThermo"
+#include "$FOAM_CASE/constant/foam_mech_files/thermo.foam"
 
 // ************************************************************************* //
