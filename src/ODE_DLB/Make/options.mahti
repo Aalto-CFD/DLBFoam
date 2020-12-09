@@ -1,0 +1,7 @@
+EXE_INC = \
+    -I${OPENBLAS_INSTALL_ROOT}/include \
+    -DDEBUG=0
+LIB_LIBS = \
+       -L${OPENBLAS_INSTALL_ROOT} -lopenblas
+
+

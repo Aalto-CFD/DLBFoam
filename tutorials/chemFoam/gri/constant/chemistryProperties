@@ -41,5 +41,6 @@ odeCoeffs
 loadbalancing{}
 refmapping{}
 
-#include "reactions"
+reactions
+{}
 // ************************************************************************* //

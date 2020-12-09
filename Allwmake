@@ -1,7 +1,52 @@
-#!/bin/sh
-cd ${0%/*} || exit 1    # Run from this directory
+#!/bin/bash
+cd ${0%/*} || exit 1    # run from this directory
+
+PLATFORM=NOT_DEFINED #PUHTI / DESKTOP / TAITO
+CLEAN_ALL=false
+COMPARE_DEV=false
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case $key in
+        --clean)
+        CLEAN_ALL=true
+        shift # past argument
+        ;;
+        --platform)
+        PLATFORM="$2"
+        shift # past argument
+        shift # past value
+        ;;
+        *) 
+        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/DESKTOP/TAITO --compare-dev" 
+        exit 1 
+        ;;    
+    esac
+
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+if [ $PLATFORM == PUHTI ]; then
+    module load intel-mkl
+    cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
+elif [ $PLATFORM == MAHTI ]; then
+    module load  openblas
+    cp  src/ODE_DLB/Make/options.mahti src/ODE_DLB/Make/options
+elif [ $PLATFORM == DESKTOP ]; then
+    cp  src/ODE_DLB/Make/options.desktop src/ODE_DLB/Make/options
+else
+    echo Error: Correct platform syntax ./Allwmake --platform  DESKTOP/PUHTI/MAHTI
+    exit 1
+fi
+
+if [ $CLEAN_ALL == true ]; then
+    ./Allwclean
+fi
 
 
+cp -r pyJac $WM_PROJECT_USER_DIR/
 cd src/thermophysicalModels/chemistryModel
 wmake libso
 cd ../../ODE_DLB

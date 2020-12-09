@@ -51,11 +51,10 @@ initialChemicalTimeStep 1;
 
 odeCoeffs
 {
-    solver          seulex;
+    solver          seulex_LAPACK;
     absTol          1e-08;
     relTol          1e-05;
 }
 
-#include "reactionsYao"
-
+reactions{}
 // ************************************************************************* //
