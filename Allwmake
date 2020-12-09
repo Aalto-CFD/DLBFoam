@@ -29,6 +29,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if [ $PLATFORM == PUHTI ]; then
+    . /appl/soft/eng/OpenFOAM/OpenFOAM-8_intelmpi/etc/bashrc
     module load intel-mkl
     cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
 elif [ $PLATFORM == MAHTI ]; then
