@@ -28,11 +28,16 @@ do
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
+if [ $CLEAN_ALL == true ]; then
+    ./Allwclean
+fi
+
 if [ $PLATFORM == PUHTI ]; then
     . /appl/soft/eng/OpenFOAM/OpenFOAM-8_intelmpi/etc/bashrc
     module load intel-mkl
     cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
 elif [ $PLATFORM == MAHTI ]; then
+    . /appl/soft/eng/OpenFOAM/OpenFOAM-8/etc/bashrc
     module load  openblas
     cp  src/ODE_DLB/Make/options.mahti src/ODE_DLB/Make/options
 elif [ $PLATFORM == DESKTOP ]; then
@@ -40,10 +45,6 @@ elif [ $PLATFORM == DESKTOP ]; then
 else
     echo Error: Correct platform syntax ./Allwmake --platform  DESKTOP/PUHTI/MAHTI
     exit 1
-fi
-
-if [ $CLEAN_ALL == true ]; then
-    ./Allwclean
 fi
 
 
