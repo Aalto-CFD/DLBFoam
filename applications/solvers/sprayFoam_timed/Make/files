@@ -1,0 +1,3 @@
+sprayFoam_timed.C
+
+EXE = $(FOAM_USER_APPBIN)/sprayFoam_timed
