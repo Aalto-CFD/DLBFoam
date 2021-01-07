@@ -1,0 +1,20 @@
+#!/bin/bash
+
+while getopts m: flag
+do
+    case "${flag}" in
+        m) mechname=${OPTARG};;
+    esac
+done
+echo "COMPILED MECHANISM: $mechname";
+
+rm -rf out/ build/ fit_validation_figs/ foam_mech_files/
+
+mkdir foam_mech_files
+python -m pyjac --lang c --last_species N2 --input mechanisms/$mechname/chem.cti
+#./runCmake.sh
+#mv build/libc_pyjac.so foam_mech_files/
+./makeMechFileForOF.sh
+python3 thermoFitter/fit_thermoProps.py --mechanism $mechname
+
+#rm -rf out/ build/ fit_validation_figs/
