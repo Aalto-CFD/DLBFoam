@@ -14,12 +14,7 @@ to minimize the load imbalance between ranks and gain speed-up. The implementati
 details can be found in our paper [[1]](#1).
 
 
-
-<p align="center">
-    <img src="rankbased_solve.png" alt="drawing" width="600"/>
-    <br>
-    <em>Figure: A demonstration of how load balancing model works compared to standard model.</em>
-</p>
+![crab pet](https://i.imgur.com/yYVBgHV.gif)
 
 
 ## Compilation
