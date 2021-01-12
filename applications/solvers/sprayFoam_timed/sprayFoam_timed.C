@@ -146,12 +146,12 @@ int main(int argc, char *argv[])
             #include "UEqn.H"
             UEqnTime.stop();
 
-            YEqnTime.start();
             #include "YEqn.H"
-            YEqnTime.stop();           
+
             EEqnTime.start();
             #include "EEqn.H"
             EEqnTime.stop();
+
             pEqnTime.start();
             // --- Pressure corrector loop
             while (pimple.correct())
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
                 thermophysicalTransport->correct();
             }
         }
-        pimpleTime.stop();//Added code
+        pimpleTime.stop();
 
         rho = thermo.rho();
 
@@ -183,6 +183,7 @@ int main(int argc, char *argv[])
         <<"\n\t\tp Equation Time (%/second): " << pEqnTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< pEqnTime.getTotalTime()
         <<"\n\t\tE Equation Time (%/second): " << EEqnTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< EEqnTime.getTotalTime()
         <<"\n\t\tY Equation Time (%/second): " << YEqnTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< YEqnTime.getTotalTime()
+         <<"\n\t\tChemistry Time (%/second): " << chemistryTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< chemistryTime.getTotalTime()
     <<endl;
     }
 
