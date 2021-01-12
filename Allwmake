@@ -3,7 +3,6 @@ cd ${0%/*} || exit 1    # run from this directory
 
 PLATFORM=NOT_DEFINED #PUHTI / DESKTOP / TAITO
 CLEAN_ALL=false
-COMPARE_DEV=false
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -20,7 +19,7 @@ do
         shift # past value
         ;;
         *) 
-        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/DESKTOP/TAITO --compare-dev" 
+        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/MAHTI/DESKTOP" 
         exit 1 
         ;;    
     esac
@@ -58,3 +57,7 @@ cd ../../
 cd ./unittests
 wmake
 ./test.sh
+cd ../
+
+cd applications/
+./Allwmake --clean
