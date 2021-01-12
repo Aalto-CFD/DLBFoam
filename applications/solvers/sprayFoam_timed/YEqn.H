@@ -10,7 +10,11 @@ tmp<fv::convectionScheme<scalar>> mvConvection
 );
 
 {
+    chemistryTime.start();
     combustion->correct();
+    chemistryTime.stop();  
+
+    YEqnTime.start();     
     volScalarField Yt(0.0*Y[0]);
 
     forAll(Y, i)
@@ -45,4 +49,6 @@ tmp<fv::convectionScheme<scalar>> mvConvection
 
     Y[inertIndex] = scalar(1) - Yt;
     Y[inertIndex].max(0.0);
+    YEqnTime.stop(); 
+
 }

@@ -95,37 +95,33 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         #include "rhoEqn.H"
-        pimpleTime.start();//Added code
+        pimpleTime.start();
         while (pimple.loop())
         {
-            UEqnTime.start();//Added code
+            UEqnTime.start();
             #include "UEqn.H"
-            UEqnTime.stop();//Added code
+            UEqnTime.stop();
 
-            YEqnTime.start();
             #include "YEqn.H"
-            YEqnTime.stop();
 
-
-            EEqnTime.start();//Added code
+            EEqnTime.start();
             #include "EEqn.H"
-            EEqnTime.stop();//Added code
+            EEqnTime.stop();
 
-            pEqnTime.start();//Added code
+            pEqnTime.start();
             // --- Pressure corrector loop
             while (pimple.correct())
             {
                 #include "pEqn.H"
             }
-            pEqnTime.stop();//Added code
+            pEqnTime.stop();
             if (pimple.turbCorr())
             {
                 turbulence->correct();
                 thermophysicalTransport->correct();
             }
         }
-        pimpleTime.stop();//Added code
-
+        pimpleTime.stop();
         rho = thermo.rho();
 
         runTime.write();
@@ -140,6 +136,7 @@ int main(int argc, char *argv[])
         <<"\n\t\tp Equation Time (%/second): " << pEqnTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< pEqnTime.getTotalTime()
         <<"\n\t\tE Equation Time (%/second): " << EEqnTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< EEqnTime.getTotalTime()
         <<"\n\t\tY Equation Time (%/second): " << YEqnTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< YEqnTime.getTotalTime()
+        <<"\n\t\tChemistry Time (%/second): " << chemistryTime.getTotalTime()/runTime.elapsedCpuTime()*100.0<<"\t\t"<< chemistryTime.getTotalTime()
     <<endl;
     }
         
