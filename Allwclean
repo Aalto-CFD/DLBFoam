@@ -7,3 +7,5 @@ rm -rf $FOAM_USER_LIBBIN/libODE_DLB.so
 
 wclean all
 
+cd ../
+./applications/Allwclean

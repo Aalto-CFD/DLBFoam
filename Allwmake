@@ -31,6 +31,11 @@ if [ $CLEAN_ALL == true ]; then
     ./Allwclean
 fi
 
+# First compile pyJac
+cd pyJac
+./runCmake.sh
+cd ../
+
 if [ $PLATFORM == PUHTI ]; then
     . /appl/soft/eng/OpenFOAM/OpenFOAM-8_intelmpi/etc/bashrc
     module load intel-mkl
@@ -48,6 +53,7 @@ fi
 
 
 cp -r pyJac $WM_PROJECT_USER_DIR/
+cp -r pyJac/build/libc_pyjac.so $FOAM_USER_LIBBIN
 cd src/thermophysicalModels/chemistryModel
 wmake libso
 cd ../../ODE_DLB
@@ -60,4 +66,4 @@ wmake
 cd ../
 
 cd applications/
-./Allwmake --clean
+./Allwmake
