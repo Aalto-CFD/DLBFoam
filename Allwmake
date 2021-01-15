@@ -27,10 +27,6 @@ do
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [ $CLEAN_ALL == true ]; then
-    ./Allwclean
-fi
-
 if [ $PLATFORM == PUHTI ]; then
     . /appl/soft/eng/OpenFOAM/OpenFOAM-8_intelmpi/etc/bashrc
     module load intel-mkl
@@ -46,6 +42,10 @@ elif [ $PLATFORM == DESKTOP ]; then
 else
     echo Error: Correct platform syntax ./Allwmake --platform  DESKTOP/PUHTI/MAHTI
     exit 1
+fi
+
+if [ $CLEAN_ALL == true ]; then
+    ./Allwclean
 fi
 
 # First compile pyJac
