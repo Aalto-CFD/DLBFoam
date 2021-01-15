@@ -27,22 +27,15 @@ do
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [ $CLEAN_ALL == true ]; then
-    ./Allwclean
-fi
-
-# First compile pyJac
-cd pyJac
-./runCmake.sh
-cd ../
-
 if [ $PLATFORM == PUHTI ]; then
     . /appl/soft/eng/OpenFOAM/OpenFOAM-8_intelmpi/etc/bashrc
     module load intel-mkl
+    module load cmake
     cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
 elif [ $PLATFORM == MAHTI ]; then
     . /appl/soft/eng/OpenFOAM/OpenFOAM-8/etc/bashrc
     module load  openblas
+    module load cmake
     cp  src/ODE_DLB/Make/options.mahti src/ODE_DLB/Make/options
 elif [ $PLATFORM == DESKTOP ]; then
     cp  src/ODE_DLB/Make/options.desktop src/ODE_DLB/Make/options
@@ -51,6 +44,14 @@ else
     exit 1
 fi
 
+if [ $CLEAN_ALL == true ]; then
+    ./Allwclean
+fi
+
+# First compile pyJac
+cd pyJac
+./runCmake.sh
+cd ../
 
 cp -r pyJac $WM_PROJECT_USER_DIR/
 cp -r pyJac/build/libc_pyjac.so $FOAM_USER_LIBBIN
