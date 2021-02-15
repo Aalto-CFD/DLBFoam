@@ -5,7 +5,8 @@ unittests/Make/linux64*
 src/ODE_DLB/Make/options
 src/**/*/lnInclude
 src/**/*/Make/linux64*
-
+utilities/mechGenerator/thermoFitter/__pycache__*
+utilities/mechGenerator/foam_mech_files/
 applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
 tutorials/
