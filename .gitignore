@@ -1,6 +1,7 @@
 # OpenFOAM related:
 src/**/lnInclude
 src/**/Make/linux64*
+unittests/Make/linux64*
 src/ODE_DLB/Make/options
 src/**/*/lnInclude
 src/**/*/Make/linux64*

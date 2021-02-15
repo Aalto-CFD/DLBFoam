@@ -1,7 +1,0 @@
-#!/bin/sh
-cd ${0%/*} || exit 1    # Run from this directory
-rm -rf ../constant/foam_mech_files
-rm -rf pyJac
-rm -rf create_OF_mechanism/fit_validation_figs
-rm -rf create_OF_mechanism/foam_mech_files
-#------------------------------------------------------------------------------

@@ -4,8 +4,11 @@ cd ${0%/*} || exit 1    # Run from this directory
 cd src/
 rm -rf $FOAM_USER_LIBBIN/libchemistryModel_DLB.so
 rm -rf $FOAM_USER_LIBBIN/libODE_DLB.so
+rm -rf $FOAM_USER_LIBBIN/libc_pyjac.so
 
 wclean all
 
 cd ../
+wclean unittests/
 ./applications/Allwclean
+
