@@ -1,13 +1,17 @@
 # OpenFOAM related:
 src/**/lnInclude
 src/**/Make/linux64*
-
+src/ODE_DLB/Make/options
 src/**/*/lnInclude
 src/**/*/Make/linux64*
 
 applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
 tutorials/
+
+# pyJac related
+pyJac/build/
+
 #Visual studio code configs
 .vscode
 
