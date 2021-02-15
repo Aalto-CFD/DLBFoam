@@ -43,6 +43,22 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::pyJacLoadBalancedCh
         eval_h(298.15, sp_enth_form_.data());
         for (label i = 0; i < this->nSpecie_; i++) { sp_enth_form[i] = sp_enth_form_[i]; }
     }
+
+    if (this->nSpecie_ == PYJAC_NSP())
+    {
+        Info<<"Mechanism information:\n"<<"Number of species: "<<PYJAC_NSP()<<"\n"
+        <<"Number of reactions: "<<PYJAC_FWD_RATES()<<endl;
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "pyJacLoadBalancedChemistryModel::New"
+        )   << "Mismatch between mechanism size in chem.foam = " << this->nSpecie_ << " and pyJac = " << PYJAC_NSP() 
+            << exit(FatalError);
+
+    }
+
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
