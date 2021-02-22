@@ -9,5 +9,6 @@ void eval_h (const double, double * __restrict__);
 void eval_u (const double, double * __restrict__);
 void eval_cv (const double, double * __restrict__);
 void eval_cp (const double, double * __restrict__);
-
+int PYJAC_NSP();
+int PYJAC_FWD_RATES();
 #endif

@@ -21,17 +21,17 @@ startFrom       latestTime;
 
 startTime       0;
 
-stopAt          nextWrite;
+stopAt          endTime;
 
-endTime         1;
+endTime         1000;
 
 deltaT          1e-7;
 
 writeControl    timeStep;//adjustableRunTime;
 
-writeInterval   1000;
+writeInterval   50;
 
-purgeWrite      10;
+purgeWrite      0;
 
 writeFormat     binary;
 
@@ -47,7 +47,7 @@ runTimeModifiable true;
 
 adjustTimeStep  yes;
 
-maxCo     0.7;
+maxCo     1.2;
 
 functions
 {

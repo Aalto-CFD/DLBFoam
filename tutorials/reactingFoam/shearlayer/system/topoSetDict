@@ -10,38 +10,22 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "constant";
-    object      chemistryProperties;
+    object      topoSetDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-chemistryType
-{
-    solver          ode_pyJac;
-    method          loadBalanced_pyJac;
-}
-
-chemistry       on;
-
-initialChemicalTimeStep 1e-7;
-
-EulerImplicitCoeffs
-{
-    cTauChem        1;
-    equilibriumRateLimiter off;
-}
-
-odeCoeffs
-{
-    solver          seulex_LAPACK;
-    absTol          1e-8;
-    relTol          1e-5;
-}
-
-loadbalancing{}
-refmapping{}
-
-reactions
-{}
+actions
+(
+    {
+        name    c0;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        sourceInfo
+        {
+            box (0 0.003 0) (0.008 0.005 8e-5); // Edit box bounds as required
+        }
+    }
+);
 
 // ************************************************************************* //

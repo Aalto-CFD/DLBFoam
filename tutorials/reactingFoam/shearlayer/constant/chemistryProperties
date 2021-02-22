@@ -55,6 +55,5 @@ odeCoeffs
     absTol          1e-08;
     relTol          1e-05;
 }
-
-reactions{}
+#include "$FOAM_CASE/constant/reactionsYao"
 // ************************************************************************* //
