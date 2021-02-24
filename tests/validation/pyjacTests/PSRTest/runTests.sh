@@ -8,7 +8,7 @@ echo
 echo -e "${YELLOW}Validate pyJac chemistry module against reference data on perfectly stirred reactor:${DARKGRAY}"
 echo
 
-./PSRTest -case testCase
+./PSRTest.bin -case testCase
 
 if [ $? -eq 0 ]; then
     echo
@@ -25,7 +25,7 @@ echo
 echo -e "${YELLOW}Test error control on mechanism consistency in pyjacLoadBalancedChemistryModel:${DARKGRAY}"
 cp testCase/constant/thermophysicalProperties testCase/constant/thermophysicalProperties.orig
 cp testCase/constant/thermophysicalProperties.illdefined testCase/constant/thermophysicalProperties
-./PSRTest -case testCase > /dev/null 2>&1
+./PSRTest.bin -case testCase > /dev/null 2>&1
 if [ $? -eq 1 ]; then
     echo -e "${GREEN}PASSED.${NC}"
 else
