@@ -1,0 +1,7 @@
+SOURCE = \
+test.C \
+helpers.C \
+testAlgorithms.C \
+testChemistryLoad.C \
+testLoadBalancerBase.C \
+testLoadBalancer.C 

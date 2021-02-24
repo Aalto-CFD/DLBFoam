@@ -1,0 +1,24 @@
+- Fix Allwclean
+
+- remove 0dtest
+
+- make pyjac2foam such that it provides single dir with everything:
+    - print out example include format for openfoam
+
+- remove unnecessary dependencies from applications/solvers.
+
+- add etc/controlDict example and perhaps shipped mechanisms
+
+- Fix the pyjac compilation optimization everywehere to Ofast and march.
+
+- Add explanation of possible linking error in README
+chemFoam: symbol lookup error: /path/to/user/OpenFoam/linux64GccDPInt32Opt/lib/libchemistryModel_DLB.so: undefined symbol: eval_h
+
+- make a safety check of library linking as introduced in pyJacLoadBalancedChemistryModel.C constructor.
+
+- Make a safety check that CONP is defined and pyjac mechanism is generated in constant pressure mode. 
+
+- library run-time naming could be different "_pyjac" in everything too much?
+
+- Add cmake as a requirement in README -- could be avoided in a long run as well
+
