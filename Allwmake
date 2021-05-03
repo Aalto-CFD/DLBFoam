@@ -1,7 +1,7 @@
 #!/bin/bash
 cd ${0%/*} || exit 1    # run from this directory
 
-PLATFORM=NOT_DEFINED #PUHTI / DESKTOP / TAITO
+PLATFORM=NOT_DEFINED #PUHTI / DESKTOP / USERDEF
 CLEAN_ALL=false
 
 POSITIONAL=()
@@ -19,7 +19,7 @@ do
         shift # past value
         ;;
         *) 
-        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/MAHTI/DESKTOP" 
+        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/MAHTI/DESKTOP/USERDEF" 
         exit 1 
         ;;    
     esac
@@ -39,8 +39,11 @@ elif [ $PLATFORM == MAHTI ]; then
     cp  src/ODE_DLB/Make/options.mahti src/ODE_DLB/Make/options
 elif [ $PLATFORM == DESKTOP ]; then
     cp  src/ODE_DLB/Make/options.desktop src/ODE_DLB/Make/options
+elif [ $PLATFORM == USERDEF ]; then
+    cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
+    module load cmake
 else
-    echo Error: Correct platform syntax ./Allwmake --platform  DESKTOP/PUHTI/MAHTI
+    echo Error: Correct platform syntax ./Allwmake --platform  DESKTOP/PUHTI/MAHTI/USERDEF
     exit 1
 fi
 
@@ -48,23 +51,24 @@ if [ $CLEAN_ALL == true ]; then
     ./Allwclean
 fi
 
-# First compile pyJac
-cd pyJac
-./runCmake.sh
-cd ../
 
-cp -r pyJac $WM_PROJECT_USER_DIR/
-cp -r pyJac/build/libc_pyjac.so $FOAM_USER_LIBBIN
-cd src/thermophysicalModels/chemistryModel
-wmake libso
-cd ../../ODE_DLB
-wmake libso
-cd ../../
+wmake libso src/thermophysicalModels/chemistryModel
+wmake libso src/ODE_DLB
 
-cd ./unittests
-wmake
-./test.sh
-cd ../
+pushd tests/validation/pyjacTests/pyjacTestMechanism  > /dev/null
+    ./runCmake.sh
+popd  > /dev/null
 
-cd applications/
-./Allwmake
+wmake tests/unittests
+
+wmake tests/validation/pyjacTests/PSRTest
+
+pushd tests/unittests  > /dev/null
+    ./test.sh
+popd  > /dev/null
+
+pushd tests/validation/pyjacTests/PSRTest  > /dev/null
+    ./runTests.sh
+popd  > /dev/null
+
+./applications/Allwmake

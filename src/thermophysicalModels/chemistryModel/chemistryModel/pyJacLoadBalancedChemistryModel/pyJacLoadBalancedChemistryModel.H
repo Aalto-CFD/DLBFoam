@@ -42,9 +42,9 @@ SourceFiles
 
 // pyJac dependencies
 extern "C" {
-#include "chem_utils.h"
-#include "dydt.h"
-#include "jacob.h"
+    #include "pyJacInclude/chem_utils.h"
+    #include "pyJacInclude/dydt.h"
+    #include "pyJacInclude/jacob.h"
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -81,7 +81,6 @@ public:
     inline virtual label nEqns() const;
 
     //- Override jacobian and derivatives function from StandardChemistryModel
-
     virtual void jacobian(const scalar        t,
                           const scalarField&  c,
                           const label         li,
@@ -94,7 +93,6 @@ public:
                              scalarField&       dcdt) const override;
 
     //- Override Qdot function from StandardChemistryModel for using pyJac's enthalpy of formation
-
     virtual tmp<volScalarField> Qdot() const override;
 
 private:

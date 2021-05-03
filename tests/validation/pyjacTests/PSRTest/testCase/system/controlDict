@@ -1,0 +1,64 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  8
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     PSRTest;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.07;
+
+deltaT          0.07;
+
+maxDeltaT       0.07;
+
+minDeltaT       1e-30;
+
+adjustTimeStep  off;
+
+writeControl    runTime;
+
+writeInterval   100;
+
+purgeWrite      0;
+
+writeFormat     binary;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   12;
+
+runTimeModifiable no;
+
+DebugSwitches
+{
+    SolverPerformance   0;
+}
+
+libs
+(
+        "libchemistryModel_DLB.so"
+        "libODE_DLB.so"
+        "$FOAM_USER_LIBBIN/unittests/pyjacTestMech/build/libc_pyjac_test.so"
+);
+
+
