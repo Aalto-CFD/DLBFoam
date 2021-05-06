@@ -190,7 +190,10 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
         
     if(balancer_.log())
     {
-        balancer_.printState();
+        if(balancer_.active())
+        {
+            balancer_.printState();
+        }
         cpuSolveFile_() << setw(22)
                         << this->time().timeOutputValue()<<tab
                         << setw(22) << t_getProblems<<tab
