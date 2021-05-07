@@ -1,0 +1,18 @@
+#!/bin/bash
+
+while getopts m: flag
+do
+    case "${flag}" in
+        m) mechname=${OPTARG};;
+    esac
+done
+echo "COMPILED MECHANISM: $mechname";
+
+
+[[ -d foam_mech ]] && rm -r foam_mech
+mkdir foam_mech
+cp -r mechanisms/$mechname/*.foam foam_mech
+cp -r mechanisms/$mechname/out .
+./runCmake.sh
+mv build/libc_pyjac.so foam_mech
+rm -rf build out

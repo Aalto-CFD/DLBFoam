@@ -29,14 +29,14 @@ refmapping
         {
             NC12H26           1;
         }
-        #include        "$FOAM_CASE/constant/foam_mech_files/thermo.foam"
+        #include        "$FOAM_CASE/constant/foam_mech/thermo.foam"
     }
     tolerance       0.0001;
 }
 
 loadbalancing
 {
-	active	true;
+	active	false;
 	log	true;
 }
 chemistryType
