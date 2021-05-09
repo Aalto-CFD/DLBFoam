@@ -23,9 +23,3 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 if [ $CLEAN_ALL == true ]; then
     ./Allwclean
 fi
-
-cd solvers/
-wmake chemFoam_timed
-wmake reactingFoam_timed
-wmake sprayFoam_timed
-cd ../

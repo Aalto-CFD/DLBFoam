@@ -1,3 +1,0 @@
-chemFoam_timed.C
-
-EXE = $(FOAM_USER_APPBIN)/chemFoam_timed

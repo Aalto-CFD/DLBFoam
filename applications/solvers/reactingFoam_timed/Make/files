@@ -1,3 +1,0 @@
-reactingFoam_timed.C
-
-EXE = $(FOAM_USER_APPBIN)/reactingFoam_timed
