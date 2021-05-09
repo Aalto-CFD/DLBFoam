@@ -36,12 +36,12 @@ refmapping
 
 loadbalancing
 {
-	active	false;
+	active	true;
 	log	true;
 }
 chemistryType
 {
-    solver          ode_pyJac;
+    solver          ode_LAPACK;
     method          loadBalanced_pyJac;
 }
 
