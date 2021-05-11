@@ -44,9 +44,9 @@ DLBFoam requires LAPACK packages for improved ODE routines (LAPACKE C interface 
     ```
     module load intel-mkl
     ```
-    make sure that the MKLROOT bash variable is defined by typing ```echo $MKLROOT``` to your terminal. This option is the fastest option for Intel processors due to optimization of MKL with Intel hardware.
+    make sure that the ```MKLROOT``` bash variable is defined by typing ```echo $MKLROOT``` to your terminal. This option is the fastest option for Intel processors due to optimization of MKL with Intel hardware.
 
-- **OpenBLAS**: Install/load [OpenBLAS](https://www.openblas.net/). It may be available on your cluster as a module, similar to Intel-MKL. Make sure that the OPENBLAS_INSTALL_ROOT bash variable is defined by typing ```echo $OPENBLAS_INSTALL_ROOT```, and define it in your ```bashrc``` if it is not.
+- **OpenBLAS**: Install/load [OpenBLAS](https://www.openblas.net/). It may be available on your cluster as a module, similar to Intel-MKL. Make sure that the ```OPENBLAS_INSTALL_ROOT``` bash variable is defined by typing ```echo $OPENBLAS_INSTALL_ROOT```, and define it in your ```bashrc``` if it is not.
 
 - **Standalone**: A standalone installation may be a good idea if you are on your personal workstation and not on a cluster. Install LAPACKE-dev libraries by:
 
