@@ -1,6 +1,14 @@
 #include "header.h"
 #include "chem_utils.h"
 
+int PYJAC_NSP()
+{
+    return NSP;
+}
+int PYJAC_FWD_RATES()
+{
+    return FWD_RATES;
+}
 void eval_conc (const double T, const double pres, const double * __restrict__ y, double * __restrict__ y_N, double * __restrict__ mw_avg, double * __restrict__ rho, double * __restrict__ conc) {
 
   // mass fraction of final species

@@ -2,6 +2,8 @@
 #define CHEM_UTILS_HEAD
 
 #include "header.h"
+int PYJAC_NSP();
+int PYJAC_FWD_RATES();
 
 void eval_conc (const double, const double, const double * __restrict__, double * __restrict__, double * __restrict__, double * __restrict__, double * __restrict__);
 void eval_conc_rho (const double, const double, const double * __restrict__, double * __restrict__, double * __restrict__, double * __restrict__, double * __restrict__);
