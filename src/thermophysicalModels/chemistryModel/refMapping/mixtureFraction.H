@@ -85,7 +85,6 @@ SourceFiles
 #include "Switch.H"
 #include "runTimeSelectionTables.H"
 #include "scalarField.H"
-#include "ChemistryProblem.H"
 
 // Mixture fraction headers
 #include "atomicWeights.H"
