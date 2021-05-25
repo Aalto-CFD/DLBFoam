@@ -47,7 +47,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
                 IOobject::AUTO_WRITE
             ),
             this->mesh(),
-            scalar(0.0)
+            scalar(0),
+            "zeroGradient"
         ),
         refMap_
         (
@@ -60,7 +61,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
                 IOobject::AUTO_WRITE
             ),
             this->mesh(),
-            scalar(0.0)
+            scalar(0.0),
+            "zeroGradient"
         )
     {
         if(balancer_.log())
@@ -151,7 +153,7 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
 
     if(!this->chemistry_)
     {
-        return great;
+        return GREAT;
     }
 
     timer.timeIncrement();
@@ -221,7 +223,7 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveSingle
 
 
     // Calculate the chemical source terms
-    while(timeLeft > small)
+    while(timeLeft > SMALL)
     {
         scalar dt = timeLeft;
         this->solve(
@@ -252,7 +254,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
     const RecvBuffer<ChemistrySolution>& solutions
 )
 {
-    scalar deltaTMin = great;
+    scalar deltaTMin = GREAT;
 
     for(const auto& array : solutions)
     {

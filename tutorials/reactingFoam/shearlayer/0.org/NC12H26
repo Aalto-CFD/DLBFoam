@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField  #codeStream
+internalField nonuniform  #codeStream
 {
 
     code
@@ -47,7 +47,7 @@ internalField  #codeStream
             
         }
         
-        writeEntry(os,"",NC12H26); 
+        os.writeEntry("",NC12H26); 
     #};
 
     //! Optional:
