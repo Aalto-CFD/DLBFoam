@@ -5,4 +5,3 @@ rm -rf *.png
 rm -rf 0
 cp -r 0.org 0
 rm -rf dynamicCode 
-rm -rf loadBal

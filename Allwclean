@@ -1,17 +1,7 @@
 #!/bin/sh
 cd ${0%/*} || exit 1    # Run from this directory
 
+cd src/thermophysicalModels/chemistryModel
 rm -rf $FOAM_USER_LIBBIN/libchemistryModel_DLB.so
-rm -rf $FOAM_USER_LIBBIN/libODE_DLB.so
-unlink $FOAM_USER_LIBBIN/libc_pyjac_test.so
-rm -rf $FOAM_USER_LIBBIN/unittests/pyjacTestMech/build
-
-cd src/
-wclean all
-cd ../
-
-wclean tests/unittests
-wclean tests/validation/pyjacTests/PSRTest
-
-./applications/Allwclean
+wclean
 

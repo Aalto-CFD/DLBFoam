@@ -1,78 +1,11 @@
-#!/bin/bash
-cd ${0%/*} || exit 1    # run from this directory
-
-if [ -z ${WM_PROJECT_VERSION+x} ]; then 
-    echo "OpenFOAM is not loaded!"
-    exit 1
-else
-    if [ $WM_PROJECT_VERSION -ne 8 ]; then
-        echo "Wrong OpenFOAM version!"
-        echo $WM_PROJECT_VERSION
-	exit 1
-    else
-        echo "Correct OpenFOAM installation! (version 8)"
-    fi
-fi
-
-PLATFORM=NOT_DEFINED
-CLEAN_ALL=false
-
-POSITIONAL=()
-while [[ $# -gt 0 ]]
-do
-    key="$1"
-    case $key in
-        --clean)
-        CLEAN_ALL=true
-        shift # past argument
-        ;;
-        --platform)
-        PLATFORM="$2"
-        shift # past argument
-        shift # past value
-        ;;
-        *) 
-        echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE" 
-        exit 1 
-        ;;    
-    esac
-
-done
-set -- "${POSITIONAL[@]}" # restore positional parameters
-
-if [ $PLATFORM == MKL ]; then
-    cp  src/ODE_DLB/Make/options.mkl src/ODE_DLB/Make/options
-elif [ $PLATFORM == OPENBLAS ]; then
-    cp  src/ODE_DLB/Make/options.openblas src/ODE_DLB/Make/options
-elif [ $PLATFORM == STANDALONE ]; then
-    cp  src/ODE_DLB/Make/options.standalone src/ODE_DLB/Make/options
-else
-    echo Error: Correct platform syntax ./Allwmake --platform  MKL/OPENBLAS/STANDALONE
-    exit 1
-fi
-
-if [ $CLEAN_ALL == true ]; then
-    ./Allwclean
-fi
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
 
 
-wmake libso src/thermophysicalModels/chemistryModel
-wmake libso src/ODE_DLB
+cd src/thermophysicalModels/chemistryModel
+wmake libso
+cd ../../../
 
-pushd tests/validation/pyjacTests/pyjacTestMechanism  > /dev/null
-    ./runCmake.sh
-popd  > /dev/null
-
-wmake tests/unittests
-
-wmake tests/validation/pyjacTests/PSRTest
-
-pushd tests/unittests  > /dev/null
-    ./test.sh
-popd  > /dev/null
-
-pushd tests/validation/pyjacTests/PSRTest  > /dev/null
-    ./runTests.sh
-popd  > /dev/null
-
-./applications/Allwmake
+cd ./unittests
+wmake
+./test.sh

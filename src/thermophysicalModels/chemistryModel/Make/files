@@ -9,12 +9,8 @@ loadBalancing/runtime_assert.C
 refMapping/mixtureFraction.C
 refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
-
 chemistrySolver/DLBChemistrySolvers.C
-chemistrySolver/DLBnoChemistrySolvers.C
-chemistrySolver/DLBEulerImplicitChemistrySolvers.C
-chemistrySolver/DLBodeChemistrySolvers.C
-chemistrySolver/DLBodeLAPACKChemistrySolvers.C
+
 
 
 LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_DLB

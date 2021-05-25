@@ -23,30 +23,70 @@ License
     
 \*---------------------------------------------------------------------------*/
 
+#include "noChemistrySolver.H"
+#include "EulerImplicit.H"
+#include "ode.H"
 #include "LoadBalancedChemistryModel.H"
-#include "pyJacLoadBalancedChemistryModel.H"
+
 #include "psiReactionThermo.H"
 #include "rhoReactionThermo.H"
 
 #include "forCommonGases.H"
 #include "forCommonLiquids.H"
 #include "forPolynomials.H"
-#include "DLBmakeChemistrySolver.H"
+#include "makeChemistrySolver.H"
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#define defineChemistrySolvers(ReactionThermo, ThermoPhysics)                  \
+    defineChemistrySolver                                                      \
+    (                                                                          \
+        LoadBalancedChemistryModel,                                            \
+        ReactionThermo,                                                        \
+        ThermoPhysics                                                          \
+    );                                                                         \
+
+#define makeChemistrySolvers(Solver, ReactionThermo, ThermoPhysics)            \
+    makeChemistrySolver                                                        \
+    (                                                                          \
+        Solver,                                                                \
+        LoadBalancedChemistryModel,                                            \
+        ReactionThermo,                                                        \
+        ThermoPhysics                                                          \
+    );                                                                         \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    //using standard ode
+
+    //gasses
     forCommonGases(defineChemistrySolvers, psiReactionThermo);
     forCommonGases(defineChemistrySolvers, rhoReactionThermo);
 
+    forCommonGases(makeChemistrySolvers, noChemistrySolver, psiReactionThermo);
+    forCommonGases(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
+    forCommonGases(makeChemistrySolvers, EulerImplicit, psiReactionThermo);
+    forCommonGases(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
+    forCommonGases(makeChemistrySolvers, ode, psiReactionThermo);
+    forCommonGases(makeChemistrySolvers, ode, rhoReactionThermo);
+
+
+    //liquids
     forCommonLiquids(defineChemistrySolvers, rhoReactionThermo);
 
+    forCommonLiquids(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
+    forCommonLiquids(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
+    forCommonLiquids(makeChemistrySolvers, ode, rhoReactionThermo);
+
+    //polynomials
     forPolynomials(defineChemistrySolvers, rhoReactionThermo);
 
-
-
+    forPolynomials(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
+    forPolynomials(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
+    forPolynomials(makeChemistrySolvers, ode, rhoReactionThermo);
 }
 
-// ************************************************************************* //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
