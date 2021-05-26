@@ -9,6 +9,8 @@ loadBalancing/runtime_assert.C
 refMapping/mixtureFraction.C
 refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
+
+chemistryModel/makeDLBChemistryModels.C
 chemistrySolver/DLBChemistrySolvers.C
 
 

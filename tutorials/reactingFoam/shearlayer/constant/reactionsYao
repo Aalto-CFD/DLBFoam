@@ -1,3 +1,73 @@
+elements
+5
+(
+O
+H
+C
+N
+Ar
+)
+;
+species
+54
+(
+N2
+AR
+H
+O
+OH
+HO2
+H2
+H2O
+H2O2
+O2
+CH2
+CH2*
+CH3
+CH4
+HCO
+CH2O
+CH3O
+CO
+CO2
+C2H2
+C2H3
+C2H4
+C2H5
+C2H6
+CH2CHO
+aC3H5
+C3H6
+nC3H7
+C2H3CHO
+C4H7
+C4H81
+pC4H9
+C5H9
+C5H10
+PXC5H11
+C6H12
+PXC6H13
+C7H14
+PXC7H15
+C8H16
+PXC8H17
+C9H18
+PXC9H19
+C10H20
+PXC10H21
+NC12H26
+PXC12H25
+SXC12H25
+S3XC12H25
+C12H24
+C12H25O2
+C12OOH
+O2C12H24OOH
+OC12H23OOH
+)
+;
+
 reactions
 {
     un-named-reaction-0
@@ -302,7 +372,7 @@ reactions
     }
     un-named-reaction-18
     {
-        type            reversibleThirdBodyArrhenius;
+        type            reversiblethirdBodyArrheniusReaction;
         reaction        "H + H = H2";
         A               1.78e+12;
         beta            -1;
@@ -369,7 +439,7 @@ reactions
     }
     un-named-reaction-19
     {
-        type            reversibleThirdBodyArrhenius;
+        type            reversiblethirdBodyArrheniusReaction;
         reaction        "H + OH = H2O";
         A               4.4e+16;
         beta            -2;
@@ -436,7 +506,7 @@ reactions
     }
     un-named-reaction-20
     {
-        type            reversibleThirdBodyArrhenius;
+        type            reversiblethirdBodyArrheniusReaction;
         reaction        "O + O = O2";
         A               1.2e+11;
         beta            -1;
@@ -527,7 +597,7 @@ reactions
     }
     un-named-reaction-24
     {
-        type            reversibleThirdBodyArrhenius;
+        type            reversiblethirdBodyArrheniusReaction;
         reaction        "O + H = OH";
         A               9.428e+12;
         beta            -1;
@@ -708,7 +778,7 @@ reactions
     }
     un-named-reaction-30
     {
-        type            reversibleThirdBodyArrhenius;
+        type            reversiblethirdBodyArrheniusReaction;
         reaction        "HCO = CO + H";
         A               1.87e+14;
         beta            -1;
@@ -4472,3 +4542,5 @@ reactions
         Ta              21166.7;
     }
 }
+Thigh   5000;
+Tlow    200;

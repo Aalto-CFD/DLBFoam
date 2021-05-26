@@ -31,7 +31,7 @@ License
 
 template <class ReactionThermo, class ThermoType>
 Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
-    LoadBalancedChemistryModel(const ReactionThermo& thermo)
+    LoadBalancedChemistryModel(ReactionThermo& thermo)
     : 
         StandardChemistryModel<ReactionThermo, ThermoType>(thermo),
         balancer_(createBalancer()), 
@@ -219,20 +219,18 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveSingle
     clockTime time;
     time.timeIncrement();
 
-    // Define a const label to pass as the cell index placeholder
-    const label arbitrary = 0;
 
     // Calculate the chemical source terms
     while(timeLeft > small)
     {
         scalar dt = timeLeft;
         this->solve(
-            problem.pi,
-            problem.Ti,
             problem.c,
-            arbitrary,
+            problem.Ti,
+            problem.pi,
             dt,
             problem.deltaTChem);
+
         timeLeft -= dt;
     }
 
@@ -264,7 +262,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
             for(label j = 0; j < this->nSpecie_; j++)
             {
                 this->RR_[j][solution.cellid] =
-                    solution.c_increment[j] * this->specieThermos_[j].W();
+                    solution.c_increment[j] * this->specieThermo_[j].W();
             }
 
             deltaTMin = min(solution.deltaTChem, deltaTMin);
@@ -371,7 +369,7 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
         {
             for(label i = 0; i < this->nSpecie_; i++)
             {
-                concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
+                concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermo_[i].W();
                 massFraction[i] = this->Y_[i][celli];
             }
             
@@ -468,7 +466,7 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactio
 {
     for(label j = 0; j < this->nSpecie_; j++)
     {
-        this->RR_[j][i] = solution.c_increment[j] * this->specieThermos_[j].W();
+        this->RR_[j][i] = solution.c_increment[j] * this->specieThermo_[j].W();
     }
     this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }

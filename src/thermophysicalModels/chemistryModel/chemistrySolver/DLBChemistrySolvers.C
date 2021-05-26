@@ -23,70 +23,102 @@ License
     
 \*---------------------------------------------------------------------------*/
 
-#include "noChemistrySolver.H"
-#include "EulerImplicit.H"
-#include "ode.H"
-#include "LoadBalancedChemistryModel.H"
+#include "DLBChemistrySolverTypes.H"
 
+#include "thermoPhysicsTypes.H"
 #include "psiReactionThermo.H"
 #include "rhoReactionThermo.H"
-
-#include "forCommonGases.H"
-#include "forCommonLiquids.H"
-#include "forPolynomials.H"
-#include "makeChemistrySolver.H"
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#define defineChemistrySolvers(ReactionThermo, ThermoPhysics)                  \
-    defineChemistrySolver                                                      \
-    (                                                                          \
-        LoadBalancedChemistryModel,                                            \
-        ReactionThermo,                                                        \
-        ThermoPhysics                                                          \
-    );                                                                         \
-
-#define makeChemistrySolvers(Solver, ReactionThermo, ThermoPhysics)            \
-    makeChemistrySolver                                                        \
-    (                                                                          \
-        Solver,                                                                \
-        LoadBalancedChemistryModel,                                            \
-        ReactionThermo,                                                        \
-        ThermoPhysics                                                          \
-    );                                                                         \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    //using standard ode
+    // Chemistry solvers based on sensibleEnthalpy
+    makeChemistrySolverTypes(psiReactionThermo, constGasHThermoPhysics);
+    makeChemistrySolverTypes(psiReactionThermo, gasHThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        psiReactionThermo,
+        constIncompressibleGasHThermoPhysics
+    );
+    makeChemistrySolverTypes
+    (
+        psiReactionThermo,
+        incompressibleGasHThermoPhysics
+    );
+    makeChemistrySolverTypes(psiReactionThermo, icoPoly8HThermoPhysics);
+    makeChemistrySolverTypes(psiReactionThermo, constFluidHThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        psiReactionThermo,
+        constAdiabaticFluidHThermoPhysics
+    );
+    makeChemistrySolverTypes(psiReactionThermo, constHThermoPhysics);
 
-    //gasses
-    forCommonGases(defineChemistrySolvers, psiReactionThermo);
-    forCommonGases(defineChemistrySolvers, rhoReactionThermo);
+    makeChemistrySolverTypes(rhoReactionThermo, constGasHThermoPhysics);
+    makeChemistrySolverTypes(rhoReactionThermo, gasHThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        rhoReactionThermo,
+        constIncompressibleGasHThermoPhysics
+    );
+    makeChemistrySolverTypes
+    (
+        rhoReactionThermo,
+        incompressibleGasHThermoPhysics
+    );
+    makeChemistrySolverTypes(rhoReactionThermo, icoPoly8HThermoPhysics);
+    makeChemistrySolverTypes(rhoReactionThermo, constFluidHThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        rhoReactionThermo,
+        constAdiabaticFluidHThermoPhysics
+    );
+    makeChemistrySolverTypes(rhoReactionThermo, constHThermoPhysics);
 
-    forCommonGases(makeChemistrySolvers, noChemistrySolver, psiReactionThermo);
-    forCommonGases(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
-    forCommonGases(makeChemistrySolvers, EulerImplicit, psiReactionThermo);
-    forCommonGases(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
-    forCommonGases(makeChemistrySolvers, ode, psiReactionThermo);
-    forCommonGases(makeChemistrySolvers, ode, rhoReactionThermo);
+    // Chemistry solvers based on sensibleInternalEnergy
+    makeChemistrySolverTypes(psiReactionThermo, constGasEThermoPhysics);
+    makeChemistrySolverTypes(psiReactionThermo, gasEThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        psiReactionThermo,
+        constIncompressibleGasEThermoPhysics
+    );
+    makeChemistrySolverTypes
+    (
+        psiReactionThermo,
+        incompressibleGasEThermoPhysics
+    );
+    makeChemistrySolverTypes(psiReactionThermo, icoPoly8EThermoPhysics);
+    makeChemistrySolverTypes(psiReactionThermo, constFluidEThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        psiReactionThermo,
+        constAdiabaticFluidEThermoPhysics
+    );
+    makeChemistrySolverTypes(psiReactionThermo, constEThermoPhysics);
 
-
-    //liquids
-    forCommonLiquids(defineChemistrySolvers, rhoReactionThermo);
-
-    forCommonLiquids(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
-    forCommonLiquids(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
-    forCommonLiquids(makeChemistrySolvers, ode, rhoReactionThermo);
-
-    //polynomials
-    forPolynomials(defineChemistrySolvers, rhoReactionThermo);
-
-    forPolynomials(makeChemistrySolvers, noChemistrySolver, rhoReactionThermo);
-    forPolynomials(makeChemistrySolvers, EulerImplicit, rhoReactionThermo);
-    forPolynomials(makeChemistrySolvers, ode, rhoReactionThermo);
+    makeChemistrySolverTypes(rhoReactionThermo, constGasEThermoPhysics);
+    makeChemistrySolverTypes(rhoReactionThermo, gasEThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        rhoReactionThermo,
+        constIncompressibleGasEThermoPhysics
+    );
+    makeChemistrySolverTypes
+    (
+        rhoReactionThermo,
+        incompressibleGasEThermoPhysics
+    );
+    makeChemistrySolverTypes(rhoReactionThermo, icoPoly8EThermoPhysics);
+    makeChemistrySolverTypes(rhoReactionThermo, constFluidEThermoPhysics);
+    makeChemistrySolverTypes
+    (
+        rhoReactionThermo,
+        constAdiabaticFluidEThermoPhysics
+    );
+    makeChemistrySolverTypes(rhoReactionThermo, constEThermoPhysics);
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
