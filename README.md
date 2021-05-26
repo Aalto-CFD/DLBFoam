@@ -174,7 +174,7 @@ Please submit a GitHub issue if you found a bug in the program. If you need help
 
 ## Citation
 
-If you use our model, please cite the publication describing its implementation [[1]](#1). 
+If you use our model, please cite the publication describing its implementation, Refs. [[1]](#1) and [[2]](#2). 
 
 ## References
 
