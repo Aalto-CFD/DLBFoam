@@ -74,5 +74,3 @@ popd  > /dev/null
 pushd tests/validation/pyjacTests/PSRTest  > /dev/null
     ./runTests.sh
 popd  > /dev/null
-
-./applications/Allwmake

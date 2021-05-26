@@ -13,5 +13,4 @@ cd ../
 wclean tests/unittests
 wclean tests/validation/pyjacTests/PSRTest
 
-./applications/Allwclean
 
