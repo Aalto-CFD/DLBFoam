@@ -8,6 +8,7 @@ src/**/*/Make/linux64*
 applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
 tutorials/
+tests/validation/pyjacTests/PSRTest/testCase/0
 
 # pyJac related
 pyJac/build/
