@@ -179,7 +179,37 @@ If you use our model, please cite the publication describing its implementation,
 ## References
 
 <a id="1">[1]</a> 
-Tekgül, Peltonen, Kahila, Kaario, Vuorinen (2020). [DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM](https://arxiv.org/abs/2011.07978)
+B. Tekgül,  P. Peltonen,  H. Kahila,  O. Kaario,  V. Vuorinen,  DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM, arXiv preprint [arXiv:2011.07978](https://arxiv.org/abs/2011.07978) (2020).
+<details>
+<summary>BibTex</summary>
+<p>
+ 
+```
+@article{tekgul2020dlbfoam,
+  title={DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM},
+  author={Tekg{\"u}l, Bulut and Peltonen, Petteri and Kahila, Heikki and Kaario, Ossi and Vuorinen, Ville},
+  journal={arXiv preprint arXiv:2011.07978},
+  year={2020}
+}
+```
+ 
+</p>
+</details>
 
 <a id="2">[2]</a> 
-Morev, Tekgül, Gadalla, Shahanaghi, Kannan, Karimkashi, Kaario, Vuorinen (2021). [Fast reactive flow simulations using analytical Jacobian and dynamic load balancing in OpenFOAM](https://arxiv.org/abs/2105.12070)
+I. Morev, B. Tekgül, M. Gadalla, A. Shahanaghi, J. Kannan, S. Karimkashi, O. Kaario, V. Vuorinen, Fast reactive flow simulations using analytical Jacobian and dynamic load balancing in OpenFOAM, arXiv preprint [arXiv:2105.12070](https://arxiv.org/abs/2105.12070) (2021).
+<details>
+<summary>BibTex</summary>
+<p>
+ 
+```
+@article{morev2021fast,
+  title={Fast reactive flow simulations using analytical Jacobian and dynamic load balancing in OpenFOAM},
+  author={Morev, Ilya and Tekg{\"u}l, Bulut and Gadalla, Mahmoud and Shahanaghi, Ali and Kannan, Jeevananthan and Karimkashi, Shervin and Kaario, Ossi and Vuorinen, Ville},
+  journal={arXiv preprint arXiv:2105.12070},
+  year={2021}
+}
+```
+ 
+</p>
+</details>
