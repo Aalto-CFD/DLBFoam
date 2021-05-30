@@ -15,23 +15,23 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     reactingLeFoam;
+application     reactingFoam;
 
 startFrom       latestTime;
 
 startTime       0;
 
-stopAt          endTime;
+stopAt          nextWrite;
 
-endTime         1000;
+endTime         1;
 
 deltaT          1e-7;
 
 writeControl    timeStep;//adjustableRunTime;
 
-writeInterval   50;
+writeInterval   1000;
 
-purgeWrite      0;
+purgeWrite      10;
 
 writeFormat     binary;
 
@@ -47,7 +47,7 @@ runTimeModifiable true;
 
 adjustTimeStep  yes;
 
-maxCo     1.2;
+maxCo     0.7;
 
 functions
 {
