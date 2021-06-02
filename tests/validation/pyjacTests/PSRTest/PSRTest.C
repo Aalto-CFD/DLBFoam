@@ -7,7 +7,7 @@
 -------------------------------------------------------------------------------
 License
     This file is part of DLBFoam library, derived from OpenFOAM.
-    https://github.com/blttkgl/DLBFoam
+    https://github.com/Aalto-CFD/DLBFoam
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
