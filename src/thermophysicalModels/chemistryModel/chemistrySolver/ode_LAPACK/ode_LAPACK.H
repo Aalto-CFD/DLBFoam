@@ -8,7 +8,7 @@
 License
     This file is part of DLBFoam library, derived from OpenFOAM.
 
-    https://github.com/blttkgl/DLBFoam
+    https://github.com/Aalto-CFD/DLBFoam
 
 Class
     Foam::ode_LAPACK
