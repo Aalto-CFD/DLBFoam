@@ -12,7 +12,6 @@ loadBalancing/LoadBalancer.C
 
 chemistrySolver/DLBChemistrySolvers.C
 chemistrySolver/DLBnoChemistrySolvers.C
-chemistrySolver/DLBEulerImplicitChemistrySolvers.C
 chemistrySolver/DLBodeChemistrySolvers.C
 chemistrySolver/DLBodeLAPACKChemistrySolvers.C
 
