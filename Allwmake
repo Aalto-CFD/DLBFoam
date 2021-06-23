@@ -51,6 +51,12 @@ else
     exit 1
 fi
 
+if ! command -v scmake &> /dev/null
+then
+    echo "Error: cmake could not be found. Required for compiling pyJac C-library."
+    exit
+fi
+
 if [ $CLEAN_ALL == true ]; then
     ./Allwclean
 fi
