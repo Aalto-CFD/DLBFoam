@@ -1,7 +1,3 @@
-- Fix Allwclean
-
-- Allwmake OF check does not support -dev : "integer error"
-
 - README mechanism choice needs to be re-written. First introduce  general requirements, 
 then introduce ct2foam and lastly the examples.
 
@@ -30,10 +26,3 @@ chemFoam: symbol lookup error: /path/to/user/OpenFoam/linux64GccDPInt32Opt/lib/l
 - Make a safety check that CONP is defined and pyjac mechanism is generated in constant pressure mode. 
 
 - library run-time naming could be different "_pyjac" in everything too much?
-
-- Add cmake as a requirement in README -- could be avoided in a long run as well
-
-
-
-commit: "Added error control for Allwmake considering MKL/OpenBLAS installation checks. Furthermore, README 
-is updated to avoid non-general references to debian systems or CSC cluster."

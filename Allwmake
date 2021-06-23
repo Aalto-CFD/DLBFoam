@@ -3,20 +3,22 @@ cd ${0%/*} || exit 1    # run from this directory
 
 set -e # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 
+# The supported OpenFOAM version
+OF_VER=8
 
-if [ -z ${WM_PROJECT_VERSION+x} ]; then 
-    echo "OpenFOAM environment is not set."
-    exit 1
-else
-    if [ $WM_PROJECT_VERSION -ne 8 ]; then
-        echo "Wrong OpenFOAM version!"
-        echo $WM_PROJECT_VERSION
-	exit 1
-    else
-        echo "Correct OpenFOAM installation! (version 8)"
+check_openfoam()
+{
+    if [ -z ${WM_PROJECT} ]; then 
+        echo "OpenFOAM environment not set."
+        exit 1
     fi
-fi
 
+    if [[ ! "$WM_PROJECT_VERSION" == "$OF_VER" ]]; then
+        echo "Error: OpenFOAM-$WM_PROJECT_VERSION not supported."
+        echo "       See other git branches for potential support."
+        exit 1
+    fi
+}
 
 check_mkl()
 {
@@ -41,11 +43,16 @@ check_openblas()
 
 check_cmake()
 {
-  cmake_com="cmake"
-  if ! type $cmake_com &> /dev/null ; then
-    echo "Error: cmake could not be found. Required for compiling the pyJac C-library."
-    exit 1
-  fi
+    if ! command -v cmake &> /dev/null
+    then
+        echo "Error: cmake could not be found. Required for compiling the pyJac C-library."
+        exit 1
+    fi
+}
+
+how_to()
+{
+    echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE" 
 }
 
 
@@ -66,7 +73,7 @@ do
         shift # past value
         ;;
         *) 
-        echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE" 
+        how_to 
         exit 1 
         ;;    
     esac
@@ -74,7 +81,8 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
-
+check_openfoam
+check_cmake
 
 if [ $PLATFORM == MKL ]; then
     check_mkl
@@ -85,12 +93,9 @@ elif [ $PLATFORM == OPENBLAS ]; then
 elif [ $PLATFORM == STANDALONE ]; then
     cp  src/ODE_DLB/Make/options.standalone src/ODE_DLB/Make/options
 else
-    echo "Error: Correct platform syntax ./Allwmake --platform  MKL/OPENBLAS/STANDALONE"
+    how_to
     exit 1
 fi
-
-
-check_cmake
 
 
 if [ $CLEAN_ALL == true ]; then

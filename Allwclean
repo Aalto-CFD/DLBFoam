@@ -6,11 +6,12 @@ rm -rf $FOAM_USER_LIBBIN/libODE_DLB.so
 unlink $FOAM_USER_LIBBIN/libc_pyjac_test.so
 rm -rf $FOAM_USER_LIBBIN/unittests/pyjacTestMech/build
 
-cd src/
-wclean all
-cd ../
+pushd src  > /dev/null
+    wclean all
+popd  > /dev/null
 
 wclean tests/unittests
+
 wclean tests/validation/pyjacTests/PSRTest
 
 
