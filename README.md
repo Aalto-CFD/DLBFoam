@@ -40,15 +40,11 @@ DLBFoam can be compiled by typing the following command after sourcing appropria
 
 DLBFoam requires LAPACK packages for improved ODE routines (LAPACKE C interface for OPENBLAS and standalone installation). There are three different ways to provide LAPACK for DLBFoam:
 
-- **Intel-MKL**: Install/load [Intel-MKL](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html) on your workstation/cluster. Installation instructions can be found online. If you are on cluster, you can most probably load it by:  
-    ```
-    module load intel-mkl
-    ```
-    make sure that the ```MKLROOT``` bash variable is defined by typing ```echo $MKLROOT``` to your terminal. This option is the fastest option for Intel processors due to optimization of MKL with Intel hardware.
+- **Intel-MKL**:  We recommend Intel-MKL libraries to be used together with DLBFoam whenever you are working on machines with Intel-based architecture. See further information and installation guidelines for  [Intel-MKL](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html). Note that DLBFoam assumes, that the ```MKLROOT``` environment variable is set to represent the installation path according to the standard library installation scripts.
 
-- **OpenBLAS**: Install/load [OpenBLAS](https://www.openblas.net/). It may be available on your cluster as a module, similar to Intel-MKL. Make sure that the ```OPENBLAS_INSTALL_ROOT``` bash variable is defined by typing ```echo $OPENBLAS_INSTALL_ROOT```, and define it in your ```bashrc``` if it is not.
+- **OpenBLAS**: Another option is to utilise [OpenBLAS](https://www.openblas.net/) library which includes LAPACK routines. In this case, DLBFoam assumes that the ```OPENBLAS_INSTALL_ROOT``` environment variable is set to represent the OpenBLAS installation path succesfully.
 
-- **Standalone**: A standalone installation may be a good idea if you are on your personal workstation and not on a cluster. Install LAPACKE-dev libraries by:
+- **Standalone**: A standalone installation may be a good idea if you are on your personal workstation and not on a cluster. You can see if you have the necessary lapacke dependency by e.g. executing ```ldconfig -p | grep "liblapacke"```. In case not, on debian systems you could e.g. install the requirements (including header files) by:
 
     ```
     (sudo) apt-get install liblapacke-dev

@@ -1,8 +1,11 @@
 #!/bin/bash
 cd ${0%/*} || exit 1    # run from this directory
 
+set -e # Any subsequent(*) commands which fail will cause the shell script to exit immediately
+
+
 if [ -z ${WM_PROJECT_VERSION+x} ]; then 
-    echo "OpenFOAM is not loaded!"
+    echo "OpenFOAM environment is not set."
     exit 1
 else
     if [ $WM_PROJECT_VERSION -ne 8 ]; then
@@ -14,9 +17,40 @@ else
     fi
 fi
 
+
+check_mkl()
+{
+    if [ -d "$MKLROOT" ]; then
+        echo "Utilising Intel MKL version from path: ${MKLROOT}"
+    else
+        echo "Error: MKL_ROOT=${MKLROOT} not found."
+        exit 1
+    fi    
+}
+
+check_openblas()
+{
+    if [ -d "$OPENBLAS_INSTALL_ROOT" ]; then
+        echo "Utilising OpenBLAS from path: ${OPENBLAS_INSTALL_ROOT}"
+    else
+        echo "Error: OPENBLAS_INSTALL_ROOT=${OPENBLAS_INSTALL_ROOT} not found."
+        exit 1
+    fi    
+}
+
+
+check_cmake()
+{
+  cmake_com="cmake"
+  if ! type $cmake_com &> /dev/null ; then
+    echo "Error: cmake could not be found. Required for compiling the pyJac C-library."
+    exit 1
+  fi
+}
+
+
 PLATFORM=NOT_DEFINED
 CLEAN_ALL=false
-
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -36,26 +70,28 @@ do
         exit 1 
         ;;    
     esac
-
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
+
+
+
 if [ $PLATFORM == MKL ]; then
+    check_mkl
     cp  src/ODE_DLB/Make/options.mkl src/ODE_DLB/Make/options
 elif [ $PLATFORM == OPENBLAS ]; then
+    check_openblas
     cp  src/ODE_DLB/Make/options.openblas src/ODE_DLB/Make/options
 elif [ $PLATFORM == STANDALONE ]; then
     cp  src/ODE_DLB/Make/options.standalone src/ODE_DLB/Make/options
 else
-    echo Error: Correct platform syntax ./Allwmake --platform  MKL/OPENBLAS/STANDALONE
+    echo "Error: Correct platform syntax ./Allwmake --platform  MKL/OPENBLAS/STANDALONE"
     exit 1
 fi
 
-if ! command -v scmake &> /dev/null
-then
-    echo "Error: cmake could not be found. Required for compiling pyJac C-library."
-    exit
-fi
+
+check_cmake
+
 
 if [ $CLEAN_ALL == true ]; then
     ./Allwclean
