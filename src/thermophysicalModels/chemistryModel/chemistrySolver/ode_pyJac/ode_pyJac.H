@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -11,13 +11,13 @@ License
     https://github.com/Aalto-CFD/DLBFoam
 
 Class
-    Foam::ode_LAPACK
+    Foam::ode_pyJac
 
 Description
-    An ODE solver for chemistry with LAPACK routines
+    An ODE solver for chemistry with pyJac routines
 
 SourceFiles
-    ode_LAPACK.C
+    ode_pyJac.C
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ SourceFiles
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef ode_LAPACK_H
-#define ode_LAPACK_H
+#ifndef ode_pyJac_H
+#define ode_pyJac_H
 
 #include "chemistrySolver.H"
 #include "ODESolver.H"
@@ -48,7 +48,7 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 template<class ChemistryModel>
-class ode_LAPACK
+class ode_pyJac
 :
     public chemistrySolver<ChemistryModel>
 {
@@ -65,17 +65,17 @@ class ode_LAPACK
 public:
 
     //- Runtime type information
-    TypeName("ode_LAPACK");
+    TypeName("ode_pyJac");
 
 
     // Constructors
 
         //- Construct from thermo
-        ode_LAPACK(const typename ChemistryModel::reactionThermo& thermo);
+        ode_pyJac(const typename ChemistryModel::reactionThermo& thermo);
 
 
     //- Destructor
-    virtual ~ode_LAPACK();
+    virtual ~ode_pyJac();
 
 
     // Member Functions
@@ -100,7 +100,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "ode_LAPACK.C"
+    #include "ode_pyJac.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
