@@ -190,17 +190,19 @@ If you use our model, please cite publications describing its implementation, Re
 ## References
 
 <a id="1">[1]</a> 
-B. Tekgül,  P. Peltonen,  H. Kahila,  O. Kaario,  V. Vuorinen,  DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM, arXiv preprint [arXiv:2011.07978](https://arxiv.org/abs/2011.07978) (2020).
+B. Tekgül,  P. Peltonen,  H. Kahila,  O. Kaario,  V. Vuorinen,  DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM, Computer Physics Communications, Volume 267, [10.1016/j.cpc.2021.108073](https://doi.org/10.1016/j.cpc.2021.108073) (2021).
 <details>
 <summary>BibTex</summary>
 <p>
  
 ```
-@article{tekgul2020dlbfoam,
+@article{tekgul2021dlbfoam,
   title={DLBFoam: An open-source dynamic load balancing model for fast reacting flow simulations in OpenFOAM},
   author={Tekg{\"u}l, Bulut and Peltonen, Petteri and Kahila, Heikki and Kaario, Ossi and Vuorinen, Ville},
-  journal={arXiv preprint arXiv:2011.07978},
-  year={2020}
+  journal={Computer Physics Communications},
+  pages={108073},
+  year={2021},
+  publisher={Elsevier}
 }
 ```
  
