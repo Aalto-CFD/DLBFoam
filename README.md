@@ -160,6 +160,17 @@ abs(T<sub>cell</sub>-T<sub>ref</sub>)<deltaT.
 
 For a working example, check the tutorials given in tutorials folder.
 
+## FAQ
+
+#### Undefined symbol: eval_h
+```
+/path/to/user/OpenFoam/linux64GccDPInt32Opt/lib/libchemistryModel_DLB.so: undefined symbol: eval_h
+```
+Compiled mechanism library (```libc_pyjac.so```) is not found. Check if a correct path is set in controlDict and the file exists.
+
+#### Tutorial hangs  
+The reason might be that both OpenBLAS and LAPACKE are installed in your system. 
+
 ## Contributors
 - Bulut Tekgül (buluttekgul@gmail.com)
 - Petteri Peltonen (petteri.peltonen@aalto.fi)
@@ -174,7 +185,7 @@ Please submit a GitHub issue if you found a bug in the program. If you need help
 
 ## Citation
 
-If you use our model, please cite the publication describing its implementation, Refs. [[1]](#1) and [[2]](#2). 
+If you use our model, please cite publications describing its implementation, Refs. [[1]](#1) and [[2]](#2). 
 
 ## References
 
