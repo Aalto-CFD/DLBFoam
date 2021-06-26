@@ -18,10 +18,10 @@ do
         shift # past argument
         shift # past value
         ;;
-        *) 
-        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/MAHTI/DESKTOP/USERDEF" 
-        exit 1 
-        ;;    
+        *)
+        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/MAHTI/DESKTOP/USERDEF"
+        exit 1
+        ;;
     esac
 
 done
@@ -38,7 +38,7 @@ elif [ $PLATFORM == MAHTI ]; then
     module load cmake
     cp  src/ODE_DLB/Make/options.mahti src/ODE_DLB/Make/options
 elif [ $PLATFORM == DESKTOP ]; then
-    cp  src/ODE_DLB/Make/options.desktop src/ODE_DLB/Make/options
+    cp  src/ODE_DLB/Make/options.standalone src/ODE_DLB/Make/options
 elif [ $PLATFORM == USERDEF ]; then
     cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
     module load cmake
@@ -70,5 +70,3 @@ popd  > /dev/null
 pushd tests/validation/pyjacTests/PSRTest  > /dev/null
     ./runTests.sh
 popd  > /dev/null
-
-./applications/Allwmake
