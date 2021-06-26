@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -20,15 +20,15 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 \*---------------------------------------------------------------------------*/
 
-#include "ode_LAPACK.H"
+#include "ode_pyJac.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-Foam::ode_LAPACK<ChemistryModel>::ode_LAPACK(const typename ChemistryModel::reactionThermo& thermo)
+Foam::ode_pyJac<ChemistryModel>::ode_pyJac(const typename ChemistryModel::reactionThermo& thermo)
 :
     chemistrySolver<ChemistryModel>(thermo),
     coeffsDict_(this->subDict("odeCoeffs")),
@@ -40,14 +40,14 @@ Foam::ode_LAPACK<ChemistryModel>::ode_LAPACK(const typename ChemistryModel::reac
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-Foam::ode_LAPACK<ChemistryModel>::~ode_LAPACK()
+Foam::ode_pyJac<ChemistryModel>::~ode_pyJac()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-void Foam::ode_LAPACK<ChemistryModel>::solve
+void Foam::ode_pyJac<ChemistryModel>::solve
 (
     scalar& p,
     scalar& T,
@@ -89,7 +89,7 @@ void Foam::ode_LAPACK<ChemistryModel>::solve
     /* pyJac implementation:                                                            */
     /* Because pyJac does not consider the last specie in the system, it is not part of */
     /* the RHS and Jacobian and thus we need here the inert = 1.0-csum functionality    */
-    else 
+    else
     {
         // Copy the concentration, T and P to the total solve-vector
         cTp_[0] = T;
@@ -112,7 +112,7 @@ void Foam::ode_LAPACK<ChemistryModel>::solve
     	    csum += c[i];
         }
         //The last specie:
-        c[nSpecie-1] = 1.0 - csum; 
+        c[nSpecie-1] = 1.0 - csum;
     }
 }
 

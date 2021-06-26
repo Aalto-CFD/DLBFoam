@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -20,10 +20,10 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 \*---------------------------------------------------------------------------*/
 
-#include "./ode_LAPACK/ode_LAPACK.H"
+#include "./ode_pyJac/ode_pyJac.H"
 #include "LoadBalancedChemistryModel.H"
 #include "pyJacLoadBalancedChemistryModel.H"
 
@@ -39,12 +39,12 @@ License
 
 namespace Foam
 {
-    forCommonGases(makeChemistrySolvers, ode_LAPACK, psiReactionThermo);
-    forCommonGases(makeChemistrySolvers, ode_LAPACK, rhoReactionThermo);
+    forCommonGases(makeChemistrySolvers, ode_pyJac, psiReactionThermo);
+    forCommonGases(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
 
-    forCommonLiquids(makeChemistrySolvers, ode_LAPACK, rhoReactionThermo);
+    forCommonLiquids(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
 
-    forPolynomials(makeChemistrySolvers, ode_LAPACK, rhoReactionThermo);
+    forPolynomials(makeChemistrySolvers, ode_pyJac, rhoReactionThermo);
 }
 
 
