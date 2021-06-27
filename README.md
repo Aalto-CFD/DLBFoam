@@ -166,10 +166,14 @@ For a working example, check the tutorials given in tutorials folder.
 ```
 /path/to/user/OpenFoam/linux64GccDPInt32Opt/lib/libchemistryModel_DLB.so: undefined symbol: eval_h
 ```
-Compiled mechanism library (```libc_pyjac.so```) is not found. Check if a correct path is set in controlDict and the file exists.
+Compiled mechanism library (```libc_pyjac.so```) is not found. Please read Mechanism Generation section of the README. Check if a correct path is set in controlDict and the file exists.
 
-#### Tutorial hangs  
-The reason might be that both OpenBLAS and LAPACKE are installed in your system. 
+#### Tutorial works in serial, but it hangs in parallel
+The reason might be that both OpenBLAS and LAPACKE are installed in your system and interfering with each other. This mostly happens in personal computers rather than clusters where software are controlled by modules. On your personal system, please follow the instructions below to mitigate this issue:
+
+1. Find all the OpenBlas related packages installed on your machine with ```dpkg --get-selections | grep openblas``` and remove all of them.
+2. Remove ```liblapacke-dev``` and install it again as ```(sudo) apt-get install liblapacke-dev```.
+3. Recompile the code with the compilation flag ```--clean``` for ```STANDALONE``` platform: ```./Allwmake --clean --platform STANDALONE```
 
 ## Contributors
 - Bulut Tekgül (buluttekgul@gmail.com)
