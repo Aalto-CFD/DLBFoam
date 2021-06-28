@@ -18,10 +18,10 @@ do
         shift # past argument
         shift # past value
         ;;
-        *) 
-        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/MAHTI/DESKTOP/USERDEF" 
-        exit 1 
-        ;;    
+        *)
+        echo "Error: Correct platform syntax ./Allwmake --platform PUHTI/MAHTI/DESKTOP/USERDEF"
+        exit 1
+        ;;
     esac
 
 done
@@ -55,7 +55,7 @@ fi
 wmake libso src/thermophysicalModels/chemistryModel
 wmake libso src/ODE_DLB
 
-pushd tests/validation/pyjacTests/pyjacTestMechanism  > /dev/null
+pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
     ./runCmake.sh
 popd  > /dev/null
 

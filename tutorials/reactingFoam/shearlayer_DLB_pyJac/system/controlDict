@@ -56,9 +56,9 @@ functions
 
 libs
 (
-        "libchemistryModel_DLB.so" 
+        "libchemistryModel_DLB.so"
         "libODE_DLB.so"
-        "$FOAM_CASE/constant/foam_mech/libc_pyjac.so"
+        "$FOAM_CASE/constant/foam/libc_pyjac.so"
 
 );
 
