@@ -1,7 +1,7 @@
 #!/bin/bash
 cd ${0%/*} || exit 1    # run from this directory
 
-if [ -z ${WM_PROJECT_VERSION+x} ]; then 
+if [ -z ${WM_PROJECT_VERSION+x} ]; then
     echo "OpenFOAM is not loaded!"
     exit 1
 else
@@ -31,10 +31,10 @@ do
         shift # past argument
         shift # past value
         ;;
-        *) 
-        echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE" 
-        exit 1 
-        ;;    
+        *)
+        echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE"
+        exit 1
+        ;;
     esac
 
 done
@@ -59,7 +59,7 @@ fi
 wmake libso src/thermophysicalModels/chemistryModel
 wmake libso src/ODE_DLB
 
-pushd tests/validation/pyjacTests/pyjacTestMechanism  > /dev/null
+pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
     ./runCmake.sh
 popd  > /dev/null
 

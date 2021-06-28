@@ -39,7 +39,7 @@ loadbalancing
 
 refmapping{}
 
-reactions
-{}
+// reactions dictionary is empty - {}
+#include "../../../pyjacTestMechanism/foam/reactions.foam"
 
 // ************************************************************************* //

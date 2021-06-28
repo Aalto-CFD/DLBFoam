@@ -55,7 +55,7 @@ fi
 wmake libso src/thermophysicalModels/chemistryModel
 wmake libso src/ODE_DLB
 
-pushd tests/validation/pyjacTests/pyjacTestMechanism  > /dev/null
+pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
     ./runCmake.sh
 popd  > /dev/null
 
