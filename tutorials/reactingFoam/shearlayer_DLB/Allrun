@@ -1,5 +1,5 @@
 blockMesh
-N_PROCS=$(grep -c ^processor /proc/cpuinfo)
+N_PROCS=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
 foamDictionary -entry NCORES system/decomposeParDict -set $N_PROCS
 
 rm -rf 0
@@ -7,4 +7,3 @@ cp -r 0.orig 0
 
 decomposePar -force > log.decompose
 mpirun -np $N_PROCS reactingFoam -parallel > log.reactingFoam
-
