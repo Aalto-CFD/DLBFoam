@@ -1,6 +1,6 @@
 blockMesh
 N_PROCS=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
-foamDictionary -entry NCORES system/decomposeParDict -set $N_PROCS
+sed -i "s/numberOfSubdomains .*/numberOfSubdomains $N_PROCS;/g" system/decomposeParDict
 
 rm -rf 0
 cp -r 0.orig 0
