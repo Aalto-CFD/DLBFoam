@@ -39,15 +39,16 @@ loadbalancing
 	active	true;
 	log	true;
 }
+
+chemistry       on;
+
+initialChemicalTimeStep 1;
+
 chemistryType
 {
     solver          ode_pyJac;
     method          loadBalanced_pyJac;
 }
-
-chemistry       on;
-
-initialChemicalTimeStep 1;
 
 odeCoeffs
 {
