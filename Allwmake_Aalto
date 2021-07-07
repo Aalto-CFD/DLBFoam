@@ -31,16 +31,16 @@ if [ $PLATFORM == PUHTI ]; then
     . /appl/soft/eng/OpenFOAM/OpenFOAM-8_intelmpi/etc/bashrc
     module load intel-mkl
     module load cmake
-    cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
+    cp src/ODE_DLB/Make/options.mkl src/ODE_DLB/Make/options
 elif [ $PLATFORM == MAHTI ]; then
     . /appl/soft/eng/OpenFOAM/OpenFOAM-8/etc/bashrc
     module load  openblas
     module load cmake
-    cp  src/ODE_DLB/Make/options.mahti src/ODE_DLB/Make/options
+    cp src/ODE_DLB/Make/options.openblas src/ODE_DLB/Make/options
 elif [ $PLATFORM == DESKTOP ]; then
     cp  src/ODE_DLB/Make/options.standalone src/ODE_DLB/Make/options
 elif [ $PLATFORM == USERDEF ]; then
-    cp  src/ODE_DLB/Make/options.puhti src/ODE_DLB/Make/options
+    cp src/ODE_DLB/Make/options.mkl src/ODE_DLB/Make/options
     module load cmake
 else
     echo Error: Correct platform syntax ./Allwmake --platform  DESKTOP/PUHTI/MAHTI/USERDEF
