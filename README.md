@@ -82,7 +82,7 @@ libs
 (
     "libchemistryModel_DLB.so" 
     "libODE_DLB.so"
-    "$FOAM_CASE/constant/foam_mech/libc_pyjac.so"
+    "$FOAM_CASE/constant/foam/libc_pyjac.so"
 );
 ```
 the first two libraries link the DLBFoam and the optimized LAPACK solvers, while the last library links the C subroutines generated in the previous section for the analytical Jacobian.
@@ -138,7 +138,7 @@ refmapping
             NC12H26       1.0;
         }
 
-        #include "$FOAM_CASE/constant/foam_mech/thermo.foam"
+        #include "$FOAM_CASE/constant/foam/thermo.foam"
     }
     tolerance	1e-4;  // mixture fraction tolerance
     deltaT	2; // temperature tolerance
