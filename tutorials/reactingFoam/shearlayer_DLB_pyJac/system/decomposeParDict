@@ -15,11 +15,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-NCORES          8;
-
-numberOfSubdomains $NCORES;
+numberOfSubdomains 4;
 
 method          scotch;
-
 
 // ************************************************************************* //
