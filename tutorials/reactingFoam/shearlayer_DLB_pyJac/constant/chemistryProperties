@@ -29,7 +29,7 @@ refmapping
         {
             NC12H26           1;
         }
-        #include        "$FOAM_CASE/constant/foam/thermo.foam"
+        #include "$FOAM_CASE/constant/foam/thermo.foam"
     }
     tolerance       0.0001;
 }

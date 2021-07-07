@@ -74,4 +74,5 @@ popd  > /dev/null
 pushd utilities  > /dev/null
 	./Allrun -m yao
 	cp mechanisms/yao/lib/build/libc_pyjac.so ../tutorials/reactingFoam/shearlayer_DLB_pyJac/constant/foam
+	cp mechanisms/yao/foam/* ../tutorials/reactingFoam/shearlayer_DLB_pyJac/constant/foam
 popd  > /dev/null

@@ -13,6 +13,7 @@ tutorials/**/[0-9]*.[0-9]*
 tutorials/**/processor*
 tutorials/**/dynamicCode
 tutorials/**/constant/polyMesh
+tutorials/reactingFoam/shearlayer_DLB_pyJac/constant/foam/*
 tests/validation/pyjacTests/PSRTest/testCase/0
 utilities/**/CMake*
 utilities/**/cmake*
