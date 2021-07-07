@@ -1,3 +1,5 @@
+#!/bin/sh
+
 blockMesh
 N_PROCS=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
 sed -i "s/numberOfSubdomains .*/numberOfSubdomains $N_PROCS;/g" system/decomposeParDict
