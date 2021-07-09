@@ -1,0 +1,4 @@
+#!/bin/bash
+
+shopt -s extglob
+rm -r !("Allrun"|"Allclean"|"pyJac"|".gitignore")

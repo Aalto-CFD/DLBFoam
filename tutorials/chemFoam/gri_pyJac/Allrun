@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Ensure the use of OpenFOAM 8, so that gri tutorial is present in $FOAM_TUTORIALS
+if [ -z ${WM_PROJECT_VERSION+x} ]; then
+    echo "OpenFOAM is not loaded!"
+    exit 1
+else
+    if [ $WM_PROJECT_VERSION -ne 8 ]; then
+        echo "Wrong OpenFOAM version!"
+        echo $WM_PROJECT_VERSION
+		exit 1
+    fi
+fi
+
+# Copy tutorial files from OpenFOAM
+cp -nr $FOAM_TUTORIALS/combustion/chemFoam/gri/* .
+
+# Compile and copy mechanism
+cd pyJac/lib
+./runCmake.sh
+cd -
+cp -r pyJac/foam constant/
+cp pyJac/lib/build/libc_pyjac.so constant/foam/
+
+# Set DLB dictionaries
+foamDictionary -entry loadbalancing -set {} constant/chemistryProperties
+foamDictionary -entry loadbalancing.active -add false constant/chemistryProperties
+foamDictionary -entry refmapping -set {} constant/chemistryProperties
+foamDictionary -entry refmapping.active -add false constant/chemistryProperties
+
+# Set pyJac and LAPACK
+foamDictionary -entry chemistryType.solver -set ode_pyJac constant/chemistryProperties
+foamDictionary -entry chemistryType.method -set loadBalanced_pyJac constant/chemistryProperties
+foamDictionary -entry odeCoeffs.solver -set seulex_LAPACK constant/chemistryProperties
+
+# Include libraries
+foamDictionary -entry libs -set '("libchemistryModel_DLB.so" "libODE_DLB.so" "$FOAM_CASE/constant/foam/libc_pyjac.so")' system/controlDict
+
+# Change links to mechanism files
+sed -i 's|#include .*|#include "$FOAM_CASE/constant/foam/reactions.foam"|g' constant/chemistryProperties
+sed -i 's|#include .*|#include "$FOAM_CASE/constant/foam/species.foam"\n#include "$FOAM_CASE/constant/foam/thermo.foam"|g' constant/thermophysicalProperties
+
+# Run chemFoam
+chemFoam > log.chemFoam
+
+# Run validation
+(cd validation && ./Allrun $*)

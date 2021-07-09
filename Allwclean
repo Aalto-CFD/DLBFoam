@@ -14,3 +14,4 @@ wclean tests/unittests
 wclean tests/validation/pyjacTests/PSRTest
 
 rm -rf tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac
+rm -rf tutorials/chemFoam/gri_pyJac/pyJac
