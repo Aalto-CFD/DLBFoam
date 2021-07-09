@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+| \\      /  F ield         | DLBFoam: Dynamic Load Balancing                 |
+|  \\    /   O peration     | for fast reactive simulations                   |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  | 2020, Aalto University, Finland                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -11,11 +11,12 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      O2;
+    object      T;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 0 0 1 0 0 0];
+
 
 internalField  #codeStream
 {
@@ -26,29 +27,30 @@ internalField  #codeStream
         const IOdictionary& d = static_cast<const IOdictionary&>(dict);
         const fvMesh& mesh = refCast<const fvMesh>(d.db());
         const vectorField& CC = mesh.C(); //cell center
-        
-         
-        scalarField O2(mesh.nCells());
-        scalar O2_i = 0.23;
 
-        scalar A = 0.23;
+
+        scalarField T(mesh.nCells());
+        scalar T_i = 900;
+
+        scalar A = 500;
         scalar L = 0.008;
         scalar ro = 0.0004;
         scalar B = 5;
-        
-        
+
+
 
         forAll(CC,cellI)
         {
 
-            
-        	scalar y = CC[cellI].y(); 
-            
-            O2[cellI] = O2_i - A * 0.5 * (1-tanh(B*(mag(y-L/2)/ro - ro/mag(y-L/2))));
-            
+
+        	scalar y = CC[cellI].y();
+
+            T[cellI] = T_i - A * 0.5 * (1-tanh(B*(mag(y-L/2)/ro - ro/mag(y-L/2))));
+
+
         }
-        
-        writeEntry(os,"",O2); 
+
+        writeEntry(os,"",T);
     #};
 
     //! Optional:
@@ -78,8 +80,10 @@ internalField  #codeStream
     #};
 
 };
+
 boundaryField
 {
+
     upperBoundary
     {
         type            cyclic;

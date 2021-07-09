@@ -1,21 +1,20 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+| \\      /  F ield         | DLBFoam: Dynamic Load Balancing                 |
+|  \\    /   O peration     | for fast reactive simulations                   |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  | 2020, Aalto University, Finland                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      NC12H26;
+    class       volVectorField;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
 internalField  #codeStream
 {
@@ -26,28 +25,30 @@ internalField  #codeStream
         const IOdictionary& d = static_cast<const IOdictionary&>(dict);
         const fvMesh& mesh = refCast<const fvMesh>(d.db());
         const vectorField& CC = mesh.C(); //cell center
-        
-         
-        scalarField NC12H26(mesh.nCells());
-        scalar NC12H26_i = 0.0;
 
-        scalar A = 1;
+
+        vectorField U(mesh.nCells());
+        scalar Umax = 40;
+
         scalar L = 0.008;
         scalar ro = 0.0004;
         scalar B = 5;
-        
-        
+
+
 
         forAll(CC,cellI)
         {
 
-        	scalar y = CC[cellI].y(); 
-         
-            NC12H26[cellI] = NC12H26_i + A * 0.5 * (1-tanh(B*(mag(y-L/2)/ro - ro/mag(y-L/2))));
-            
+
+        	scalar y = CC[cellI].y();
+        	scalar x = CC[cellI].x();
+
+            U[cellI] = vector(1,0,0) * Umax * 0.5 *(1-tanh(B*(mag(y-L/2)/ro - ro/mag(y-L/2)))) + vector(0,1,0)*(Umax/2000)*sin(2*constant::mathematical::pi*x/(L/2));
+
+
         }
-        
-        writeEntry(os,"",NC12H26); 
+
+        writeEntry(os,"",U);
     #};
 
     //! Optional:
@@ -77,6 +78,7 @@ internalField  #codeStream
     #};
 
 };
+
 boundaryField
 {
     upperBoundary
@@ -98,13 +100,9 @@ boundaryField
     {
         type            cyclic;
     }
-
     frontAndBack
     {
         type            empty;
     }
-
 }
-
-
 // ************************************************************************* //

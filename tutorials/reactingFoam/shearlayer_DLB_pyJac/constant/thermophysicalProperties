@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  dev
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | DLBFoam: Dynamic Load Balancing                 |
+|  \\    /   O peration     | for fast reactive simulations                   |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  | 2020, Aalto University, Finland                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -28,6 +28,7 @@ thermoType
 
 inertSpecie N2;
 
+#include "$FOAM_CASE/constant/foam/species.foam"
 #include "$FOAM_CASE/constant/foam/thermo.foam"
 
 

@@ -1,4 +1,3 @@
-#include "species.foam"
 N2
 {
 	specie
