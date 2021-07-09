@@ -7,3 +7,4 @@ rm -rf *.png
 rm -rf 0
 rm -rf dynamicCode
 rm -rf loadBal
+rm -rf constant/foam

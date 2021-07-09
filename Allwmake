@@ -75,8 +75,6 @@ pushd tests/validation/pyjacTests/PSRTest  > /dev/null
     ./runTests.sh
 popd  > /dev/null
 
-pushd utilities  > /dev/null
-	./Allrun -m yao
-	cp mechanisms/yao/lib/build/libc_pyjac.so ../tutorials/reactingFoam/shearlayer_DLB_pyJac/constant/foam
-	cp mechanisms/yao/foam/* ../tutorials/reactingFoam/shearlayer_DLB_pyJac/constant/foam
-popd  > /dev/null
+cp -r utilities/mechanisms/yao tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac
+cp utilities/CMakeLists.txt tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac/lib/
+cp utilities/runCmake.sh tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac/lib/
