@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+| \\      /  F ield         | DLBFoam: Dynamic Load Balancing                 |
+|  \\    /   O peration     | for fast reactive simulations                   |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  | 2020, Aalto University, Finland                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -56,9 +56,9 @@ functions
 
 libs
 (
-        "libchemistryModel_DLB.so" 
+        "libchemistryModel_DLB.so"
         "libODE_DLB.so"
-        "$FOAM_CASE/constant/foam_mech/libc_pyjac.so"
+        "$FOAM_CASE/constant/foam/libc_pyjac.so"
 
 );
 

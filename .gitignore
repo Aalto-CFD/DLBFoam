@@ -7,11 +7,22 @@ src/**/*/lnInclude
 src/**/*/Make/linux64*
 applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
-tutorials/
+tutorials/**/0
+tutorials/**/[1-9]*
+tutorials/**/[0-9]*.[0-9]*
+tutorials/**/processor*
+tutorials/**/dynamicCode
+tutorials/**/constant/polyMesh
+tutorials/**/pyJac
+tutorials/reactingFoam/shearlayer_DLB_pyJac/constant/foam/*
 tests/validation/pyjacTests/PSRTest/testCase/0
+utilities/**/CMake*
+utilities/**/cmake*
+utilities/**/Makefile
 
 # pyJac related
 pyJac/build/
+utilities/mechanisms/**/build
 
 #Visual studio code configs
 .vscode
