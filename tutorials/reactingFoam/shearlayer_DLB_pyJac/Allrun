@@ -1,10 +1,18 @@
+#!/bin/sh
+
+cd pyJac/lib
+./runCmake.sh
+cd -
+cp -r pyJac/foam constant/
+cp pyJac/lib/build/libc_pyjac.so constant/foam/
+
 blockMesh
-N_PROCS=$(grep -c ^processor /proc/cpuinfo)
-foamDictionary -entry NCORES system/decomposeParDict -set $N_PROCS
+N_PROCS=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
+[ -z "$N_PROCS" ] && N_PROCS=4 # if N_PROCS not found, set it to 4
+sed -i "s/numberOfSubdomains .*/numberOfSubdomains $N_PROCS;/g" system/decomposeParDict
 
 rm -rf 0
-cp -r 0.org 0
+cp -r 0.orig 0
 
 decomposePar -force > log.decompose
 mpirun -np $N_PROCS reactingFoam -parallel > log.reactingFoam
-

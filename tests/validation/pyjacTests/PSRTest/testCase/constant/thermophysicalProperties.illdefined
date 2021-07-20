@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -26,7 +26,7 @@ thermoType
     specie          specie;
 }
 
-#include "../../../pyjacTestMechanism/foam_files/chem.foam.illdefined"
-#include "../../../pyjacTestMechanism/foam_files/thermo.foam.illdefined"
+#include "../../../pyjacTestMechanism/foam/species.foam.illdefined"
+#include "../../../pyjacTestMechanism/foam/thermo.foam.illdefined"
 
 // ************************************************************************* //

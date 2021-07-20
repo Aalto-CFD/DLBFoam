@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
-   \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
-     \\/     M anipulation  | 2020, Aalto University, Finland
+| =========                 |                                                 |
+| \\      /  F ield         | DLBFoam: Dynamic Load Balancing                 |
+|  \\    /   O peration     | for fast reactive simulations                   |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  | 2020, Aalto University, Finland                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -29,25 +29,26 @@ refmapping
         {
             NC12H26           1;
         }
-        #include        "$FOAM_CASE/constant/foam_mech/thermo.foam"
+        #include "$FOAM_CASE/constant/foam/thermo.foam"
     }
     tolerance       0.0001;
 }
+
+chemistry       on;
+
+initialChemicalTimeStep 1;
 
 loadbalancing
 {
 	active	true;
 	log	true;
 }
+
 chemistryType
 {
     solver          ode;
     method          loadBalanced;
 }
-
-chemistry       on;
-
-initialChemicalTimeStep 1;
 
 odeCoeffs
 {
@@ -55,5 +56,6 @@ odeCoeffs
     absTol          1e-08;
     relTol          1e-05;
 }
+
 #include "$FOAM_CASE/constant/reactionsYao"
 // ************************************************************************* //

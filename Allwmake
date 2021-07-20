@@ -106,7 +106,7 @@ fi
 wmake libso src/thermophysicalModels/chemistryModel
 wmake libso src/ODE_DLB
 
-pushd tests/validation/pyjacTests/pyjacTestMechanism  > /dev/null
+pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
     ./runCmake.sh
 popd  > /dev/null
 
@@ -121,3 +121,11 @@ popd  > /dev/null
 pushd tests/validation/pyjacTests/PSRTest  > /dev/null
     ./runTests.sh
 popd  > /dev/null
+
+cp -r utilities/mechanisms/yao tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac
+cp utilities/CMakeLists.txt tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac/lib/
+cp utilities/runCmake.sh tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac/lib/
+
+cp -r utilities/mechanisms/gri30 tutorials/chemFoam/gri_pyJac/pyJac
+cp utilities/CMakeLists.txt tutorials/chemFoam/gri_pyJac/pyJac/lib/
+cp utilities/runCmake.sh tutorials/chemFoam/gri_pyJac/pyJac/lib/

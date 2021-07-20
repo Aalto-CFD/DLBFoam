@@ -6,13 +6,14 @@ do
         m) mechname=${OPTARG};;
     esac
 done
-echo "COMPILED MECHANISM: $mechname";
 
+echo "Compiling mechanism: $mechname...";
 
-[[ -d foam_mech ]] && rm -r foam_mech
-mkdir foam_mech
-cp -r mechanisms/$mechname/*.foam foam_mech
-cp -r mechanisms/$mechname/out .
+[[ -d mechanisms/$mechname/lib/build ]] && rm -r mechanisms/$mechname/lib/build
+cp -r mechanisms/$mechname/lib/src .
 ./runCmake.sh
-mv build/libc_pyjac.so foam_mech
-rm -rf build out
+mv build mechanisms/$mechname/lib/
+rm -rf src
+
+echo "Compiled!"
+echo "Compiled $mechname mechanism location: mechanisms/$mechname/lib/build/libc_pyjac.so";
