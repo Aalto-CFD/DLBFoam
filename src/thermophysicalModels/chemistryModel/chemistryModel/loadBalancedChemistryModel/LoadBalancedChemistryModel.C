@@ -29,11 +29,11 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template <class ReactionThermo, class ThermoType>
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
-    LoadBalancedChemistryModel(const ReactionThermo& thermo)
+template <class ThermoType>
+Foam::LoadBalancedChemistryModel<ThermoType>::
+    LoadBalancedChemistryModel(const fluidReactionThermo& thermo)
     : 
-        StandardChemistryModel<ReactionThermo, ThermoType>(thermo),
+        standardChemistryModel<ThermoType>(thermo),
         balancer_(createBalancer()), 
         mapper_(createMapper(this->thermo())),
         cpuTimes_
@@ -79,19 +79,19 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template <class ReactionThermo, class ThermoType>
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::
+template <class ThermoType>
+Foam::LoadBalancedChemistryModel<ThermoType>::
     ~LoadBalancedChemistryModel()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 Foam::mixtureFractionRefMapper
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createMapper
+Foam::LoadBalancedChemistryModel<ThermoType>::createMapper
 (
-    const ReactionThermo& thermo
+    const fluidReactionThermo& thermo
 )
 {
     const IOdictionary chemistryDict_tmp
@@ -99,8 +99,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createMapper
             IOobject
             (
                 thermo.phasePropertyName("chemistryProperties"),
-                thermo.db().time().constant(),
-                thermo.db(),
+                thermo.T().mesh().time().constant(),
+                thermo.T().mesh(),
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE,
                 false
@@ -111,17 +111,17 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createMapper
 }
 
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 Foam::LoadBalancer
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createBalancer()
+Foam::LoadBalancedChemistryModel<ThermoType>::createBalancer()
 {
     const IOdictionary chemistryDict_tmp
         (
             IOobject
             (
                 this->thermo().phasePropertyName("chemistryProperties"),
-                this->thermo().db().time().constant(),
-                this->thermo().db(),
+                this->thermo().T().mesh().time().constant(),
+                this->thermo().T().mesh(),
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE,
                 false
@@ -132,9 +132,9 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::createBalancer()
 }
 
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 template <class DeltaTType>
-Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
+Foam::scalar Foam::LoadBalancedChemistryModel<ThermoType>::solve
 (
     const DeltaTType& deltaT
 )
@@ -147,7 +147,7 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
     scalar t_solveBuffer(0);
     scalar t_unbalance(0);
 
-    BasicChemistryModel<ReactionThermo>::correct();
+    basicChemistryModel::correct();
 
     if(!this->chemistry_)
     {
@@ -209,8 +209,8 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
 }
 
 
-template <class ReactionThermo, class ThermoType>
-void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveSingle
+template <class ThermoType>
+void Foam::LoadBalancedChemistryModel<ThermoType>::solveSingle
 (
     ChemistryProblem& problem, ChemistrySolution& solution
 ) const
@@ -250,9 +250,9 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveSingle
 }
 
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 Foam::scalar
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRates
+Foam::LoadBalancedChemistryModel<ThermoType>::updateReactionRates
 (
     const RecvBuffer<ChemistrySolution>& solutions
 )
@@ -276,8 +276,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
 }
 
 
-template <class ReactionThermo, class ThermoType>
-Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
+template <class ThermoType>
+Foam::scalar Foam::LoadBalancedChemistryModel<ThermoType>::solve
 (
     const scalarField& deltaT
 )
@@ -286,8 +286,8 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
 }
 
 
-template <class ReactionThermo, class ThermoType>
-Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
+template <class ThermoType>
+Foam::scalar Foam::LoadBalancedChemistryModel<ThermoType>::solve
 (
     const scalar deltaT
 )
@@ -299,9 +299,9 @@ Foam::scalar Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solve
 }
 
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 Foam::RecvBuffer<Foam::ChemistrySolution>
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveBuffer
+Foam::LoadBalancedChemistryModel<ThermoType>::solveBuffer
 (
     RecvBuffer<ChemistryProblem>& problems
 ) const
@@ -317,9 +317,9 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveBuffer
 }
 
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 Foam::DynamicList<Foam::ChemistrySolution>
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList
+Foam::LoadBalancedChemistryModel<ThermoType>::solveList
 (
     UList<ChemistryProblem>& problems
 ) const
@@ -336,10 +336,10 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::solveList
 
 
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 template<class DeltaTType>
 Foam::DynamicList<Foam::ChemistryProblem>
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
+Foam::LoadBalancedChemistryModel<ThermoType>::getProblems
 (
     const DeltaTType& deltaT
 )
@@ -419,8 +419,8 @@ Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getProblems
 }
 
 
-template <class ReactionThermo, class ThermoType>
-void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
+template <class ThermoType>
+void Foam::LoadBalancedChemistryModel<ThermoType>::map
 (
     DynamicList<ChemistryProblem>& mapped_problems, 
     DynamicList<ChemistryProblem>& solved_problems
@@ -456,8 +456,8 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::map
     }
 }
 
-template <class ReactionThermo, class ThermoType>
-void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
+template <class ThermoType>
+void Foam::LoadBalancedChemistryModel<ThermoType>::updateReactionRate
 (
     const ChemistrySolution& solution, const label& i
 )
@@ -469,8 +469,8 @@ void Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactio
     this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }
 
-template <class ReactionThermo, class ThermoType>
-Foam::scalarField Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::getVariable
+template <class ThermoType>
+Foam::scalarField Foam::LoadBalancedChemistryModel<ThermoType>::getVariable
 (
     const scalarField& concentration, const scalarField& massFraction
 )

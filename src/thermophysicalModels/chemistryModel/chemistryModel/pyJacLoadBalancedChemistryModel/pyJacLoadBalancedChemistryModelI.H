@@ -30,9 +30,9 @@ License
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class ReactionThermo, class ThermoType>
+template<class ThermoType>
 inline Foam::label
-Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::nEqns() const
+Foam::pyJacLoadBalancedChemistryModel<ThermoType>::nEqns() const
 {
     // nEqns = number of species - 1(inert) + temperature + pressure
     return this->nSpecie_ + 1;

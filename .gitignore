@@ -2,11 +2,17 @@
 src/**/lnInclude
 src/**/Make/linux64*
 tests/**/*/Make/linux64*
+tests/**/*/Make/linuxArm64*
 src/ODE_DLB/Make/options
 src/**/*/lnInclude
 src/**/*/Make/linux64*
+src/**/*/Make/linuxArm64*
 applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
+applications/solvers/**/*/Make/linuxArm64*
+applications/utilities/**/Make/linuxArm64*
+
+tutorials/
 tutorials/**/0
 tutorials/**/[1-9]*
 tutorials/**/[0-9]*.[0-9]*
