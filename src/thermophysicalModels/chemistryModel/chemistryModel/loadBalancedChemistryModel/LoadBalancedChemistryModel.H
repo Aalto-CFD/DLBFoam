@@ -42,7 +42,7 @@ SourceFiles
 #include "LoadBalancer.H"
 #include "OFstream.H"
 #include "IOmanip.H"
-#include "StandardChemistryModel.H"
+#include "standardChemistryModel.H"
 #include "clockTime.H"
 #include "mixtureFractionRefMapper.H"
 
@@ -55,10 +55,10 @@ namespace Foam
                 Class LoadBalancedChemistryModel Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class ReactionThermo, class ThermoType>
+template<class ThermoType>
 class LoadBalancedChemistryModel
 : 
-    public StandardChemistryModel<ReactionThermo, ThermoType>
+    public standardChemistryModel<ThermoType>
 {
 
 private:
@@ -86,7 +86,7 @@ private:
     // Private Member Functions
 
         //- Create a reference mapper object
-        static mixtureFractionRefMapper createMapper(const ReactionThermo& thermo);
+        static mixtureFractionRefMapper createMapper(const fluidReactionThermo& thermo);
 
         //- Create a load balancer object
         LoadBalancer createBalancer();
@@ -136,7 +136,7 @@ public:
     // Constructors
 
         //- Construct from thermo
-        LoadBalancedChemistryModel(const ReactionThermo& thermo);
+        LoadBalancedChemistryModel(const fluidReactionThermo& thermo);
 
         //- Disallow default bitwise copy construction
         LoadBalancedChemistryModel(const LoadBalancedChemistryModel&);
@@ -152,7 +152,7 @@ public:
         void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution) const;
 
         // Chemistry model functions (overriding functions in
-        // StandardChemistryModel to use the private solve function)
+        // standardChemistryModel to use the private solve function)
 
             //- Solve the reaction system for the given time step
             //  and return the characteristic time
@@ -193,7 +193,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#include "LoadBalancedChemistryModel.C"
+    #include "LoadBalancedChemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

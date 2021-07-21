@@ -31,10 +31,10 @@ License
 
 namespace Foam {
 
-template <class ReactionThermo, class ThermoType>
-pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::pyJacLoadBalancedChemistryModel(
-    const ReactionThermo& thermo)
-    : LoadBalancedChemistryModel<ReactionThermo, ThermoType>(thermo)
+template <class ThermoType>
+pyJacLoadBalancedChemistryModel<ThermoType>::pyJacLoadBalancedChemistryModel(
+    const fluidReactionThermo& thermo)
+    : LoadBalancedChemistryModel<ThermoType>(thermo)
     , sp_enth_form(this->nSpecie_) {
 
     if (this->chemistry_) {
@@ -51,7 +51,7 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::pyJacLoadBalancedCh
         for (label i = 0; i < this->nSpecie_; i++) { sp_enth_form[i] = sp_enth_form_[i]; }
     }
     
-    Info << "Overriding StandardChemistryModel by pyJacLoadBalancedChemistryModel:" << endl; 
+    Info << "Overriding standardChemistryModel by pyJacLoadBalancedChemistryModel:" << endl; 
 
     if (this->nSpecie_ == PYJAC_NSP())
     {
@@ -71,11 +71,11 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::pyJacLoadBalancedCh
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template <class ReactionThermo, class ThermoType>
-pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::~pyJacLoadBalancedChemistryModel() {}
+template <class ThermoType>
+pyJacLoadBalancedChemistryModel<ThermoType>::~pyJacLoadBalancedChemistryModel() {}
 
-template <class ReactionThermo, class ThermoType>
-void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
+template <class ThermoType>
+void pyJacLoadBalancedChemistryModel<ThermoType>::jacobian(
     const scalar t, const scalarField& c, const label li, scalarField& dcdt, scalarSquareMatrix& J)
     const {
 
@@ -116,8 +116,8 @@ void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::jacobian(
 
 }
 
-template <class ReactionThermo, class ThermoType>
-void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::derivatives(
+template <class ThermoType>
+void pyJacLoadBalancedChemistryModel<ThermoType>::derivatives(
     const scalar t, const scalarField& c, const label li, scalarField& dcdt) const {
 
     std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
@@ -145,9 +145,9 @@ void pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::derivatives(
     dcdt[this->nSpecie_] = 0.0;
 }
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 Foam::tmp<Foam::volScalarField>
-pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::Qdot() const {
+pyJacLoadBalancedChemistryModel<ThermoType>::Qdot() const {
 
     tmp<volScalarField> tQdot(
         new volScalarField(IOobject("Qdot",
@@ -171,8 +171,8 @@ pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::Qdot() const {
 }
 
 // TODO: Make this work for pyjac
-template <class ReactionThermo, class ThermoType>
-void Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateReactionRate
+template <class ThermoType>
+void Foam::pyJacLoadBalancedChemistryModel<ThermoType>::updateReactionRate
 (
     const ChemistrySolution& solution, const label& i
 )
@@ -184,8 +184,8 @@ void Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::updateRe
     this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }
 
-template <class ReactionThermo, class ThermoType>
-Foam::scalarField Foam::pyJacLoadBalancedChemistryModel<ReactionThermo, ThermoType>::getVariable
+template <class ThermoType>
+Foam::scalarField Foam::pyJacLoadBalancedChemistryModel<ThermoType>::getVariable
 (
     const scalarField& concentration, const scalarField& massFraction
 )

@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ChemistryModel>
-Foam::ode_pyJac<ChemistryModel>::ode_pyJac(const typename ChemistryModel::reactionThermo& thermo)
+Foam::ode_pyJac<ChemistryModel>::ode_pyJac(const fluidReactionThermo& thermo)
 :
     chemistrySolver<ChemistryModel>(thermo),
     coeffsDict_(this->subDict("odeCoeffs")),

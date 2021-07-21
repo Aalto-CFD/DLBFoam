@@ -25,14 +25,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "volFields.H"
-#include "zeroGradientFvPatchFields.H"
+#include "OSspecific.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template <class ReactionThermo, class ThermoType>
-Foam::autoPtr<Foam::OFstream>
-Foam::LoadBalancedChemistryModel<ReactionThermo, ThermoType>::logFile(
+template <class ThermoType>
+inline Foam::autoPtr<Foam::OFstream>
+Foam::LoadBalancedChemistryModel<ThermoType>::logFile(
     const word& name) const
 {
     mkDir(this->mesh().time().path() / "loadBal" / this->group());

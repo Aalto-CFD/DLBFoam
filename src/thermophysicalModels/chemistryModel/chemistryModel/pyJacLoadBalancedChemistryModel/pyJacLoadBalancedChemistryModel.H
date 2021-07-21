@@ -58,9 +58,9 @@ class fvMesh;
                       Class pyJacLoadBalancedChemistryModel Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class ReactionThermo, class ThermoType>
+template <class ThermoType>
 class pyJacLoadBalancedChemistryModel
-    : public LoadBalancedChemistryModel<ReactionThermo, ThermoType> {
+    : public LoadBalancedChemistryModel<ThermoType> {
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
 public:
@@ -70,7 +70,7 @@ public:
     // Constructors
 
     //- Construct from thermo
-    pyJacLoadBalancedChemistryModel(const ReactionThermo& thermo);
+    pyJacLoadBalancedChemistryModel(const fluidReactionThermo& thermo);
 
     //- Destructor
     virtual ~pyJacLoadBalancedChemistryModel();
@@ -80,7 +80,7 @@ public:
 
     inline virtual label nEqns() const;
 
-    //- Override jacobian and derivatives function from StandardChemistryModel
+    //- Override jacobian and derivatives function from standardChemistryModel
     virtual void jacobian(const scalar        t,
                           const scalarField&  c,
                           const label         li,
@@ -92,7 +92,7 @@ public:
                              const label        li,
                              scalarField&       dcdt) const override;
 
-    //- Override Qdot function from StandardChemistryModel for using pyJac's enthalpy of formation
+    //- Override Qdot function from standardChemistryModel for using pyJac's enthalpy of formation
     virtual tmp<volScalarField> Qdot() const override;
 
 private:

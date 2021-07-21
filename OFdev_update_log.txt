@@ -1,0 +1,7 @@
+Modifications required since the working OF-8 version:
+- gas / liquid definitions  https://github.com/OpenFOAM/OpenFOAM-dev/commit/fe89082f73c6c65320528632c1398ce938c4ebd3#diff-4869cbe262a9a1d9d85f809d95fd3d28447edbcfce29be2e5fd04cdc49216245
+- Standard -> standard https://github.com/OpenFOAM/OpenFOAM-dev/commit/07d583e9897b16212776860936424dca913c21b8#diff-f537bda90dec8bc2ad5fc20a5ff8cbf253fb6e19fa60ba16bf88ab7edb434989
+- thermo.db() not defined anymore --> new standard way to access mesh object via thermo is: thermo.T().mesh().time().constant()
+- "typename ChemistryModel::reactionThermo& thermo" -->  "const fluidReactionThermo& thermo", see https://github.com/OpenFOAM/OpenFOAM-dev/commit/a8e809080347c18b9496f353c6cd2d9c53b3e82a#diff-4147dd0445bf26f125190b5062f8422dab84eb7db9a6bb26e13f6d4790db3fef
+- BasicChemistryModel --> basicChemistryModel
+    - basicChemistryModel<T>::correct(); --> basicChemistryModel::correct();

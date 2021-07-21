@@ -1,7 +1,6 @@
 ### Test module for validating pyJac chemistry models
 
 - Covered tests:
-    - X
     - Reference data obtained by Cantera-2.5.1-dev (c.f. XX.py)
 
 - pyjacTestMechanism:

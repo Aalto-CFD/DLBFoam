@@ -1,6 +1,11 @@
 - README mechanism choice needs to be re-written. First introduce  general requirements, 
 then introduce ct2foam and lastly the examples.
 
+- thermophysicalProperties requires defaultSpecie N2; -- perhaps in ct2foam as well -- check?
+
+- two tutorials should share same files --now double
+
+
 - remove 0dtest
 
 - remove rankbased figure to a separate doc folder
@@ -9,8 +14,8 @@ then introduce ct2foam and lastly the examples.
 
 - README has lot of debian based assumption (bashrc references etc.)
 
-- make pyjac2foam such that it provides single dir with everything:
-    - print out example include format for openfoam
+- Add readme that tested with Intel, AMD and Qualcomm arm64 architectures. Also with debian / red hat systems as well as 
+ with WSL and WSL2 environments.
 
 - remove unnecessary dependencies from applications/solvers.
 
