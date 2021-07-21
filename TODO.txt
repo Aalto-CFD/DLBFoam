@@ -1,6 +1,13 @@
-- Fix Allwclean
+- README mechanism choice needs to be re-written. First introduce  general requirements, 
+then introduce ct2foam and lastly the examples.
 
 - remove 0dtest
+
+- remove rankbased figure to a separate doc folder
+
+- Fix README controldict example with unified ct2foam output
+
+- README has lot of debian based assumption (bashrc references etc.)
 
 - make pyjac2foam such that it provides single dir with everything:
     - print out example include format for openfoam
@@ -19,6 +26,3 @@ chemFoam: symbol lookup error: /path/to/user/OpenFoam/linux64GccDPInt32Opt/lib/l
 - Make a safety check that CONP is defined and pyjac mechanism is generated in constant pressure mode. 
 
 - library run-time naming could be different "_pyjac" in everything too much?
-
-- Add cmake as a requirement in README -- could be avoided in a long run as well
-
