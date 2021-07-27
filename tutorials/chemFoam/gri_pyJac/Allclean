@@ -1,4 +1,4 @@
 #!/bin/bash
 
 shopt -s extglob
-rm -r !("Allrun"|"Allclean"|"pyJac"|".gitignore")
+rm -r !("Allrun"|"Allclean"|"pyJac"|".gitignore"|".."|".")
