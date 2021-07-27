@@ -5,7 +5,7 @@ if [ -z ${WM_PROJECT_VERSION+x} ]; then
     echo "OpenFOAM is not loaded!"
     exit 1
 else
-    if [ $WM_PROJECT_VERSION -ne 8 ]; then
+    if [ $WM_PROJECT_VERSION -ne 9 ]; then
         echo "Wrong OpenFOAM version!"
         echo $WM_PROJECT_VERSION
 		exit 1
