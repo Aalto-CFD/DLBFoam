@@ -30,14 +30,14 @@ cp pyJac/lib/build/libc_pyjac.so constant/foam/
 
 # Set DLB dictionaries
 foamDictionary -entry loadbalancing -set {} constant/chemistryProperties
-foamDictionary -entry loadbalancing.active -add false constant/chemistryProperties
+foamDictionary -entry loadbalancing/active -add false constant/chemistryProperties
 foamDictionary -entry refmapping -set {} constant/chemistryProperties
-foamDictionary -entry refmapping.active -add false constant/chemistryProperties
+foamDictionary -entry refmapping/active -add false constant/chemistryProperties
 
 # Set pyJac and LAPACK
-foamDictionary -entry chemistryType.solver -set ode_pyJac constant/chemistryProperties
-foamDictionary -entry chemistryType.method -set loadBalanced_pyJac constant/chemistryProperties
-foamDictionary -entry odeCoeffs.solver -set seulex_LAPACK constant/chemistryProperties
+foamDictionary -entry chemistryType/solver -set ode_pyJac constant/chemistryProperties
+foamDictionary -entry chemistryType/method -set loadBalanced_pyJac constant/chemistryProperties
+foamDictionary -entry odeCoeffs/solver -set seulex_LAPACK constant/chemistryProperties
 
 # Include libraries
 foamDictionary -entry libs -set '("libchemistryModel_DLB.so" "libODE_DLB.so" "$FOAM_CASE/constant/foam/libc_pyjac.so")' system/controlDict
