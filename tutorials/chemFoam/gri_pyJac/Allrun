@@ -1,16 +1,22 @@
 #!/bin/sh
 
-# Ensure the use of OpenFOAM 8, so that gri tutorial is present in $FOAM_TUTORIALS
-if [ -z ${WM_PROJECT_VERSION+x} ]; then
-    echo "OpenFOAM is not loaded!"
-    exit 1
-else
-    if [ $WM_PROJECT_VERSION -ne 8 ]; then
-        echo "Wrong OpenFOAM version!"
-        echo $WM_PROJECT_VERSION
-		exit 1
+# Ensure the use of OpenFOAM 9, so that gri tutorial is present in $FOAM_TUTORIALS
+OF_VER="9"
+
+check_openfoam()
+{
+    if [ -z ${WM_PROJECT} ]; then
+        echo "OpenFOAM environment not set."
+        exit 1
     fi
-fi
+
+    if [[ ! "$WM_PROJECT_VERSION" == "$OF_VER" ]]; then
+        echo "Error: OpenFOAM-$WM_PROJECT_VERSION not supported."
+        echo "       See other git branches for potential support."
+        exit 1
+    fi
+}
+check_openfoam
 
 # Copy tutorial files from OpenFOAM
 cp -nr $FOAM_TUTORIALS/combustion/chemFoam/gri/* .
