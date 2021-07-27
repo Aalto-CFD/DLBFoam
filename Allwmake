@@ -4,8 +4,7 @@ cd ${0%/*} || exit 1    # run from this directory
 set -e # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 
 # The supported OpenFOAM version
-OF_VER="dev"
-#OF_VER="9"
+OF_VER="9"
 
 check_openfoam()
 {
