@@ -141,6 +141,9 @@ refmapping
     deltaT	2; // temperature tolerance
 }
 ```
+
+![refmap](https://i.imgur.com/3SvRUZZ.gif)
+
 Reference mapping uses mixture fraction (Z) and maps a reference solution to reference
 cells satisfying a condition.
 
