@@ -211,17 +211,21 @@ B. Tekgül,  P. Peltonen,  H. Kahila,  O. Kaario,  V. Vuorinen,  DLBFoam: An ope
 </details>
 
 <a id="2">[2]</a> 
-I. Morev, B. Tekgül, M. Gadalla, A. Shahanaghi, J. Kannan, S. Karimkashi, O. Kaario, V. Vuorinen, Fast reactive flow simulations using analytical Jacobian and dynamic load balancing in OpenFOAM, arXiv preprint [arXiv:2105.12070](https://arxiv.org/abs/2105.12070) (2021).
+I. Morev, B. Tekgül, M. Gadalla, A. Shahanaghi, J. Kannan, S. Karimkashi, O. Kaario, V. Vuorinen, Fast reactive flow simulations using analytical Jacobian and dynamic load balancing in OpenFOAM, Physics of Fluids 34, 021801, [10.1063/5.0077437](https://doi.org/10.1063/5.0077437) (2022).
 <details>
 <summary>BibTex</summary>
 <p>
  
 ```
-@article{morev2021fast,
-  title={Fast reactive flow simulations using analytical Jacobian and dynamic load balancing in OpenFOAM},
-  author={Morev, Ilya and Tekg{\"u}l, Bulut and Gadalla, Mahmoud and Shahanaghi, Ali and Kannan, Jeevananthan and Karimkashi, Shervin and Kaario, Ossi and Vuorinen, Ville},
-  journal={arXiv preprint arXiv:2105.12070},
-  year={2021}
+@article{morev2022fast,
+  author = {Morev,Ilya  and Tekg{\"u}l,Bulut  and Gadalla,Mahmoud  and Shahanaghi,Ali  and Kannan,Jeevananthan  and Karimkashi,Shervin  and Kaario,Ossi  and Vuorinen,Ville },
+  title = {{Fast reactive flow simulations using analytical Jacobian and dynamic load balancing in OpenFOAM}},
+  journal = {Physics of Fluids},
+  volume = {34},
+  number = {2},
+  pages = {021801},
+  year = {2022},
+  doi = {10.1063/5.0077437},
 }
 ```
  
