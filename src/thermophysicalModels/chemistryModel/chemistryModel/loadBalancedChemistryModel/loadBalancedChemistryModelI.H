@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ License
 
 template <class ThermoType>
 inline Foam::autoPtr<Foam::OFstream>
-Foam::LoadBalancedChemistryModel<ThermoType>::logFile(
+Foam::loadBalancedChemistryModel<ThermoType>::logFile(
     const word& name) const
 {
     mkDir(this->mesh().time().path() / "loadBal" / this->group());

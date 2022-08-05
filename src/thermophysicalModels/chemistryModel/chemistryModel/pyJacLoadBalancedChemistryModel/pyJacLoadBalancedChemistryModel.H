@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -38,7 +38,7 @@ SourceFiles
 #define pyJacLoadBalancedChemistryModel_H
 
 #include "clockTime.H"
-#include "LoadBalancedChemistryModel.H"
+#include "loadBalancedChemistryModel.H"
 
 // pyJac dependencies
 extern "C" {
@@ -60,7 +60,7 @@ class fvMesh;
 
 template <class ThermoType>
 class pyJacLoadBalancedChemistryModel
-    : public LoadBalancedChemistryModel<ThermoType> {
+    : public loadBalancedChemistryModel<ThermoType> {
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
 public:
@@ -105,7 +105,7 @@ private:
     //- Update the reaction rate of cell i
     void
     updateReactionRate(const ChemistrySolution& solution, const label& i);
-    
+
     //- Return the main chemistry variable
     //  (concentration for standard, mass fraction for pyJac)
     scalarField getVariable(const scalarField& concentration, const scalarField& massFraction);

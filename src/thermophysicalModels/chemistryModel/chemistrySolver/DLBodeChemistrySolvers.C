@@ -25,7 +25,7 @@ License
 
 #include "ode.H"
 
-#include "LoadBalancedChemistryModel.H"
+#include "loadBalancedChemistryModel.H"
 #include "pyJacLoadBalancedChemistryModel.H"
 
 #include "forGases.H"

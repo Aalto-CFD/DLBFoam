@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -34,14 +34,14 @@ namespace Foam {
 template <class ThermoType>
 pyJacLoadBalancedChemistryModel<ThermoType>::pyJacLoadBalancedChemistryModel(
     const fluidReactionThermo& thermo)
-    : LoadBalancedChemistryModel<ThermoType>(thermo)
+    : loadBalancedChemistryModel<ThermoType>(thermo)
     , sp_enth_form(this->nSpecie_) {
 
     if (this->chemistry_) {
         // TODO: prevent symbol look-up error in case of ill mechanism library compilation or wrong path
         // 1) Instead of providing libc_pyjac.so in controlDict, it should be given in chemistryProperties as a lib() argument (similar to functionObjects).
         // 2) Read the new lib() as dictionary path variable here in the constructor.
-        // 3) Implement here "is_pyjac_lib_available(pyjac_lib_path)": 
+        // 3) Implement here "is_pyjac_lib_available(pyjac_lib_path)":
         //      - utilise dlopen for the test, see e.g. https://stackoverflow.com/questions/56747328/loading-shared-library-dynamically-using-dlopen
         // 4) If library is not available, safe exit and print out "check your libc_pyjac.so path in chemistryProperties."
 
@@ -50,12 +50,12 @@ pyJacLoadBalancedChemistryModel<ThermoType>::pyJacLoadBalancedChemistryModel(
         eval_h(298.15, sp_enth_form_.data());
         for (label i = 0; i < this->nSpecie_; i++) { sp_enth_form[i] = sp_enth_form_[i]; }
     }
-    
-    Info << "Overriding standardChemistryModel by pyJacLoadBalancedChemistryModel:" << endl; 
+
+    Info << "Overriding standardChemistryModel by pyJacLoadBalancedChemistryModel:" << endl;
 
     if (this->nSpecie_ == PYJAC_NSP())
     {
-        Info << "pyJac mechanism information:" << 
+        Info << "pyJac mechanism information:" <<
                 "\n\tNumber of species: " << PYJAC_NSP() <<
                 "\n\tNumber of forward reactions: " << PYJAC_FWD_RATES() << "\n" << endl;
     }
