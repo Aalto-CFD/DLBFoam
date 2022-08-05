@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -32,7 +32,7 @@ License
 
 template<class ThermoType>
 inline Foam::label
-Foam::pyJacLoadBalancedChemistryModel<ThermoType>::nEqns() const
+Foam::loadBalanced_pyJacChemistryModel<ThermoType>::nEqns() const
 {
     // nEqns = number of species - 1(inert) + temperature + pressure
     return this->nSpecie_ + 1;

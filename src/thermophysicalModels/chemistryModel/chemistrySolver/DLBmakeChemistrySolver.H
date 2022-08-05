@@ -39,7 +39,7 @@ License
                                                                                \
     defineChemistrySolver                                                      \
     (                                                                          \
-        pyJacLoadBalancedChemistryModel,                                       \
+        loadBalanced_pyJacChemistryModel,                                      \
         ThermoPhysics                                                          \
     )
 
@@ -54,7 +54,7 @@ License
     makeChemistrySolver                                                        \
     (                                                                          \
         Solver,                                                                \
-        pyJacLoadBalancedChemistryModel,                                       \
+        loadBalanced_pyJacChemistryModel,                                      \
         ThermoPhysics                                                          \
     )
 

@@ -25,14 +25,14 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "pyJacLoadBalancedChemistryModel.H"
+#include "loadBalanced_pyJacChemistryModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 namespace Foam {
 
 template <class ThermoType>
-pyJacLoadBalancedChemistryModel<ThermoType>::pyJacLoadBalancedChemistryModel(
+loadBalanced_pyJacChemistryModel<ThermoType>::loadBalanced_pyJacChemistryModel(
     const fluidReactionThermo& thermo)
     : loadBalancedChemistryModel<ThermoType>(thermo)
     , sp_enth_form(this->nSpecie_) {
@@ -51,7 +51,7 @@ pyJacLoadBalancedChemistryModel<ThermoType>::pyJacLoadBalancedChemistryModel(
         for (label i = 0; i < this->nSpecie_; i++) { sp_enth_form[i] = sp_enth_form_[i]; }
     }
 
-    Info << "Overriding standardChemistryModel by pyJacLoadBalancedChemistryModel:" << endl;
+    Info << "Overriding standardChemistryModel by loadBalanced_pyJacChemistryModel:" << endl;
 
     if (this->nSpecie_ == PYJAC_NSP())
     {
@@ -63,7 +63,7 @@ pyJacLoadBalancedChemistryModel<ThermoType>::pyJacLoadBalancedChemistryModel(
     {
         FatalErrorIn
         (
-            "pyJacLoadBalancedChemistryModel::New"
+            "loadBalanced_pyJacChemistryModel::New"
         )   << "\nInconsistent definition of number of species between thermophysicalProperties (Nsp = " << this->nSpecie_ << ") and pyJac library (Nsp = " << PYJAC_NSP() << ")"
             << exit(FatalError);
     }
@@ -72,10 +72,10 @@ pyJacLoadBalancedChemistryModel<ThermoType>::pyJacLoadBalancedChemistryModel(
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template <class ThermoType>
-pyJacLoadBalancedChemistryModel<ThermoType>::~pyJacLoadBalancedChemistryModel() {}
+loadBalanced_pyJacChemistryModel<ThermoType>::~loadBalanced_pyJacChemistryModel() {}
 
 template <class ThermoType>
-void pyJacLoadBalancedChemistryModel<ThermoType>::jacobian(
+void loadBalanced_pyJacChemistryModel<ThermoType>::jacobian(
     const scalar t, const scalarField& c, const label li, scalarField& dcdt, scalarSquareMatrix& J)
     const {
 
@@ -117,7 +117,7 @@ void pyJacLoadBalancedChemistryModel<ThermoType>::jacobian(
 }
 
 template <class ThermoType>
-void pyJacLoadBalancedChemistryModel<ThermoType>::derivatives(
+void loadBalanced_pyJacChemistryModel<ThermoType>::derivatives(
     const scalar t, const scalarField& c, const label li, scalarField& dcdt) const {
 
     std::vector<scalar> yToPyJac(this->nSpecie_ + 1, 0.0);
@@ -147,7 +147,7 @@ void pyJacLoadBalancedChemistryModel<ThermoType>::derivatives(
 
 template <class ThermoType>
 Foam::tmp<Foam::volScalarField>
-pyJacLoadBalancedChemistryModel<ThermoType>::Qdot() const {
+loadBalanced_pyJacChemistryModel<ThermoType>::Qdot() const {
 
     tmp<volScalarField> tQdot(
         new volScalarField(IOobject("Qdot",
@@ -172,7 +172,7 @@ pyJacLoadBalancedChemistryModel<ThermoType>::Qdot() const {
 
 // TODO: Make this work for pyjac
 template <class ThermoType>
-void Foam::pyJacLoadBalancedChemistryModel<ThermoType>::updateReactionRate
+void Foam::loadBalanced_pyJacChemistryModel<ThermoType>::updateReactionRate
 (
     const ChemistrySolution& solution, const label& i
 )
@@ -185,7 +185,7 @@ void Foam::pyJacLoadBalancedChemistryModel<ThermoType>::updateReactionRate
 }
 
 template <class ThermoType>
-Foam::scalarField Foam::pyJacLoadBalancedChemistryModel<ThermoType>::getVariable
+Foam::scalarField Foam::loadBalanced_pyJacChemistryModel<ThermoType>::getVariable
 (
     const scalarField& concentration, const scalarField& massFraction
 )

@@ -26,7 +26,7 @@ License
 #include "noChemistrySolver.H"
 
 #include "loadBalancedChemistryModel.H"
-#include "pyJacLoadBalancedChemistryModel.H"
+#include "loadBalanced_pyJacChemistryModel.H"
 
 #include "forGases.H"
 #include "forLiquids.H"
