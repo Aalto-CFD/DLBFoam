@@ -24,18 +24,18 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::pyJacLoadBalancedChemistryModel
+    Foam::loadBalanced_pyJacChemistryModel
 
 Description
     Extends loadBalancedChemistryModel model by adding analytical Jacobian.
 
 SourceFiles
-    pyJacLoadBalancedChemistryModel.C
+    loadBalanced_pyJacChemistryModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef pyJacLoadBalancedChemistryModel_H
-#define pyJacLoadBalancedChemistryModel_H
+#ifndef loadBalanced_pyJacChemistryModel_H
+#define loadBalanced_pyJacChemistryModel_H
 
 #include "clockTime.H"
 #include "loadBalancedChemistryModel.H"
@@ -55,11 +55,11 @@ namespace Foam {
 class fvMesh;
 
 /*---------------------------------------------------------------------------*\
-                      Class pyJacLoadBalancedChemistryModel Declaration
+                      Class loadBalanced_pyJacChemistryModel Declaration
 \*---------------------------------------------------------------------------*/
 
 template <class ThermoType>
-class pyJacLoadBalancedChemistryModel
+class loadBalanced_pyJacChemistryModel
     : public loadBalancedChemistryModel<ThermoType> {
     template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
@@ -70,13 +70,13 @@ public:
     // Constructors
 
     //- Construct from thermo
-    pyJacLoadBalancedChemistryModel(const fluidReactionThermo& thermo);
+    loadBalanced_pyJacChemistryModel(const fluidReactionThermo& thermo);
 
     //- Destructor
-    virtual ~pyJacLoadBalancedChemistryModel();
+    virtual ~loadBalanced_pyJacChemistryModel();
 
     //- Disallow default bitwise copy construction
-    pyJacLoadBalancedChemistryModel(const pyJacLoadBalancedChemistryModel&);
+    loadBalanced_pyJacChemistryModel(const loadBalanced_pyJacChemistryModel&);
 
     inline virtual label nEqns() const;
 
@@ -117,12 +117,12 @@ private:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "pyJacLoadBalancedChemistryModelI.H"
+#include "loadBalanced_pyJacChemistryModelI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#include "pyJacLoadBalancedChemistryModel.C"
+#include "loadBalanced_pyJacChemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
