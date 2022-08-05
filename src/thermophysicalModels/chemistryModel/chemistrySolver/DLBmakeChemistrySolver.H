@@ -33,7 +33,7 @@ License
 #define DLBdefineChemistrySolvers(nullArg, ThermoPhysics)                      \
     defineChemistrySolver                                                      \
     (                                                                          \
-        LoadBalancedChemistryModel,                                            \
+        loadBalancedChemistryModel,                                            \
         ThermoPhysics                                                          \
     );                                                                         \
                                                                                \
@@ -48,7 +48,7 @@ License
     makeChemistrySolver                                                        \
     (                                                                          \
         Solver,                                                                \
-        LoadBalancedChemistryModel,                                            \
+        loadBalancedChemistryModel,                                            \
         ThermoPhysics                                                          \
     );                                                                         \
     makeChemistrySolver                                                        \

@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -24,18 +24,18 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::LoadBalancedChemistryModel
+    Foam::loadBalancedChemistryModel
 
 Description
     Extends standardChemistryModel model by adding a load balancing algorithm.
 
 SourceFiles
-    LoadBalancedChemistryModel.C
+    loadBalancedChemistryModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef LoadBalancedChemistryModel_H
-#define LoadBalancedChemistryModel_H
+#ifndef loadBalancedChemistryModel_H
+#define loadBalancedChemistryModel_H
 
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
@@ -52,12 +52,12 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                Class LoadBalancedChemistryModel Declaration
+                Class loadBalancedChemistryModel Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class ThermoType>
-class LoadBalancedChemistryModel
-: 
+class loadBalancedChemistryModel
+:
     public standardChemistryModel<ThermoType>
 {
 
@@ -70,10 +70,10 @@ private:
         // Reference mapping object
         mixtureFractionRefMapper mapper_;
 
-        // Field containing chemistry CPU time information    
+        // Field containing chemistry CPU time information
         volScalarField cpuTimes_;
 
-        // Field containing reference mapping information   
+        // Field containing reference mapping information
         // 0 -> reference solution
         // 1 -> mapped from reference solution
         // 2 -> solved explicitly
@@ -96,11 +96,11 @@ private:
         DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
 
         //- Solve a list of chemistry problems and return a list of solutions
-        DynamicList<ChemistrySolution> 
+        DynamicList<ChemistrySolution>
         solveList(UList<ChemistryProblem>& problems) const;
 
         //- Solve the problem buffer coming from the balancer
-        RecvBuffer<ChemistrySolution> 
+        RecvBuffer<ChemistrySolution>
         solveBuffer(RecvBuffer<ChemistryProblem>& problems) const;
 
         //- Update the reaction rate of cell i
@@ -119,10 +119,10 @@ private:
         template<class DeltaTType>
         scalar solve(const DeltaTType& deltaT);
 
-        //- Apply the reference cell mapping 
-        //TODO: This doesnt belong here and should be in reference cell mapping class. 
-        //      Implement a generic filter class from which the tabulation methods inherit and make 
-        //      the mapping base class inherit from that. 
+        //- Apply the reference cell mapping
+        //TODO: This doesnt belong here and should be in reference cell mapping class.
+        //      Implement a generic filter class from which the tabulation methods inherit and make
+        //      the mapping base class inherit from that.
         void map(DynamicList<ChemistryProblem>& mapped_problems, DynamicList<ChemistryProblem>& solved_problems);
 
 
@@ -136,19 +136,19 @@ public:
     // Constructors
 
         //- Construct from thermo
-        LoadBalancedChemistryModel(const fluidReactionThermo& thermo);
+        loadBalancedChemistryModel(const fluidReactionThermo& thermo);
 
         //- Disallow default bitwise copy construction
-        LoadBalancedChemistryModel(const LoadBalancedChemistryModel&);
+        loadBalancedChemistryModel(const loadBalancedChemistryModel&);
 
 
     //- Destructor
-    virtual ~LoadBalancedChemistryModel();
+    virtual ~loadBalancedChemistryModel();
 
 
     // Member Functions
 
-        //- Solve a single ChemistryProblem and put the solution to ChemistrySolution 
+        //- Solve a single ChemistryProblem and put the solution to ChemistrySolution
         void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution) const;
 
         // Chemistry model functions (overriding functions in
@@ -180,7 +180,7 @@ public:
     // Member Operators
 
         //- Disallow default bitwise assignment
-        void operator=(const LoadBalancedChemistryModel&) = delete;
+        void operator=(const loadBalancedChemistryModel&) = delete;
 
 
 };
@@ -189,11 +189,11 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-#include "LoadBalancedChemistryModelI.H"
+#include "loadBalancedChemistryModelI.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "LoadBalancedChemistryModel.C"
+    #include "loadBalancedChemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
