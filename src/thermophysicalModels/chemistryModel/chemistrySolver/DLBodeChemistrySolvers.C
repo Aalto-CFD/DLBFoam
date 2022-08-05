@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -20,7 +20,7 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "ode.H"
@@ -37,8 +37,8 @@ License
 
 namespace Foam
 {
-    forCoeffGases(makeChemistrySolvers, ode);
-    forCoeffLiquids(makeChemistrySolvers, ode);
+    forCoeffGases(DLBmakeChemistrySolvers, ode);
+    forCoeffLiquids(DLBmakeChemistrySolvers, ode);
 }
 
 

@@ -36,8 +36,8 @@ License
 
 namespace Foam
 {
-    forCoeffGases(makeChemistrySolvers, ode_pyJac);
-    forCoeffLiquids(makeChemistrySolvers, ode_pyJac);
+    forCoeffGases(DLBmakeChemistrySolvers, ode_pyJac);
+    forCoeffLiquids(DLBmakeChemistrySolvers, ode_pyJac);
 }
 
 
