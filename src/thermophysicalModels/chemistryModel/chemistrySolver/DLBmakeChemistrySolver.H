@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -20,59 +20,17 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef DLBmakeChemistrySolver_H
 #define DLBmakeChemistrySolver_H
 
-#include "addToRunTimeSelectionTable.H"
+#include "makeChemistrySolver.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-#define defineChemistrySolver(Model, ThermoPhysics)                            \
-                                                                               \
-    typedef Model<ThermoPhysics>                                               \
-        Model##ThermoPhysics;                                                  \
-                                                                               \
-    defineTemplateTypeNameAndDebugWithName                                     \
-    (                                                                          \
-        Model##ThermoPhysics,                                                  \
-        (                                                                      \
-            word(Model##ThermoPhysics::typeName_())                            \
-          + "<" + ThermoPhysics::typeName() + ">"                              \
-        ).c_str(),                                                             \
-        0                                                                      \
-    )
-
-
-#define makeChemistrySolver(Solver, Model, ThermoPhysics)                      \
-                                                                               \
-    typedef Solver<Model<ThermoPhysics>>                                       \
-        Solver##Model##ThermoPhysics;                                          \
-                                                                               \
-    defineTemplateTypeNameAndDebugWithName                                     \
-    (                                                                          \
-        Solver##Model##ThermoPhysics,                                          \
-        (                                                                      \
-            word(Solver##Model##ThermoPhysics::typeName_())                    \
-          + "<" + word(Model<ThermoPhysics>::typeName_())                      \
-          + "<" + ThermoPhysics::typeName() + ">>"                             \
-        ).c_str(),                                                             \
-        0                                                                      \
-    );                                                                         \
-                                                                               \
-    addToRunTimeSelectionTable                                                 \
-    (                                                                          \
-        basicChemistryModel,                                                   \
-        Solver##Model##ThermoPhysics,                                          \
-        thermo                                                                 \
-    )
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#define defineChemistrySolvers(nullArg, ThermoPhysics)                         \
+#define DLBdefineChemistrySolvers(nullArg, ThermoPhysics)                      \
     defineChemistrySolver                                                      \
     (                                                                          \
         LoadBalancedChemistryModel,                                            \
@@ -86,7 +44,7 @@ License
     )
 
 
-#define makeChemistrySolvers(Solver, ThermoPhysics)                            \
+#define DLBmakeChemistrySolvers(Solver, ThermoPhysics)                         \
     makeChemistrySolver                                                        \
     (                                                                          \
         Solver,                                                                \
