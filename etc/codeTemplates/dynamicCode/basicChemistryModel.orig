@@ -1,0 +1,55 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
+   \\    /   O peration     | for fast reactive simulations
+    \\  /    A nd           |
+     \\/     M anipulation  | 2022, Aalto University, Finland
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      basicChemistryModel;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solver
+(
+    EulerImplicit
+    ode
+    none
+    ode_pyJac
+);
+
+solverRenamed
+(
+    none noChemistrySolver
+);
+
+method
+(
+    standard
+    TDAC
+    loadBalanced
+    loadBalanced_pyJac
+);
+
+codeOptions
+#{
+DLBFOAM_PATH = %MY_DLBFOAM_PATH%
+
+EXE_INC = \
+    -I$(LIB_SRC)/transportModels/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
+    -I$(LIB_SRC)/ODE/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(DLBFOAM_PATH)/src/thermophysicalModels/chemistryModel/lnInclude \
+    -I$(DLBFOAM_PATH)/src/ODE_DLB/lnInclude
+#};
+
+
+// ************************************************************************* //

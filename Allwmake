@@ -8,7 +8,7 @@ OF_VER="9"
 
 check_openfoam()
 {
-    if [ -z ${WM_PROJECT} ]; then 
+    if [ -z ${WM_PROJECT} ]; then
         echo "OpenFOAM environment not set."
         exit 1
     fi
@@ -27,7 +27,7 @@ check_mkl()
     else
         echo "Error: MKL_ROOT=${MKLROOT} not found."
         exit 1
-    fi    
+    fi
 }
 
 check_openblas()
@@ -37,7 +37,7 @@ check_openblas()
     else
         echo "Error: OPENBLAS_INSTALL_ROOT=${OPENBLAS_INSTALL_ROOT} not found."
         exit 1
-    fi    
+    fi
 }
 
 
@@ -52,7 +52,7 @@ check_cmake()
 
 how_to()
 {
-    echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE" 
+    echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE"
 }
 
 
@@ -72,10 +72,10 @@ do
         shift # past argument
         shift # past value
         ;;
-        *) 
-        how_to 
-        exit 1 
-        ;;    
+        *)
+        how_to
+        exit 1
+        ;;
     esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
@@ -104,7 +104,20 @@ fi
 
 
 wmake libso src/thermophysicalModels/chemistryModel
+cp -r src/thermophysicalModels/chemistryModel/pyJacInclude src/thermophysicalModels/chemistryModel/lnInclude
 wmake libso src/ODE_DLB
+
+# copy files needed for dynamic compilation of chemistry models and solvers
+DLB_ETC_DC=etc/codeTemplates/dynamicCode
+USER_ETC_DC=${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/codeTemplates/dynamicCode
+cp $DLB_ETC_DC/basicChemistryModel.orig \
+   $DLB_ETC_DC/basicChemistryModel
+sed -i "s|%MY_DLBFOAM_PATH%|${PWD}|g" \
+    $DLB_ETC_DC/basicChemistryModel
+mkdir --parents $USER_ETC_DC
+cp $DLB_ETC_DC/basicChemistryModel $USER_ETC_DC
+cp $DLB_ETC_DC/basicChemistryModelTemplate.C $USER_ETC_DC
+
 
 pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
     ./runCmake.sh

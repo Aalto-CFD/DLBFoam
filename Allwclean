@@ -16,3 +16,10 @@ wclean tests/validation/pyjacTests/PSRTest
 
 rm -rf tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac
 rm -rf tutorials/chemFoam/gri_pyJac/pyJac
+
+# Remove files related to dynamic compilation
+DLB_ETC_DC=etc/codeTemplates/dynamicCode
+USER_ETC_DC=${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/codeTemplates/dynamicCode
+rm -f $USER_ETC_DC/basicChemistryModel
+rm -f $DLB_ETC_DC/basicChemistryModel # .orig file is there
+rm -f $USER_ETC_DC/basicChemistryModelTemplate.C
