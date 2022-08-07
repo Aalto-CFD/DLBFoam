@@ -11,6 +11,7 @@ applications/solvers/**/*/Make/linux64*
 applications/utilities/**/Make/linux64*
 applications/solvers/**/*/Make/linuxArm64*
 applications/utilities/**/Make/linuxArm64*
+etc/codeTemplates/dynamicCode/basicChemistryModel
 
 tutorials/**/0
 tutorials/**/[1-9]*
