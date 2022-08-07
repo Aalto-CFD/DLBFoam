@@ -3,6 +3,7 @@ src/**/lnInclude
 src/**/Make/linux64*
 tests/**/*/Make/linux64*
 tests/**/*/Make/linuxArm64*
+tests/**/dynamicCode
 src/ODE_DLB/Make/options
 src/**/*/lnInclude
 src/**/*/Make/linux64*

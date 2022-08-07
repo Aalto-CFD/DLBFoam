@@ -16,6 +16,8 @@ OH
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -42,6 +44,8 @@ CN
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -68,6 +72,8 @@ C2H3
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -94,6 +100,8 @@ N2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -119,6 +127,8 @@ HOCN
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -147,6 +157,8 @@ N
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -172,6 +184,8 @@ C2H
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -198,6 +212,8 @@ HNO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -225,6 +241,8 @@ CH2CO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -252,6 +270,8 @@ CH3
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -278,6 +298,8 @@ C2H5
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -304,6 +326,8 @@ C2H4
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -330,6 +354,8 @@ C3H8
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -356,6 +382,8 @@ HCN
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -383,6 +411,8 @@ C2H6
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -409,6 +439,8 @@ NH3
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -435,6 +467,8 @@ CO2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -461,6 +495,8 @@ C2H2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -487,6 +523,8 @@ CH2OH
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -514,6 +552,8 @@ H2CN
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -541,6 +581,8 @@ HCCOH
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -568,6 +610,8 @@ H2O2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -594,6 +638,8 @@ HCO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -621,6 +667,8 @@ NNH
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -647,6 +695,8 @@ N2O
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -673,6 +723,8 @@ CH2(S)
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -699,6 +751,8 @@ O2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -724,6 +778,8 @@ CH2CHO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -751,6 +807,8 @@ HNCO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -779,6 +837,8 @@ HCCO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -806,6 +866,8 @@ H2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -831,6 +893,8 @@ NO2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -857,6 +921,8 @@ CH4
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -883,6 +949,8 @@ C
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -908,6 +976,8 @@ HO2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -934,6 +1004,8 @@ CH3CHO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -961,6 +1033,8 @@ C3H7
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -987,6 +1061,8 @@ CH3OH
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1014,6 +1090,8 @@ CH2O
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1041,6 +1119,8 @@ CO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1067,6 +1147,8 @@ CH3O
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1094,6 +1176,8 @@ O
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1119,6 +1203,8 @@ HCNN
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1146,6 +1232,8 @@ NCO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1173,6 +1261,8 @@ CH2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1199,6 +1289,8 @@ HCNO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1227,6 +1319,8 @@ NH2
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1253,6 +1347,8 @@ H2O
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1279,6 +1375,8 @@ NH
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1305,6 +1403,8 @@ H
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1330,6 +1430,8 @@ AR
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1355,6 +1457,8 @@ NO
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
@@ -1381,6 +1485,8 @@ CH
     {
         As              0;
         Ts              0;
+        muLogCoeffs<8>	     ( 0 0 0 0 0 0 0 0 );
+        kappaLogCoeffs<8>	 ( 0 0 0 0 0 0 0 0 );
     }
     elements
     {
