@@ -8,7 +8,7 @@ echo
 echo -e "${YELLOW}Validate pyJac chemistry module against reference data on perfectly stirred reactor:${DARKGRAY}"
 echo
 
-./PSRTest.bin -case testCase
+./PSRTest.bin -case testCase | tee testCase/log.orig
 
 if [ $? -eq 0 ]; then
     echo
@@ -22,14 +22,27 @@ fi
 
 
 echo
-echo -e "${YELLOW}Test error control on mechanism consistency in pyjacLoadBalancedChemistryModel:${DARKGRAY}"
+echo -e "${YELLOW}Test error control on mechanism consistency in loadBalanced_pyJacChemistryModel:${DARKGRAY}"
 cp testCase/constant/thermophysicalProperties testCase/constant/thermophysicalProperties.orig
 cp testCase/constant/thermophysicalProperties.illdefined testCase/constant/thermophysicalProperties
-./PSRTest.bin -case testCase > /dev/null 2>&1
+./PSRTest.bin -case testCase > testCase/log.illdefined 2>&1
 if [ $? -eq 1 ]; then
     echo -e "${GREEN}PASSED.${NC}"
 else
-    echo -e "${RED}FAILED. pyjacLoadBalancedChemistryModel.C did not catch the species mismatch error.${NC}"
+    echo -e "${RED}FAILED. loadBalanced_pyJacChemistryModel.C did not catch the species mismatch error.${NC}"
 fi
+
+echo
+echo -e "${YELLOW}Test dynamic compilation of loadBalanced_pyJacChemistryModel:${DARKGRAY}"
+cp testCase/constant/thermophysicalProperties.orig testCase/constant/thermophysicalProperties
+foamDictionary -entry thermoType/transport -set logPolynomial testCase/constant/thermophysicalProperties > /dev/null
+./PSRTest.bin -case testCase > testCase/log.dynamicCode 2>&1
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}PASSED.${NC}"
+else
+    echo -e "${RED}FAILED. See tests/validation/pyjacTests/PSRTest/testCase/log.dynamicCode for further information.${NC}"
+    echo -e "${RED}You may still use DLBFoam with thermo properties that are precompiled in OpenFOAM.${NC}"
+fi
+
 cp testCase/constant/thermophysicalProperties.orig testCase/constant/thermophysicalProperties
 rm testCase/constant/thermophysicalProperties.orig
