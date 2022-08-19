@@ -184,7 +184,6 @@ bool Foam::seulex_LAPACK::seul
         // check that temperature remains in range           */
    	    if (yTemp_[0] <= NASAP_mintemp || yTemp_[0] > NASAP_maxtemp)
         {
-            Info << "Warning: You exceeded the NASA temperature limits: T=" << yTemp_[0] << endl;
 		    return false;
         }
 
