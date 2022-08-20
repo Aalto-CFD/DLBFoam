@@ -27,7 +27,7 @@ Class
     Foam::loadBalancedChemistryModel
 
 Description
-    Extends standardChemistryModel model by adding a load balancing algorithm.
+    Extends chemistryModel model by adding a load balancing algorithm.
 
 SourceFiles
     loadBalancedChemistryModel.C
@@ -42,7 +42,7 @@ SourceFiles
 #include "LoadBalancer.H"
 #include "OFstream.H"
 #include "IOmanip.H"
-#include "standardChemistryModel.H"
+#include "chemistryModel.H"
 #include "clockTime.H"
 #include "mixtureFractionRefMapper.H"
 
@@ -58,7 +58,7 @@ namespace Foam
 template<class ThermoType>
 class loadBalancedChemistryModel
 :
-    public standardChemistryModel<ThermoType>
+    public chemistryModel<ThermoType>
 {
 
 private:
@@ -152,7 +152,7 @@ public:
         void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution) const;
 
         // Chemistry model functions (overriding functions in
-        // standardChemistryModel to use the private solve function)
+        // chemistryModel to use the private solve function)
 
             //- Solve the reaction system for the given time step
             //  and return the characteristic time

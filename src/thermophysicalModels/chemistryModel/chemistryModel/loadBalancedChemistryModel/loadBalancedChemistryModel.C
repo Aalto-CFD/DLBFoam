@@ -33,7 +33,7 @@ template <class ThermoType>
 Foam::loadBalancedChemistryModel<ThermoType>::
     loadBalancedChemistryModel(const fluidReactionThermo& thermo)
     :
-        standardChemistryModel<ThermoType>(thermo),
+        chemistryModel<ThermoType>(thermo),
         balancer_(createBalancer()), 
         mapper_(createMapper(this->thermo())),
         cpuTimes_

@@ -51,7 +51,7 @@ loadBalanced_pyJacChemistryModel<ThermoType>::loadBalanced_pyJacChemistryModel(
         for (label i = 0; i < this->nSpecie_; i++) { sp_enth_form[i] = sp_enth_form_[i]; }
     }
 
-    Info << "Overriding standardChemistryModel by loadBalanced_pyJacChemistryModel:" << endl;
+    Info << "Overriding chemistryModel by loadBalanced_pyJacChemistryModel:" << endl;
 
     if (this->nSpecie_ == PYJAC_NSP())
     {
