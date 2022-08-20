@@ -364,8 +364,8 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     {
             for(label i = 0; i < this->nSpecie(); i++)
             {
-                concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
-                massFraction[i] = this->Y_[i][celli];
+                concentration[i] = rho[celli] * this->Y()[i][celli] / this->specieThermos()[i].W();
+                massFraction[i] = this->Y()[i][celli];
             }
 
             ChemistryProblem problem;
@@ -453,7 +453,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRate
 {
     for(label j = 0; j < this->nSpecie(); j++)
     {
-        this->RR_[j][i] = solution.c_increment[j] * this->specieThermos_[j].W();
+        this->RR(j)[i] = solution.c_increment[j] * this->specieThermos()[j].W();
     }
     this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }

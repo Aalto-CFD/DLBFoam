@@ -162,8 +162,8 @@ loadBalanced_pyJacChemistryModel<ThermoType>::Qdot() const {
     if (this->chemistry_) {
         scalarField& Qdot = tQdot.ref();
 
-        forAll(this->Y_, i) {
-            forAll(Qdot, celli) { Qdot[celli] -= sp_enth_form[i] * this->RR_[i][celli]; }
+        forAll(this->Y(), i) {
+            forAll(Qdot, celli) { Qdot[celli] -= sp_enth_form[i] * this->RR(i)[celli]; }
         }
     }
 
@@ -179,7 +179,7 @@ void Foam::loadBalanced_pyJacChemistryModel<ThermoType>::updateReactionRate
 {
     for(label j = 0; j < this->nSpecie(); j++)
     {
-        this->RR_[j][i] = solution.c_increment[j] * solution.rhoi;
+        this->RR(j)[i] = solution.c_increment[j] * solution.rhoi;
     }
     this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }
