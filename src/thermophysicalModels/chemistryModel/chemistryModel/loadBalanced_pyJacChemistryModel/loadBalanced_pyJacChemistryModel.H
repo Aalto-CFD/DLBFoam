@@ -96,6 +96,9 @@ public:
     virtual tmp<volScalarField> Qdot() const override;
 
 private:
+    //- Temporary concentration field
+    mutable scalarField c_;
+
     ///
     ///@brief List of enthalpy of formation from pyJac
     ///

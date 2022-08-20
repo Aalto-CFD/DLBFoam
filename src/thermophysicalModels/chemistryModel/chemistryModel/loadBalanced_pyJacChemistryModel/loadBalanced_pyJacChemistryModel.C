@@ -35,6 +35,7 @@ template <class ThermoType>
 loadBalanced_pyJacChemistryModel<ThermoType>::loadBalanced_pyJacChemistryModel(
     const fluidReactionThermo& thermo)
     : loadBalancedChemistryModel<ThermoType>(thermo),
+    c_(this->nSpecie()),
     sp_enth_form(this->nSpecie()) {
 
     if (this->chemistry_) {
