@@ -362,9 +362,6 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     label counter = 0;
     forAll(T, celli)
     {
-
-        if(T[celli] > this->Treact())
-        {
             for(label i = 0; i < this->nSpecie(); i++)
             {
                 concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
@@ -396,14 +393,6 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
                 refMap_[celli] = 2;
             }
 
-        }
-        else
-        {
-            for(label i = 0; i < this->nSpecie(); i++)
-            {
-                this->RR_[i][celli] = 0;
-            }
-        }
 
     }
 
