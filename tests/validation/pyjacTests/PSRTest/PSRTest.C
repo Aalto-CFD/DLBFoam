@@ -29,6 +29,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "zeroDimensionalFvMesh.H"
 #include "fluidReactionThermo.H"
 #include "basicChemistryModel.H"
 #include "multiComponentMixture.H"
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
     
     argList::noParallel();
 
-    #define CREATE_MESH createSingleCellMesh.H
+    #define CREATE_MESH createZeroDimensionalFvMesh.H
     #define NO_CONTROL
 
     #include "StopWatch.H"
