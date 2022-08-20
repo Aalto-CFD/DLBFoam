@@ -325,7 +325,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::solveList
 ) const
 {
     DynamicList<ChemistrySolution> solutions(
-        problems.size(), ChemistrySolution(this->nSpecie_));
+        problems.size(), ChemistrySolution(this->nSpecie()));
 
     for(label i = 0; i < problems.size(); ++i)
     {
@@ -354,10 +354,10 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     DynamicList<ChemistryProblem> solved_problems;
     DynamicList<ChemistryProblem> mapped_problems;
 
-    solved_problems.resize(p.size(), ChemistryProblem(this->nSpecie_));
+    solved_problems.resize(p.size(), ChemistryProblem(this->nSpecie()));
 
-    scalarField massFraction(this->nSpecie_);
-    scalarField concentration(this->nSpecie_);
+    scalarField massFraction(this->nSpecie());
+    scalarField concentration(this->nSpecie());
 
     label counter = 0;
     forAll(T, celli)
@@ -365,7 +365,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
 
         if(T[celli] > this->Treact())
         {
-            for(label i = 0; i < this->nSpecie_; i++)
+            for(label i = 0; i < this->nSpecie(); i++)
             {
                 concentration[i] = rho[celli] * this->Y_[i][celli] / this->specieThermos_[i].W();
                 massFraction[i] = this->Y_[i][celli];
@@ -432,7 +432,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::map
         ChemistryProblem refProblem = mapped_problems[0];
         scalar refTemperature = refProblem.Ti;
 
-        ChemistrySolution refSolution(this->nSpecie_);
+        ChemistrySolution refSolution(this->nSpecie());
         solveSingle(refProblem, refSolution);
         refMap_[refProblem.cellid] = 0;
 
@@ -462,7 +462,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRate
     const ChemistrySolution& solution, const label& i
 )
 {
-    for(label j = 0; j < this->nSpecie_; j++)
+    for(label j = 0; j < this->nSpecie(); j++)
     {
         this->RR_[j][i] = solution.c_increment[j] * this->specieThermos_[j].W();
     }
