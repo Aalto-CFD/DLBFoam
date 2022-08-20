@@ -25,8 +25,18 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#define chemistryModelCppTest 0
+#define loadBalancedChemistryModelCppTest 1
+#define loadBalanced_pyJacChemistryModelCppTest 2
+
 #include "makeChemistrySolver.H"
-#include "${method}ChemistryModel.H"
+#if ${method}ChemistryModelCppTest == loadBalancedChemistryModelCppTest
+    #include "${method}ChemistryModel.H"
+#elif ${method}ChemistryModelCppTest == loadBalanced_pyJacChemistryModelCppTest
+    #include "${method}ChemistryModel.H"
+#else
+    #include "${method}.H"
+#endif
 #include "${solver}.H"
 
 #include "typedefThermo.H"
@@ -73,10 +83,6 @@ extern "C"
 #define ThermoPhysics                                                          \
     ${transport}Transport${energy}${thermo}Thermo${equationOfState}${specie}
 
-#define standardChemistryModelCppTest 0
-#define TDACChemistryModelCppTest 1
-#define loadBalancedChemistryModelCppTest 2
-#define loadBalanced_pyJacChemistryModelCppTest 3
 
 namespace Foam
 {
@@ -90,33 +96,35 @@ namespace Foam
     );
 
     #if ${method}ChemistryModelCppTest == loadBalanced_pyJacChemistryModelCppTest
-    defineChemistrySolver(standardChemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, standardChemistryModel, ThermoPhysics);
+    defineChemistrySolver(chemistryModel, ThermoPhysics);
+    makeChemistrySolver(${solver}, chemistryModel, ThermoPhysics);
     defineChemistrySolver(loadBalancedChemistryModel, ThermoPhysics);
     makeChemistrySolver(${solver}, loadBalancedChemistryModel, ThermoPhysics);
+    defineChemistrySolver(loadBalanced_pyJacChemistryModel, ThermoPhysics);
+    makeChemistrySolver(${solver}, loadBalanced_pyJacChemistryModel, ThermoPhysics);
+    #elif ${method}ChemistryModelCppTest == loadBalancedChemistryModelCppTest
+    defineChemistrySolver(chemistryModel, ThermoPhysics);
+    makeChemistrySolver(${solver}, chemistryModel, ThermoPhysics);
+    defineChemistrySolver(loadBalancedChemistryModel, ThermoPhysics);
+    makeChemistrySolver(${solver}, loadBalancedChemistryModel, ThermoPhysics);
+    #elif ${method}CppTest == chemistryModelCppTest
+    defineChemistrySolver(chemistryModel, ThermoPhysics);
+    makeChemistrySolver(${solver}, chemistryModel, ThermoPhysics);
+    #else
+    defineChemistrySolver(${method}, ThermoPhysics);
+    makeChemistrySolver(${solver}, ${method}, ThermoPhysics);
     #endif
-
-    #if ${method}ChemistryModelCppTest == loadBalancedChemistryModelCppTest
-    defineChemistrySolver(standardChemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, standardChemistryModel, ThermoPhysics);
-    #endif
-
-    defineChemistrySolver(${method}ChemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, ${method}ChemistryModel, ThermoPhysics);
 }
 
 
 
-#if ${method}ChemistryModelCppTest == TDACChemistryModelCppTest
+#if ${method}CppTest == chemistryModelCppTest
 
 #include "makeChemistryReductionMethod.H"
-#include "makeChemistryTabulationMethod.H"
 
 namespace Foam
 {
-    defineChemistrySolver(standardChemistryModel, ThermoPhysics);
     defineChemistryReductionMethod(nullArg, ThermoPhysics);
-    defineChemistryTabulationMethod(nullArg, ThermoPhysics);
 }
 
 #include "noChemistryReduction.H"
@@ -136,14 +144,6 @@ namespace Foam
     makeChemistryReductionMethod(PFA, ThermoPhysics);
 }
 
-#include "noChemistryTabulation.H"
-#include "ISAT.H"
-namespace Foam
-{
-    makeChemistryTabulationMethod(none, ThermoPhysics);
-    makeChemistryTabulationMethod(ISAT, ThermoPhysics);
-}
-
 #endif
 
 
@@ -158,16 +158,15 @@ namespace Foam
 #include "JanevReactionRate.H"
 #include "powerSeriesReactionRate.H"
 
+#include "LangmuirHinshelwoodReactionRate.H"
+#include "MichaelisMentenReactionRate.H"
+
 #include "ChemicallyActivatedReactionRate.H"
 #include "FallOffReactionRate.H"
 
 #include "LindemannFallOffFunction.H"
 #include "SRIFallOffFunction.H"
 #include "TroeFallOffFunction.H"
-
-#include "LangmuirHinshelwoodReactionRate.H"
-
-#include "MichaelisMentenReactionRate.H"
 
 namespace Foam
 {
@@ -178,6 +177,9 @@ namespace Foam
     makeIRNReactions(thirdBodyArrheniusReactionRate, ThermoPhysics);
     makeIRReactions(JanevReactionRate, ThermoPhysics);
     makeIRReactions(powerSeriesReactionRate, ThermoPhysics);
+
+    makeIRReactions(LangmuirHinshelwoodReactionRate, ThermoPhysics);
+    makeIReactions(MichaelisMentenReactionRate, ThermoPhysics);
 
     makeIRRPressureDependentReactions
     (
@@ -230,14 +232,6 @@ namespace Foam
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "LangmuirHinshelwoodReactionRate.H"
-
-namespace Foam
-{
-    makeIRReactions(LangmuirHinshelwoodReactionRate, ThermoPhysics);
-}
-
 
 #include "fluxLimitedLangmuirHinshelwoodReactionRate.H"
 
