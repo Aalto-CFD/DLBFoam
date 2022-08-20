@@ -195,7 +195,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
             balancer_.printState();
         }
         cpuSolveFile_() << setw(22)
-                        << this->time().timeOutputValue()<<tab
+                        << this->time().userTimeValue()<<tab
                         << setw(22) << t_getProblems<<tab
                         << setw(22) << t_updateState<<tab
                         << setw(22) << t_balance<<tab
