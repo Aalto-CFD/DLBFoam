@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Ensure the use of OpenFOAM 9, so that gri tutorial is present in $FOAM_TUTORIALS
-OF_VER="9"
+OF_VER="10"
 
 check_openfoam()
 {
@@ -44,7 +44,7 @@ foamDictionary -entry libs -set '("libchemistryModel_DLB.so" "libODE_DLB.so" "$F
 
 # Change links to mechanism files
 sed -i 's|#include .*|#include "$FOAM_CASE/constant/foam/reactions.foam"|g' constant/chemistryProperties
-sed -i 's|#include .*|#include "$FOAM_CASE/constant/foam/species.foam"\n#include "$FOAM_CASE/constant/foam/thermo.foam"|g' constant/thermophysicalProperties
+sed -i 's|#include .*|#include "$FOAM_CASE/constant/foam/species.foam"\n#include "$FOAM_CASE/constant/foam/thermo.foam"|g' constant/physicalProperties
 
 # Run chemFoam
 chemFoam > log.chemFoam
