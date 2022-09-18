@@ -44,7 +44,7 @@ struct ChemistrySolution
     ChemistrySolution() = default;
 
     ChemistrySolution(label nspecie)
-        : c_increment(nspecie, 0.0), deltaTChem(0.0), cellid(0), rhoi(0.0)
+        : rr(nspecie, 0.0), deltaTChem(0.0), cellid(0), rhoi(0.0)
     {
     }
 
@@ -58,7 +58,7 @@ struct ChemistrySolution
         return !(*this == rhs);
     }
 
-    scalarField c_increment; // =   (c_{i+1} - c_{i}) / deltaT;
+    scalarField rr; // =   (c_{i+1} - c_{i}) * rhoi / deltaT;
     scalar deltaTChem;
     scalar cpuTime;
     label cellid;
@@ -68,7 +68,7 @@ struct ChemistrySolution
 //- Serialization for send
 static inline Ostream& operator<<(Ostream& os, const ChemistrySolution& s)
 {
-    os << s.c_increment;
+    os << s.rr;
     os << s.deltaTChem;
     os << s.cpuTime;
     os << s.cellid;
@@ -79,7 +79,7 @@ static inline Ostream& operator<<(Ostream& os, const ChemistrySolution& s)
 //- Get a serialized solution from IStream
 static inline Istream& operator>>(Istream& is, ChemistrySolution& s)
 {
-    is >> s.c_increment;
+    is >> s.rr;
     is >> s.deltaTChem;
     is >> s.cpuTime;
     is >> s.cellid;
