@@ -104,15 +104,10 @@ private:
         solveBuffer(RecvBuffer<ChemistryProblem>& problems) const;
 
         //- Update the reaction rate of cell i
-        virtual void
-        updateReactionRate(const ChemistrySolution& solution, const label& i);
+        void updateReactionRate(const ChemistrySolution& solution, const label& i);
 
         //- Update the reaction rates from a list of solutions
         scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
-
-        //- Return the main chemistry variable
-        //  (concentration for standard, mass fraction for pyJac)
-        virtual scalarField getVariable(const scalarField& concentration, const scalarField& massFraction);
 
         //- Solve the reaction system for the given time step
         //  of given type and return the characteristic time

@@ -105,14 +105,6 @@ private:
     ///
     scalarList sp_enth_form;
 
-    //- Update the reaction rate of cell i
-    void
-    updateReactionRate(const ChemistrySolution& solution, const label& i);
-
-    //- Return the main chemistry variable
-    //  (concentration for standard, mass fraction for pyJac)
-    scalarField getVariable(const scalarField& concentration, const scalarField& massFraction);
-
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

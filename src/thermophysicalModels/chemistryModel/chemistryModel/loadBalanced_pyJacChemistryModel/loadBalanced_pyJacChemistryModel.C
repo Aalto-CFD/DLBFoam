@@ -171,28 +171,7 @@ loadBalanced_pyJacChemistryModel<ThermoType>::Qdot() const {
     return tQdot;
 }
 
-// TODO: Make this work for pyjac
-template <class ThermoType>
-void Foam::loadBalanced_pyJacChemistryModel<ThermoType>::updateReactionRate
-(
-    const ChemistrySolution& solution, const label& i
-)
-{
-    for(label j = 0; j < this->nSpecie(); j++)
-    {
-        this->RR(j)[i] = solution.c_increment[j] * solution.rhoi;
-    }
-    this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
-}
 
-template <class ThermoType>
-Foam::scalarField Foam::loadBalanced_pyJacChemistryModel<ThermoType>::getVariable
-(
-    const scalarField& concentration, const scalarField& massFraction
-)
-{
-    return massFraction;
-}
 
 
 } // namespace Foam
