@@ -171,6 +171,28 @@ loadBalanced_pyJacChemistryModel<ThermoType>::Qdot() const {
     return tQdot;
 }
 
+template <class ThermoType>
+Foam::tmp<Foam::volScalarField>
+loadBalanced_pyJacChemistryModel<ThermoType>::tc() const {
+
+    FatalErrorInFunction
+        << "loadBalanced_pyJac chemistry model currently does not "<<
+            "support combustion models such as PaSR or EDC.\n" <<
+            "Please either use laminar combustion model, "<< 
+            "or use loadBalanced chemistry model." << exit(FatalError);
+ 
+    tmp<volScalarField> ttc
+    (
+        volScalarField::New
+        (
+            "tc",
+            this->mesh(),
+            dimensionedScalar(dimTime, small),
+            extrapolatedCalculatedFvPatchScalarField::typeName
+        )
+    );
+    return ttc;
+}
 
 
 
