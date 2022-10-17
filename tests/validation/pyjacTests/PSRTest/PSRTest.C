@@ -30,9 +30,9 @@ Description
 
 #include "fvCFD.H"
 #include "zeroDimensionalFvMesh.H"
-#include "fluidReactionThermo.H"
+#include "fluidMulticomponentThermo.H"
 #include "basicChemistryModel.H"
-#include "multiComponentMixture.H"
+#include "multicomponentMixture.H"
 #include "chemistrySolver.H"
 #include "OFstream.H"
 #include "basicSpecieMixture.H"

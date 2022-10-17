@@ -31,7 +31,7 @@ License
 
 template <class ThermoType>
 Foam::loadBalancedChemistryModel<ThermoType>::
-    loadBalancedChemistryModel(const fluidReactionThermo& thermo)
+    loadBalancedChemistryModel(const fluidMulticomponentThermo& thermo)
     :
         chemistryModel<ThermoType>(thermo),
         balancer_(createBalancer()), 
@@ -91,7 +91,7 @@ template <class ThermoType>
 Foam::mixtureFractionRefMapper
 Foam::loadBalancedChemistryModel<ThermoType>::createMapper
 (
-    const fluidReactionThermo& thermo
+    const fluidMulticomponentThermo& thermo
 )
 {
     const IOdictionary chemistryDict_tmp

@@ -33,7 +33,7 @@ namespace Foam {
 
 template <class ThermoType>
 loadBalanced_pyJacChemistryModel<ThermoType>::loadBalanced_pyJacChemistryModel(
-    const fluidReactionThermo& thermo)
+    const fluidMulticomponentThermo& thermo)
     : loadBalancedChemistryModel<ThermoType>(thermo),
     c_(this->nSpecie()),
     sp_enth_form(this->nSpecie()) {
