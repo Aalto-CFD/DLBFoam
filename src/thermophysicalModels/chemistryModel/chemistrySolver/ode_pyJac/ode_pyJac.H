@@ -71,7 +71,7 @@ public:
     // Constructors
 
         //- Construct from thermo
-        ode_pyJac(const fluidReactionThermo& thermo);
+        ode_pyJac(const fluidMulticomponentThermo& thermo);
 
 
     //- Destructor

@@ -7,8 +7,8 @@
 
     #include "createBaseFields.H"
 
-    autoPtr<fluidReactionThermo> pThermo(fluidReactionThermo::New(mesh));
-    fluidReactionThermo& thermo = pThermo();
+    autoPtr<fluidMulticomponentThermo> pThermo(fluidMulticomponentThermo::New(mesh));
+    fluidMulticomponentThermo& thermo = pThermo();
     thermo.validate(args.executable(), "h");
 
     autoPtr<basicChemistryModel> pChemistry(basicChemistryModel::New(thermo));

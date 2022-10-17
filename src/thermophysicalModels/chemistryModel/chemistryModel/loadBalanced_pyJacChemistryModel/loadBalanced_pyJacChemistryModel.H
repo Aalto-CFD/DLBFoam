@@ -70,7 +70,7 @@ public:
     // Constructors
 
     //- Construct from thermo
-    loadBalanced_pyJacChemistryModel(const fluidReactionThermo& thermo);
+    loadBalanced_pyJacChemistryModel(const fluidMulticomponentThermo& thermo);
 
     //- Destructor
     virtual ~loadBalanced_pyJacChemistryModel();
