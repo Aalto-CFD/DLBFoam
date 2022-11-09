@@ -344,9 +344,9 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     const DeltaTType& deltaT
 )
 {
-    const scalarField& T = this->thermo().T();
-    const scalarField& p = this->thermo().p();
-    tmp<volScalarField> trho(this->thermo().rho());
+    const scalarField& T = this->thermo().T().oldTime();
+    const scalarField& p = this->thermo().p().oldTime();
+    tmp<volScalarField> trho(this->thermo().rho0());
     const scalarField& rho = trho();
 
 
@@ -363,7 +363,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     {
             for(label i = 0; i < this->nSpecie(); i++)
             {
-                massFraction[i] = this->Y()[i][celli];
+                massFraction[i] = this->Y()[i].oldTime()[celli];
             }
 
             ChemistryProblem problem;
