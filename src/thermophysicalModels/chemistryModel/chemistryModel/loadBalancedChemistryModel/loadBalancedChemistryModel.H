@@ -156,7 +156,7 @@ public:
             //- Solve the reaction system for the given time step
             //  and return the characteristic time
             virtual scalar solve(const scalarField& deltaT) override;
-
+        
         // ODE functions (overriding abstract functions in ODE.H)
         virtual void solve
         (
