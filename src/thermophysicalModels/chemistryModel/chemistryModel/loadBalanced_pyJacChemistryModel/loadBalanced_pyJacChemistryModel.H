@@ -79,7 +79,7 @@ public:
     loadBalanced_pyJacChemistryModel(const loadBalanced_pyJacChemistryModel&);
 
     inline virtual label nEqns() const;
-
+    
     //- Override jacobian and derivatives function from chemistryModel
     virtual void jacobian(const scalar        t,
                           const scalarField&  c,

@@ -150,22 +150,22 @@ template <class ThermoType>
 Foam::tmp<Foam::volScalarField>
 loadBalanced_pyJacChemistryModel<ThermoType>::Qdot() const {
 
-    tmp<volScalarField> tQdot(
-        new volScalarField(IOobject("Qdot",
-                                    this->mesh_.time().timeName(),
-                                    this->mesh_,
-                                    IOobject::NO_READ,
-                                    IOobject::NO_WRITE,
-                                    false),
-                           this->mesh_,
-                           dimensionedScalar("zero", dimEnergy / dimVolume / dimTime, 0)));
+    tmp<volScalarField> tQdot
+    (
+        volScalarField::New
+        (
+            "Qdot",
+            this->mesh_,
+            dimensionedScalar(dimEnergy/dimVolume/dimTime, 0)
+        )
+    );
 
     if (this->chemistry_) {
-        scalarField& Qdot = tQdot.ref();
+    scalarField& Qdot = tQdot.ref();
 
-        forAll(this->Y(), i) {
-            forAll(Qdot, celli) { Qdot[celli] -= sp_enth_form[i] * this->RR(i)[celli]; }
-        }
+    forAll(this->Y(), i) {
+        forAll(Qdot, celli) { Qdot[celli] -= sp_enth_form[i] * this->RR(i)[celli]; }
+    }
     }
 
     return tQdot;

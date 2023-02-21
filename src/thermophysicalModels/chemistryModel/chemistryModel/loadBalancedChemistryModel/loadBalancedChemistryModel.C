@@ -147,8 +147,6 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     scalar t_solveBuffer(0);
     scalar t_unbalance(0);
 
-    basicChemistryModel::correct();
-
     if(!this->chemistry_)
     {
         return great;
@@ -225,25 +223,25 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
     // Define a const label to pass as the cell index placeholder
     const label arbitrary = 0;
 
-    // Calculate the chemical source terms
-    while(timeLeft > small)
-    {
-        scalar dt = timeLeft;
-        this->solve(
-            problem.pi,
-            problem.Ti,
-            problem.c,
-            arbitrary,
-            dt,
-            problem.deltaTChem);
-        timeLeft -= dt;
-    }
+        // Calculate the chemical source terms
+        while(timeLeft > small)
+        {
+            scalar dt = timeLeft;
+            this->solve(
+                problem.pi,
+                problem.Ti,
+                problem.c,
+                arbitrary,
+                dt,
+                problem.deltaTChem);
+            timeLeft -= dt;
+        }  
 
     solution.rr = (problem.c - c0) * problem.rhoi / problem.deltaT;
     solution.deltaTChem = min(problem.deltaTChem, this->deltaTChemMax_);
 
     // Timer ends
-    solution.cpuTime = time.timeIncrement();
+    solution.cpuTime = time.timeIncrement();    
 
     solution.cellid = problem.cellid;
     solution.rhoi = problem.rhoi;
@@ -360,7 +358,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
 
     label counter = 0;
     forAll(T, celli)
-    {
+    {       
             for(label i = 0; i < this->nSpecie(); i++)
             {
                 massFraction[i] = this->Y()[i][celli];
