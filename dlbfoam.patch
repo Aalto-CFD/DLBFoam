@@ -1,0 +1,92 @@
+diff --git a/src/thermophysicalModels/chemistryModel/basicChemistryModel/basicChemistryModel.H b/src/thermophysicalModels/chemistryModel/basicChemistryModel/basicChemistryModel.H
+index 703d1e2..b129612 100644
+--- a/src/thermophysicalModels/chemistryModel/basicChemistryModel/basicChemistryModel.H
++++ b/src/thermophysicalModels/chemistryModel/basicChemistryModel/basicChemistryModel.H
+@@ -178,7 +178,18 @@ public:
+         //- Return the heat release rate [kg/m/s^3]
+         virtual tmp<volScalarField> Qdot() const = 0;
+ 
+-
++        // Functions to be derived in derived classes
++            //- Return const access to chemical source terms [kg/m^3/s]
++            virtual const volScalarField::Internal& RR
++            (
++                const label i
++            ) const = 0;
++            
++            //- Return write access to chemical source terms [kg/m^3/s]
++            virtual volScalarField::Internal& RR
++            (
++                const label i
++            ) = 0;
+     // Member Operators
+ 
+         //- Disallow default bitwise assignment
+diff --git a/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModel.H b/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModel.H
+index 64ba05a..69302c1 100644
+--- a/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModel.H
++++ b/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModel.H
+@@ -221,6 +221,8 @@ public:
+             //- Thermodynamic data of the species
+             inline const PtrList<ThermoType>& specieThermos() const;
+ 
++            //- Return a reference to tabulation
++            inline chemistryTabulationMethod& tabulation() const;
+ 
+         // Overrides to basicChemistryModel functions
+ 
+@@ -230,6 +232,17 @@ public:
+             //- Return reaction rates of the species [kg/m^3/s]
+             virtual inline const PtrList<volScalarField::Internal>& RR() const;
+ 
++            //- Return const access to the chemical source terms for specie, i
++            inline const volScalarField::Internal& RR
++            (
++                const label i
++            ) const;
++            
++            //- Return non const access to chemical source terms [kg/m^3/s]
++            virtual volScalarField::Internal& RR
++            (
++                const label i
++            );
+             //- Return reaction rates of the species in reactioni [kg/m^3/s]
+             virtual PtrList<volScalarField::Internal> reactionRR
+             (
+diff --git a/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModelI.H b/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModelI.H
+index 0f2dba0..b649703 100644
+--- a/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModelI.H
++++ b/src/thermophysicalModels/chemistryModel/chemistryModel/chemistryModelI.H
+@@ -48,6 +48,12 @@ Foam::chemistryModel<ThermoType>::specieThermos() const
+     return specieThermos_;
+ }
+ 
++template<class ThermoType>
++inline Foam::chemistryTabulationMethod&
++Foam::chemistryModel<ThermoType>::tabulation() const
++{
++    return tabulation_;
++}
+ 
+ template<class ThermoType>
+ inline Foam::label Foam::chemistryModel<ThermoType>::nReaction() const
+@@ -63,6 +69,19 @@ Foam::chemistryModel<ThermoType>::RR() const
+     return RR_;
+ }
+ 
++template<class ThermoType>
++inline const Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
++Foam::chemistryModel<ThermoType>::RR(const label i) const
++{
++    return RR_[i];
++}
++
++template<class ThermoType>
++Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
++Foam::chemistryModel<ThermoType>::RR(const label i)
++{
++    return RR_[i];
++}
+ 
+ template<class ThermoType>
+ inline void Foam::chemistryModel<ThermoType>::setActive(const label i)
