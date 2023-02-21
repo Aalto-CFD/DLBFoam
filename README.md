@@ -1,6 +1,6 @@
 # DLBFoam: Dynamic load balancing for fast reactive simulations
 ![v1.1](https://img.shields.io/badge/DLBFoam-v1.1-blue)
-![OpenFOAM 10](https://img.shields.io/badge/OpenFOAM-10-brightgreen)
+![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM-dev_53dc33d25-brightgreen)
 
 ## DLBFoam v1.1 - What's new?
 DLBFoam v1.1 introduces a fully analytical chemistry Jacobian via [pyJac](https://github.com/SLACKHA/pyJac), and optimized ODE solution routines via [LAPACK](http://www.netlib.org/lapack/). Combined with the load balancing features, v1.1 provides up to x250 speed-up compared to standard OpenFOAM chemistry model. If you are interested with using only dynamic load balancing without any third party dependency, please use [DLBFoam v1.0](https://github.com/blttkgl/DLBFoam-1.0).
@@ -29,6 +29,10 @@ details can be found in our paper [[1]](#1). In addition, the cell-wise chemistr
 - [ct2foam](https://github.com/kahilah/ct2foam) (Optional)
 
 ## Compilation
+
+**NOTE: Due to recent changes in OpenFOAM-dev, the patch file 'dlbfoam.patch' included in this branch should be applied to the OpenFOAM-dev installation.**
+
+**Apply the patch by *git apply dlbfoam.patch* on your OpenFOAM-dev installation before moving forward with DLBFoam compilation.**
 
 DLBFoam can be compiled by typing the following command after sourcing appropriate OpenFOAM version and making sure a valid LAPACK installation exists:
 
