@@ -99,8 +99,8 @@ Foam::loadBalancedChemistryModel<ThermoType>::createMapper
             IOobject
             (
                 thermo.phasePropertyName("chemistryProperties"),
-                thermo.T().mesh().time().constant(),
-                thermo.T().mesh(),
+                thermo.mesh().time().constant(),
+                thermo.mesh(),
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE,
                 false
@@ -120,8 +120,8 @@ Foam::loadBalancedChemistryModel<ThermoType>::createBalancer()
             IOobject
             (
                 this->thermo().phasePropertyName("chemistryProperties"),
-                this->thermo().T().mesh().time().constant(),
-                this->thermo().T().mesh(),
+                this->thermo().mesh().time().constant(),
+                this->thermo().mesh(),
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE,
                 false
