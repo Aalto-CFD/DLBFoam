@@ -1,6 +1,8 @@
 # DLBFoam: Dynamic load balancing for fast reactive simulations
 ![OpenFOAM 8](https://img.shields.io/badge/OpenFOAM-8-brightgreen)
 
+[<img src="https://img.shields.io/badge/-YouTube_Video_Tutorials-red?style=for-the-badge&logo=youtube&logoColor=white"/>](https://www.youtube.com/playlist?list=PLXqVaOXSsv1SBnfyGRa_C-E0X--FIT27P)
+
 DLBFoam is an open-source library for OpenFOAM. It introduces dynamic load balancing and a zonal reference mapping model 
 for fast chemistry calculation in parallel simulations.
 
