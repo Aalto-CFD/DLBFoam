@@ -2,6 +2,8 @@
 ![v1.1](https://img.shields.io/badge/DLBFoam-v1.1-blue)
 ![OpenFOAM 10](https://img.shields.io/badge/OpenFOAM-10-brightgreen)
 
+[<img src="https://img.shields.io/badge/-YouTube_Video_Tutorials-red?style=for-the-badge&logo=youtube&logoColor=white"/>](https://www.youtube.com/playlist?list=PLXqVaOXSsv1SBnfyGRa_C-E0X--FIT27P)
+
 ## DLBFoam v1.1 - What's new?
 DLBFoam v1.1 introduces a fully analytical chemistry Jacobian via [pyJac](https://github.com/SLACKHA/pyJac), and optimized ODE solution routines via [LAPACK](http://www.netlib.org/lapack/). Combined with the load balancing features, v1.1 provides up to x250 speed-up compared to standard OpenFOAM chemistry model. If you are interested with using only dynamic load balancing without any third party dependency, please use [DLBFoam v1.0](https://github.com/blttkgl/DLBFoam-1.0).
 
