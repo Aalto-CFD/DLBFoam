@@ -344,8 +344,11 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
 {
     const scalarField& T = this->thermo().T().oldTime();
     const scalarField& p = this->thermo().p().oldTime();
-    tmp<volScalarField> trho(this->thermo().rho0());
-    const scalarField& rho = trho();
+    const volScalarField& rho0vf =
+        this->mesh().template lookupObject<volScalarField>
+        (
+            this->thermo().phasePropertyName("rho")
+        ).oldTime();
 
 
 
@@ -368,7 +371,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
             problem.c = massFraction;
             problem.Ti = T[celli];
             problem.pi = p[celli];
-            problem.rhoi = rho[celli];
+            problem.rhoi = rho0vf[celli];
             problem.deltaTChem = this->deltaTChem_[celli];
             problem.deltaT = deltaT[celli];
             problem.cpuTime = cpuTimes_[celli];
