@@ -1,10 +1,12 @@
 EXE_INC = \
     -DMKL_ILP64 \
     -m64 \
+    -I${MKLROOT} \
     -I${MKLROOT}/include
 
 LIB_LIBS = \
     -L${MKLROOT}/lib/intel64 \
+    -L/usr/lib/x86_64-linux-gnu/mkl \
     -Wl,--no-as-needed \
     -lmkl_intel_ilp64 \
     -lmkl_sequential \
