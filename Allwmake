@@ -25,7 +25,7 @@ check_mkl()
     if [ -d "$MKLROOT" ]; then
         echo "Utilising Intel MKL version from path: ${MKLROOT}"
     else
-        echo "Error: MKL_ROOT=${MKLROOT} not found."
+        echo "Error: MKLROOT=${MKLROOT} not found."
         exit 1
     fi
 }
