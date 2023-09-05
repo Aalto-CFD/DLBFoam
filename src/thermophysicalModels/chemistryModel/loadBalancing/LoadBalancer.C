@@ -82,7 +82,7 @@ Foam::LoadBalancer::timesToProblemCounts(
     const DynamicList<ChemistryProblem>& problems)
 {
 
-    std::vector<int> counts;
+    std::vector<label> counts;
     counts.reserve(times.size() + 1);
     auto begin = problems.begin();
 

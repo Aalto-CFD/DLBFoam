@@ -73,9 +73,9 @@ TEST_CASE("LoadBalancerBase sendRecv() swap test"){
     using namespace Foam;
 
 
-    std::vector<int> sources = {};
-    std::vector<int> destinations = {};
-    std::vector<int> counts = {};
+    std::vector<label> sources = {};
+    std::vector<label> destinations = {};
+    std::vector<label> counts = {};
 
     if (Pstream::myProcNo() == 0){
         destinations = {1};
@@ -98,7 +98,7 @@ TEST_CASE("LoadBalancerBase sendRecv() swap test"){
         send_buffer, sources, destinations);
 
     if (Pstream::myProcNo() == 1) {
-        for (size_t i = 0; i < 10; ++i) {
+        for (label i = 0; i < 10; ++i) {
             auto p = recv_buffer[0][i];
             CHECK(p.c[0] == 32.04); // note only the first one checked
             CHECK(p.Ti == 13.0);
