@@ -15,7 +15,9 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     reactingFoam;
+application     foamRun;
+
+solver          multicomponentFluid;
 
 startFrom       latestTime;
 
