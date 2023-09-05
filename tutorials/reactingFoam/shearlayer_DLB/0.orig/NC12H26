@@ -53,9 +53,7 @@ internalField  #codeStream
     //! Optional:
     codeInclude
     #{
-
-        #include "fvCFD.H"
-
+        #include "volFields.H"
     #};
 
 

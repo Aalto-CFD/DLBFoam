@@ -28,7 +28,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
+#include "argList.H"
+#include "volFields.H"
 #include "zeroDimensionalFvMesh.H"
 #include "fluidMulticomponentThermo.H"
 #include "basicChemistryModel.H"
@@ -38,6 +39,9 @@ Description
 #include "basicSpecieMixture.H"
 #include "cellModeller.H"
 #include "thermoTypeFunctions.H"
+#include "physicoChemicalConstants.H"
+#include "fvcFlux.H"
+#include "fvmDdt.H"
 
 #include <iostream> 
 #include <vector> 
@@ -47,6 +51,7 @@ extern "C" {
     #include "chem_utils.h"
 };
 
+using namespace Foam;
 
 void print_passed(scalar err)
 {
@@ -127,8 +132,8 @@ void performanceCheck(scalar elapsed, scalar reference)
 }
 
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 int main(int argc, char *argv[])
 {
     
@@ -139,7 +144,7 @@ int main(int argc, char *argv[])
 
     #include "StopWatch.H"
 
-    #include "setRootCaseLists.H"
+    #include "setRootCase.H"
     #include "createTime.H"
 
     // Initialisation parameters

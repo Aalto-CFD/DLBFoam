@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Ensure the use of OpenFOAM 9, so that gri tutorial is present in $FOAM_TUTORIALS
-OF_VER="10"
+# Ensure the use of OpenFOAM dev, so that gri tutorial is present in $WM_PROJECT_DIR/test
+OF_VER="dev"
 
 check_openfoam()
 {
@@ -19,7 +19,7 @@ check_openfoam()
 check_openfoam
 
 # Copy tutorial files from OpenFOAM
-cp -nr $FOAM_TUTORIALS/combustion/chemFoam/gri/* .
+cp -nr $WM_PROJECT_DIR/test/chemistry/gri/* .
 
 # Compile and copy mechanism
 cd pyJac/lib

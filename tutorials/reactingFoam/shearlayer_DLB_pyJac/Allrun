@@ -15,4 +15,4 @@ rm -rf 0
 cp -r 0.orig 0
 
 decomposePar -force > log.decompose
-mpirun -np $N_PROCS reactingFoam -parallel > log.reactingFoam
+mpirun -np $N_PROCS foamRun -solver multicomponentFluid -parallel > log.foamRun
