@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Ensure the use of OpenFOAM dev, so that gri tutorial is present in $WM_PROJECT_DIR/test
-OF_VER="dev"
+# Ensure the use of OpenFOAM 11, so that gri tutorial is present in $WM_PROJECT_DIR/test
+OF_VER="11"
 
 check_openfoam()
 {
