@@ -76,7 +76,7 @@ public:
     mixtureFractionRefMapper() = default;
 
     mixtureFractionRefMapper(
-        const dictionary& dict, const basicSpecieMixture& composition)
+        const dictionary& dict, const fluidMulticomponentThermo& thermo)
         : dict_(dict), coeffsDict_(dict.subDict("refmapping")),
           active_(coeffsDict_.lookupOrDefault<Switch>("active", false)),
           Ztolerance_(coeffsDict_.lookupOrDefault<scalar>("tolerance", 1e-4)),
@@ -87,7 +87,7 @@ public:
         {
             mixture_fraction_ = mixtureFraction(
               coeffsDict_.subDict("mixtureFractionProperties"),
-              composition);
+              thermo);
         }
     }
 

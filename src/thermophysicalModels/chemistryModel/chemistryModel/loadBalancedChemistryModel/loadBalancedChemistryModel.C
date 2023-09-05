@@ -107,7 +107,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::createMapper
             )
         );
 
-    return mixtureFractionRefMapper(chemistryDict_tmp, thermo.composition());
+    return mixtureFractionRefMapper(chemistryDict_tmp, thermo);
 }
 
 

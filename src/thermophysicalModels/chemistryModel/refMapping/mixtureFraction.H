@@ -100,8 +100,8 @@ class mixtureFraction
 public:
     mixtureFraction() = default;
 
-    // Construct from dict and composition 
-    mixtureFraction(const dictionary& mixFracDict, const basicSpecieMixture& composition);
+    // Construct from dict and thermo 
+    mixtureFraction(const dictionary& mixFracDict, const fluidMulticomponentThermo& thermo);
 
     scalar massFractionToMixtureFraction(const scalarField& massFraction) const;
 
@@ -115,7 +115,7 @@ private:
     
     //- Initialize the alpha and beta values needed for 
     // mixture fraction calculation
-    void initialize(const basicSpecieMixture& composition);
+    void initialize(const fluidMulticomponentThermo& thermo);
 
 
 };

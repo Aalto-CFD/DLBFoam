@@ -28,25 +28,25 @@ License
 
 
 // Constructor
-Foam::mixtureFraction::mixtureFraction(const dictionary& mixFracDict, const basicSpecieMixture& composition)
-    : mixFracDict_(mixFracDict), species_(composition.species()), alpha_(composition.species().size(), 0.0),
+Foam::mixtureFraction::mixtureFraction(const dictionary& mixFracDict, const fluidMulticomponentThermo& thermo)
+    : mixFracDict_(mixFracDict), species_(thermo.species()), alpha_(thermo.species().size(), 0.0),
       beta_(2, 0.0) 
 {
-    initialize(composition);
+    initialize(thermo);
 }
 
-void Foam::mixtureFraction::initialize(const basicSpecieMixture& composition)
+void Foam::mixtureFraction::initialize(const fluidMulticomponentThermo& thermo)
 {
     forAll(alpha_, i)
     {
         const dictionary& dict =
             mixFracDict_.subDict(species_[i]).subDict("elements");
         scalar a0(
-            2.0 * dict.lookupOrDefault<label>("C", 0) / composition.Wi(i));
+            2.0 * dict.lookupOrDefault<label>("C", 0) / thermo.Wi(i));
         scalar a1(
-            0.5 * dict.lookupOrDefault<label>("H", 0) / composition.Wi(i));
+            0.5 * dict.lookupOrDefault<label>("H", 0) / thermo.Wi(i));
         scalar a2(
-            -1.0 * dict.lookupOrDefault<label>("O", 0) / composition.Wi(i));
+            -1.0 * dict.lookupOrDefault<label>("O", 0) / thermo.Wi(i));
         alpha_[i] = a0 + a1 + a2;
     }
 

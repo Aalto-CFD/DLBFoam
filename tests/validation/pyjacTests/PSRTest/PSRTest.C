@@ -36,7 +36,6 @@ Description
 #include "multicomponentMixture.H"
 #include "chemistrySolver.H"
 #include "OFstream.H"
-#include "basicSpecieMixture.H"
 #include "cellModeller.H"
 #include "thermoTypeFunctions.H"
 #include "physicoChemicalConstants.H"
