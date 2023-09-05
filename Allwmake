@@ -135,9 +135,9 @@ pushd tests/validation/pyjacTests/PSRTest  > /dev/null
     ./runTests.sh
 popd  > /dev/null
 
-cp -r utilities/mechanisms/yao tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac
-cp utilities/CMakeLists.txt tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac/lib/
-cp utilities/runCmake.sh tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac/lib/
+cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
+cp utilities/CMakeLists.txt tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
+cp utilities/runCmake.sh tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
 
 cp -r utilities/mechanisms/gri30 tutorials/chemFoam/gri_pyJac/pyJac
 cp utilities/CMakeLists.txt tutorials/chemFoam/gri_pyJac/pyJac/lib/

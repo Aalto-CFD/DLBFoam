@@ -17,7 +17,7 @@ rm -rf tests/validation/pyjacTests/PSRTest/testCase/dynamicCode
 rm -rf tests/validation/pyjacTests/PSRTest/testCase/log.*
 rm -rf tests/validation/pyjacTests/PSRTest/PSRTest.bin
 
-rm -rf tutorials/reactingFoam/shearlayer_DLB_pyJac/pyJac
+rm -rf tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
 rm -rf tutorials/chemFoam/gri_pyJac/pyJac
 
 # Remove files related to dynamic compilation
