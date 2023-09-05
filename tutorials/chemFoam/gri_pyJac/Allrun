@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Ensure the use of OpenFOAM 9, so that gri tutorial is present in $FOAM_TUTORIALS
 OF_VER="10"
