@@ -32,10 +32,6 @@ details can be found in our paper [[1]](#1). In addition, the cell-wise chemistr
 
 ## Compilation
 
-**NOTE: Due to recent changes in OpenFOAM-dev, the patch file 'dlbfoam.patch' included in this branch should be applied to the OpenFOAM-dev installation.**
-
-**Apply the patch by `git apply dlbfoam.patch` on your OpenFOAM-dev installation before moving forward with DLBFoam compilation.**
-
 DLBFoam can be compiled by typing the following command after sourcing appropriate OpenFOAM version and making sure a valid LAPACK installation exists:
 
 ```

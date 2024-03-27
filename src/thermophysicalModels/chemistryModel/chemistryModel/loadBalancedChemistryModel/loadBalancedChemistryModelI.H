@@ -39,4 +39,21 @@ Foam::loadBalancedChemistryModel<ThermoType>::logFile(
         this->mesh().time().path() / "loadBal" / this->group() / name));
 }
 
+template <class ThermoType>
+inline const Foam::volScalarField::Internal&
+Foam::loadBalancedChemistryModel<ThermoType>::RR(const label i) const{
+    const PtrList<volScalarField::Internal>& rr = chemistryModel<ThermoType>::RR();
+    return rr[i];
+}
+
+// Non const access to chemical source terms was removed in OF 11
+// and thus casting is required
+template <class ThermoType>
+inline Foam::volScalarField::Internal& 
+Foam::loadBalancedChemistryModel<ThermoType>::RR(const label i) {
+    PtrList<volScalarField::Internal>& rr =
+    	const_cast<PtrList<volScalarField::Internal>&>(chemistryModel<ThermoType>::RR());
+    return rr[i];
+}
+
 // ************************************************************************* //
