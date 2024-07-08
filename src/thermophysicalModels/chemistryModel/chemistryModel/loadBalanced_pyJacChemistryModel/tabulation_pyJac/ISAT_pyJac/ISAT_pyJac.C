@@ -58,7 +58,7 @@ Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
     chemistry_(chemistry),
     log_(coeffsDict_.lookupOrDefault<Switch>("log", false)),
     chemisTree_(*this, coeffsDict_),
-    scaleFactor_(chemistry.nSpecie()+2, 1), // Change the scalefactor for Nsp-1 + T + p + deltaT 
+    scaleFactor_(chemistry.nSpecie()+2, 1), // Change the scalefactor for Nsp-1 + T + p + deltaT
     runTime_(chemistry.time()),
     timeSteps_(0),
     chPMaxLifeTime_
@@ -102,7 +102,7 @@ Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
         IOobject
         (
             chemistry.thermo().phasePropertyName("TabulationResults"),
-            chemistry.time().timeName(),
+            chemistry.time().name(),
             chemistry.mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
@@ -324,7 +324,7 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::computeA
     const scalar dt
 )
 {
-    
+
     // Prepare the vector order for the pyJac version by alternating the T order in Rcq
     const label nSpecie = chemistry_.nSpecie() - 1; // Note the pyJac indexing
 
@@ -364,19 +364,19 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::computeA
     for (label i=0; i<nSpecie; i++)
     {
         A_tmp(nSpecie,i) = A(0,i+1);
-        A_tmp(i,nSpecie) = A(i+1,0);     
+        A_tmp(i,nSpecie) = A(i+1,0);
 
         A_tmp(nSpecie+1,i) = A(nSpecie+1,i+1);
-        A_tmp(i,nSpecie + 1) = A(i+1,nSpecie+1);        
+        A_tmp(i,nSpecie + 1) = A(i+1,nSpecie+1);
     }
     A_tmp(nSpecie, nSpecie) = A(0,0);
     A_tmp(nSpecie, nSpecie + 1) = A(nSpecie+1,0);
     A_tmp(nSpecie+1,nSpecie) = A(0,nSpecie+1);
 
     for (label i=0; i<ASize; i++)
-    {    
+    {
         A_tmp(ASize-1,i) = 0.0;
-        A_tmp(i,ASize-1) = 0.0;                   
+        A_tmp(i,ASize-1) = 0.0;
     }
 
     for (label i=0; i<ASize; i++)

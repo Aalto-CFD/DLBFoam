@@ -41,7 +41,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::
             IOobject
             (
                 thermo.phasePropertyName("cellCpuTimes"),
-                this->time().timeName(),
+                this->time().name(),
                 this->mesh(),
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
@@ -54,7 +54,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::
             IOobject
             (
                 thermo.phasePropertyName("referenceMap"),
-                this->time().timeName(),
+                this->time().name(),
                 this->mesh(),
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
