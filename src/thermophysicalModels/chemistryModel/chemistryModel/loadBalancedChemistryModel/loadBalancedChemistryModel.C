@@ -219,6 +219,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
 {
     scalar timeLeft = problem.deltaT;
     scalarField c0 = problem.c;
+    solution.cellid = problem.cellid;
 
     // Timer begins
     clockTime time;
@@ -228,8 +229,8 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
         // Composition vector (Yi, T, p, deltaT)
         scalarField phiq(this->nEqns() + 1);
         scalarField Rphiq(this->nEqns() + 1);
-        bool retrieve = retrieveProblem(problem, phiq, Rphiq);
-        if(!retrieve)
+        solution.retrieved = retrieveProblem(problem, phiq, Rphiq);
+        if(!solution.retrieved)
         {
             // Calculate the chemical source terms
             while(timeLeft > small)
@@ -245,6 +246,11 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
                 timeLeft -= dt;
             }
             tabulateProblem(problem, phiq, Rphiq);
+            solution.deltaTChem = problem.deltaTChem;
+        }
+        else
+        {
+            solution.deltaTChem = this->deltaTChem_[solution.cellid];
         }
     }
     else
@@ -262,9 +268,8 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
                 problem.deltaTChem);
             timeLeft -= dt;
         }
+        solution.deltaTChem = problem.deltaTChem;
     }
-    solution.deltaTChem = min(problem.deltaTChem, this->deltaTChemMax_);
-    solution.cellid = problem.cellid;
     solution.rr = (problem.c - c0) * problem.rhoi / problem.deltaT;
     // Timer ends
     solution.cpuTime = time.timeIncrement();
@@ -287,13 +292,26 @@ Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRates
 
             updateReactionRate(solution, solution.cellid);
 
-            deltaTMin = min(solution.deltaTChem, deltaTMin);
+            updateDeltaT(solution, deltaTMin);
 
             cpuTimes_[solution.cellid] = solution.cpuTime;
         }
     }
-
     return deltaTMin;
+}
+
+
+template <class ThermoType>
+void Foam::loadBalancedChemistryModel<ThermoType>::updateDeltaT
+(
+    const ChemistrySolution& solution, scalar& deltaTMin
+)
+{
+    if(!solution.retrieved)
+    {
+        deltaTMin = min(solution.deltaTChem, deltaTMin);
+        this->deltaTChem_[solution.cellid] = min(solution.deltaTChem, this->deltaTChemMax_);
+    }
 }
 
 
@@ -478,7 +496,6 @@ void Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRate
     {
         this->RR(j)[i] = solution.rr[j];
     }
-    this->deltaTChem_[i] = min(solution.deltaTChem, this->deltaTChemMax_);
 }
 
 

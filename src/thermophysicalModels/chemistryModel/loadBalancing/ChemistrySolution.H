@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -23,7 +23,7 @@ License
 
 Class
     Foam::ChemistrySolution
-    
+
 Description
     A small object containing everything required for updating the reaction rate
     and the chemistry time step. These are passed around in the load balancer.
@@ -44,7 +44,7 @@ struct ChemistrySolution
     ChemistrySolution() = default;
 
     ChemistrySolution(label nspecie)
-        : rr(nspecie, 0.0), deltaTChem(0.0), cellid(0), rhoi(0.0)
+        : rr(nspecie, 0.0), deltaTChem(0.0), cellid(0), rhoi(0.0), retrieved(false)
     {
     }
 
@@ -63,6 +63,7 @@ struct ChemistrySolution
     scalar cpuTime;
     label cellid;
     scalar rhoi;
+    bool retrieved;
 };
 
 //- Serialization for send
@@ -73,6 +74,7 @@ static inline Ostream& operator<<(Ostream& os, const ChemistrySolution& s)
     os << s.cpuTime;
     os << s.cellid;
     os << s.rhoi;
+    os << s.retrieved;
     return os;
 }
 
@@ -84,6 +86,7 @@ static inline Istream& operator>>(Istream& is, ChemistrySolution& s)
     is >> s.cpuTime;
     is >> s.cellid;
     is >> s.rhoi;
+    is >> s.retrieved;
     return is;
 }
 

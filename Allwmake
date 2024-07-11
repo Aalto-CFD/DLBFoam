@@ -136,6 +136,11 @@ pushd tests/validation/pyjacTests/PSRTest  > /dev/null
     ./runTests.sh
 popd  > /dev/null
 
+pushd tests/validation/isatTests > /dev/null
+    ./test.sh
+popd  > /dev/null
+
+
 cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
 cp utilities/CMakeLists.txt tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
 cp utilities/runCmake.sh tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/

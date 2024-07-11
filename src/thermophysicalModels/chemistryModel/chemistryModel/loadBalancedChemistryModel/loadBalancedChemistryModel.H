@@ -114,6 +114,9 @@ private:
         //- Update the reaction rates from a list of solutions
         scalar updateReactionRates(const RecvBuffer<ChemistrySolution>& solutions);
 
+        //- Update the deltaTMin and deltaTChem from a solution
+        void updateDeltaT(const ChemistrySolution& solution, scalar& deltaTMin);
+
         //- Try to retrieve the candidate problem from the ISAT tree
         bool retrieveProblem(ChemistryProblem& problem, scalarField& phiq, scalarField& Rphiq) const;
         void tabulateProblem(ChemistryProblem& problem, scalarField& phiq, scalarField& Rphiq) const;

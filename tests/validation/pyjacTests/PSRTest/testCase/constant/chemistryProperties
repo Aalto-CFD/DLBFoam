@@ -15,8 +15,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#includeEtc     "caseDicts/solvers/chemistry/TDAC/chemistryPropertiesFlame.cfg"
-
 chemistryType
 {
     solver          ode_pyJac;
@@ -39,16 +37,11 @@ loadbalancing
     log     false;
 }
 
-refmapping{}
-
-reduction
+refmapping
 {
+
 }
 
-tabulation
-{
-    method          none;
-}
 // reactions dictionary is empty - {}
 #include "../../../pyjacTestMechanism/foam/reactions.foam"
 

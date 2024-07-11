@@ -8,7 +8,6 @@ echo
 echo -e "${YELLOW}Validate pyJac chemistry module against reference data on perfectly stirred reactor:${DARKGRAY}"
 echo
 
-foamDictionary -entry tabulation/method -set none testCase/constant/chemistryProperties > /dev/null
 
 ./PSRTest.bin -case testCase | tee testCase/log.orig
 
@@ -46,7 +45,9 @@ else
     echo -e "${RED}You may still use DLBFoam with thermo properties that are precompiled in OpenFOAM.${NC}"
 fi
 
-
+cp testCase/constant/chemistryProperties testCase/constant/chemistryProperties.orig
+foamDictionary  testCase/constant/chemistryProperties -entry '#includeEtc' -add '"caseDicts/solvers/chemistry/TDAC/chemistryProperties.cfg"'
+foamDictionary  testCase/constant/chemistryProperties -entry tabulation -add '{}'
 echo
 echo -e "${YELLOW}Test ISAT_pyJac compilation for DLBFoam-ISAT coupling:${DARKGRAY}"
 foamDictionary -entry tabulation/method -set ISAT_pyJac testCase/constant/chemistryProperties > /dev/null
@@ -61,3 +62,6 @@ fi
 
 cp testCase/constant/thermophysicalProperties.orig testCase/constant/thermophysicalProperties
 rm testCase/constant/thermophysicalProperties.orig
+
+cp testCase/constant/chemistryProperties.orig testCase/constant/chemistryProperties
+rm testCase/constant/chemistryProperties.orig
