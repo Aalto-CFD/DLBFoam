@@ -116,7 +116,7 @@ Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
     // tabulationResults_( // Idea: take it from parent class (reuse=True)
     //     chemistry.mesh().lookupObject<volScalarField::Internal>(
     //         "TabulationResults"
-    //     ), 
+    //     ),
     //     true
     // ),
     cleaningRequired_(false)
@@ -264,7 +264,7 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::calcNewC
             }
         }
         else
-        {        
+        {
             // Extrapolate using the gradients matrix
             for (label j=0; j<nEqns + 1; j++)
             {
@@ -366,7 +366,6 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::computeA
     const scalar dt
 )
 {
-    Info << "Computing A matrix for ISAT_pyJac" << endl;
     // Prepare the vector order for the pyJac version by alternating the T order in Rcq
     const label nSpecie = chemistry_.nSpecie() - 1; // Note the pyJac indexing
 

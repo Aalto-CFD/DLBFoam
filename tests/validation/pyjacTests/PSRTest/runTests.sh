@@ -48,10 +48,11 @@ fi
 cp testCase/constant/chemistryProperties testCase/constant/chemistryProperties.orig
 foamDictionary  testCase/constant/chemistryProperties -entry '#includeEtc' -add '"caseDicts/solvers/chemistry/TDAC/chemistryProperties.cfg"'
 foamDictionary  testCase/constant/chemistryProperties -entry tabulation -add '{}'
-foamDictionary  testCase/constant/chemistryProperties -expand -entry reduction -remove
-echo
+foamDictionary  testCase/constant/chemistryProperties -entry reduction -add '{}'
+
 echo -e "${YELLOW}Test ISAT_pyJac compilation for DLBFoam-ISAT coupling:${DARKGRAY}"
-foamDictionary -entry tabulation/method -set ISAT_pyJac testCase/constant/chemistryProperties > /dev/null
+foamDictionary -entry tabulation/method -add ISAT_pyJac testCase/constant/chemistryProperties > /dev/null
+foamDictionary -entry reduction/method -add none testCase/constant/chemistryProperties > /dev/null
 ./PSRTest.bin -case testCase > testCase/log.dynamicCode 2>&1
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}PASSED.${NC}"
