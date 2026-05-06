@@ -4,7 +4,6 @@ GREEN='\e[1;32m'
 YELLOW='\e[1;33m'
 DARKGRAY='\e[1;30m'
 
-echo
 echo -e "${YELLOW}Validate ISAT-DLBFoam coupling on a chemFoam test:${DARKGRAY}"
 
 # Source tutorial run functions

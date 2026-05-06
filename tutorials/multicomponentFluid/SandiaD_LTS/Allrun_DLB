@@ -1,0 +1,43 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+rm -rf log.*
+cp -r $FOAM_TUTORIALS/multicomponentFluid/SandiaD_LTS/* .
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Set application name
+application=$(getApplication)
+
+runApplication chemkinToFoam \
+               chemkin/grimech30.dat chemkin/thermo30.dat chemkin/transportProperties \
+               constant/reactionsGRI constant/thermo.compressibleGasGRI
+
+runApplication blockMesh
+runApplication setFields
+cp -r system/controlDict.orig system/controlDict
+
+#Configure controlDict
+foamDictionary  system/controlDict  -entry endTime  -set 5000
+foamDictionary  system/controlDict -entry libs -add '("libchemistryModel_DLB.so")'
+
+cp -r constant/chemistryProperties.orig constant/chemistryProperties
+#Remove tabulation and reduction
+foamDictionary  constant/chemistryProperties -entry "#includeEtc" -remove
+foamDictionary  constant/chemistryProperties -entry tabulation -remove
+
+# Add loadbalancing and refmapping entries
+foamDictionary  constant/chemistryProperties -entry chemistryType/method -add loadBalanced
+foamDictionary  constant/chemistryProperties -entry loadbalancing -add "{active true;}"
+foamDictionary  constant/chemistryProperties -entry refmapping -add "{}"
+
+#Enable skipSpecies and set skip threshold. Chemistry activates at t=1500
+foamDictionary  constant/chemistryProperties -entry skipSpecies -add true
+foamDictionary  constant/chemistryProperties -entry startTime -add 1500
+foamDictionary  constant/chemistryProperties -entry skipThreshold -add 1e-5
+
+
+
+runApplication -o $application
+
+#------------------------------------------------------------------------------
