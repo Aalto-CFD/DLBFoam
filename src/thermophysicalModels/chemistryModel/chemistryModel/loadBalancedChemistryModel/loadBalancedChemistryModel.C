@@ -51,7 +51,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::
             scalar(0.0)
         ),
         resetSkipSpecies_(false),
-        skipThreshold_(this->lookupOrDefault("skipThreshold", 1e-5)),
+        skipThreshold_(this->lookupOrDefault("skipThreshold", small)),
         refMap_
         (
             IOobject
