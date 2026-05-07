@@ -206,7 +206,7 @@ public:
 	//- Return non const access to the chemical source terms
         inline volScalarField::Internal& RR(const label i);
 
-    //- Calculate the time for chemistry activation/deactivation
+    //- Compute local chemistry activation time coordinate
         inline scalar timeValue() const;
 
     //- Chemistry activation switch
