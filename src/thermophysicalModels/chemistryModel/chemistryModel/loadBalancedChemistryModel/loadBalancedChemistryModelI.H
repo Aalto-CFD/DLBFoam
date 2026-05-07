@@ -61,7 +61,7 @@ inline Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::timeValue() co
 {
     if (repeat_ > 0)
     {
-        return begin_ + fmod(this->time().userTimeValue() - begin_, repeat_);
+        return fmod(this->time().userTimeValue(), repeat_);
     }
     else
     {
