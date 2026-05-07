@@ -1,0 +1,49 @@
+name: DLBFoam test
+run-name: ${{ github.actor }} is testing out DLBFoam installation
+on:
+  push:
+  pull_request:
+
+jobs:
+  compile-dlbfoam:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install dependencies
+        uses: gerlero/apt-install@v1
+        with:
+          packages: >-
+
+            liblapacke-dev
+      - name: Set up OpenFOAM
+        uses: gerlero/setup-openfoam@v1
+        with:
+          openfoam-version: 13
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Build repository with Allwmake (STANDALONE)
+        run: |
+          # load OpenFOAM environment for version 13
+          source /opt/openfoam13/etc/bashrc || true
+
+          # ensure Allwmake is executable
+          if [ -f "./Allwmake" ]; then
+            chmod +x ./Allwmake
+          fi
+
+          # run Allwmake with STANDALONE platform, parallelized, but skip tests (build only)
+          ./Allwmake --platform STANDALONE --skip-tests
+
+      - name: Run repository tests (Allwmake --only-tests)
+        run: |
+          # load OpenFOAM environment for version 13
+          source /opt/openfoam13/etc/bashrc || true
+
+          # ensure Allwmake is executable
+          if [ -f "./Allwmake" ]; then
+            chmod +x ./Allwmake
+          fi
+
+          # run only the tests (assumes build artifacts are present from previous step)
+          ./Allwmake --only-tests

@@ -4,18 +4,16 @@ cd ${0%/*} || exit 1    # run from this directory
 set -e # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 
 # The supported OpenFOAM version
-OF_VER="dev"
-
 check_openfoam()
 {
-    if [ -z ${WM_PROJECT} ]; then
+    if [ -z "${WM_PROJECT}" ]; then
         echo "OpenFOAM environment not set."
         exit 1
     fi
 
-    if [[ ! "$WM_PROJECT_VERSION" == "$OF_VER" ]]; then
-        echo "Error: OpenFOAM-$WM_PROJECT_VERSION not supported."
-        echo "       See other git branches for potential support."
+    if [[ "${WM_PROJECT_VERSION}" != "13" && "${WM_PROJECT_VERSION}" != "dev" ]]; then
+        echo "Error: OpenFOAM-${WM_PROJECT_VERSION} not supported."
+        echo "       Supported versions: 13, dev"
         exit 1
     fi
 }
@@ -58,6 +56,8 @@ how_to()
 
 PLATFORM=NOT_DEFINED
 CLEAN_ALL=false
+SKIP_TESTS=false
+ONLY_TESTS=false
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -72,6 +72,14 @@ do
         shift # past argument
         shift # past value
         ;;
+        --skip-tests)
+        SKIP_TESTS=true
+        shift
+        ;;
+        --only-tests)
+        ONLY_TESTS=true
+        shift
+        ;;
         *)
         how_to
         exit 1
@@ -83,6 +91,37 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 check_openfoam
 check_cmake
+
+run_tests()
+{
+    pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
+        ./runCmake.sh
+    popd  > /dev/null
+
+    wmake tests/unittests
+
+    wmake tests/validation/pyjacTests/PSRTest
+
+    pushd tests/unittests  > /dev/null
+        ./test.sh
+    popd  > /dev/null
+
+    pushd tests/validation/pyjacTests/PSRTest  > /dev/null
+        ./runTests.sh
+    popd  > /dev/null
+
+    pushd tests/validation/isatTests > /dev/null
+        ./test.sh
+    popd  > /dev/null
+}
+
+
+# If user requested only running tests, skip build/configuration steps that require platform selection
+if [ "$ONLY_TESTS" = true ]; then
+    echo "Running only tests (assumes build/artifacts already present)"
+    run_tests
+    exit 0
+fi
 
 if [ $PLATFORM == MKL ]; then
     check_mkl
@@ -119,25 +158,12 @@ cp $DLB_ETC_DC/basicChemistryModel $USER_ETC_DC
 cp $DLB_ETC_DC/basicChemistryModelTemplate.C $USER_ETC_DC
 
 
-pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
-    ./runCmake.sh
-popd  > /dev/null
-
-wmake tests/unittests
-
-wmake tests/validation/pyjacTests/PSRTest
-
-pushd tests/unittests  > /dev/null
-    ./test.sh
-popd  > /dev/null
-
-pushd tests/validation/pyjacTests/PSRTest  > /dev/null
-    ./runTests.sh
-popd  > /dev/null
-
-pushd tests/validation/isatTests > /dev/null
-    ./test.sh
-popd  > /dev/null
+# Run tests unless user asked to skip them
+if [ "$SKIP_TESTS" = false ]; then
+    run_tests
+else
+    echo "Tests skipped (requested with --skip-tests)"
+fi
 
 
 cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
