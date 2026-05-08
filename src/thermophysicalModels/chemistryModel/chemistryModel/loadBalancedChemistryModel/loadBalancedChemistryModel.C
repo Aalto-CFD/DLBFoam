@@ -163,7 +163,6 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
         {
             if (this->thermo().solveSpecie(i))
             {
-                // TODO: Check also the boundary values (Aleksi)
                 const scalar maxY = max(this->Y()[i].oldTime()).value();
 
                 if(maxY < skipThreshold_)
