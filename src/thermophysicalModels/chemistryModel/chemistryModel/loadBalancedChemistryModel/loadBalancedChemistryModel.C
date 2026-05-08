@@ -68,7 +68,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::
         tabulationPtr_(chemistryTabulationMethod::New(*this, *this)),
         tabulation_(*tabulationPtr_),
         startTime_(this->lookupOrDefault("startTime", -great)),
-        endTime_(this->lookupOrDefault("endTime", great)),
+        duration_(this->lookupOrDefault("duration", great)),
         repeat_(this->lookupOrDefault("repeat", 0))
     {
         if(balancer_.log())

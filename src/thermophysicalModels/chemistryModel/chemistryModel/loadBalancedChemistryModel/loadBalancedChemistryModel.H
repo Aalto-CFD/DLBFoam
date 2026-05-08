@@ -99,8 +99,8 @@ private:
     	//- Optional start time for chemistry calculation
 	    const scalar startTime_;
 
-	    //- Optional end time for chemistry calculation
-	    const scalar endTime_;
+        //- Optional duration for chemistry calculation
+        const scalar duration_;
 
 	    //- Optional repetition period
 	    const scalar repeat_;
