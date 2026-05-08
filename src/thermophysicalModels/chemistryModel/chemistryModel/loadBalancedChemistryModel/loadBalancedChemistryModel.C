@@ -83,27 +83,6 @@ Foam::loadBalancedChemistryModel<ThermoType>::
                             << "               rank ID" << endl;
         }
 
-        if(skipSpecies_)
-        {
-            forAll(this->Y(), i)
-            {
-                typeIOobject<volScalarField> header
-                (
-                    this->Y()[i].name(),
-                    this->mesh().time().name(),
-                    this->mesh(),
-                    IOobject::NO_READ
-                );
-
-                // Check if the species file is provided, if not set inactive
-                // and NO_WRITE
-                if (!header.headerOk())
-                {
-                    this->thermo().setSpecieInactive(i);
-                }
-            }
-            this->thermo().syncSpeciesActive();
-        }
 
     }
 
@@ -182,21 +161,16 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
-            if(i == this->thermo().defaultSpecie())
+            if (this->thermo().solveSpecie(i))
             {
-                continue;
-            }
+                // TODO: Check also the boundary values (Aleksi)
+                const scalar maxY = max(this->Y()[i].oldTime()).value();
 
-            const scalar maxY = gMax(this->Y()[i].oldTime());
-
-            if(maxY < skipThreshold_)
-            {
-                this->thermo().setSpecieInactive(i);
-                const_cast<volScalarField&>(this->Y()[i]) == 0;
-            }
-            else
-            {
-                this->thermo().setSpecieActive(i);
+                if(maxY < skipThreshold_)
+                {
+                    this->thermo().setSpecieInactive(i);
+                    const_cast<volScalarField&>(this->Y()[i]) == Zero;
+                }
             }
         }
     }
@@ -209,18 +183,11 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
-            if(i == this->thermo().defaultSpecie())
+            // ensure all species are active
+            if (!this->thermo().solveSpecie(i))
             {
-                continue;
-            }
-            else
-            {
-                if(!this->thermo().speciesActive()[i])
-                {
                     this->thermo().setSpecieActive(i);
-                }
             }
-
         }
         resetSkipSpecies_ = false;
     }
@@ -228,18 +195,9 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
 
     if(!chemistry())
     {
-        const volScalarField& rho0vf =
-        this->mesh().template lookupObject<volScalarField>
-        (
-            this->thermo().phasePropertyName("rho")
-        ).oldTime();
-
-        forAll(rho0vf, celli)
+        for(label i = 0; i < this->nSpecie(); i++)
         {
-            for(label j = 0; j < this->nSpecie(); j++)
-            {
-                this->RR(j)[celli] = 0.0;
-            }
+            this->RR(i) = Zero;
         }
         return great;
     }
