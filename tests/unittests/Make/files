@@ -2,6 +2,7 @@ test.C
 helpers.C
 testAlgorithms.C
 testChemistryLoad.C
+testChemistryActivation.C
 testLoadBalancerBase.C
 testLoadBalancer.C
 
