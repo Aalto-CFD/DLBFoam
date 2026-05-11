@@ -39,6 +39,7 @@ SourceFiles
 
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
+#include "ChemistryActivation.H"
 #include "LoadBalancer.H"
 #include "OFstream.H"
 #include "IOmanip.H"
@@ -205,9 +206,6 @@ public:
 
 	//- Return non const access to the chemical source terms
         inline volScalarField::Internal& RR(const label i);
-
-    //- Compute local chemistry activation time coordinate
-        inline scalar timeValue() const;
 
     //- Chemistry activation switch
         inline Switch chemistry() const;
