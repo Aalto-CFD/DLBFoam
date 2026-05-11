@@ -1,10 +1,12 @@
 #!/bin/sh
 
-rm -rf constant/polyMesh
-rm -rf processor*
-rm -rf log*
-rm -rf *.png
-rm -rf 0
-rm -rf dynamicCode
-rm -rf loadBal
-rm -rf constant/foam
+# Run from this directory
+cd "${0%/*}" || exit 1
+
+# Source tutorial run functions
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+. "$WM_PROJECT_DIR/bin/tools/CleanFunctions"
+
+cleanCase && rm -rf 0/ loadBal/ constant/foam/
+runApplication foamUnMergeCase ../shearlayer_DLB
+

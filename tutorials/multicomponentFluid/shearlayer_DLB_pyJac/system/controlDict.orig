@@ -10,12 +10,19 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "constant";
-    object      turbulenceProperties;
+    location    "system";
+    object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType  laminar;
+
+libs
+(
+        "libchemistryModel_DLB.so"
+        "libODE_DLB.so"
+        "$FOAM_CASE/constant/foam/libc_pyjac.so"
+
+);
 
 
 // ************************************************************************* //

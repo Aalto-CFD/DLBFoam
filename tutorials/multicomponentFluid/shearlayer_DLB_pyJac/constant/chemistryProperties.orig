@@ -7,15 +7,38 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      turbulenceProperties;
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "constant";
+    object          chemistryProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType  laminar;
+// Uncomment to enable ISAT tabulation
+// #includeEtc "caseDicts/solvers/chemistry/TDAC/chemistryProperties.cfg"
+//
+// #remove         reduction
+//
+// tabulation
+// {
+//     method	ISAT_pyJac;
+// }
 
+
+chemistryType
+{
+    solver          ode_pyJac;
+    method          loadBalanced_pyJac;
+}
+
+odeCoeffs
+{
+    solver          seulex_LAPACK;
+}
+
+reactions
+{
+}
 
 // ************************************************************************* //
