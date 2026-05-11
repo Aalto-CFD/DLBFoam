@@ -16,66 +16,39 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField  #codeStream
+#include "initialisationSetup"
+
+internalField
 {
+    type coded;
 
-    code
+    evaluate
     #{
+        const scalarField y = C.component(vector::Y);
+        const scalarField x = C.component(vector::X);
+        const scalar L = $L;
+        const scalar ro = $ro;
+        const scalar B = $B;
+        const scalar Umax = $Umax;
+        const scalar UyScale = $UyScale;
 
-        const IOdictionary& d = static_cast<const IOdictionary&>(dict);
-        const fvMesh& mesh = refCast<const fvMesh>(d.db());
-        const volVectorField& CC = mesh.C(); //cell center
+        const scalarField dist = max(mag(y - L/2.0), scalar(VSMALL));
 
+        const scalarField Ux =
+            Umax*0.5
+           *(1.0 - tanh(B*(dist/ro - ro/dist)));
 
-        vectorField U(mesh.nCells());
-        scalar Umax = 40;
+        const scalarField Uy =
+            (Umax/UyScale)
+           *sin(2.0*constant::mathematical::pi*x/(L/2.0));
 
-        scalar L = 0.008;
-        scalar ro = 0.0004;
-        scalar B = 5;
+        vectorField U(y.size(), vector::zero);
+        U.replace(vector::X, Ux);
+        U.replace(vector::Y, Uy);
 
-
-
-        forAll(CC,cellI)
-        {
-
-
-        	scalar y = CC[cellI].y();
-        	scalar x = CC[cellI].x();
-
-            U[cellI] = vector(1,0,0) * Umax * 0.5 *(1-tanh(B*(mag(y-L/2)/ro - ro/mag(y-L/2)))) + vector(0,1,0)*(Umax/2000)*sin(2*constant::mathematical::pi*x/(L/2));
-
-
-        }
-
-        writeEntry(os,"",U);
+        field.primitiveFieldRef() = U;
     #};
-
-    //! Optional:
-    codeInclude
-    #{
-        #include "volFields.H"
-    #};
-
-
-    codeOptions
-    #{
-
-        -I$(LIB_SRC)/finiteVolume/lnInclude \
-        -I$(LIB_SRC)/meshTools/lnInclude
-
-    #};
-
-
-    //! libs:
-
-    codeLibs
-    #{
-        -lmeshTools \
-        -lfiniteVolume
-    #};
-
-};
+}
 
 boundaryField
 {

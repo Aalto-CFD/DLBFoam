@@ -1,0 +1,14 @@
+L   0.008;   // Domain length in y [m]
+B   5.0;     // Shear-layer sharpness factor
+ro  0.0004;  // Shear-layer thickness scale [m]
+
+N2_i       0.77;  // Oxidizer-side baseline mass fraction
+O2_i       0.23;  // Oxidizer-side baseline mass fraction
+NC12H26_i  0.0;   // Oxidizer-side baseline fuel mass fraction
+NC12H26_A  1.0;   // Fuel-side amplitude for tanh profile
+
+T_i  900.0;  // Oxidizer-side baseline temperature [K]
+T_A  500.0;  // Temperature drop amplitude across layer [K]
+
+Umax    40.0;    // Streamwise velocity scale [m/s]
+UyScale 2000.0;  // Cross-stream perturbation divisor
