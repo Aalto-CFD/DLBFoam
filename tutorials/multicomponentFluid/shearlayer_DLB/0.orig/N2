@@ -17,64 +17,31 @@ FoamFile
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField  #codeStream
+// Common setup variables are shared in 0.orig/initialisationSetup
+#include "initialisationSetup"
+
+internalField
 {
+    type coded;
 
-    code
+    evaluate
     #{
+        const scalarField y = C.component(vector::Y);
+        const scalar L = $L;
+        const scalar ro = $ro;
+        const scalar B = $B;
+        const scalar N2_i = $N2_i;
 
-        const IOdictionary& d = static_cast<const IOdictionary&>(dict);
-        const fvMesh& mesh = refCast<const fvMesh>(d.db());
-        const volVectorField& CC = mesh.C(); //cell center
+        const scalarField dist = max(mag(y - L/2.0), scalar(VSMALL));
 
+        const scalarField N2 =
+            N2_i
+          - N2_i*0.5
+           *(1.0 - tanh(B*(dist/ro - ro/dist)));
 
-        scalarField N2(mesh.nCells());
-        scalar N2_i = 0.77;
-
-        scalar A = 0.77;
-        scalar L = 0.008;
-        scalar ro = 0.0004;
-        scalar B = 5;
-
-
-
-        forAll(CC,cellI)
-        {
-
-
-        	scalar y = CC[cellI].y();
-            N2[cellI] = N2_i - A * 0.5 * (1-tanh(B*(mag(y-L/2)/ro - ro/mag(y-L/2))));
-
-        }
-
-        writeEntry(os,"",N2);
+        field.primitiveFieldRef() = N2;
     #};
-
-    //! Optional:
-    codeInclude
-    #{
-        #include "volFields.H"
-    #};
-
-
-    codeOptions
-    #{
-
-        -I$(LIB_SRC)/finiteVolume/lnInclude \
-        -I$(LIB_SRC)/meshTools/lnInclude
-
-    #};
-
-
-    //! libs:
-
-    codeLibs
-    #{
-        -lmeshTools \
-        -lfiniteVolume
-    #};
-
-};
+}
 boundaryField
 {
     upperBoundary

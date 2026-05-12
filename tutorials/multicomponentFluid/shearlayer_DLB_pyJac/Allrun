@@ -1,4 +1,17 @@
 #!/bin/sh
+
+# Run from this directory
+cd "${0%/*}" || exit 1
+
+# Source tutorial run functions
+. "$WM_PROJECT_DIR/bin/tools/RunFunctions"
+
+
+runApplication foamMergeCase ../shearlayer_DLB
+cp -r ../shearlayer_DLB/0.orig .
+
+
+#!/bin/sh
 # Run from this directory
 cd "${0%/*}" || exit 1
 
@@ -18,7 +31,6 @@ N_PROCS=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
 
 foamDictionary system/decomposeParDict -entry numberOfSubdomains -set $N_PROCS
 
-rm -rf 0
 cp -r 0.orig 0
 
 runApplication decomposePar
