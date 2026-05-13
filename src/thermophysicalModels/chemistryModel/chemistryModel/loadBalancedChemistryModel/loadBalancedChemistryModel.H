@@ -45,6 +45,8 @@ SourceFiles
 #include "chemistryModel.H"
 #include "clockTime.H"
 #include "mixtureFractionRefMapper.H"
+#include "boolList.H"
+#include "wordList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -78,6 +80,12 @@ private:
         // 1 -> mapped from reference solution
         // 2 -> solved explicitly
         volScalarField refMap_;
+
+        // Optional cellZones limiting chemistry integration
+        wordList zoneNames_;
+
+        // Mask of cells where chemistry is solved
+        boolList solveChemistryInCell_;
 
         // A file to output the balancing stats
         autoPtr<OFstream>        cpuSolveFile_;

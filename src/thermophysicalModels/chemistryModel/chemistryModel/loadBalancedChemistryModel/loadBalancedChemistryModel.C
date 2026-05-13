@@ -62,6 +62,8 @@ Foam::loadBalancedChemistryModel<ThermoType>::
             this->mesh(),
             scalar(0.0)
         ),
+        zoneNames_(this->lookupOrDefault("zones", wordList::null())),
+        solveChemistryInCell_(this->mesh().nCells(), true),
         tabulationPtr_(chemistryTabulationMethod::New(*this, *this)),
         tabulation_(*tabulationPtr_)
     {
@@ -391,6 +393,27 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
             this->thermo().phasePropertyName("rho")
         ).oldTime();
 
+    // Refresh the active-cell mask every call to support dynamic zones
+    if (!zoneNames_.empty())
+    {
+        solveChemistryInCell_ = boolList(this->mesh().nCells(), false);
+
+        forAll(zoneNames_, zonei)
+        {
+            const labelList& zoneCells =
+                this->mesh().cellZones()[zoneNames_[zonei]];
+
+            forAll(zoneCells, i)
+            {
+                solveChemistryInCell_[zoneCells[i]] = true;
+            }
+        }
+    }
+    else
+    {
+        solveChemistryInCell_ = boolList(this->mesh().nCells(), true);
+    }
+
 
 
     DynamicList<ChemistryProblem> solved_problems;
@@ -401,8 +424,23 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     scalarField massFraction(this->nSpecie());
 
     label counter = 0;
+    label nChemistryCells = 0;
     forAll(T, celli)
     {
+            if (!solveChemistryInCell_[celli])
+            {
+                for (label i = 0; i < this->nSpecie(); i++)
+                {
+                    this->RR(i)[celli] = 0;
+                }
+
+                cpuTimes_[celli] = 0;
+                refMap_[celli] = -1;
+                continue;
+            }
+
+            nChemistryCells++;
+
             for(label i = 0; i < this->nSpecie(); i++)
             {
                 massFraction[i] = this->Y()[i].oldTime()[celli];
@@ -440,7 +478,11 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     //the real size is set here
     solved_problems.setSize(counter);
 
-    runtime_assert(solved_problems.size() + mapped_problems.size() == p.size(), "getProblems fails");
+    runtime_assert
+    (
+        solved_problems.size() + mapped_problems.size() == nChemistryCells,
+        "getProblems fails"
+    );
 
     this->map(mapped_problems, solved_problems);
 
