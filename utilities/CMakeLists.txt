@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 2.6)
+if(CMAKE_VERSION VERSION_LESS "3.5")
+  cmake_minimum_required(VERSION 2.6)
+else()
+  cmake_minimum_required(VERSION 3.5)
+endif()
 
 project(pyJac)
 
