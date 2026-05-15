@@ -83,7 +83,6 @@ Foam::loadBalancedChemistryModel<ThermoType>::
                             << "               rank ID" << endl;
         }
 
-
     }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -264,7 +263,6 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
 ) const
 {
     scalar timeLeft = problem.deltaT;
-
     scalarField Y0 = problem.Y;
     solution.cellid = problem.cellid;
 
@@ -317,7 +315,6 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
         }
         solution.deltaTChem = problem.deltaTChem;
     }
-
     solution.rr = (problem.Y - Y0) * problem.rhoi / problem.deltaT;
     // Timer ends
     solution.cpuTime = time.timeIncrement();

@@ -61,11 +61,11 @@ class loadBalancedChemistryModel
     public chemistryModel<ThermoType>
 {
 
-protected:
-        // Skip species flag
-        Switch  skipSpecies_;
 private:
     // Private member data
+
+        // Skip species flag
+        Switch  skipSpecies_;
 
         // Load balancing object
         LoadBalancer balancer_;
