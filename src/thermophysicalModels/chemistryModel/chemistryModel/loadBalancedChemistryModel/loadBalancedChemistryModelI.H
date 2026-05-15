@@ -60,7 +60,9 @@ template <class ThermoType>
 inline Foam::Switch
 Foam::loadBalancedChemistryModel<ThermoType>::chemistry() const
 {
-    return chemistryActive(startTime_, duration_, repeat_, this->time().userTimeValue());
+    scalar t = this->time().userTimeValue() - startTime_;
+    if(repeat_ && t >= 0) t = fmod(t, repeat_);
+    return this->chemistry_ && 0 <= t && t < duration_;
 }
 
 // ************************************************************************* //
