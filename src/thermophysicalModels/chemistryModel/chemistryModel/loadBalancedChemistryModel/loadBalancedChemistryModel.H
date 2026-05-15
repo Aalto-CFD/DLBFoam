@@ -39,7 +39,6 @@ SourceFiles
 
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
-#include "ChemistryActivation.H"
 #include "LoadBalancer.H"
 #include "OFstream.H"
 #include "IOmanip.H"
