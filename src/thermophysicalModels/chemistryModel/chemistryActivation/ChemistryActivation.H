@@ -42,15 +42,6 @@ Description
 namespace Foam
 {
 
-inline scalar timeValueFromUserTime(const scalar userTime, const scalar repeat)
-{
-    if (repeat > 0)
-    {
-        return fmod(userTime, repeat);
-    }
-    return userTime;
-}
-
 inline bool chemistryActive
 (
     const scalar startTime,
@@ -62,25 +53,24 @@ inline bool chemistryActive
     if (startTime <= -great) return true;
     if (duration <= scalar(0)) return false;
 
-    const scalar time = timeValueFromUserTime(timeValue, repeat);
+    const scalar time = timeValue;  // keep global time
 
-    if (repeat > 0)
+    // non-repeating case
+    if (repeat <= 0)
     {
-        const scalar period = repeat;
-
-        if (duration >= period) return true;
-
-        const scalar end = fmod(startTime + duration, period);
-
-        if (end < startTime) // wrapped interval
-        {
-            return (time >= startTime) || (time <= end);
-        }
-
-        return (time >= startTime) && (time <= end);
+        return (time >= startTime && time <= startTime + duration);
     }
 
-    return (time >= startTime) && (time <= startTime + duration);
+    // before first activation
+    if (time < startTime) return false;
+
+    // infinite active window
+    if (duration >= repeat) return true;
+
+    const scalar dt = time - startTime;
+    const scalar modt = fmod(dt, repeat);
+
+    return (modt >= 0 && modt <= duration);
 }
 
 } // namespace Foam
