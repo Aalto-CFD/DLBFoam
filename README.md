@@ -1,6 +1,6 @@
 # DLBFoam: Dynamic load balancing for fast reactive simulations
 ![v1.1](https://img.shields.io/badge/DLBFoam-v1.1-blue)
-![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM-dev_20240707-brightgreen)
+![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM-dev_20260502-brightgreen)
 
 [<img src="https://img.shields.io/badge/-YouTube_Video_Tutorials-red?style=for-the-badge&logo=youtube&logoColor=white"/>](https://www.youtube.com/playlist?list=PLXqVaOXSsv1SBnfyGRa_C-E0X--FIT27P)
 
@@ -106,9 +106,9 @@ loadbalancing
 }
 ```
 
-* Set the solver flag under ```odeCoeffs``` to ```seulex_LAPACK``` in order to use the optimized ODE solvers:
+* Set the solver flag under ```ode``` to ```seulex_LAPACK``` in order to use the optimized ODE solvers:
 ```
-odeCoeffs
+ode
 {
     solver          seulex_LAPACK;
     absTol          1e-08;

@@ -32,7 +32,7 @@ chemistryType
     method          loadBalanced_pyJac;
 }
 
-odeCoeffs
+ode
 {
     solver          seulex_LAPACK;
 }

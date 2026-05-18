@@ -50,7 +50,7 @@ chemistryType
     method          loadBalanced;
 }
 
-odeCoeffs
+ode
 {
     solver          seulex;
     absTol          1e-08;

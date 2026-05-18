@@ -25,7 +25,7 @@ chemistry       on;
 
 initialChemicalTimeStep 1e30; // - should not influence ODE stability if all good.
 
-odeCoeffs
+ode
 {
     solver          seulex_LAPACK;
     absTol          1e-12;

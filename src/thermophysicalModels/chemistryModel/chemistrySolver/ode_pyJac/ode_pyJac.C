@@ -31,8 +31,7 @@ template<class ChemistryModel>
 Foam::ode_pyJac<ChemistryModel>::ode_pyJac(const fluidMulticomponentThermo& thermo)
 :
     chemistrySolver<ChemistryModel>(thermo),
-    coeffsDict_(this->subDict("odeCoeffs")),
-    odeSolver_(ODESolver::New(*this, coeffsDict_)),
+    odeSolver_(ODESolver::New(*this, this->typeDict("ode"))),
     YTp_(this->nEqns())
 {}
 
