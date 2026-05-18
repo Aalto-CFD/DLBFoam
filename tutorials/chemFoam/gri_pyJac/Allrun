@@ -1,23 +1,5 @@
 #!/bin/bash
 
-# Ensure the use of OpenFOAM dev, so that gri tutorial is present in $WM_PROJECT_DIR/test
-OF_VER="dev"
-
-check_openfoam()
-{
-    if [ -z ${WM_PROJECT} ]; then
-        echo "OpenFOAM environment not set."
-        exit 1
-    fi
-
-    if [[ ! "$WM_PROJECT_VERSION" == "$OF_VER" ]]; then
-        echo "Error: OpenFOAM-$WM_PROJECT_VERSION not supported."
-        echo "       See other git branches for potential support."
-        exit 1
-    fi
-}
-check_openfoam
-
 # Copy tutorial files from OpenFOAM
 cp -nr $WM_PROJECT_DIR/test/chemistry/gri/* .
 
