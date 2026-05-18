@@ -1,4 +1,4 @@
-name: DLBFoam test
+name: DLBFoam test - OpenFOAM-dev-tagged version
 run-name: ${{ github.actor }} is testing out DLBFoam on latest tagged OpenFOAM-dev installation
 on:
   push:
