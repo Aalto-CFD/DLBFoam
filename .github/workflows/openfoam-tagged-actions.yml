@@ -1,0 +1,33 @@
+name: DLBFoam test
+run-name: ${{ github.actor }} is testing out DLBFoam on latest tagged OpenFOAM-dev installation
+on:
+  push:
+  pull_request:
+
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install OpenFOAM-dev
+      run: |
+        sudo sh -c "wget -O - https://dl.openfoam.org/gpg.key > /etc/apt/trusted.gpg.d/openfoam.asc"
+        sudo add-apt-repository http://dl.openfoam.org/ubuntu
+        sudo add-apt-repository "http://dl.openfoam.org/ubuntu dev"
+        sudo apt-get update
+        sudo apt-get install -y openfoam-dev liblapacke-dev
+
+    - name: Display OpenFOAM version
+      run: |
+        bash -c "source /opt/openfoam-dev/etc/bashrc && echo 'OpenFOAM version:' \$WM_PROJECT_VERSION && echo 'OpenFOAM directory:' \$WM_PROJECT_DIR && which wmake"
+
+    - name: Compile with Allwmake
+      run: |
+        bash -c "source /opt/openfoam-dev/etc/bashrc && chmod +x Allwmake && ./Allwmake --platform STANDALONE"
+
+    - name: Check compilation artifacts
+      run: |
+        bash -c "source /opt/openfoam-dev/etc/bashrc && echo 'Checking for compiled libraries...' && find \$FOAM_USER_LIBBIN -type f -name '*.so' 2>/dev/null || echo 'No libraries found in \$FOAM_USER_LIBBIN' && find . -type f -name '*.so' || echo 'No .so files found in repository'"

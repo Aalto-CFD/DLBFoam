@@ -1,0 +1,44 @@
+name: DLBFoam test
+run-name: ${{ github.actor }} is testing out DLBFoam on latest OpenFOAM installation
+on:
+  push:
+  pull_request:
+
+jobs:
+  compile-dlbfoam:
+    name: Build code base (OpenFOAM-dev)
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/drhcelik/dlbfoam-ci:latest
+      options: --user foam
+    env:
+      CCACHE_DISABLE: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: Build repository with Allwmake (STANDALONE)
+        shell: bash
+        run: |
+          source /opt/OpenFOAM/OpenFOAM-dev/etc/bashrc
+          chmod +x ./Allwmake
+          ./Allwmake --platform STANDALONE
+      - name: Show test logs on failure
+        if: always()
+        shell: bash
+        run: |
+          shopt -s nullglob globstar
+          found=0
+          for f in tests/**/log.* tests/**/*.log; do
+            [ -f "$f" ] || continue
+            found=1
+            echo "=========================================="
+            echo "=== $f"
+            echo "=========================================="
+            cat "$f"
+            echo
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "No log files found under tests/"
+          fi
