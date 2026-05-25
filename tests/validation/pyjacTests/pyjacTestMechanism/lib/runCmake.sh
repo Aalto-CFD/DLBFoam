@@ -3,7 +3,7 @@ testMechLibdDir=$FOAM_USER_LIBBIN/unittests/pyjacTestMech/build
 
 rm -rf $testMechLibdDir
 
-cmake -B$testMechLibdDir -H. -DCMAKE_C_COMPILER=cc 
+cmake -B$testMechLibdDir -H. -DCMAKE_C_COMPILER=cc
 
 pushd $testMechLibdDir
     make

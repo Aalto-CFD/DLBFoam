@@ -57,7 +57,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -239,7 +239,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -307,7 +307,7 @@ reactions
         A               1.78e+12;
         beta            -1;
         Ta              0;
-        coeffs          
+        coeffs
 54
 (
 (N2 1)
@@ -374,7 +374,7 @@ reactions
         A               4.4e+16;
         beta            -2;
         Ta              0;
-        coeffs          
+        coeffs
 54
 (
 (N2 1)
@@ -441,7 +441,7 @@ reactions
         A               1.2e+11;
         beta            -1;
         Ta              0;
-        coeffs          
+        coeffs
 54
 (
 (N2 1)
@@ -532,7 +532,7 @@ reactions
         A               9.428e+12;
         beta            -1;
         Ta              0;
-        coeffs          
+        coeffs
 54
 (
 (N2 1)
@@ -637,7 +637,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -713,7 +713,7 @@ reactions
         A               1.87e+14;
         beta            -1;
         Ta              8554.25;
-        coeffs          
+        coeffs
 54
 (
 (N2 1)
@@ -846,7 +846,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -932,7 +932,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -1018,7 +1018,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -1256,7 +1256,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -1382,7 +1382,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -1564,7 +1564,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -1746,7 +1746,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -1864,7 +1864,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -2038,7 +2038,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -2164,7 +2164,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -2346,7 +2346,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -2488,7 +2488,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -2622,7 +2622,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -2756,7 +2756,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -2842,7 +2842,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3072,7 +3072,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3182,7 +3182,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3420,7 +3420,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3530,7 +3530,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3640,7 +3640,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3750,7 +3750,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3860,7 +3860,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)
@@ -3970,7 +3970,7 @@ reactions
         }
         thirdBodyEfficiencies
         {
-            coeffs          
+            coeffs
 54
 (
 (N2 1)

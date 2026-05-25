@@ -136,7 +136,7 @@ namespace Foam
 namespace Foam
 {
     defineChemistryReductionMethod(nullArg, ThermoPhysics);
-    
+
     makeChemistryReductionMethod(none, ThermoPhysics);
     makeChemistryReductionMethod(DAC, ThermoPhysics);
     makeChemistryReductionMethod(DRG, ThermoPhysics);

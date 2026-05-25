@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -20,7 +20,7 @@ License
     for more details.
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "LoadBalancerBase.H"
@@ -89,7 +89,7 @@ Foam::label Foam::LoadBalancerBase::rankToLoadIdx(
 
 bool Foam::LoadBalancerBase::validState() const
 {
-    
+
     auto sources = state_.sources;
     auto destinations = state_.destinations;
 

@@ -1,4 +1,4 @@
-StopWatch   chemistryTime;  
+StopWatch   chemistryTime;
 chemistryTime.start();
 dtChem = chemistry.solve(endTime);
 chemistryTime.stop();

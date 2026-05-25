@@ -1,22 +1,22 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | DLBFoam: Dynamic Load Balancing                 |
-|  \\    /   O peration     | for fast reactive simulations                   |
-|   \\  /    A nd           |                                                 |
-|    \\/     M anipulation  | 2020, Aalto University, Finland                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  dev
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version         2;
-    format          ascii;
-    class           dictionary;
-    location        "system";
-    object          decomposeParDict;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains 4;
+numberOfSubdomains 6;
 
 method          scotch;
+
 
 // ************************************************************************* //

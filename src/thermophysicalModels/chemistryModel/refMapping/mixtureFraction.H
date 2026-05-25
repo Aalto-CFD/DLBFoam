@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -29,7 +29,7 @@ Class
 Description
     Calculates and outputs the mixture fraction calculated between the
     fuel and the oxidizer.
-    
+
     \f
         Z = (beta - beta_0)/(beta_1 - beta_0)
     \f]
@@ -100,7 +100,7 @@ class mixtureFraction
 public:
     mixtureFraction() = default;
 
-    // Construct from dict and thermo 
+    // Construct from dict and thermo
     mixtureFraction(const dictionary& mixFracDict, const fluidMulticomponentThermo& thermo);
 
     scalar massFractionToMixtureFraction(const scalarField& massFraction) const;
@@ -112,8 +112,8 @@ private:
     wordList species_;
     List<scalar> alpha_;
     List<scalar> beta_;
-    
-    //- Initialize the alpha and beta values needed for 
+
+    //- Initialize the alpha and beta values needed for
     // mixture fraction calculation
     void initialize(const fluidMulticomponentThermo& thermo);
 

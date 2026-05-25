@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -37,8 +37,8 @@ namespace Foam
     addToRunTimeSelectionTable(ODESolver, seulex_LAPACK, dictionary);
 
     const scalar
-        seulex_LAPACK::stepFactor1_ = 0.8, // Safety factor for step control, Hairer default 0.8, OF default 0.6 
-        seulex_LAPACK::stepFactor2_ = 0.93, //Safety factor for step control HNEW=H*sf2_*(sf1_*TOL/ERR)^(1/(J-1)) 
+        seulex_LAPACK::stepFactor1_ = 0.8, // Safety factor for step control, Hairer default 0.8, OF default 0.6
+        seulex_LAPACK::stepFactor2_ = 0.93, //Safety factor for step control HNEW=H*sf2_*(sf1_*TOL/ERR)^(1/(J-1))
         seulex_LAPACK::stepFactor3_ = 0.1, // Step size selection: (sf3_*(1/(J-1)))/sF4_ <= hnew(J)/hold <= 1/(sf3_*(1/(J-1)))
         seulex_LAPACK::stepFactor4_ = 4.0, // Step size selection, see above
         seulex_LAPACK::stepFactor5_ = 0.5, // Step size hnew = sf5_*hold, whenever err_j >= err_j-1 and j>3
@@ -99,7 +99,7 @@ Foam::seulex_LAPACK::seulex_LAPACK(const ODESystem& ode, const dictionary& dict)
             scalar ratio = scalar(nSeq_[k])/nSeq_[l];
             coeff_(k, l) = 1/(ratio - 1);
         }
-    }    
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -173,12 +173,12 @@ bool Foam::seulex_LAPACK::seul
 	    {
 	        yTemp_[i] = yTemp_[i] + dy_[i];
 	    }
-        
+
         xnew += dx;
 
         /*****************************************************/
-        /* Stability check begins, original Hairer's         */ 
-        /* implementation on fortran  lines 1067-1126 and    */ 
+        /* Stability check begins, original Hairer's         */
+        /* implementation on fortran  lines 1067-1126 and    */
         /* idea  from book's p. 140 eq. 9.30                 */
         /*****************************************************/
         // check that temperature remains in range           */
@@ -417,7 +417,7 @@ void Foam::seulex_LAPACK::solve
 			if (k != 0)
 			{
 				extrapolate(k, table_, y);
-                
+
                 /* Compute the optimal step sizes   */
                 /* Corresponds fortran lines 1144-> */
 				scalar err = 0.0;
@@ -527,7 +527,7 @@ void Foam::seulex_LAPACK::solve
 
    					odes_.jacobian(x, y, li, dfdx_, dfdy_);
 					jacUpdated = true;
-	                
+
 
 		    }
 			}
@@ -593,7 +593,7 @@ void Foam::seulex_LAPACK::solve
 	}
 
 	step.dxTry = step.forward ? dxNew : -dxNew; //if you would force here a too large dxNew, convergence deteriorates
- 
+
 }
 
 
