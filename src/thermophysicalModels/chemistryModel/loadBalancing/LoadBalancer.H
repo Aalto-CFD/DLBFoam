@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -27,7 +27,7 @@ Class
 Description
     Extends the base class LoadBalancerBase by implementing a
     balancing algorithm which tries to set the global mean load to each rank.
-    
+
 SourceFiles
     LoadBalancer.C
 \*---------------------------------------------------------------------------*/
@@ -70,6 +70,7 @@ public:
         : LoadBalancerBase(), dict_(dict),
           coeffsDict_(dict.subDict("loadbalancing")),
           active_(coeffsDict_.lookupOrDefault<Switch>("active", true)),
+          debug_(coeffsDict_.lookupOrDefault<Switch>("debug", false)),
           log_(coeffsDict_.lookupOrDefault<Switch>("log", false))
     {
     }
@@ -90,6 +91,12 @@ public:
     bool log() const
     {
         return log_;
+    }
+
+    //- Is detailed load balancing state printed to main log?
+    bool debug() const
+    {
+        return debug_;
     }
 
 
@@ -122,6 +129,9 @@ private:
 
     // Is load balancing active?
     Switch active_;
+
+    // Is detailed balancing state output enabled?
+    Switch debug_;
 
     // Is load balancing logged?
     Switch log_;

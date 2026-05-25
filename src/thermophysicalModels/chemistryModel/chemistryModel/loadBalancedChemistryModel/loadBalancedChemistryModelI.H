@@ -34,9 +34,15 @@ inline Foam::autoPtr<Foam::OFstream>
 Foam::loadBalancedChemistryModel<ThermoType>::logFile(
     const word& name) const
 {
-    mkDir(this->mesh().time().path() / "loadBal" / this->group());
-    return autoPtr<OFstream>(new OFstream(
-        this->mesh().time().path() / "loadBal" / this->group() / name));
+    const fileName outDir =
+        this->mesh().time().globalPath()
+      / "postProcessing"
+      / regionName(this->mesh())
+      / "loadBalancing"
+      / this->mesh().time().name()
+    ;
+    mkDir(outDir);
+    return autoPtr<OFstream>(new OFstream(outDir / name));
 }
 
 template <class ThermoType>

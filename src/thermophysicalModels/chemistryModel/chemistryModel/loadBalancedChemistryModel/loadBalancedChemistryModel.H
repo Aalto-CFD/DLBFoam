@@ -41,6 +41,8 @@ SourceFiles
 #include "ChemistrySolution.H"
 #include "LoadBalancer.H"
 #include "OFstream.H"
+#include "Pstream.H"
+#include "regionName.H"
 #include "IOmanip.H"
 #include "chemistryModel.H"
 #include "clockTime.H"
@@ -87,8 +89,12 @@ private:
         // 2 -> solved explicitly
         volScalarField refMap_;
 
-        // A file to output the balancing stats
-        autoPtr<OFstream>        cpuSolveFile_;
+        // Files for post-processing timing statistics
+        autoPtr<OFstream> getProblemsFile_;
+        autoPtr<OFstream> updateStateFile_;
+        autoPtr<OFstream> balanceFile_;
+        autoPtr<OFstream> solveBufferFile_;
+        autoPtr<OFstream> unbalanceFile_;
 
         //- Tabulation method
         autoPtr<chemistryTabulationMethod> tabulationPtr_;
@@ -142,6 +148,19 @@ private:
         //  of given type and return the characteristic time
         template<class DeltaTType>
         scalar solve(const DeltaTType& deltaT);
+
+        //- Initialize post-processing files for timing statistics
+        void initTimingFiles();
+
+        //- Gather rank-local timing values and append a new row to output files
+        void writeTimingStatistics
+        (
+            const scalar t_getProblems,
+            const scalar t_updateState,
+            const scalar t_balance,
+            const scalar t_solveBuffer,
+            const scalar t_unbalance
+        );
 
         //- Apply the reference cell mapping
         //TODO: This doesnt belong here and should be in reference cell mapping class.

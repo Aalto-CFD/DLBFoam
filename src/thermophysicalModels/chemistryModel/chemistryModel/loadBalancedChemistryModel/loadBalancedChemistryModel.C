@@ -73,14 +73,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::
     {
         if(balancer_.log())
         {
-            cpuSolveFile_ = logFile("cpu_solve.out");
-            cpuSolveFile_() << "                  time" << tab
-                            << "           getProblems" << tab
-                            << "           updateState" << tab
-                            << "               balance" << tab
-                            << "           solveBuffer" << tab
-                            << "             unbalance" << tab
-                            << "               rank ID" << endl;
+            initTimingFiles();
         }
 
     }
@@ -234,22 +227,23 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
         t_solveBuffer = timer.timeIncrement();
     }
 
-    if(balancer_.log())
+    if(balancer_.debug() && balancer_.active())
     {
-        if(balancer_.active())
-        {
-            balancer_.printState();
-        }
-        cpuSolveFile_() << setw(22)
-                        << this->time().userTimeValue()<<tab
-                        << setw(22) << t_getProblems<<tab
-                        << setw(22) << t_updateState<<tab
-                        << setw(22) << t_balance<<tab
-                        << setw(22) << t_solveBuffer<<tab
-                        << setw(22) << t_unbalance<<tab
-                        << setw(22) << Pstream::myProcNo()
-                        << endl;
+        balancer_.printState();
     }
+
+    if (balancer_.log())
+    {
+        writeTimingStatistics
+        (
+            t_getProblems,
+            t_updateState,
+            t_balance,
+            t_solveBuffer,
+            t_unbalance
+        );
+    }
+
     tabulation_.update();
 
     return updateReactionRates(incomingSolutions);
@@ -380,6 +374,86 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     return min(
         this->solve<UniformField<scalar>>(UniformField<scalar>(deltaT)),
         2 * deltaT);
+}
+
+
+template <class ThermoType>
+void Foam::loadBalancedChemistryModel<ThermoType>::initTimingFiles()
+{
+    if (!Pstream::master())
+    {
+        return;
+    }
+
+    getProblemsFile_ = logFile("getProblems.dat");
+    updateStateFile_ = logFile("updateState.dat");
+    balanceFile_ = logFile("balance.dat");
+    solveBufferFile_ = logFile("solveBuffer.dat");
+    unbalanceFile_ = logFile("unbalance.dat");
+
+    auto writeHeader = [](OFstream& os)
+    {
+        os << "# time";
+        for (label procI = 0; procI < Pstream::nProcs(); ++procI)
+        {
+            os << tab << tab << "proc" << procI;
+        }
+        os << endl;
+    };
+
+    writeHeader(getProblemsFile_());
+    writeHeader(updateStateFile_());
+    writeHeader(balanceFile_());
+    writeHeader(solveBufferFile_());
+    writeHeader(unbalanceFile_());
+}
+
+
+template <class ThermoType>
+void Foam::loadBalancedChemistryModel<ThermoType>::writeTimingStatistics
+(
+    const scalar t_getProblems,
+    const scalar t_updateState,
+    const scalar t_balance,
+    const scalar t_solveBuffer,
+    const scalar t_unbalance
+)
+{
+    List<scalar> myData
+    {
+        t_getProblems,
+        t_updateState,
+        t_balance,
+        t_solveBuffer,
+        t_unbalance
+    };
+
+    List<List<scalar>> gatheredData(Pstream::nProcs(), myData);
+    gatheredData[Pstream::myProcNo()] = myData;
+
+    if (Pstream::parRun())
+    {
+        Pstream::gatherList(gatheredData);
+    }
+
+    if (Pstream::master())
+    {
+        auto writeRow = [&](OFstream& os, const label col)
+        {
+            os << this->time().userTimeValue();
+            for (label procI = 0; procI < Pstream::nProcs(); ++procI)
+            {
+                os << tab << tab << gatheredData[procI][col];
+            }
+            os << endl;
+        };
+
+        writeRow(getProblemsFile_(), 0);
+        writeRow(updateStateFile_(), 1);
+        writeRow(balanceFile_(), 2);
+        writeRow(solveBufferFile_(), 3);
+        writeRow(unbalanceFile_(), 4);
+    }
 }
 
 
