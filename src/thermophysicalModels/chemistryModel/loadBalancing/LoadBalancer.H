@@ -67,11 +67,10 @@ public:
     LoadBalancer() = default;
 
     LoadBalancer(const dictionary& dict)
-        : LoadBalancerBase(), dict_(dict),
-          coeffsDict_(dict.subDict("loadbalancing")),
-          active_(coeffsDict_.lookupOrDefault<Switch>("active", true)),
-          debug_(coeffsDict_.lookupOrDefault<Switch>("debug", false)),
-          log_(coeffsDict_.lookupOrDefault<Switch>("log", false))
+        : LoadBalancerBase(),
+          dict_(dict),
+          active_(dict_.lookupOrDefault<Switch>("active", true)),
+          log_(dict_.lookupOrDefault<Switch>("log", false))
     {
     }
 
@@ -124,8 +123,6 @@ protected:
 private:
 
     const dictionary dict_;
-
-    const dictionary coeffsDict_;
 
     // Is load balancing active?
     Switch active_;

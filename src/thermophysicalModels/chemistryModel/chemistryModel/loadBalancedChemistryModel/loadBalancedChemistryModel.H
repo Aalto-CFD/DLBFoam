@@ -113,12 +113,6 @@ private:
 
     // Private Member Functions
 
-        //- Create a reference mapper object
-        static mixtureFractionRefMapper createMapper(const fluidMulticomponentThermo& thermo);
-
-        //- Create a load balancer object
-        LoadBalancer createBalancer();
-
         //- Get the list of problems to be solved
         template<class DeltaTType>
         DynamicList<ChemistryProblem> getProblems(const DeltaTType& deltaT);
