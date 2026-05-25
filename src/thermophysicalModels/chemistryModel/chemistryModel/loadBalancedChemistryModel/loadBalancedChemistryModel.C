@@ -35,8 +35,8 @@ Foam::loadBalancedChemistryModel<ThermoType>::
     :
         chemistryModel<ThermoType>(thermo),
         skipSpecies_(this->lookupOrDefault("skipSpecies", false)),
-        balancer_(createBalancer()),
-        mapper_(createMapper(this->thermo())),
+        balancer_(this->subOrEmptyDict("loadbalancing")),
+        mapper_(this->subOrEmptyDict("refmapping"), this->thermo()),
         cpuTimes_
         (
             IOobject
@@ -94,51 +94,6 @@ Foam::loadBalancedChemistryModel<ThermoType>::
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template <class ThermoType>
-Foam::mixtureFractionRefMapper
-Foam::loadBalancedChemistryModel<ThermoType>::createMapper
-(
-    const fluidMulticomponentThermo& thermo
-)
-{
-    const IOdictionary chemistryDict_tmp
-        (
-            IOobject
-            (
-                thermo.phasePropertyName("chemistryProperties"),
-                thermo.mesh().time().constant(),
-                thermo.mesh(),
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE,
-                false
-            )
-        );
-
-    return mixtureFractionRefMapper(chemistryDict_tmp, thermo);
-}
-
-
-template <class ThermoType>
-Foam::LoadBalancer
-Foam::loadBalancedChemistryModel<ThermoType>::createBalancer()
-{
-    const IOdictionary chemistryDict_tmp
-        (
-            IOobject
-            (
-                this->thermo().phasePropertyName("chemistryProperties"),
-                this->thermo().mesh().time().constant(),
-                this->thermo().mesh(),
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE,
-                false
-            )
-        );
-
-    return LoadBalancer(chemistryDict_tmp);
-}
-
 
 template <class ThermoType>
 template <class DeltaTType>
