@@ -91,11 +91,11 @@ void loadBalanced_pyJacChemistryModel<ThermoType>::jacobian(
     for (label i = 1; i < this->nSpecie(); i++) {
         yToPyJac[i] = max(TYp[i], 0);
     }
-    
+
     eval_jacob(0, p, yToPyJac.begin(), jac.begin());
-    
+
     for (label j = 0; j < this->nSpecie(); j++) {
-        for (label i = 0; i < this->nSpecie(); i++) { 
+        for (label i = 0; i < this->nSpecie(); i++) {
         J[i][j] = jac[i + j*this->nSpecie()];
         }
     }
@@ -113,7 +113,7 @@ void loadBalanced_pyJacChemistryModel<ThermoType>::derivatives(
     for (label i = 1; i < this->nSpecie(); i++) {
         yToPyJac[i] = max(TYp[i], 0);
     }
-    
+
     // call pyJac RHS function
     dydt(0, p, yToPyJac.begin(), dTYpdt.begin());
 

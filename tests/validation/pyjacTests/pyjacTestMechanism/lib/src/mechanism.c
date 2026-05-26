@@ -117,7 +117,7 @@
         y_specs[51] = temp[50];
         y_specs[52] = temp[51];
     }
-void set_same_initial_conditions(int NUM, double** y_host, double** var_host) 
+void set_same_initial_conditions(int NUM, double** y_host, double** var_host)
 {
     double Xi [NSP] = {0.0};
     //set initial mole fractions here

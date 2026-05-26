@@ -1,9 +1,9 @@
-# Note: 
+# Note:
 # - This python script computes reference results used in the OpenFOAM validation tests.
-# - Cantera environment must be created to run this python script. 
+# - Cantera environment must be created to run this python script.
 # - See https://cantera.org/index.html for further information
 # - The utilised mechanism is a modified GRI30 to achieve thermodynamic consistency with openfoam
- 
+
 import time
 import cantera as ct
 import numpy as np
@@ -45,5 +45,5 @@ elapsed = time.time() - t
 states.append(r.thermo.state, t=sim.time*1e3)
 print('{:10.3e} {:10.6f} {:10.3f} {:14.10f}'.format(
         sim.time, r.T, r.thermo.P, gas.Y[gas.species_index('CH4')]))#r.thermo.u))
-        
+
 print("\n Wall clock time: " + repr(elapsed))

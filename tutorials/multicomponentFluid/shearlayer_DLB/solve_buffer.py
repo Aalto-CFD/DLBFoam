@@ -30,7 +30,7 @@ for rankid,rank in enumerate(sorted(glob.glob('processor*'))):
     update_state = np.array([float(i) for i in update_state])
     balance = np.array([float(i) for i in balance])
     solve_buffer = np.array([float(i) for i in solve_buffer])
-    unbalance = np.array([float(i) for i in unbalance])         
+    unbalance = np.array([float(i) for i in unbalance])
     total = get_problem[:size]  + update_state[:size] + balance[:size] + solve_buffer[:size] + unbalance[:size]
     mean += solve_buffer[:size]
     ax.plot(solve_buffer,linewidth=0.6,label='Processor ID' if rankid==0 else "")

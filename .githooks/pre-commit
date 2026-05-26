@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Staged files added/copied/modified
+staged_files="$(git diff --cached --name-only --diff-filter=ACM)"
+
+# Nothing to do
+[ -z "${staged_files}" ] && exit 0
+
+# Remove trailing whitespace from staged text files, then re-stage
+while IFS= read -r f; do
+  [ -f "${f}" ] || continue
+
+  # Skip binary files
+  if ! grep -Iq . "${f}"; then
+    continue
+  fi
+
+  sed -i -E 's/[[:blank:]]+$//' "${f}"
+  git add "${f}"
+done <<< "${staged_files}"
+
+# Fail commit if whitespace problems remain in staged diff
+if ! git diff --cached --check -- .; then
+  echo
+  echo "pre-commit: whitespace errors remain. Fix and commit again."
+  exit 1
+fi

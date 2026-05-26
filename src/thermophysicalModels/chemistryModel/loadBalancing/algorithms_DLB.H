@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing 
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
    \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  | 2020, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
@@ -29,11 +29,11 @@ Class
 Description
     Converts an iterator to a reverse iterator, since UList:: reverse iterator
     does not behave like one.
-    
+
     See bug report on: https://bugs.openfoam.org/view.php?id=3534
 
-    The issue is resolved in OpenFOAM-dev in commit 17c40d2aa57b1f922cdddc315d8cf3471c9bc600 
-    
+    The issue is resolved in OpenFOAM-dev in commit 17c40d2aa57b1f922cdddc315d8cf3471c9bc600
+
 \*---------------------------------------------------------------------------*/
 
 #pragma once
