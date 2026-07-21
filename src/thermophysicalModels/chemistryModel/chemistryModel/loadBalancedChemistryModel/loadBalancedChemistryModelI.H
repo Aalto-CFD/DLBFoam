@@ -42,7 +42,8 @@ Foam::loadBalancedChemistryModel<ThermoType>::logFile(
 template <class ThermoType>
 inline const Foam::volScalarField::Internal&
 Foam::loadBalancedChemistryModel<ThermoType>::RR(const label i) const{
-    const PtrList<volScalarField::Internal>& rr = chemistryModel<ThermoType>::RR();
+    const PtrList<volScalarField::Internal>& rr =
+        chemistryModels::Standard<ThermoType>::RR();
     return rr[i];
 }
 
@@ -52,7 +53,10 @@ template <class ThermoType>
 inline Foam::volScalarField::Internal&
 Foam::loadBalancedChemistryModel<ThermoType>::RR(const label i) {
     PtrList<volScalarField::Internal>& rr =
-    	const_cast<PtrList<volScalarField::Internal>&>(chemistryModel<ThermoType>::RR());
+        const_cast<PtrList<volScalarField::Internal>&>
+        (
+            chemistryModels::Standard<ThermoType>::RR()
+        );
     return rr[i];
 }
 
