@@ -42,8 +42,9 @@ struct ChemistryProblem
 {
 
     ChemistryProblem() = default;
+
     ChemistryProblem(label nSpecie)
-        : Y(nSpecie), Ti(0), pi(0), rhoi(0), deltaTChem(0), deltaT(0), cellid(0)
+        : Y(nSpecie), Ti(0), pi(0), rhoi(0), deltaTChem(0), deltaT(0), cpuTime(0), cellid(0), procNo(0)
     {
     }
 

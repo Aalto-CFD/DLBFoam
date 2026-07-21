@@ -44,7 +44,7 @@ struct ChemistrySolution
     ChemistrySolution() = default;
 
     ChemistrySolution(label nspecie)
-        : rr(nspecie, 0.0), deltaTChem(0.0), cellid(0), rhoi(0.0), retrieved(false)
+        : rr(nspecie, 0.0), deltaTChem(0.0), cpuTime(0.0), cellid(0), rhoi(0.0), retrieved(false)
     {
     }
 

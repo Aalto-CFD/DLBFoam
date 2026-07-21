@@ -10,13 +10,4 @@ refMapping/mixtureFraction.C
 refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
 
-chemistrySolver/DLBChemistrySolvers.C
-chemistrySolver/DLBnoChemistrySolvers.C
-
-chemistrySolver/DLBodeChemistrySolvers.C
-chemistrySolver/DLBodePyJacChemistrySolvers.C
-
-chemistryModel/loadBalanced_pyJacChemistryModel/tabulation_pyJac/ISAT_pyJac/ISAT_pyJac.C
-
-
 LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_DLB
