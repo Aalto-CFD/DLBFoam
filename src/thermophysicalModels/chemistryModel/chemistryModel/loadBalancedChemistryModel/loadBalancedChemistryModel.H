@@ -42,7 +42,7 @@ SourceFiles
 #include "LoadBalancer.H"
 #include "OFstream.H"
 #include "IOmanip.H"
-#include "chemistryModel.H"
+#include "Standard_chemistryModel.H"
 #include "clockTime.H"
 #include "mixtureFractionRefMapper.H"
 
@@ -58,7 +58,7 @@ namespace Foam
 template<class ThermoType>
 class loadBalancedChemistryModel
 :
-    public chemistryModel<ThermoType>
+    public chemistryModels::Standard<ThermoType>
 {
 
 private:
@@ -179,17 +179,6 @@ public:
             //- Solve the reaction system for the given time step
             //  and return the characteristic time
             virtual scalar solve(const scalarField& deltaT) override;
-
-        // ODE functions (overriding abstract functions in ODE.H)
-        virtual void solve
-        (
-            scalar&      p,
-            scalar&      T,
-            scalarField& dYTp,
-            const label  li,
-            scalar&      deltaT,
-            scalar&      subDeltaT
-        ) const = 0;
 
         //- Create and return a log file of the given name
         inline autoPtr<OFstream> logFile(const word& name) const;

@@ -33,7 +33,7 @@ template <class ThermoType>
 Foam::loadBalancedChemistryModel<ThermoType>::
     loadBalancedChemistryModel(const fluidMulticomponentThermo& thermo)
     :
-        chemistryModel<ThermoType>(thermo),
+        chemistryModels::Standard<ThermoType>(thermo),
         skipSpecies_(this->lookupOrDefault("skipSpecies", false)),
         balancer_(this->subOrEmptyDict("loadbalancing")),
         mapper_(this->subOrEmptyDict("refmapping"), this->thermo()),
@@ -102,6 +102,8 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     const DeltaTType& deltaT
 )
 {
+    this->zone_.regenerate();
+
     tabulation_.reset();
     // CPU time analysis
     clockTime timer;
@@ -148,11 +150,16 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
 
     if(!chemistry())
     {
+        return great;
+    }
+
+    // Set non-zone cells to zero when a zone restriction is active.
+    if (!this->zone_.all())
+    {
         for(label i = 0; i < this->nSpecie(); i++)
         {
             this->RR(i) = Zero;
         }
-        return great;
     }
 
     timer.timeIncrement();
@@ -236,7 +243,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
             while(timeLeft > small)
             {
                 scalar dt = timeLeft;
-                this->solve(
+                chemistryModels::Standard<ThermoType>::solve(
                     problem.pi,
                     problem.Ti,
                     problem.Y,
@@ -259,7 +266,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
         while(timeLeft > small)
         {
             scalar dt = timeLeft;
-            this->solve(
+            chemistryModels::Standard<ThermoType>::solve(
                 problem.pi,
                 problem.Ti,
                 problem.Y,
@@ -396,13 +403,18 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     DynamicList<ChemistryProblem> solved_problems;
     DynamicList<ChemistryProblem> mapped_problems;
 
-    solved_problems.resize(p.size(), ChemistryProblem(this->nSpecie()));
+    const label nZoneCells = this->zone_.nCells();
+
+    solved_problems.resize(nZoneCells, ChemistryProblem(this->nSpecie()));
+    refMap_ = -1;
 
     scalarField massFraction(this->nSpecie());
 
     label counter = 0;
-    forAll(T, celli)
+    for(label zci = 0; zci < nZoneCells; zci++)
     {
+            const label celli = this->zone_.celli(zci);
+
             for(label i = 0; i < this->nSpecie(); i++)
             {
                 massFraction[i] = this->Y()[i].oldTime()[celli];
@@ -440,7 +452,11 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
     //the real size is set here
     solved_problems.setSize(counter);
 
-    runtime_assert(solved_problems.size() + mapped_problems.size() == p.size(), "getProblems fails");
+    runtime_assert
+    (
+        solved_problems.size() + mapped_problems.size() == nZoneCells,
+        "getProblems fails"
+    );
 
     this->map(mapped_problems, solved_problems);
 
