@@ -67,7 +67,7 @@ class ISAT_pyJac
 
         const dictionary coeffsDict_;
 
-        const odeChemistryModel& chemistry_;
+        const chemistryModels::standard& chemistry_;
 
         //- Switch to select performance logging
         Switch log_;
@@ -220,7 +220,7 @@ public:
         ISAT_pyJac
         (
             const dictionary& chemistryProperties,
-            const odeChemistryModel& chemistry
+            const chemistryModels::standard& chemistry
         );
 
         //- Disallow default bitwise copy construction
@@ -247,7 +247,7 @@ public:
             return false;
         }
 
-        const odeChemistryModel& chemistry()
+        const chemistryModels::standard& chemistry()
         {
             return chemistry_;
         }
