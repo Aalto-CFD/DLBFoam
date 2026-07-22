@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ISAT_pyJac.H"
-#include "odeChemistryModel.H"
+#include "standard_chemistryModel.H"
 #include "LUscalarMatrix.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -46,7 +46,7 @@ namespace chemistryTabulationMethods
 Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
 (
     const dictionary& chemistryProperties,
-    const odeChemistryModel& chemistry
+    const chemistryModels::standard& chemistry
 )
 :
     // Unfortunatly, all these variables are stored twice, because this is
