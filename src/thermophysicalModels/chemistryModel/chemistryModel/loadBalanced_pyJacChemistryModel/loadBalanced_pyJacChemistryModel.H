@@ -81,16 +81,33 @@ public:
     inline virtual label nEqns() const;
 
     //- Override jacobian and derivatives function from chemistryModel
-    virtual void jacobian(const scalar        t,
-                          const scalarField&  TYp,
-                          const label         li,
-                          scalarField&        dTYpdt,
-                          scalarSquareMatrix& J) const override;
+    virtual void jacobian
+    (
+        const scalar t,
+        const scalarField& TYp,
+        const label li,
+        scalarField& dTYpdt,
+        scalarSquareMatrix& J
+    ) const override;
 
-    virtual void derivatives(const scalar       t,
-                             const scalarField& TYp,
-                             const label        li,
-                             scalarField&       dTYpdt) const override;
+    virtual void derivatives
+    (
+        const scalar t,
+        const scalarField& TYp,
+        const label li,
+        scalarField& dTYpdt
+    ) const override;
+
+    //- Solve the ODE system
+    virtual void solve
+    (
+        scalar& p,
+        scalar& T,
+        scalarField& c,
+        const label li,
+        scalar& deltaT,
+        scalar& subDeltaT
+    ) const override;
 
     //- Override Qdot function from chemistryModel for using pyJac's enthalpy of formation
     virtual tmp<volScalarField> Qdot() const override;
