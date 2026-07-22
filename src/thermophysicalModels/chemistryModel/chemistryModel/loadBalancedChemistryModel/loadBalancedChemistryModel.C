@@ -243,7 +243,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
             while(timeLeft > small)
             {
                 scalar dt = timeLeft;
-                chemistryModels::Standard<ThermoType>::solve(
+                this->solve(
                     problem.pi,
                     problem.Ti,
                     problem.Y,
@@ -266,7 +266,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
         while(timeLeft > small)
         {
             scalar dt = timeLeft;
-            chemistryModels::Standard<ThermoType>::solve(
+            this->solve(
                 problem.pi,
                 problem.Ti,
                 problem.Y,
