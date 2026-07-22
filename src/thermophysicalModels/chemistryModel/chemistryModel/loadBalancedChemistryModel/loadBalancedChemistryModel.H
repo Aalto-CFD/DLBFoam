@@ -147,6 +147,8 @@ private:
 
 public:
 
+    using chemistryModels::Standard<ThermoType>::solve;
+
     //- Runtime type information
     TypeName("loadBalanced");
 
