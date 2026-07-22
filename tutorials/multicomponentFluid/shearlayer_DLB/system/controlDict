@@ -23,15 +23,15 @@ startFrom       latestTime;
 
 startTime       0;
 
-stopAt          nextWrite;
+stopAt          endTime;
 
-endTime         1;
+endTime         0.003;
 
-deltaT          1e-7;
+deltaT          4e-7;
 
-writeControl    timeStep;//adjustableRunTime;
+writeControl    adjustableRunTime;
 
-writeInterval   1000;
+writeInterval   0.0005;
 
 purgeWrite      10;
 
@@ -47,18 +47,15 @@ timePrecision   9;
 
 runTimeModifiable true;
 
-adjustTimeStep  yes;
+adjustTimeStep  no;
 
-maxCo     0.7;
+maxCo     0.5;
 
-functions
-{
-}
-
+maxDeltaT 1e-6;
 
 libs
 (
-        "libchemistryModel_DLB.so"
+    "libchemistryModel_DLB.so"
 );
 
 

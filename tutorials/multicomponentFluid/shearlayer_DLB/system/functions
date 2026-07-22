@@ -1,0 +1,85 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      functions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#includeFunc    time(name=cpuTime, perTimeStep=yes)
+#includeFunc Qdot(executeControl=timeStep, executeInterval=1)
+
+#includeFunc    volIntegrate(
+    fields=(Qdot),
+    name=total_Qdot
+)
+
+#includeFunc cellMax
+(
+    name=pTMax,
+    fields=(p T)
+)
+
+#includeFunc volAverage
+(
+    name=pTAvg,
+    fields=(p T)
+)
+
+mixtureFraction
+{
+    type        mixtureFraction;
+    libs        ("libFunctionObjects_w.so");
+    executeControl  timeStep;
+    executeInterval 1;
+    writeControl    writeTime;
+    oxidizerMassFractions
+    {
+        N2              0.77;
+        O2              0.23;
+    }
+    fuelMassFractions
+    {
+        NC12H26           1;
+    }
+    #include "$FOAM_CASE/constant/foam/thermo.foam"
+}
+
+reactionZone
+{
+    type generateZone;
+
+    libs        ("libutilityFunctionObjects.so");
+    writeControl    writeTime;
+
+    zone
+    {
+        type coded;
+        regenerate    true;
+
+        code
+        #{
+            // Lookup field from the objectRegistry, e.g. k
+            const volScalarField& Z =
+                mesh().lookupObject<volScalarField>("Z");
+
+            cellIndices = selectIndices
+            (
+                Z,
+                [&](const scalar Z)
+                {
+                    return Z > 1e-6;
+                }
+            );
+        #};
+    }
+}
+// ************************************************************************* //
