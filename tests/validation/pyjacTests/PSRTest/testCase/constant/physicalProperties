@@ -7,11 +7,10 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      thermophysicalProperties;
+    object      physicalProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,9 +25,9 @@ thermoType
     specie          specie;
 }
 
-defaultSpecie N2;
+defaultSpecie   N2;
 
-#include "../../../pyjacTestMechanism/foam/species.foam.illdefined"
-#include "../../../pyjacTestMechanism/foam/thermo.foam.illdefined"
+#include        "../../../pyjacTestMechanism/foam/species.foam"
+#include        "../../../pyjacTestMechanism/foam/thermo.foam"
 
 // ************************************************************************* //

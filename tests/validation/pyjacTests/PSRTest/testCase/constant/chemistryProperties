@@ -7,7 +7,6 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
     format      ascii;
     class       dictionary;
     location    "constant";
@@ -15,11 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-chemistryType
-{
-    solver          ode_pyJac;
-    method          loadBalanced_pyJac;
-}
+type    loadBalanced_pyJac;
 
 chemistry       on;
 

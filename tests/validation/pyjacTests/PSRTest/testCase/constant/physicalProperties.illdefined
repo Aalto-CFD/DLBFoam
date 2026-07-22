@@ -11,14 +11,14 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      thermophysicalProperties;
+    object      physicalProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 thermoType
 {
     type            heRhoThermo;
-    mixture         multicomponentMixture;
+    mixture         multiComponentMixture;
     transport       sutherland;
     thermo          janaf;
     energy          sensibleEnthalpy;
@@ -28,7 +28,7 @@ thermoType
 
 defaultSpecie N2;
 
-#include "../../../pyjacTestMechanism/foam/species.foam"
-#include "../../../pyjacTestMechanism/foam/thermo.foam"
+#include "../../../pyjacTestMechanism/foam/species.foam.illdefined"
+#include "../../../pyjacTestMechanism/foam/thermo.foam.illdefined"
 
 // ************************************************************************* //

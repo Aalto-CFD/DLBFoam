@@ -40,7 +40,7 @@ cd gri
     foamDictionary -entry refmapping -set {} constant/chemistryProperties
     foamDictionary -entry refmapping/active -add false constant/chemistryProperties
 
-    foamDictionary -entry chemistryType/method -set loadBalanced constant/chemistryProperties
+    foamDictionary -entry type -add loadBalanced constant/chemistryProperties
     runApplication -s DLB chemFoam
     mv chemFoam.out chemFoam_DLB.out
     (cd validation && ./Allrun $*)
