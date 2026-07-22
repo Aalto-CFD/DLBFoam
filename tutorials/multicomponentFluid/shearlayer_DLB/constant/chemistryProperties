@@ -14,7 +14,19 @@ FoamFile
     object          chemistryProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+type    loadBalanced;
 
+//- You can use this entry to restrict the chemistry computation to a cellZone.
+//- In this particular example, the "reactionZone" cellZone is not a geometric
+//- zone, but instead a function of mixture fraction field. Implementation can be
+//- found in system/functions.
+/*
+cellZone
+{
+    type lookup;
+    name reactionZone;
+}
+*/
 refmapping
 {
     active          true;
@@ -36,19 +48,14 @@ refmapping
 
 chemistry       on;
 
-initialChemicalTimeStep 1;
+initialChemicalTimeStep 1e-7;
 
 loadbalancing
 {
 	active	true;
-	debug	true;
+    log     true;
 }
 
-chemistryType
-{
-    solver          ode;
-    method          loadBalanced;
-}
 
 ode
 {

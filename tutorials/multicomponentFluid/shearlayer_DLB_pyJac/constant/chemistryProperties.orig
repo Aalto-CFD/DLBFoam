@@ -25,12 +25,7 @@ FoamFile
 //     method	ISAT_pyJac;
 // }
 
-
-chemistryType
-{
-    solver          ode_pyJac;
-    method          loadBalanced_pyJac;
-}
+type    loadBalanced_pyJac;
 
 ode
 {
