@@ -24,8 +24,8 @@ fi
 
 echo
 echo -e "${YELLOW}Test error control on mechanism consistency in loadBalanced_pyJacChemistryModel:${DARKGRAY}"
-cp testCase/constant/thermophysicalProperties testCase/constant/thermophysicalProperties.orig
-cp testCase/constant/thermophysicalProperties.illdefined testCase/constant/thermophysicalProperties
+cp testCase/constant/physicalProperties testCase/constant/physicalProperties.orig
+cp testCase/constant/physicalProperties.illdefined testCase/constant/physicalProperties
 ./PSRTest.bin -case testCase > testCase/log.illdefined 2>&1
 if [ $? -eq 1 ]; then
     echo -e "${GREEN}PASSED.${NC}"
@@ -35,8 +35,8 @@ fi
 
 echo
 echo -e "${YELLOW}Test dynamic compilation of loadBalanced_pyJacChemistryModel:${DARKGRAY}"
-cp testCase/constant/thermophysicalProperties.orig testCase/constant/thermophysicalProperties
-foamDictionary -entry thermoType/transport -set logPolynomial testCase/constant/thermophysicalProperties > /dev/null
+cp testCase/constant/physicalProperties.orig testCase/constant/physicalProperties
+foamDictionary -entry thermoType/transport -set logPolynomial testCase/constant/physicalProperties > /dev/null
 ./PSRTest.bin -case testCase > testCase/log.dynamicCode 2>&1
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}PASSED.${NC}"
@@ -62,8 +62,8 @@ else
 fi
 
 
-cp testCase/constant/thermophysicalProperties.orig testCase/constant/thermophysicalProperties
-rm testCase/constant/thermophysicalProperties.orig
+cp testCase/constant/physicalProperties.orig testCase/constant/physicalProperties
+rm testCase/constant/physicalProperties.orig
 
 cp testCase/constant/chemistryProperties.orig testCase/constant/chemistryProperties
 rm testCase/constant/chemistryProperties.orig

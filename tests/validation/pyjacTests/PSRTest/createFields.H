@@ -11,7 +11,7 @@
     fluidMulticomponentThermo& thermo = pThermo();
     thermo.validate(args.executable(), "h");
 
-    autoPtr<basicChemistryModel> pChemistry(basicChemistryModel::New(thermo));
+    autoPtr<chemistryModel> pChemistry(chemistryModel::New(thermo));
 
     volScalarField rho
     (
