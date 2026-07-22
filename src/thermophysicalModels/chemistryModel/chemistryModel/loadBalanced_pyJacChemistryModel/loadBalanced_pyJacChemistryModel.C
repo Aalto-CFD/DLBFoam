@@ -146,6 +146,55 @@ loadBalanced_pyJacChemistryModel<ThermoType>::Qdot() const {
     return tQdot;
 }
 
+template<class ThermoType>
+void loadBalanced_pyJacChemistryModel<ThermoType>::solve
+(
+    scalar& p,
+    scalar& T,
+    scalarField& c,
+    const label li,
+    scalar& deltaT,
+    scalar& subDeltaT
+) const
+{
+    //Info << "HELLO from loadBalanced_pyJacChemistryModel::solve" << endl;
+    // Reset the size of the ODE system to the simplified size when mechanism
+    // reduction is active
+    if (this->odeSolver_->resize())
+    {
+        this->odeSolver_->resizeField(this->cTp_);
+    }
+
+    const label nSpecie = this->nSpecie();
+
+    /* pyJac implementation:                                                            */
+    /* Because pyJac does not consider the last specie in the system, it is not part of */
+    /* the RHS and Jacobian and thus we need here the inert = 1.0-csum functionality    */
+
+    // Copy the concentration, T and P to the total solve-vector
+    this->cTp_[0] = T;
+    this->cTp_[nSpecie] = p;
+
+    for (label i=0; i<nSpecie-1; i++)
+    {
+        this->cTp_[i+1] = c[i];
+    }
+
+    this->odeSolver_->solve(0, deltaT, this->cTp_, li, subDeltaT);
+
+    T = this->cTp_[0];
+    p = this->cTp_[nSpecie];
+    scalar csum = 0;
+
+    for (label i=0; i<nSpecie-1; i++)
+    {
+        c[i] = max(0.0, this->cTp_[i+1]);
+        csum += c[i];
+    }
+    //The last specie:
+    c[nSpecie-1] = 1.0 - csum;
+}
+
 template <class ThermoType>
 Foam::tmp<Foam::volScalarField>
 loadBalanced_pyJacChemistryModel<ThermoType>::tc() const {
