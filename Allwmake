@@ -4,7 +4,7 @@ cd ${0%/*} || exit 1    # run from this directory
 set -e # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 
 # The supported OpenFOAM version
-OF_VER="dev"
+OF_VER="14"
 
 check_openfoam()
 {
@@ -110,13 +110,10 @@ wmake libso src/ODE_DLB
 # copy files needed for dynamic compilation of chemistry models and solvers
 DLB_ETC_DC=etc/codeTemplates/dynamicCode
 USER_ETC_DC=${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/codeTemplates/dynamicCode
-cp $DLB_ETC_DC/basicChemistryModel.orig \
-   $DLB_ETC_DC/basicChemistryModel
-sed -i "s|%MY_DLBFOAM_PATH%|${PWD}|g" \
-    $DLB_ETC_DC/basicChemistryModel
+DLB_REPO_ROOT=$(pwd)
 mkdir --parents $USER_ETC_DC
-cp $DLB_ETC_DC/basicChemistryModel $USER_ETC_DC
-cp $DLB_ETC_DC/basicChemistryModelTemplate.C $USER_ETC_DC
+sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" $DLB_ETC_DC/chemistryModel > $USER_ETC_DC/chemistryModel
+cp $DLB_ETC_DC/chemistryModelTemplate.C $USER_ETC_DC
 
 
 pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
