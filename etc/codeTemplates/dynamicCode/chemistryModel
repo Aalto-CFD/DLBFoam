@@ -1,0 +1,67 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      chemistryModel;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type
+(
+    standard
+    loadBalanced
+    loadBalanced_pyJac
+);
+
+typeRenamed
+(
+    standard Standard
+    loadBalanced loadBalancedChemistryModel
+    loadBalanced_pyJac loadBalanced_pyJacChemistryModel
+);
+
+codeOptions
+#{
+DLBFOAM_ROOT = @DLBFOAM_ROOT@
+DLBFOAM_PATH = $(DLBFOAM_ROOT)/src/thermophysicalModels/chemistryModel/lnInclude
+DLBFOAM_CM = $(DLBFOAM_ROOT)/src/thermophysicalModels/chemistryModel/chemistryModel
+DLBFOAM_CHM = $(DLBFOAM_ROOT)/src/thermophysicalModels/chemistryModel
+
+EXE_INC = \
+    -I$(LIB_SRC)/physicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/multicomponentThermo/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
+    -I$(LIB_SRC)/ODE/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(DLBFOAM_CHM) \
+    -I$(DLBFOAM_PATH) \
+    -I$(DLBFOAM_CM)/loadBalancedChemistryModel \
+    -I$(DLBFOAM_CM)/loadBalanced_pyJacChemistryModel
+#};
+
+    codeLibs
+    #{
+    LIB_LIBS = \
+        -L$(FOAM_USER_LIBBIN)/unittests/pyjacTestMech/build \
+        -lc_pyjac_test \
+        -L$(FOAM_USER_LIBBIN) \
+        -lchemistryModel_DLB \
+        -lODE_DLB \
+        -lchemistryModel \
+        -lODE \
+        -lfiniteVolume \
+        -lOpenFOAM \
+    #};
+
+
+// ************************************************************************* //

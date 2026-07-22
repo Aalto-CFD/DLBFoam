@@ -1,14 +1,12 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
-   \\    /   O peration     | for fast reactive simulations
-    \\  /    A nd           |
-     \\/     M anipulation  | 2022-2023, Aalto University, Finland
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Copyright (C) YEAR OpenFOAM Foundation
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of DLBFoam library, derived from OpenFOAM.
-
-    https://github.com/Aalto-CFD/DLBFoam
+    This file is part of OpenFOAM.
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -41,16 +39,14 @@ License
 // Transport
 #include "${transport}Transport.H"
 
+
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 extern "C"
 {
-    // dynamicCode:
-    // SHA1 = ${SHA1sum}
-    //
-    // Unique function name that can be checked if the correct library version
-    // has been loaded
-    void ${typeName}_${SHA1sum}(bool load)
+    // Unique function name that can be checked
+    // to ensure the correct library version has been loaded
+    void ${uniqueFunctionName}(bool load)
     {
         if (load)
         {
@@ -69,7 +65,6 @@ extern "C"
 #define ThermoPhysics                                                          \
     ${transport}Transport${energy}${thermo}Thermo${equationOfState}${specie}
 
-
 namespace Foam
 {
     typedefThermo
@@ -82,47 +77,52 @@ namespace Foam
     );
 }
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define chemistryModelCppTest 0
-#define loadBalancedChemistryModelCppTest 1
-#define loadBalanced_pyJacChemistryModelCppTest 2
+#include "makeChemistryModel.H"
+#include "${type}_chemistryModel.H"
 
-#include "makeChemistrySolver.H"
-
-#include "${method}.H"
-#include "${solver}.H"
+// loadBalanced_pyJac inherits from loadBalancedChemistryModel; include its
+// header so the parent class can be instantiated below.
+#if defined(loadBalanced_pyJacChemistryModel_chemistryModel)
+#include "loadBalancedChemistryModel_chemistryModel.H"
+#endif
 
 namespace Foam
 {
-    #if ${method}CppTest == loadBalanced_pyJacChemistryModelCppTest
-    defineChemistrySolver(chemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, chemistryModel, ThermoPhysics);
-    defineChemistrySolver(loadBalancedChemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, loadBalancedChemistryModel, ThermoPhysics);
-    defineChemistrySolver(loadBalanced_pyJacChemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, loadBalanced_pyJacChemistryModel, ThermoPhysics);
-    #elif ${method}CppTest == loadBalancedChemistryModelCppTest
-    defineChemistrySolver(chemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, chemistryModel, ThermoPhysics);
-    defineChemistrySolver(loadBalancedChemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, loadBalancedChemistryModel, ThermoPhysics);
-    #elif ${method}CppTest == chemistryModelCppTest
-    defineChemistrySolver(chemistryModel, ThermoPhysics);
-    makeChemistrySolver(${solver}, chemistryModel, ThermoPhysics);
-    #else
-    defineChemistrySolver(${method}, ThermoPhysics);
-    makeChemistrySolver(${solver}, ${method}, ThermoPhysics);
-    #endif
+    // For sutherland transport, the full DLB model hierarchy is precompiled
+    // in libchemistryModel_DLB.so.  For any other transport (e.g. logPolynomial)
+    // the parent classes are not precompiled and must be instantiated here.
+
+    // Standard base — needed whenever loadBalanced or loadBalanced_pyJac is
+    // selected with a transport not precompiled in libchemistryModel_DLB.so.
+#if defined(DLB_CHEM_MODEL_LOADBALANCED) && !defined(sutherlandTransport_H)
+    makeChemistryModel(Standard, ThermoPhysics);
+#endif
+
+    // loadBalancedChemistryModel base — needed by loadBalanced_pyJac.
+    // Keep this unconditional for loadBalanced_pyJac since this symbol is not
+    // guaranteed to be provided by precompiled libs for every transport.
+#if defined(loadBalanced_pyJacChemistryModel_chemistryModel)
+    makeChemistryModel(loadBalancedChemistryModel, ThermoPhysics);
+#endif
+
+    makeChemistryModel(${type}, ThermoPhysics);
 }
 
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Chemistry reduction and reaction registrations.
+// These match the upstream OpenFOAM template structure: only activate for the
+// Standard chemistry model type.  DLBFoam's _chemistryModel macros all equal 1
+// (same as Standard_chemistryModel), so the additional !defined(sutherlandTransport_H)
+// guard prevents re-registering entries already in libchemistryModel.so for
+// sutherland/precompiled transports.
 
-#define chemistryModelMethod 0
+#define Standard_chemistryModel 1
 
-#if ${method}Method == chemistryModelMethod
+#if ${type}_chemistryModel == Standard_chemistryModel && !defined(sutherlandTransport_H)
 
 #include "makeChemistryReductionMethod.H"
 
@@ -150,9 +150,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define chemistryModelMethod 0
-
-#if ${method}Method == chemistryModelMethod
+#if ${type}_chemistryModel == Standard_chemistryModel && !defined(sutherlandTransport_H)
 
 #include "makeReaction.H"
 
