@@ -96,14 +96,6 @@ private:
         //- Tabulation method reference
         chemistryTabulationMethod& tabulation_;
 
-    	//- Optional start time for chemistry calculation
-	    const scalar startTime_;
-
-        //- Optional duration for chemistry calculation
-        const scalar duration_;
-
-	    //- Optional repetition period
-	    const scalar repeat_;
 
     // Private Member Functions
 
@@ -190,9 +182,6 @@ public:
 
 	//- Return non const access to the chemical source terms
         inline volScalarField::Internal& RR(const label i);
-
-    //- Chemistry activation switch
-        inline Switch chemistry() const;
 
     // Member Operators
 
