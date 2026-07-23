@@ -61,7 +61,6 @@ class fvMesh;
 template <class ThermoType>
 class loadBalanced_pyJacChemistryModel
     : public loadBalancedChemistryModel<ThermoType> {
-    template <class DeltaTType> scalar solve(const DeltaTType& deltaT);
 
 public:
     //- Runtime type information
