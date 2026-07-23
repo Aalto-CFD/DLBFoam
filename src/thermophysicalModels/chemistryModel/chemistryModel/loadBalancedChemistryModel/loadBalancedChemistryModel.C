@@ -66,10 +66,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::
             scalar(0.0)
         ),
         tabulationPtr_(chemistryTabulationMethod::New(*this, *this)),
-        tabulation_(*tabulationPtr_),
-        startTime_(this->lookupOrDefault("startTime", this->time().userTimeValue())),
-        duration_(this->lookupOrDefault("duration", vGreat)),
-        repeat_(this->lookupOrDefault("repeat", 0))
+        tabulation_(*tabulationPtr_)
     {
         if(balancer_.log())
         {
@@ -113,7 +110,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     scalar t_solveBuffer(0);
     scalar t_unbalance(0);
 
-    if(!chemistry() && skipSpecies_)
+    if(!this->chemistry() && skipSpecies_)
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
@@ -134,7 +131,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
         resetSkipSpecies_ = true;
     }
 
-    if (chemistry() && resetSkipSpecies_)
+    if (this->chemistry() && resetSkipSpecies_)
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
@@ -148,7 +145,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     }
     this->thermo().syncSpeciesActive();
 
-    if(!chemistry())
+    if(!this->chemistry())
     {
         return great;
     }
