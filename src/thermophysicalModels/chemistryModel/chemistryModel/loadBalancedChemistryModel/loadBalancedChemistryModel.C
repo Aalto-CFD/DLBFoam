@@ -110,7 +110,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
     scalar t_solveBuffer(0);
     scalar t_unbalance(0);
 
-    if(!this->chemistry() && skipSpecies_)
+    if (skipSpecies_ && (!this->chemistry() || this->zone_.nCells() == 0))
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
@@ -131,14 +131,14 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
         resetSkipSpecies_ = true;
     }
 
-    if (this->chemistry() && resetSkipSpecies_)
+    if (resetSkipSpecies_ && (this->chemistry() || this->zone_.nCells() > 0))
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
             // ensure all species are active
             if (!this->thermo().solveSpecie(i))
             {
-                    this->thermo().setSpecieActive(i);
+                this->thermo().setSpecieActive(i);
             }
         }
         resetSkipSpecies_ = false;
