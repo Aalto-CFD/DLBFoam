@@ -49,19 +49,4 @@ EXE_INC = \
     -I$(DLBFOAM_CM)/loadBalanced_pyJacChemistryModel
 #};
 
-    codeLibs
-    #{
-    LIB_LIBS = \
-        -L$(FOAM_USER_LIBBIN)/unittests/pyjacTestMech/build \
-        -lc_pyjac_test \
-        -L$(FOAM_USER_LIBBIN) \
-        -lchemistryModel_DLB \
-        -lODE_DLB \
-        -lchemistryModel \
-        -lODE \
-        -lfiniteVolume \
-        -lOpenFOAM \
-    #};
-
-
 // ************************************************************************* //
