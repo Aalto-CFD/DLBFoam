@@ -27,14 +27,17 @@ foamDictionary  constant/chemistryProperties -entry "#includeEtc" -remove
 foamDictionary  constant/chemistryProperties -entry tabulation -remove
 
 # Add loadbalancing and refmapping entries
-foamDictionary  constant/chemistryProperties -entry chemistryType/method -add loadBalanced
+foamDictionary  constant/chemistryProperties -entry type -set loadBalanced
 foamDictionary  constant/chemistryProperties -entry loadbalancing -add "{active true;}"
 foamDictionary  constant/chemistryProperties -entry refmapping -add "{}"
 
+# Add cellZone entry for periodic zone, so chemistry starts at t=1500. This is to test skipSpecies functionality.
+foamDictionary constant/chemistryProperties -entry cellZone -add "{type periodic; begin 1500; regenerate true; all {zoneType cell;}}"
+
 #Enable skipSpecies and set skip threshold. Chemistry activates at t=1500
 foamDictionary  constant/chemistryProperties -entry skipSpecies -add true
-foamDictionary  constant/chemistryProperties -entry startTime -add 1500
 foamDictionary  constant/chemistryProperties -entry skipThreshold -add 1e-5
+
 
 
 
