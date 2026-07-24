@@ -52,12 +52,13 @@ check_cmake()
 
 how_to()
 {
-    echo "Error: Correct platform syntax ./Allwmake --platform MKL/OPENBLAS/STANDALONE"
+    echo "Error: Correct platform syntax ./Allwmake [--clean] [--sudo] --platform MKL/OPENBLAS/STANDALONE"
 }
 
 
 PLATFORM=NOT_DEFINED
 CLEAN_ALL=false
+USE_SUDO=false
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -65,6 +66,10 @@ do
     case $key in
         --clean)
         CLEAN_ALL=true
+        shift # past argument
+        ;;
+        --sudo)
+        USE_SUDO=true
         shift # past argument
         ;;
         --platform)
@@ -83,6 +88,13 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 check_openfoam
 check_cmake
+
+if [[ "$USE_SUDO" == true ]]; then
+    export FOAM_USER_LIBBIN="$FOAM_LIBBIN"
+    USER_ETC_DC="$FOAM_ETC/codeTemplates/dynamicCode"
+else
+    USER_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/codeTemplates/dynamicCode"
+fi
 
 if [ $PLATFORM == MKL ]; then
     check_mkl
@@ -109,11 +121,10 @@ wmake libso src/ODE_DLB
 
 # copy files needed for dynamic compilation of chemistry models and solvers
 DLB_ETC_DC=etc/codeTemplates/dynamicCode
-USER_ETC_DC=${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/codeTemplates/dynamicCode
 DLB_REPO_ROOT=$(pwd)
-mkdir --parents $USER_ETC_DC
-sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" $DLB_ETC_DC/chemistryModel > $USER_ETC_DC/chemistryModel
-cp $DLB_ETC_DC/chemistryModelTemplate.C $USER_ETC_DC
+mkdir --parents "$USER_ETC_DC"
+sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" "$DLB_ETC_DC/chemistryModel" > "$USER_ETC_DC/chemistryModel"
+cp "$DLB_ETC_DC/chemistryModelTemplate.C" "$USER_ETC_DC"
 
 
 pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
