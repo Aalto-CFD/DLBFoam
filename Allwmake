@@ -126,6 +126,13 @@ mkdir --parents "$USER_ETC_DC"
 sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" "$DLB_ETC_DC/chemistryModel" > "$USER_ETC_DC/chemistryModel"
 cp "$DLB_ETC_DC/chemistryModelTemplate.C" "$USER_ETC_DC"
 
+cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
+cp utilities/CMakeLists.txt tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
+cp utilities/runCmake.sh tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
+
+cp -r utilities/mechanisms/gri30 tutorials/chemFoam/gri_pyJac/pyJac
+cp utilities/CMakeLists.txt tutorials/chemFoam/gri_pyJac/pyJac/lib/
+cp utilities/runCmake.sh tutorials/chemFoam/gri_pyJac/pyJac/lib/
 
 pushd tests/validation/pyjacTests/pyjacTestMechanism/lib  > /dev/null
     ./runCmake.sh
@@ -146,12 +153,3 @@ popd  > /dev/null
 pushd tests/validation/isatTests > /dev/null
     ./test.sh
 popd  > /dev/null
-
-
-cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
-cp utilities/CMakeLists.txt tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
-cp utilities/runCmake.sh tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
-
-cp -r utilities/mechanisms/gri30 tutorials/chemFoam/gri_pyJac/pyJac
-cp utilities/CMakeLists.txt tutorials/chemFoam/gri_pyJac/pyJac/lib/
-cp utilities/runCmake.sh tutorials/chemFoam/gri_pyJac/pyJac/lib/
