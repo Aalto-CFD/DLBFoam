@@ -139,8 +139,6 @@ private:
 
 public:
 
-    using chemistryModels::Standard<ThermoType>::solve;
-
     //- Runtime type information
     TypeName("loadBalanced");
 
@@ -173,6 +171,16 @@ public:
             //- Solve the reaction system for the given time step
             //  and return the characteristic time
             virtual scalar solve(const scalarField& deltaT) override;
+
+            virtual void solve
+            (
+                scalar& p,
+                scalar& T,
+                scalarField& Y,
+                const label li,
+                scalar& deltaT,
+                scalar& subDeltaT
+            ) const override;
 
         //- Create and return a log file of the given name
         inline autoPtr<OFstream> logFile(const word& name) const;

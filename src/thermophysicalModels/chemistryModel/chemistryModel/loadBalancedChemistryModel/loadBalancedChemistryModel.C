@@ -343,6 +343,29 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
 
 
 template <class ThermoType>
+void Foam::loadBalancedChemistryModel<ThermoType>::solve
+(
+    scalar& p,
+    scalar& T,
+    scalarField& Y,
+    const label li,
+    scalar& deltaT,
+    scalar& subDeltaT
+) const
+{
+    chemistryModels::Standard<ThermoType>::solve
+    (
+        p,
+        T,
+        Y,
+        li,
+        deltaT,
+        subDeltaT
+    );
+}
+
+
+template <class ThermoType>
 Foam::RecvBuffer<Foam::ChemistrySolution>
 Foam::loadBalancedChemistryModel<ThermoType>::solveBuffer
 (
