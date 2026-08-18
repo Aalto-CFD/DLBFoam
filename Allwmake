@@ -90,7 +90,8 @@ check_openfoam
 check_cmake
 
 if [[ "$USE_SUDO" == true ]]; then
-    export FOAM_USER_LIBBIN="$FOAM_LIBBIN"
+    mkdir -p "${FOAM_SITE_LIBBIN}"
+    export FOAM_USER_LIBBIN="$FOAM_SITE_LIBBIN"
     USER_ETC_DC="$FOAM_ETC/codeTemplates/dynamicCode"
 else
     USER_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/codeTemplates/dynamicCode"
