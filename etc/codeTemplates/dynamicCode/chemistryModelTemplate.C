@@ -1,12 +1,14 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) YEAR OpenFOAM Foundation
-     \\/     M anipulation  |
+  \\      /  F ield         | DLBFoam: Dynamic Load Balancing
+   \\    /   O peration     | for fast reactive simulations
+    \\  /    A nd           |
+     \\/     M anipulation  | 2026, Aalto University, Finland
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of DLBFoam library, derived from OpenFOAM.
+
+    https://github.com/Aalto-CFD/DLBFoam
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
