@@ -157,7 +157,6 @@ void loadBalanced_pyJacChemistryModel<ThermoType>::solve
     scalar& subDeltaT
 ) const
 {
-    //Info << "HELLO from loadBalanced_pyJacChemistryModel::solve" << endl;
     // Reset the size of the ODE system to the simplified size when mechanism
     // reduction is active
     if (this->odeSolver_->resize())
