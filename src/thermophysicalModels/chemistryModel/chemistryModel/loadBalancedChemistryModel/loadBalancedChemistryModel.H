@@ -172,6 +172,9 @@ public:
             //  and return the characteristic time
             virtual scalar solve(const scalarField& deltaT) override;
 
+            //- Solve the ODE system.  Forwards to Standard because the solve
+            //  overloads above hide it and a using-declaration is not possible:
+            //  Standard::solve(const DeltaTType&) is private.
             virtual void solve
             (
                 scalar& p,
