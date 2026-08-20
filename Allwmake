@@ -52,13 +52,12 @@ check_cmake()
 
 how_to()
 {
-    echo "Error: Correct platform syntax ./Allwmake [--clean] [--sudo] --platform MKL/OPENBLAS/STANDALONE"
+    echo "Error: Correct platform syntax ./Allwmake [--clean] --platform MKL/OPENBLAS/STANDALONE"
 }
 
 
 PLATFORM=NOT_DEFINED
 CLEAN_ALL=false
-USE_SUDO=false
 POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
@@ -66,10 +65,6 @@ do
     case $key in
         --clean)
         CLEAN_ALL=true
-        shift # past argument
-        ;;
-        --sudo)
-        USE_SUDO=true
         shift # past argument
         ;;
         --platform)
@@ -89,12 +84,18 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 check_openfoam
 check_cmake
 
-if [[ "$USE_SUDO" == true ]]; then
-    mkdir -p "${FOAM_SITE_LIBBIN}"
-    export FOAM_USER_LIBBIN="$FOAM_SITE_LIBBIN"
-    USER_ETC_DC="$FOAM_ETC/codeTemplates/dynamicCode"
+DLB_ETC_DC=etc/codeTemplates/dynamicCode
+if [ $WM_BUILD == site ]; then
+    if [ -n "$WM_PROJECT_SITE" ]
+    then
+        FOAM_ETC_DC=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/$DLB_ETC_DC
+    else
+        FOAM_ETC_DC=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/$DLB_ETC_DC
+    fi
+elif [ $WM_BUILD == core ]; then
+    FOAM_ETC_DC=$WM_PROJECT_DIR/$DLB_ETC_DC
 else
-    USER_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/codeTemplates/dynamicCode"
+    FOAM_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/$DLB_ETC_DC"
 fi
 
 if [ $PLATFORM == MKL ]; then
@@ -121,11 +122,10 @@ cp -r src/thermophysicalModels/chemistryModel_DLB/pyJacInclude src/thermophysica
 wmake libso src/ODE_DLB
 
 # copy files needed for dynamic compilation of chemistry models and solvers
-DLB_ETC_DC=etc/codeTemplates/dynamicCode
 DLB_REPO_ROOT=$(pwd)
-mkdir --parents "$USER_ETC_DC"
-sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" "$DLB_ETC_DC/chemistryModel" > "$USER_ETC_DC/chemistryModel"
-cp "$DLB_ETC_DC/chemistryModelTemplate.C" "$USER_ETC_DC"
+mkdir --parents "$FOAM_ETC_DC"
+sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" "$DLB_ETC_DC/chemistryModel" > "$FOAM_ETC_DC/chemistryModel"
+cp "$DLB_ETC_DC/chemistryModelTemplate.C" "$FOAM_ETC_DC"
 
 cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
 cp utilities/CMakeLists.txt tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/

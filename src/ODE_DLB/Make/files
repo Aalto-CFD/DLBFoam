@@ -1,3 +1,11 @@
 ODESolvers/seulex_LAPACK/seulex_LAPACK.C
 
-LIB = $(FOAM_USER_LIBBIN)/libODE_DLB
+LIBpath = $(FOAM_USER_LIBBIN)
+ifeq "$(WM_BUILD)" "site"
+LIBpath = $(FOAM_SITE_LIBBIN)
+endif
+ifeq "$(WM_BUILD)" "core"
+LIBpath = $(FOAM_LIBBIN)
+endif
+
+LIB = $(LIBpath)/libODE_DLB
