@@ -14,4 +14,12 @@ loadBalanced_pyJac/tabulation_pyJac/ISAT_pyJac/ISAT_pyJac.C
 loadBalanced/loadBalancedChemistryModels.C
 loadBalanced_pyJac/loadBalanced_pyJacChemistryModels.C
 
-LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_DLB
+LIBpath = $(FOAM_USER_LIBBIN)
+ifeq "$(WM_BUILD)" "site"
+LIBpath = $(FOAM_SITE_LIBBIN)
+endif
+ifeq "$(WM_BUILD)" "core"
+LIBpath = $(FOAM_LIBBIN)
+endif
+
+LIB = $(LIBpath)/libchemistryModel_DLB
