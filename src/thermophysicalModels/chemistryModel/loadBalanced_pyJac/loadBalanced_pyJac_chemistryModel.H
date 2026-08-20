@@ -24,21 +24,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::loadBalanced_pyJacChemistryModel
+    Foam::chemistryModels::loadBalanced_pyJac
 
 Description
-    Extends loadBalancedChemistryModel model by adding analytical Jacobian.
+    Extends chemistryModels::loadBalanced by adding an analytical Jacobian.
 
 SourceFiles
-    loadBalanced_pyJacChemistryModel.C
+    loadBalanced_pyJac_chemistryModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef loadBalanced_pyJacChemistryModel_H
-#define loadBalanced_pyJacChemistryModel_H
+#ifndef loadBalanced_pyJac_chemistryModel_H
+#define loadBalanced_pyJac_chemistryModel_H
 
 #include "clockTime.H"
-#include "loadBalancedChemistryModel.H"
+#include "loadBalanced_chemistryModel.H"
 
 // pyJac dependencies
 extern "C" {
@@ -54,13 +54,16 @@ namespace Foam {
 // Forward declaration of classes
 class fvMesh;
 
+namespace chemistryModels
+{
+
 /*---------------------------------------------------------------------------*\
-                      Class loadBalanced_pyJacChemistryModel Declaration
+                     Class loadBalanced_pyJac Declaration
 \*---------------------------------------------------------------------------*/
 
 template <class ThermoType>
-class loadBalanced_pyJacChemistryModel
-    : public loadBalancedChemistryModel<ThermoType> {
+class loadBalanced_pyJac
+    : public loadBalanced<ThermoType> {
 
 public:
     //- Runtime type information
@@ -69,13 +72,13 @@ public:
     // Constructors
 
     //- Construct from thermo
-    loadBalanced_pyJacChemistryModel(const fluidMulticomponentThermo& thermo);
+    loadBalanced_pyJac(const fluidMulticomponentThermo& thermo);
 
     //- Destructor
-    virtual ~loadBalanced_pyJacChemistryModel();
+    virtual ~loadBalanced_pyJac();
 
     //- Disallow default bitwise copy construction
-    loadBalanced_pyJacChemistryModel(const loadBalanced_pyJacChemistryModel&);
+    loadBalanced_pyJac(const loadBalanced_pyJac&);
 
     inline virtual label nEqns() const;
 
@@ -130,18 +133,25 @@ private:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace chemistryModels
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "loadBalanced_pyJacChemistryModelI.H"
+
+#include "loadBalanced_pyJac_chemistryModelI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#include "loadBalanced_pyJacChemistryModel.C"
+#include "loadBalanced_pyJac_chemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Opts this model into the Standard reaction and reduction registrations of the
+// chemistryModel dynamic code template, which tests
+// "#if <type>_chemistryModel == Standard_chemistryModel"
+#define loadBalanced_pyJac_chemistryModel 1
 
 #endif
 

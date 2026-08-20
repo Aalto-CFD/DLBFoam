@@ -25,13 +25,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "loadBalancedChemistryModel.H"
+#include "loadBalanced_chemistryModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template <class ThermoType>
-Foam::loadBalancedChemistryModel<ThermoType>::
-    loadBalancedChemistryModel(const fluidMulticomponentThermo& thermo)
+Foam::chemistryModels::loadBalanced<ThermoType>::
+    loadBalanced(const fluidMulticomponentThermo& thermo)
     :
         chemistryModels::Standard<ThermoType>(thermo),
         skipSpecies_(this->lookupOrDefault("skipSpecies", false)),
@@ -85,8 +85,8 @@ Foam::loadBalancedChemistryModel<ThermoType>::
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template <class ThermoType>
-Foam::loadBalancedChemistryModel<ThermoType>::
-    ~loadBalancedChemistryModel()
+Foam::chemistryModels::loadBalanced<ThermoType>::
+    ~loadBalanced()
 {}
 
 
@@ -94,7 +94,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::
 
 template <class ThermoType>
 template <class DeltaTType>
-Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
+Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
 (
     const DeltaTType& deltaT
 )
@@ -216,7 +216,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
 
 
 template <class ThermoType>
-void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
+void Foam::chemistryModels::loadBalanced<ThermoType>::solveSingle
 (
     ChemistryProblem& problem, ChemistrySolution& solution
 ) const
@@ -282,7 +282,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solveSingle
 
 template <class ThermoType>
 Foam::scalar
-Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRates
+Foam::chemistryModels::loadBalanced<ThermoType>::updateReactionRates
 (
     const RecvBuffer<ChemistrySolution>& solutions
 )
@@ -306,7 +306,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRates
 
 
 template <class ThermoType>
-void Foam::loadBalancedChemistryModel<ThermoType>::updateDeltaT
+void Foam::chemistryModels::loadBalanced<ThermoType>::updateDeltaT
 (
     const ChemistrySolution& solution, scalar& deltaTMin
 )
@@ -320,7 +320,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::updateDeltaT
 
 
 template <class ThermoType>
-Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
+Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
 (
     const scalarField& deltaT
 )
@@ -330,7 +330,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
 
 
 template <class ThermoType>
-Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
+Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
 (
     const scalar deltaT
 )
@@ -343,7 +343,7 @@ Foam::scalar Foam::loadBalancedChemistryModel<ThermoType>::solve
 
 
 template <class ThermoType>
-void Foam::loadBalancedChemistryModel<ThermoType>::solve
+void Foam::chemistryModels::loadBalanced<ThermoType>::solve
 (
     scalar& p,
     scalar& T,
@@ -367,7 +367,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::solve
 
 template <class ThermoType>
 Foam::RecvBuffer<Foam::ChemistrySolution>
-Foam::loadBalancedChemistryModel<ThermoType>::solveBuffer
+Foam::chemistryModels::loadBalanced<ThermoType>::solveBuffer
 (
     RecvBuffer<ChemistryProblem>& problems
 ) const
@@ -385,7 +385,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::solveBuffer
 
 template <class ThermoType>
 Foam::DynamicList<Foam::ChemistrySolution>
-Foam::loadBalancedChemistryModel<ThermoType>::solveList
+Foam::chemistryModels::loadBalanced<ThermoType>::solveList
 (
     UList<ChemistryProblem>& problems
 ) const
@@ -405,7 +405,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::solveList
 template <class ThermoType>
 template<class DeltaTType>
 Foam::DynamicList<Foam::ChemistryProblem>
-Foam::loadBalancedChemistryModel<ThermoType>::getProblems
+Foam::chemistryModels::loadBalanced<ThermoType>::getProblems
 (
     const DeltaTType& deltaT
 )
@@ -486,7 +486,7 @@ Foam::loadBalancedChemistryModel<ThermoType>::getProblems
 
 
 template <class ThermoType>
-void Foam::loadBalancedChemistryModel<ThermoType>::map
+void Foam::chemistryModels::loadBalanced<ThermoType>::map
 (
     DynamicList<ChemistryProblem>& mapped_problems,
     DynamicList<ChemistryProblem>& solved_problems
@@ -523,7 +523,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::map
 }
 
 template <class ThermoType>
-void Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRate
+void Foam::chemistryModels::loadBalanced<ThermoType>::updateReactionRate
 (
     const ChemistrySolution& solution, const label& i
 )
@@ -536,7 +536,7 @@ void Foam::loadBalancedChemistryModel<ThermoType>::updateReactionRate
 
 
 template <class ThermoType>
-bool Foam::loadBalancedChemistryModel<ThermoType>::retrieveProblem
+bool Foam::chemistryModels::loadBalanced<ThermoType>::retrieveProblem
 (
     ChemistryProblem& problem, scalarField& phiq, scalarField& Rphiq
 ) const
@@ -570,7 +570,7 @@ bool Foam::loadBalancedChemistryModel<ThermoType>::retrieveProblem
     }
 }
 template <class ThermoType>
-void Foam::loadBalancedChemistryModel<ThermoType>::tabulateProblem
+void Foam::chemistryModels::loadBalanced<ThermoType>::tabulateProblem
 (
     ChemistryProblem& problem, scalarField& phiq, scalarField& Rphiq
 ) const
