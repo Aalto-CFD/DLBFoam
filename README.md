@@ -86,14 +86,10 @@ libs
 ```
 the first two libraries link the DLBFoam and the optimized LAPACK solvers, while the last library links the C subroutines generated in the previous section for the analytical Jacobian.
 
-* Select chemistry solver as ```ode_pyJac``` and the method as ```loadBalanced_pyJac``` in constant/chemistryProperties:
+* Select type ```loadBalanced_pyJac``` in ```constant/chemistryProperties```:
 
 ```
-chemistryType
-{
-    solver          ode_pyJac;
-    method          loadBalanced_pyJac;
-}
+type    loadBalanced_pyJac;
 ```
 
 * Add the loadbalancing subdictionary to the same chemistryProperties file:
@@ -102,7 +98,7 @@ chemistryType
 loadbalancing
 {
     active true;
-    log	true;
+    log	   true;
 }
 ```
 
