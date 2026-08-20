@@ -28,7 +28,7 @@ typeRenamed
 codeOptions
 #{
 DLBFOAM_ROOT = @DLBFOAM_ROOT@
-DLBFOAM_CHM = $(DLBFOAM_ROOT)/src/thermophysicalModels/chemistryModel
+DLBFOAM_CHM = $(DLBFOAM_ROOT)/src/thermophysicalModels/chemistryModel_DLB
 DLBFOAM_PATH = $(DLBFOAM_CHM)/lnInclude
 
 EXE_INC = \
