@@ -9,6 +9,9 @@ loadBalancing/runtime_assert.C
 refMapping/mixtureFraction.C
 refMapping/mixtureFractionRefMapper.C
 loadBalancing/LoadBalancer.C
-chemistryModel/loadBalanced_pyJacChemistryModel/tabulation_pyJac/ISAT_pyJac/ISAT_pyJac.C
+loadBalanced_pyJac/tabulation_pyJac/ISAT_pyJac/ISAT_pyJac.C
+
+loadBalanced/loadBalancedChemistryModels.C
+loadBalanced_pyJac/loadBalanced_pyJacChemistryModels.C
 
 LIB = $(FOAM_USER_LIBBIN)/libchemistryModel_DLB

@@ -85,29 +85,17 @@ namespace Foam
 #include "makeChemistryModel.H"
 #include "${type}_chemistryModel.H"
 
-// loadBalanced_pyJac inherits from loadBalancedChemistryModel; include its
-// header so the parent class can be instantiated below.
-#if defined(loadBalanced_pyJacChemistryModel_chemistryModel)
-#include "loadBalancedChemistryModel_chemistryModel.H"
-#endif
-
 namespace Foam
 {
-    // For sutherland transport, the full DLB model hierarchy is precompiled
-    // in libchemistryModel_DLB.so.  For any other transport (e.g. logPolynomial)
-    // the parent classes are not precompiled and must be instantiated here.
-
-    // Standard base — needed whenever loadBalanced or loadBalanced_pyJac is
-    // selected with a transport not precompiled in libchemistryModel_DLB.so.
-#if defined(DLB_CHEM_MODEL_LOADBALANCED) && !defined(sutherlandTransport_H)
+    // This template is only compiled for thermodynamics that libchemistryModel
+    // and libchemistryModel_DLB do not pre-instantiate, so the base classes of
+    // the DLB models have to be instantiated here as well.
+#if defined(loadBalanced_chemistryModel_H)
     makeChemistryModel(Standard, ThermoPhysics);
 #endif
 
-    // loadBalancedChemistryModel base — needed by loadBalanced_pyJac.
-    // Keep this unconditional for loadBalanced_pyJac since this symbol is not
-    // guaranteed to be provided by precompiled libs for every transport.
-#if defined(loadBalanced_pyJacChemistryModel_chemistryModel)
-    makeChemistryModel(loadBalancedChemistryModel, ThermoPhysics);
+#if defined(loadBalanced_pyJac_chemistryModel_H)
+    makeChemistryModel(loadBalanced, ThermoPhysics);
 #endif
 
     makeChemistryModel(${type}, ThermoPhysics);
@@ -115,16 +103,10 @@ namespace Foam
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Chemistry reduction and reaction registrations.
-// These match the upstream OpenFOAM template structure: only activate for the
-// Standard chemistry model type.  DLBFoam's _chemistryModel macros all equal 1
-// (same as Standard_chemistryModel), so the additional !defined(sutherlandTransport_H)
-// guard prevents re-registering entries already in libchemistryModel.so for
-// sutherland/precompiled transports.
 
 #define Standard_chemistryModel 1
 
-#if ${type}_chemistryModel == Standard_chemistryModel && !defined(sutherlandTransport_H)
+#if ${type}_chemistryModel == Standard_chemistryModel
 
 #include "makeChemistryReductionMethod.H"
 
@@ -152,7 +134,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#if ${type}_chemistryModel == Standard_chemistryModel && !defined(sutherlandTransport_H)
+#define Standard_chemistryModel 1
+
+#if ${type}_chemistryModel == Standard_chemistryModel
 
 #include "makeReaction.H"
 

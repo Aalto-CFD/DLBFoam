@@ -24,18 +24,18 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::loadBalancedChemistryModel
+    Foam::chemistryModels::loadBalanced
 
 Description
-    Extends chemistryModel model by adding a load balancing algorithm.
+    Extends chemistryModels::Standard by adding a load balancing algorithm.
 
 SourceFiles
-    loadBalancedChemistryModel.C
+    loadBalanced_chemistryModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef loadBalancedChemistryModel_H
-#define loadBalancedChemistryModel_H
+#ifndef loadBalanced_chemistryModel_H
+#define loadBalanced_chemistryModel_H
 
 #include "ChemistryProblem.H"
 #include "ChemistrySolution.H"
@@ -50,13 +50,15 @@ SourceFiles
 
 namespace Foam
 {
+namespace chemistryModels
+{
 
 /*---------------------------------------------------------------------------*\
-                Class loadBalancedChemistryModel Declaration
+                        Class loadBalanced Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class ThermoType>
-class loadBalancedChemistryModel
+class loadBalanced
 :
     public chemistryModels::Standard<ThermoType>
 {
@@ -146,14 +148,14 @@ public:
     // Constructors
 
         //- Construct from thermo
-        loadBalancedChemistryModel(const fluidMulticomponentThermo& thermo);
+        loadBalanced(const fluidMulticomponentThermo& thermo);
 
         //- Disallow default bitwise copy construction
-        loadBalancedChemistryModel(const loadBalancedChemistryModel&);
+        loadBalanced(const loadBalanced&);
 
 
     //- Destructor
-    virtual ~loadBalancedChemistryModel();
+    virtual ~loadBalanced();
 
 
     // Member Functions
@@ -197,7 +199,7 @@ public:
     // Member Operators
 
         //- Disallow default bitwise assignment
-        void operator=(const loadBalancedChemistryModel&) = delete;
+        void operator=(const loadBalanced&) = delete;
 
 
 };
@@ -205,15 +207,25 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace chemistryModels
 } // End namespace Foam
-#include "loadBalancedChemistryModelI.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "loadBalanced_chemistryModelI.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "loadBalancedChemistryModel.C"
+    #include "loadBalanced_chemistryModel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Opts this model into the Standard reaction and reduction registrations of the
+// chemistryModel dynamic code template, which tests
+// "#if <type>_chemistryModel == Standard_chemistryModel"
+#define loadBalanced_chemistryModel 1
 
 #endif
 

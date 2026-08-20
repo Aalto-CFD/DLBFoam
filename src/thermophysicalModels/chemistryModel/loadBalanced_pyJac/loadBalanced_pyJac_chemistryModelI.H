@@ -25,39 +25,18 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "OSspecific.H"
+#include "volFields.H"
+#include "zeroGradientFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template <class ThermoType>
-inline Foam::autoPtr<Foam::OFstream>
-Foam::loadBalancedChemistryModel<ThermoType>::logFile(
-    const word& name) const
+template<class ThermoType>
+inline Foam::label
+Foam::chemistryModels::loadBalanced_pyJac<ThermoType>::nEqns() const
 {
-    mkDir(this->mesh().time().path() / "loadBal" / this->group());
-    return autoPtr<OFstream>(new OFstream(
-        this->mesh().time().path() / "loadBal" / this->group() / name));
+    // nEqns = number of species - 1(inert) + temperature + pressure
+    return this->nSpecie() + 1;
 }
 
-template <class ThermoType>
-inline const Foam::volScalarField::Internal&
-Foam::loadBalancedChemistryModel<ThermoType>::RR(const label i) const{
-    const PtrList<volScalarField::Internal>& rr =
-        chemistryModels::Standard<ThermoType>::RR();
-    return rr[i];
-}
-
-// Non const access to chemical source terms was removed in OF 11
-// and thus casting is required
-template <class ThermoType>
-inline Foam::volScalarField::Internal&
-Foam::loadBalancedChemistryModel<ThermoType>::RR(const label i) {
-    PtrList<volScalarField::Internal>& rr =
-        const_cast<PtrList<volScalarField::Internal>&>
-        (
-            chemistryModels::Standard<ThermoType>::RR()
-        );
-    return rr[i];
-}
 
 // ************************************************************************* //
