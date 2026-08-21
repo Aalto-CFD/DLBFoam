@@ -188,6 +188,7 @@ The reason might be that both OpenBLAS and LAPACKE are installed in your system 
 - Heikki Kahila (heikki.kahila@wartsila.com)
 - Ilya Morev (ilya.morev@aalto.fi)
 - Mahmoud Gadalla (mahmoud.gadalla@aalto.fi)
+- Hasan Celik (hasan.celik@vtt.fi)
 
 
 ## Getting help and reporting bugs
