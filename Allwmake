@@ -4,7 +4,7 @@ cd ${0%/*} || exit 1    # run from this directory
 set -e # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 
 # The supported OpenFOAM version
-OF_VER="dev"
+OF_VER="14"
 
 check_openfoam()
 {
@@ -84,16 +84,16 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 check_openfoam
 check_cmake
 
-DLB_ETC_DC=etc/codeTemplates/dynamicCode
+DLB_ETC_DC=codeTemplates/dynamicCode
 if [ "$WM_BUILD" == "site" ]; then
     if [ -n "$WM_PROJECT_SITE" ]
     then
-        FOAM_ETC_DC=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/$DLB_ETC_DC
+        FOAM_ETC_DC=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/etc/$DLB_ETC_DC
     else
-        FOAM_ETC_DC=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/$DLB_ETC_DC
+        FOAM_ETC_DC=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/etc/$DLB_ETC_DC
     fi
 elif [ "$WM_BUILD" == "core" ]; then
-    FOAM_ETC_DC=$WM_PROJECT_DIR/$DLB_ETC_DC
+    FOAM_ETC_DC=$WM_PROJECT_DIR/etc/$DLB_ETC_DC
 else
     FOAM_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/$DLB_ETC_DC"
 fi
@@ -124,8 +124,8 @@ wmake libso src/ODE_DLB
 # copy files needed for dynamic compilation of chemistry models and solvers
 DLB_REPO_ROOT=$(pwd)
 mkdir --parents "$FOAM_ETC_DC"
-sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" "$DLB_ETC_DC/chemistryModel" > "$FOAM_ETC_DC/chemistryModel"
-cp "$DLB_ETC_DC/chemistryModelTemplate.C" "$FOAM_ETC_DC"
+sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" "etc/$DLB_ETC_DC/chemistryModel" > "$FOAM_ETC_DC/chemistryModel"
+cp "etc/$DLB_ETC_DC/chemistryModelTemplate.C" "$FOAM_ETC_DC"
 
 cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
 cp utilities/CMakeLists.txt tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
