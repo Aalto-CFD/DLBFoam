@@ -85,26 +85,26 @@ check_openfoam
 check_cmake
 
 DLB_ETC_DC=etc/codeTemplates/dynamicCode
-if [ $WM_BUILD == site ]; then
+if [ "$WM_BUILD" == "site" ]; then
     if [ -n "$WM_PROJECT_SITE" ]
     then
         FOAM_ETC_DC=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/$DLB_ETC_DC
     else
         FOAM_ETC_DC=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/$DLB_ETC_DC
     fi
-elif [ $WM_BUILD == core ]; then
+elif [ "$WM_BUILD" == "core" ]; then
     FOAM_ETC_DC=$WM_PROJECT_DIR/$DLB_ETC_DC
 else
     FOAM_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/$DLB_ETC_DC"
 fi
 
-if [ $PLATFORM == MKL ]; then
+if [ "$PLATFORM" == "MKL" ]; then
     check_mkl
     cp  src/ODE_DLB/Make/options.mkl src/ODE_DLB/Make/options
-elif [ $PLATFORM == OPENBLAS ]; then
+elif [ "$PLATFORM" == "OPENBLAS" ]; then
     check_openblas
     cp  src/ODE_DLB/Make/options.openblas src/ODE_DLB/Make/options
-elif [ $PLATFORM == STANDALONE ]; then
+elif [ "$PLATFORM" == "STANDALONE" ]; then
     cp  src/ODE_DLB/Make/options.standalone src/ODE_DLB/Make/options
 else
     how_to
@@ -112,7 +112,7 @@ else
 fi
 
 
-if [ $CLEAN_ALL == true ]; then
+if [ "$CLEAN_ALL" == true ]; then
     ./Allwclean
 fi
 
