@@ -1,0 +1,158 @@
+name: DLBFoam OpenFOAM-dev test
+
+run-name: Test DLBFoam against latest tagged OpenFOAM-dev
+
+on:
+  push:
+    paths-ignore:
+      - README.md
+
+  pull_request:
+    paths-ignore:
+      - README.md
+
+  schedule:
+    - cron: "0 10 * * 0"
+      timezone: "Europe/Helsinki"
+
+  workflow_dispatch:
+
+concurrency:
+  group: openfoam-dev-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    name: Compile with OpenFOAM-dev
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: read
+
+    outputs:
+      openfoam_date: ${{ steps.openfoam-version.outputs.date }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install OpenFOAM-dev and LAPACK
+        run: |
+          wget -qO- https://dl.openfoam.org/gpg.key \
+            | sudo tee /etc/apt/trusted.gpg.d/openfoam.asc > /dev/null
+
+          sudo add-apt-repository -y \
+            "http://dl.openfoam.org/ubuntu main dev"
+
+          sudo sed -i \
+            "s/^\(deb\).*\(http:\/\/dl\.openfoam\.org\/ubuntu\)/\1 [arch=amd64] \2/" \
+            /etc/apt/sources.list.d/*dl_openfoam_org*list
+
+          sudo apt-get update
+          sudo apt-get install -y \
+            openfoam-dev \
+            liblapacke-dev
+
+      - name: Detect OpenFOAM-dev version
+        id: openfoam-version
+        run: |
+          PACKAGE_VERSION=$(dpkg-query -W -f='${Version}' openfoam-dev)
+
+          DATE=$(printf '%s\n' "$PACKAGE_VERSION" \
+            | grep -oE '[0-9]{8}' \
+            | head -n1)
+
+          if [ -z "$DATE" ]; then
+            echo "::error::Could not extract OpenFOAM-dev date from package version: $PACKAGE_VERSION"
+            exit 1
+          fi
+
+          echo "OpenFOAM-dev package: $PACKAGE_VERSION"
+          echo "OpenFOAM-dev date:    $DATE"
+
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+
+      - name: Show OpenFOAM environment
+        run: |
+          source /opt/openfoam-dev/etc/bashrc
+
+          echo "WM_PROJECT_VERSION=$WM_PROJECT_VERSION"
+          echo "WM_PROJECT_DIR=$WM_PROJECT_DIR"
+          echo "FOAM_USER_LIBBIN=$FOAM_USER_LIBBIN"
+
+          which wmake
+          wmake -help >/dev/null
+
+      - name: Compile DLBFoam
+        run: |
+          source /opt/openfoam-dev/etc/bashrc
+
+          chmod +x Allwmake
+          ./Allwmake --platform STANDALONE
+
+      - name: Show compiled libraries
+        run: |
+          source /opt/openfoam-dev/etc/bashrc
+
+          echo "Libraries under FOAM_USER_LIBBIN:"
+          find "$FOAM_USER_LIBBIN" \
+            -maxdepth 1 \
+            -type f \
+            -name '*.so' \
+            -print 2>/dev/null || true
+
+          echo
+          echo "Libraries generated inside repository:"
+          find . \
+            -type f \
+            -name '*.so' \
+            -print
+
+  update-badge:
+    name: Update OpenFOAM-dev badge
+    needs: compile
+
+    if: >
+      (github.event_name == 'push' ||
+       github.event_name == 'schedule' ||
+       github.event_name == 'workflow_dispatch') &&
+      github.ref_name == github.event.repository.default_branch
+
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Update README badge
+        env:
+          OPENFOAM_DATE: ${{ needs.compile.outputs.openfoam_date }}
+        run: |
+          echo "Updating OpenFOAM-dev badge to $OPENFOAM_DATE"
+
+          sed -i -E \
+            "s#!\[OpenFOAM dev\]\(https://img\.shields\.io/badge/[^)]*\)#![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM--dev-${OPENFOAM_DATE}-brightgreen)#" \
+            README.md
+
+          grep "OpenFOAM dev" README.md
+
+      - name: Commit badge change
+        env:
+          OPENFOAM_DATE: ${{ needs.compile.outputs.openfoam_date }}
+        run: |
+          if git diff --quiet -- README.md; then
+            echo "OpenFOAM-dev badge is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add README.md
+          git commit -m "ci: update OpenFOAM-dev badge to ${OPENFOAM_DATE}"
+          git push
