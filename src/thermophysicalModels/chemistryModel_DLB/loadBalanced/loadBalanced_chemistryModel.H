@@ -190,6 +190,9 @@ public:
         //- Create and return a log file of the given name
         inline autoPtr<OFstream> logFile(const word& name) const;
 
+    //- Inherit the base class' chemical source term access functions
+        using Standard<ThermoType>::RR;
+        
 	//- Return const access to the chemical source terms
         inline const volScalarField::Internal& RR(const label i) const;
 
