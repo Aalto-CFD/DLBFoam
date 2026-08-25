@@ -3,7 +3,8 @@ EXE_INC = \
     -DMKL_LP64 \
     -m64 \
     -I${MKLROOT} \
-    -I${MKLROOT}/include
+    -I${MKLROOT}/include \
+    -Wno-overloaded-virtual
 
 LIB_LIBS = \
     -lODE \
