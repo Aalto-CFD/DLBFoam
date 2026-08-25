@@ -144,7 +144,11 @@ bool Foam::seulex_LAPACK::seul
     }
 
     dgetrf_(&N,&N,A,&LDA,IPIV,&INFO);
-    if(INFO){std::cout << "an error occured in seul LAPACK LU phase: "<< INFO << endl << endl;}
+    if (INFO)
+    {
+        WarningInFunction
+            << "an error occured in seul LAPACK LU phase: " << INFO << endl;
+    }
 
     scalar xnew = x0 + dx;
     odes_.derivatives(xnew, y0,li,dy_);
@@ -155,7 +159,11 @@ bool Foam::seulex_LAPACK::seul
         b[i] = dy_[i];
     }
     dgetrs_(&TRANS,&N,&NRHS,A,&LDA,IPIV,b,&LDB,&INFO);
-	if(INFO){std::cout << "an error occured in seul LAPACK BS 1: "<< INFO << endl;}
+	if (INFO)
+    {
+        WarningInFunction
+            << "an error occured in seul LAPACK BS 1: " << INFO << endl;
+    }
 	for (label i=0; i<n_; i++)
 	{
 		dy_[i] = b[i];
@@ -208,7 +216,11 @@ bool Foam::seulex_LAPACK::seul
                 b[i] = dy_[i];
             }
             dgetrs_(&TRANS,&N,&NRHS,A,&LDA,IPIV,b,&LDB,&INFO);
-            if(INFO){std::cout << "an error occured in seul LAPACK BS 2: "<< INFO << endl;}
+            if (INFO)
+            {
+                WarningInFunction
+                    << "an error occured in seul LAPACK BS 3: " << INFO << endl;
+            }
             for (label i=0; i<n_; i++)
             {
                 dy_[i] = b[i];
@@ -265,7 +277,11 @@ bool Foam::seulex_LAPACK::seul
             b[i] = dy_[i];
         }
         dgetrs_(&TRANS,&N,&NRHS,A,&LDA,IPIV,b,&LDB,&INFO);
-        if(INFO){std::cout << "an error occured in seul LAPACK BS 3: "<< INFO << endl;}
+        if (INFO)
+        {
+            WarningInFunction
+                << "an error occured in seul LAPACK BS 3: " << INFO << endl;
+        }
         for (label i=0; i<n_; i++)
         {
             dy_[i] = b[i];
