@@ -1,7 +1,8 @@
 EXE_INC = \
     -I$(LIB_SRC)/ODE/lnInclude \
     -I/usr/include \
-    -DDEBUG=0 
+    -DDEBUG=0 \
+    -Wno-overloaded-virtual
 LIB_LIBS = \
     -lODE \
     -L/usr/lib  -llapacke

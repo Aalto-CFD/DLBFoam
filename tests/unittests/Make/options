@@ -10,7 +10,7 @@ EXE_INC = \
     -I../../src/thermophysicalModels/lnInclude \
     -I../../src/thermophysicalModels/chemistryModel/lnInclude \
     -I../../src/thermophysicalModels/chemistryModel/pyJacInclude \
-    -DDEBUG
+    -DDEBUG -Wno-overloaded-virtual
 
 
 EXE_LIBS = \
