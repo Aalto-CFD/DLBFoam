@@ -14,7 +14,6 @@ runApplication chemkinToFoam \
                constant/reactionsGRI constant/thermo.compressibleGasGRI
 
 runApplication blockMesh
-runApplication setFields
 cp -r system/controlDict.orig system/controlDict
 
 #Configure controlDict
