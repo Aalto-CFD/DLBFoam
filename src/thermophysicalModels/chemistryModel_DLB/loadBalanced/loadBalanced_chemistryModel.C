@@ -101,6 +101,10 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
 {
     this->zone_.regenerate();
 
+    const label nGlobalZoneCells =
+        returnReduce(this->zone_.nCells(), sumOp());
+    const bool chemistryActive =
+        this->chemistry() && nGlobalZoneCells > 0;
     tabulation_.reset();
     // CPU time analysis
     clockTime timer;
@@ -110,7 +114,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
     scalar t_solveBuffer(0);
     scalar t_unbalance(0);
 
-    if (skipSpecies_ && (!this->chemistry() || this->zone_.nCells() == 0))
+    if (skipSpecies_ && !chemistryActive)
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
@@ -131,7 +135,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
         resetSkipSpecies_ = true;
     }
 
-    if (resetSkipSpecies_ && (this->chemistry() || this->zone_.nCells() > 0))
+    if (resetSkipSpecies_ && chemistryActive)
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
