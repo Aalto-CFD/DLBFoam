@@ -36,7 +36,7 @@ Foam::chemistryModels::loadBalanced<ThermoType>::
         chemistryModels::Standard<ThermoType>(thermo),
         skipSpecies_(this->lookupOrDefault("skipSpecies", false)),
         balancer_(this->subOrEmptyDict("loadbalancing")),
-        mapper_(this->subOrEmptyDict("refmapping"), this->thermo()),
+        mapper_(this->subOrEmptyDict("refmapping")),
         cpuTimes_
         (
             IOobject
@@ -418,6 +418,14 @@ Foam::chemistryModels::loadBalanced<ThermoType>::getProblems
             this->thermo().phasePropertyName("rho")
         ).oldTime();
 
+        const volScalarField* mappingFieldPtr =
+                mapper_.active()
+            ? &this->mesh().template lookupObject<volScalarField>
+                (
+                        mapper_.fieldName()
+                )
+            : nullptr;
+
 
 
     DynamicList<ChemistryProblem> solved_problems;
@@ -451,9 +459,12 @@ Foam::chemistryModels::loadBalanced<ThermoType>::getProblems
             problem.cellid = celli;
             problem.procNo = Pstream::myProcNo();
 
-            // This check can only be done based on the concentration as the
-            // reference temperature is not known
-            if (mapper_.shouldMap(massFraction))
+            // The reference temperature is not known at this stage
+            if
+            (
+                mappingFieldPtr
+             && mapper_.shouldMap((*mappingFieldPtr)[celli])
+            )
             {
                 mapped_problems.append(problem);
                 refMap_[celli] = 1;

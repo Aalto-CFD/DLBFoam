@@ -1,0 +1,2 @@
+mixtureFraction/mixtureFraction.C
+LIB = $(FOAM_USER_LIBBIN)/libFunctionObjects_DLB
