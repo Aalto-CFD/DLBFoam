@@ -23,26 +23,48 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "mixtureFractionRefMapper.H"
+#include "fieldRefMapper.H"
 
-
-bool Foam::mixtureFractionRefMapper::shouldMap(const scalarField& massFraction) const
+Foam::fieldRefMapper::fieldRefMapper(const dictionary& dict)
+:
+    dict_(dict),
+    active_(dict_.lookupOrDefault<Switch>("active", false)),
+    fieldName_(word::null),
+    minValue_(-VGREAT),
+    maxValue_(VGREAT),
+    Ttolerance_(dict_.lookupOrDefault<scalar>("deltaT", VGREAT))
 {
-    if (active()){
+    if (active_)
+    {
+        fieldName_ = dict_.lookup<word>("field");
+        minValue_ = dict_.lookup<scalar>("min");
+        maxValue_ = dict_.lookup<scalar>("max");
 
-        scalar Z = mixture_fraction_.massFractionToMixtureFraction(massFraction);
-
-        if(Z < Ztolerance_)
+        if (minValue_ > maxValue_)
         {
-            return true;
+            FatalIOErrorInFunction(dict_)
+                << "Minimum field value " << minValue_
+                << " exceeds maximum field value " << maxValue_
+                << exit(FatalIOError);
         }
     }
-    return false;
 }
 
 
-
-bool Foam::mixtureFractionRefMapper::temperatureWithinRange(scalar Ti, scalar Tref) const
+bool Foam::fieldRefMapper::shouldMap(const scalar fieldValue) const
 {
-    return (abs(Ti-Tref) < Ttolerance_);
+    return active_ && fieldValue >= minValue_ && fieldValue <= maxValue_;
 }
+
+
+bool Foam::fieldRefMapper::temperatureWithinRange
+(
+    const scalar Ti,
+    const scalar Tref
+) const
+{
+    return abs(Ti - Tref) < Ttolerance_;
+}
+
+
+// ************************************************************************* //
