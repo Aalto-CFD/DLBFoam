@@ -26,6 +26,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "OSspecific.H"
+#include "polyMesh.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -37,6 +38,28 @@ Foam::chemistryModels::loadBalanced<ThermoType>::logFile(
     mkDir(this->mesh().time().path() / "loadBal" / this->group());
     return autoPtr<OFstream>(new OFstream(
         this->mesh().time().path() / "loadBal" / this->group() / name));
+}
+
+template <class ThermoType>
+inline Foam::autoPtr<Foam::OFstream>
+Foam::chemistryModels::loadBalanced<ThermoType>::timingFile
+(
+    const word& name
+) const
+{
+    fileName outputDir =
+        this->mesh().time().globalPath() / "postProcessing";
+
+    if (this->mesh().name() != polyMesh::defaultRegion)
+    {
+        outputDir /= this->mesh().name();
+    }
+
+    outputDir /= "loadBalancing";
+    outputDir /= this->mesh().time().name();
+
+    mkDir(outputDir);
+    return autoPtr<OFstream>(new OFstream(outputDir / name));
 }
 
 template <class ThermoType>
