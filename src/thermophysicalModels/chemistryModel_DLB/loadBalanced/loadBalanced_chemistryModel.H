@@ -44,7 +44,7 @@ SourceFiles
 #include "IOmanip.H"
 #include "Standard_chemistryModel.H"
 #include "clockTime.H"
-#include "mixtureFractionRefMapper.H"
+#include "fieldRefMapper.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,7 +73,7 @@ private:
         LoadBalancer balancer_;
 
         // Reference mapping object
-        mixtureFractionRefMapper mapper_;
+        fieldRefMapper mapper_;
 
         // Field containing chemistry CPU time information
         volScalarField cpuTimes_;
@@ -192,7 +192,7 @@ public:
 
     //- Inherit the base class' chemical source term access functions
         using Standard<ThermoType>::RR;
-        
+
 	//- Return const access to the chemical source terms
         inline const volScalarField::Internal& RR(const label i) const;
 
