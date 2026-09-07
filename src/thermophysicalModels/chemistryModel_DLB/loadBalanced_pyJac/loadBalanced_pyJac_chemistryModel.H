@@ -112,11 +112,11 @@ public:
     ) const override;
 
     //- Override Qdot function from chemistryModel for using pyJac's enthalpy of formation
-    virtual tmp<volScalarField> Qdot() const override;
+    virtual tmp<volInternalScalarField> Qdot() const override;
 
     //- Override tc function from chemistryModel for using calculating chemical time scale
     //- via pyJac
-    virtual tmp<volScalarField> tc() const override;
+    virtual tmp<volInternalScalarField> tc() const override;
 
 
 private:
