@@ -27,6 +27,8 @@ License
 
 #include "typedefThermo.H"
 
+#include "IOstream.H"
+
 #include "${specie}.H"
 
 #include "thermo.H"
