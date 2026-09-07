@@ -49,11 +49,6 @@ timePrecision   12;
 
 runTimeModifiable no;
 
-DebugSwitches
-{
-    SolverPerformance   0;
-}
-
 libs
 (
         "libchemistryModel_DLB.so"
