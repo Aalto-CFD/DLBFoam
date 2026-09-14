@@ -63,9 +63,9 @@ Foam::chemistryModels::loadBalanced<ThermoType>::timingFile
 }
 
 template <class ThermoType>
-inline const Foam::volScalarField::Internal&
+inline const Foam::volInternalScalarField&
 Foam::chemistryModels::loadBalanced<ThermoType>::RR(const label i) const{
-    const PtrList<volScalarField::Internal>& rr =
+    const PtrList<volInternalScalarField>& rr =
         chemistryModels::Standard<ThermoType>::RR();
     return rr[i];
 }
@@ -73,10 +73,10 @@ Foam::chemistryModels::loadBalanced<ThermoType>::RR(const label i) const{
 // Non const access to chemical source terms was removed in OF 11
 // and thus casting is required
 template <class ThermoType>
-inline Foam::volScalarField::Internal&
+inline Foam::volInternalScalarField&
 Foam::chemistryModels::loadBalanced<ThermoType>::RR(const label i) {
-    PtrList<volScalarField::Internal>& rr =
-        const_cast<PtrList<volScalarField::Internal>&>
+    PtrList<volInternalScalarField>& rr =
+        const_cast<PtrList<volInternalScalarField>&>
         (
             chemistryModels::Standard<ThermoType>::RR()
         );

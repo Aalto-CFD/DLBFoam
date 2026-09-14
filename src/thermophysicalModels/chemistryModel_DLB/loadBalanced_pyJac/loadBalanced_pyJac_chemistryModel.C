@@ -123,12 +123,12 @@ void loadBalanced_pyJac<ThermoType>::derivatives(
 }
 
 template <class ThermoType>
-Foam::tmp<Foam::volScalarField>
+Foam::tmp<Foam::volInternalScalarField>
 loadBalanced_pyJac<ThermoType>::Qdot() const {
 
-    tmp<volScalarField> tQdot
+    tmp<volInternalScalarField> tQdot
     (
-        volScalarField::New
+        volInternalScalarField::New
         (
             "Qdot",
             this->mesh_,
@@ -196,7 +196,7 @@ void loadBalanced_pyJac<ThermoType>::solve
 }
 
 template <class ThermoType>
-Foam::tmp<Foam::volScalarField>
+Foam::tmp<Foam::volInternalScalarField>
 loadBalanced_pyJac<ThermoType>::tc() const {
 
     if(PYJAC_FWD_RATES()!=this->nReaction()) {
