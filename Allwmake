@@ -120,6 +120,7 @@ fi
 wmake libso src/thermophysicalModels/chemistryModel_DLB
 cp -r src/thermophysicalModels/chemistryModel_DLB/pyJacInclude src/thermophysicalModels/chemistryModel_DLB/lnInclude
 wmake libso src/ODE_DLB
+wmake libso src/functionObjects
 
 # copy files needed for dynamic compilation of chemistry models and solvers
 DLB_REPO_ROOT=$(pwd)
