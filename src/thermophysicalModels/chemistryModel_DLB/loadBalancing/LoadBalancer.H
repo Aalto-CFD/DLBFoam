@@ -68,9 +68,10 @@ public:
 
     LoadBalancer(const dictionary& dict)
         : LoadBalancerBase(),
-          dict_(dict),
-          active_(dict_.lookupOrDefault<Switch>("active", true)),
-          log_(dict_.lookupOrDefault<Switch>("log", false))
+        dict_(dict),
+        active_(dict_.lookupOrDefault<Switch>("active", true)),
+        debug_(dict_.lookupOrDefault<Switch>("debug", false)),
+        log_(dict_.lookupOrDefault<Switch>("log", false))
     {
     }
 
@@ -90,6 +91,12 @@ public:
     bool log() const
     {
         return log_;
+    }
+
+    //- Is detailed load balancing state printed to the main log?
+    bool debug() const
+    {
+        return debug_;
     }
 
 
@@ -120,6 +127,9 @@ private:
 
     // Is load balancing active?
     Switch active_;
+
+    // Is detailed balancing state output enabled?
+    Switch debug_;
 
     // Is load balancing logged?
     Switch log_;
