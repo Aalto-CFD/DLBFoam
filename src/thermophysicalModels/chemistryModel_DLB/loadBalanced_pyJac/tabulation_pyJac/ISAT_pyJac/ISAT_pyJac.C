@@ -114,7 +114,7 @@ Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
         scalar(0)
     ),
     // tabulationResults_( // Idea: take it from parent class (reuse=True)
-    //     chemistry.mesh().lookupObject<volScalarField::Internal>(
+    //     chemistry.mesh().lookupObject<volInternalScalarField>(
     //         "TabulationResults"
     //     ),
     //     true

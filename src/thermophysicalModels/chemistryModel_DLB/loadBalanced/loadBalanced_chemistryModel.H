@@ -194,10 +194,10 @@ public:
         using Standard<ThermoType>::RR;
         
 	//- Return const access to the chemical source terms
-        inline const volScalarField::Internal& RR(const label i) const;
+        inline const volInternalScalarField& RR(const label i) const;
 
 	//- Return non const access to the chemical source terms
-        inline volScalarField::Internal& RR(const label i);
+        inline volInternalScalarField& RR(const label i);
 
     // Member Operators
 

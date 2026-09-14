@@ -146,7 +146,7 @@ class ISAT_pyJac
         // 0 -> add (direct integration)
         // 1 -> grow
         // 2 -> retrieve
-        volScalarField::Internal tabulationResults_;
+        volInternalScalarField tabulationResults_;
 
         bool cleaningRequired_;
 
