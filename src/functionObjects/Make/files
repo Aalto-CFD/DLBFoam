@@ -1,2 +1,11 @@
 mixtureFraction/mixtureFraction.C
-LIB = $(FOAM_USER_LIBBIN)/libFunctionObjects_DLB
+
+LIBpath = $(FOAM_USER_LIBBIN)
+ifeq "$(WM_BUILD)" "site"
+LIBpath = $(FOAM_SITE_LIBBIN)
+endif
+ifeq "$(WM_BUILD)" "core"
+LIBpath = $(FOAM_LIBBIN)
+endif
+
+LIB = $(LIBpath)/libFunctionObjects_DLB
