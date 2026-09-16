@@ -1,10 +1,18 @@
 #!/bin/bash
 cd ${0%/*} || exit 1    # Run from this directory
 
-rm -rf $FOAM_USER_LIBBIN/libchemistryModel_DLB.so
-rm -rf $FOAM_USER_LIBBIN/libODE_DLB.so
-unlink $FOAM_USER_LIBBIN/libc_pyjac_test.so
-rm -rf $FOAM_USER_LIBBIN/unittests/pyjacTestMech/build
+DLB_LIBBIN=$FOAM_USER_LIBBIN
+if [ "$WM_BUILD" == "site" ]; then
+    DLB_LIBBIN=$FOAM_SITE_LIBBIN
+elif [ "$WM_BUILD" == "core" ]; then
+    DLB_LIBBIN=$FOAM_LIBBIN
+fi
+
+rm -f "$DLB_LIBBIN/libchemistryModel_DLB.so"
+rm -f "$DLB_LIBBIN/libODE_DLB.so"
+rm -f "$DLB_LIBBIN/libFunctionObjects_DLB.so"
+rm -f "$FOAM_USER_LIBBIN/libc_pyjac_test.so"
+rm -rf "$FOAM_USER_LIBBIN/unittests/pyjacTestMech/build"
 
 pushd src > /dev/null
     wclean all
