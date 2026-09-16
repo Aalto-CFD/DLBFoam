@@ -1,15 +1,15 @@
 # DLBFoam: Dynamic load balancing for fast reactive simulations
-![v1.1](https://img.shields.io/badge/DLBFoam-v1.1-blue)
 ![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM-14-brightgreen)
 
 [<img src="https://img.shields.io/badge/-YouTube_Video_Tutorials-red?style=for-the-badge&logo=youtube&logoColor=white"/>](https://www.youtube.com/playlist?list=PLXqVaOXSsv1SBnfyGRa_C-E0X--FIT27P)
 
-## DLBFoam v1.1 - What's new?
-DLBFoam v1.1 introduces a fully analytical chemistry Jacobian via [pyJac](https://github.com/SLACKHA/pyJac), and optimized ODE solution routines via [LAPACK](http://www.netlib.org/lapack/). Combined with the load balancing features, v1.1 provides up to x250 speed-up compared to standard OpenFOAM chemistry model. If you are interested with using only dynamic load balancing without any third party dependency, please use [DLBFoam v1.0](https://github.com/blttkgl/DLBFoam-1.0).
-
 ## What is DLBFoam?
-DLBFoam is an open-source library for OpenFOAM. It introduces dynamic load balancing and a zonal reference mapping model
-for fast chemistry calculation in parallel simulations. In addition, it also introduces a fully analytical Jacobian formulation and optimized ODE solution routines for further speed-up.
+
+DLBFoam is an open-source library for OpenFOAM that accelerates chemistry calculations in parallel simulations through dynamic load balancing and a zonal reference mapping model.
+
+DLBFoam also provides a fully analytical chemistry Jacobian via [pyJac](https://github.com/SLACKHA/pyJac) and optimized ODE solution routines via [LAPACK](http://www.netlib.org/lapack/). Combined with the load balancing features, these optimizations provide speed-ups of up to 250× compared to the standard OpenFOAM chemistry model.
+
+The library can also be used solely for dynamic load balancing without the third-party pyJac and LAPACK dependencies.
 
 
 ## Why do I need this?
@@ -18,16 +18,16 @@ Load imbalance in parallel reactive simulations is an issue that causes very lon
 simulation times in OpenFOAM simulations utilizing finite-rate chemistry.
 
 DLBFoam introduces runtime load balancing through MPI routines
-to minimize the load imbalance between ranks and gain speed-up. The implementation
-details can be found in our paper [[1]](#1). In addition, the cell-wise chemistry problem is vastly improved by the analytical Jacobian formulation and optimized matrix operations in the ODE solver class. The details for those implementations can be found in our follow-up paper [[2]](#2).
+to minimize the load imbalance between ranks and achieve speed-up. The implementation
+details can be found in our paper [[1]](#1). In addition, the cellwise chemistry problem is significantly improved by the analytical Jacobian formulation and optimized matrix operations in the ODE solver class. The details for those implementations can be found in our follow-up paper [[2]](#2).
 
 
 ![crab pet](https://i.imgur.com/yYVBgHV.gif)
 
 ## Prerequisites
-- OpenFOAM installation. [dev](https://github.com/OpenFOAM/OpenFOAM-dev) and three latest official releases are maintaned in corresponding branches. You can find older versions under tags and releases.
-- LAPACK (Intel-MKL, OpenBLAS or standalone)
-- Cmake
+- OpenFOAM installation. [dev](https://github.com/OpenFOAM/OpenFOAM-dev) and three latest official releases are maintained in corresponding branches. You can find older versions under tags and releases.
+- LAPACK (Intel MKL, OpenBLAS or standalone)
+- CMake
 - [ct2foam](https://github.com/kahilah/ct2foam) (Optional)
 
 ## Compilation
@@ -44,7 +44,7 @@ DLBFoam requires LAPACK packages for improved ODE routines (LAPACKE C interface 
 
 - **Intel-MKL**:  We recommend Intel-MKL libraries to be used together with DLBFoam whenever you are working on machines with Intel-based architecture. See further information and installation guidelines for  [Intel-MKL](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/onemkl.html). Note that DLBFoam assumes, that the ```MKLROOT``` environment variable is set to represent the installation path according to the standard library installation scripts.
 
-- **OpenBLAS**: Another option is to utilise [OpenBLAS](https://www.openblas.net/) library which includes LAPACK routines. In this case, DLBFoam assumes that the ```OPENBLAS_INSTALL_ROOT``` environment variable is set to represent the OpenBLAS installation path succesfully.
+- **OpenBLAS**: Another option is to utilise [OpenBLAS](https://www.openblas.net/) library, which includes LAPACK routines. In this case, DLBFoam assumes that the ```OPENBLAS_INSTALL_ROOT``` environment variable is set to represent the OpenBLAS installation path successfully.
 
 - **Standalone**: A standalone installation may be a good idea if you are on your personal workstation and not on a cluster. You can see if you have the necessary lapacke dependency by e.g. executing ```ldconfig -p | grep "liblapacke"```. In case not, on debian systems you could e.g. install the requirements (including header files) by:
 
@@ -52,7 +52,7 @@ DLBFoam requires LAPACK packages for improved ODE routines (LAPACKE C interface 
     (sudo) apt-get install liblapacke-dev
     ```
 
-The default installtion location is ```$FOAM_USER_LIBBIN```. To install to ```$WM_PROJECT_SITE``` use:
+The default installation location is ```$FOAM_USER_LIBBIN```. To install to ```$WM_PROJECT_SITE``` use:
 
 ```
 WM_BUILD=site ./Allwmake --platform <LAPACK_INSTALLATION_TYPE>
@@ -79,13 +79,13 @@ where ```<mechName>``` is ```gri30```, ```yao```, or ```drm19```. This command w
 **If you want to use a different chemical mechanism**, you need to create the thermo input files in a format required by OpenFOAM, as well as analytical Jacobian C subroutines generated by pyJac. This process requires many dependencies, most notably [Cantera](https://cantera.org/) and pyJac.
 
 We have developed a tool called
-[ct2foam](https://github.com/kahilah/ct2foam) that makes this process a lot easier. Please check ct2foam (and the pyjac2foam utility in it) if you are interested in using a different mechanism.
+[ct2foam](https://github.com/kahilah/ct2foam) that makes this process a lot easier. Please check ct2foam (and pyjac2foam utility in it) if you are interested in using a different mechanism.
 ## Usage
 
 Once the compilation is successful, any case running with standard OpenFOAM can be easily converted to
-use DLBFOAM, following these steps:
+use DLBFOAM, by following these steps:
 
-* The DLBFoam should be linked to the solver. Add the following to your system/controlDict file:
+* DLBFoam should be linked to the solver. Add the following to your system/controlDict file:
 
 ```
 libs
@@ -123,38 +123,30 @@ ode
 }
 ```
 * (Optional) Set the refmapping as active in chemistryProperties file if you want to
-    use the reference mapping method (you have to add an empty ```refmapping{}``` dict
-    even if you do not use it):
+    use the reference mapping method:
 
 ```
 refmapping
 {
     active  true;
 
-    mixtureFractionProperties
-    {
-        oxidizerMassFractions
-        {
-            N2       0.77;
-            O2       0.23;
-        }
 
-        fuelMassFractions
-        {
-            NC12H26       1.0;
-        }
-
-        #include "$FOAM_CASE/constant/foam/thermo.foam"
-    }
-    tolerance	1e-4;  // mixture fraction tolerance
+refmapping
+{
+    active          true;
+    field           Z;
+    min             0;
+    max             1e-4;
+}
+    tolerance	1e-4;  // field tolerance
     deltaT	2; // temperature tolerance
 }
 ```
-Reference mapping uses mixture fraction (Z) and maps a reference solution to reference
-cells satisfying a condition.
+Reference mapping uses a given field and maps a reference solution to reference
+cells satisfying a condition. You can use mixture fraction (Z) field by setting up the mixture fraction function object with `executeInterval` set on every time step.
 
-The entry above sets the Z=0 and Z=1 conditions from given mass fractions. For each
-CFD iteration it finds a reference solution where Z<tolerance and solves the chemistry.
+In the example above, for each
+CFD iteration DLBFoam finds a reference solution where min<Z<max and solves the chemistry.
 Subsequent cells following the same condition are mapped from this reference solution.
 
 (Optional) When deltaT is explicitly set, the mapper also checks the temperature
@@ -173,7 +165,7 @@ For a working example, check the tutorials given in tutorials folder.
 ```
 /path/to/user/OpenFoam/linux64GccDPInt32Opt/lib/libchemistryModel_DLB.so: undefined symbol: eval_h
 ```
-Compiled mechanism library (```libc_pyjac.so```) is not found. Please read Mechanism Generation section of the README. Check if a correct path is set in controlDict and the file exists.
+Compiled mechanism library (```libc_pyjac.so```) cannot be found. Please read Mechanism Generation section of the README. Check if a correct path is set in controlDict and the file exists.
 
 #### Tutorial works in serial, but it hangs in parallel
 The reason might be that both OpenBLAS and LAPACKE are installed in your system and interfering with each other. This mostly happens in personal computers rather than clusters where software are controlled by modules. On your personal system, please follow the instructions below to mitigate this issue:
@@ -193,7 +185,7 @@ The reason might be that both OpenBLAS and LAPACKE are installed in your system 
 
 ## Getting help and reporting bugs
 
-Please submit a GitHub issue if you found a bug in the program. If you need help with the software or have further questions, either open an issue or contact the contributors.
+Please submit a GitHub issue if you find a bug in the program. If you need help with the software or have further questions, either open an issue or contact the contributors.
 
 ## Citation
 
