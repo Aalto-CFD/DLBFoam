@@ -38,6 +38,8 @@ mixtureFraction
 {
     type        mixtureFraction;
     libs        ("libFunctionObjects_DLB.so");
+    executeControl  timeStep;
+    executeInterval 1;
     writeControl    writeTime;
 
     oxidizerMassFractions
