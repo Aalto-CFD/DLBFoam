@@ -31,17 +31,22 @@ rm -rf tutorials/chemFoam/gri_pyJac/pyJac
 # Remove files related to dynamic compilation
 # Logic is almost copy-paste from Allwmake
 DLB_ETC_DC=codeTemplates/dynamicCode
+DLB_CASE_DICTS=caseDicts/functions
 if [ "$WM_BUILD" == "site" ]; then
     if [ -n "$WM_PROJECT_SITE" ]
     then
         FOAM_ETC_DC=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/etc/$DLB_ETC_DC
+        FOAM_CASE_DICTS=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/etc/$DLB_CASE_DICTS
     else
         FOAM_ETC_DC=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/etc/$DLB_ETC_DC
+        FOAM_CASE_DICTS=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/etc/$DLB_CASE_DICTS
     fi
 elif [ "$WM_BUILD" == "core" ]; then
     exit 1 # Do not remove files from core OpenFOAM installation
 else
     FOAM_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/$DLB_ETC_DC"
+    FOAM_CASE_DICTS="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/$DLB_CASE_DICTS"
 fi
 rm -f $FOAM_ETC_DC/chemistryModel
 rm -f $FOAM_ETC_DC/chemistryModelTemplate.C
+rm -f $FOAM_CASE_DICTS/mixtureFraction
