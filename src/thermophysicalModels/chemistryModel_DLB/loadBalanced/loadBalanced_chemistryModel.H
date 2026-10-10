@@ -180,6 +180,13 @@ public:
         //- Solve a single ChemistryProblem and put the solution to ChemistrySolution
         void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution) const;
 
+        //- Number of species in the tabulation composition vector
+        //  (Yi, T, p, deltaT); overridden by loadBalanced_pyJac
+        virtual label nTabulatedSpecie() const
+        {
+            return this->nSpecie();
+        }
+
         // Chemistry model functions (overriding functions in
         // chemistryModel to use the private solve function)
 

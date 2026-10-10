@@ -82,6 +82,13 @@ public:
 
     inline virtual label nEqns() const;
 
+    //- Number of species in the tabulation composition vector
+    //  pyJac does not integrate the last (inert) specie
+    virtual label nTabulatedSpecie() const override
+    {
+        return this->nSpecie() - 1;
+    }
+
     //- Override jacobian and derivatives function from chemistryModel
     virtual void jacobian
     (

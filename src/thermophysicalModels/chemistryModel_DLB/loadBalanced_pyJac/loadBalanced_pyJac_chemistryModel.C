@@ -162,7 +162,7 @@ void loadBalanced_pyJac<ThermoType>::solve
     // reduction is active
     if (this->odeSolver_->resize())
     {
-        this->odeSolver_->resizeField(this->cTp_);
+        this->odeSolver_->resizeField(this->cT_);
     }
 
     const label nSpecie = this->nSpecie();
@@ -172,23 +172,23 @@ void loadBalanced_pyJac<ThermoType>::solve
     /* the RHS and Jacobian and thus we need here the inert = 1.0-csum functionality    */
 
     // Copy the concentration, T and P to the total solve-vector
-    this->cTp_[0] = T;
-    this->cTp_[nSpecie] = p;
+    this->cT_[0] = T;
+    this->cT_[nSpecie] = p;
 
     for (label i=0; i<nSpecie-1; i++)
     {
-        this->cTp_[i+1] = c[i];
+        this->cT_[i+1] = c[i];
     }
 
-    this->odeSolver_->solve(0, deltaT, this->cTp_, li, subDeltaT);
+    this->odeSolver_->solve(0, deltaT, this->cT_, li, subDeltaT);
 
-    T = this->cTp_[0];
-    p = this->cTp_[nSpecie];
+    T = this->cT_[0];
+    p = this->cT_[nSpecie];
     scalar csum = 0;
 
     for (label i=0; i<nSpecie-1; i++)
     {
-        c[i] = max(0.0, this->cTp_[i+1]);
+        c[i] = max(0.0, this->cT_[i+1]);
         csum += c[i];
     }
     //The last specie:
