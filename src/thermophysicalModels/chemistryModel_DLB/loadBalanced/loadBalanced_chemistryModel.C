@@ -124,7 +124,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
                 {
                     this->thermo().setSpecieInactive(i);
 
-                    this->thermo().availableSpecies()[i] = false;
+                    this->thermo().activeSpecies()[i] = false;
 
                     const_cast<volScalarField&>(this->Y()[i]) == Zero;
                 }
@@ -155,7 +155,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
 
     if (!skipSpecies_)
     {
-        this->thermo().availableSpecies() = true;
+        this->thermo().activeSpecies() = true;
     }
 
     this->thermo().syncActiveSpecies();
