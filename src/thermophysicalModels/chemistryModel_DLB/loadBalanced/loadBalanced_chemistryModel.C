@@ -111,15 +111,27 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
+            if (i == this->thermo().defaultSpecie())
+            {
+                continue;
+            }
+
+            const scalar maxY = max(this->Y()[i].oldTime()).value();
+
             if (this->thermo().solveSpecie(i))
             {
-                const scalar maxY = max(this->Y()[i].oldTime()).value();
-
                 if(maxY < skipThreshold_)
                 {
                     this->thermo().setSpecieInactive(i);
+
+                    this->thermo().availableSpecies()[i] = false;
+
                     const_cast<volScalarField&>(this->Y()[i]) == Zero;
                 }
+            }
+            else if (maxY >= skipThreshold_)
+            {
+                this->thermo().setSpecieActive(i);
             }
         }
     }
@@ -140,7 +152,13 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
         }
         resetSkipSpecies_ = false;
     }
-    this->thermo().syncSpeciesActive();
+
+    if (!skipSpecies_)
+    {
+        this->thermo().availableSpecies() = true;
+    }
+
+    this->thermo().syncActiveSpecies();
 
     if(!this->chemistry())
     {
