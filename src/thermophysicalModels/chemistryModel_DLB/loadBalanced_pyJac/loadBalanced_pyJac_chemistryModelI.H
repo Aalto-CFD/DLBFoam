@@ -34,8 +34,8 @@ template<class ThermoType>
 inline Foam::label
 Foam::chemistryModels::loadBalanced_pyJac<ThermoType>::nEqns() const
 {
-    // nEqns = number of species - 1(inert) + temperature + pressure
-    return this->nSpecie() + 1;
+    // nEqns = number of species - 1(inert) + temperature
+    return this->nSpecie();
 }
 
 

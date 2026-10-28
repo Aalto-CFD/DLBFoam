@@ -86,18 +86,18 @@ public:
     virtual void jacobian
     (
         const scalar t,
-        const scalarField& TYp,
+        const scalarField& TY,
         const label li,
-        scalarField& dTYpdt,
+        scalarField& dTYdt,
         scalarSquareMatrix& J
     ) const override;
 
     virtual void derivatives
     (
         const scalar t,
-        const scalarField& TYp,
+        const scalarField& TY,
         const label li,
-        scalarField& dTYpdt
+        scalarField& dTYdt
     ) const override;
 
     //- Solve the ODE system

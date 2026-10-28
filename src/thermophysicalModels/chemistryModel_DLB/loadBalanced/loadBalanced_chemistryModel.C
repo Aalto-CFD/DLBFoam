@@ -303,14 +303,17 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::solveSingle
     scalarField Y0 = problem.Y;
     solution.cellid = problem.cellid;
 
+    // The ODE system takes the pressure from the model, not the state vector
+    this->p_ = problem.pi;
+
     // Timer begins
     clockTime time;
     time.timeIncrement();
     if(problem.procNo == Pstream::myProcNo())
     {
         // Composition vector (Yi, T, p, deltaT)
-        scalarField phiq(this->nEqns() + 1);
-        scalarField Rphiq(this->nEqns() + 1);
+        scalarField phiq(this->nEqns() + 2);
+        scalarField Rphiq(this->nEqns() + 2);
         solution.retrieved = retrieveProblem(problem, phiq, Rphiq);
         if(!solution.retrieved)
         {
@@ -630,7 +633,7 @@ bool Foam::chemistryModels::loadBalanced<ThermoType>::retrieveProblem
     ChemistryProblem& problem, scalarField& phiq, scalarField& Rphiq
 ) const
 {
-    for (label i=0; i<this->nEqns()-2; i++)
+    for (label i=0; i<this->nEqns()-1; i++)
     {
         phiq[i] = problem.Y[i];
     }
@@ -642,12 +645,12 @@ bool Foam::chemistryModels::loadBalanced<ThermoType>::retrieveProblem
     {
         // Retrieved solution stored in Rphiq
         scalar Ysum = 0.0;
-        for (label i=0; i<this->nEqns()-2; i++)
+        for (label i=0; i<this->nEqns()-1; i++)
         {
             problem.Y[i] = Rphiq[i];
             Ysum+=Rphiq[i];
         }
-        if(this->nEqns() == this->nSpecie()+1)      // check if you are operating with pyJac solver (nEqns=nSpecie+1)
+        if(this->nEqns() == this->nSpecie())      // check if you are operating with pyJac solver (nEqns=nSpecie)
         {
             problem.Y[this->nSpecie()-1] = 1.0-Ysum;
         }
@@ -667,7 +670,7 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::tabulateProblem
     if (tabulation_.tabulates())
     {
 
-        for (label i=0; i<this->nEqns()-2; i++)
+        for (label i=0; i<this->nEqns()-1; i++)
         {
             Rphiq[i] = problem.Y[i];
         }
@@ -679,7 +682,7 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::tabulateProblem
         (
             phiq,
             Rphiq,
-            this->nEqns()-2,   // TODO: What should be the value here, when we have the pyJac array Nsp-1+T+p???
+            this->nEqns()-1,   // TODO: What should be the value here, when we have the pyJac array Nsp-1+T+p???
             problem.cellid,
             problem.deltaT
         );

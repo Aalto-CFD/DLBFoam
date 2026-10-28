@@ -78,7 +78,7 @@ loadBalanced_pyJac<ThermoType>::~loadBalanced_pyJac() {}
 
 template <class ThermoType>
 void loadBalanced_pyJac<ThermoType>::jacobian(
-    const scalar t, const scalarField& TYp, const label li, scalarField& dTYdt, scalarSquareMatrix& J)
+    const scalar t, const scalarField& TY, const label li, scalarField& dTYdt, scalarSquareMatrix& J)
     const {
 
     scalarField yToPyJac(this->nSpecie(), 0.0);
@@ -86,19 +86,18 @@ void loadBalanced_pyJac<ThermoType>::jacobian(
 
     J = Zero;
     dTYdt = Zero;
-    const scalar p = TYp[this->nSpecie()];
 
     yToPyJac[0] = maxMin
     (
-        TYp[0],
+        TY[0],
         Reaction<ThermoType>::TlowDefault,
         Reaction<ThermoType>::ThighDefault
     );
     for (label i = 1; i < this->nSpecie(); i++) {
-        yToPyJac[i] = max(TYp[i], 0);
+        yToPyJac[i] = max(TY[i], 0);
     }
 
-    eval_jacob(0, p, yToPyJac.begin(), jac.begin());
+    eval_jacob(0, this->p_, yToPyJac.begin(), jac.begin());
 
     for (label j = 0; j < this->nSpecie(); j++) {
         for (label i = 0; i < this->nSpecie(); i++) {
@@ -109,27 +108,22 @@ void loadBalanced_pyJac<ThermoType>::jacobian(
 
 template <class ThermoType>
 void loadBalanced_pyJac<ThermoType>::derivatives(
-    const scalar t, const scalarField& TYp, const label li, scalarField& dTYpdt) const {
+    const scalar t, const scalarField& TY, const label li, scalarField& dTYdt) const {
 
     scalarField yToPyJac(this->nSpecie(), 0.0);
 
-    const scalar p = TYp[this->nSpecie()];
-
     yToPyJac[0] = maxMin
     (
-        TYp[0],
+        TY[0],
         Reaction<ThermoType>::TlowDefault,
         Reaction<ThermoType>::ThighDefault
     );
     for (label i = 1; i < this->nSpecie(); i++) {
-        yToPyJac[i] = max(TYp[i], 0);
+        yToPyJac[i] = max(TY[i], 0);
     }
 
     // call pyJac RHS function
-    dydt(0, p, yToPyJac.begin(), dTYpdt.begin());
-
-    // dp/dt = 0
-    dTYpdt[this->nSpecie()] = 0.0;
+    dydt(0, this->p_, yToPyJac.begin(), dTYdt.begin());
 }
 
 template <class ThermoType>
@@ -172,7 +166,7 @@ void loadBalanced_pyJac<ThermoType>::solve
     // reduction is active
     if (this->odeSolver_->resize())
     {
-        this->odeSolver_->resizeField(this->cTp_);
+        this->odeSolver_->resizeField(this->cT_);
     }
 
     const label nSpecie = this->nSpecie();
@@ -181,24 +175,22 @@ void loadBalanced_pyJac<ThermoType>::solve
     /* Because pyJac does not consider the last specie in the system, it is not part of */
     /* the RHS and Jacobian and thus we need here the inert = 1.0-csum functionality    */
 
-    // Copy the concentration, T and P to the total solve-vector
-    this->cTp_[0] = T;
-    this->cTp_[nSpecie] = p;
+    // Copy the temperature and concentrations to the total solve-vector
+    this->cT_[0] = T;
 
     for (label i=0; i<nSpecie-1; i++)
     {
-        this->cTp_[i+1] = c[i];
+        this->cT_[i+1] = c[i];
     }
 
-    this->odeSolver_->solve(0, deltaT, this->cTp_, li, subDeltaT);
+    this->odeSolver_->solve(0, deltaT, this->cT_, li, subDeltaT);
 
-    T = this->cTp_[0];
-    p = this->cTp_[nSpecie];
+    T = this->cT_[0];
     scalar csum = 0;
 
     for (label i=0; i<nSpecie-1; i++)
     {
-        c[i] = max(0.0, this->cTp_[i+1]);
+        c[i] = max(0.0, this->cT_[i+1]);
         csum += c[i];
     }
     //The last specie:

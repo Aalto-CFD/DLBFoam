@@ -369,14 +369,12 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::computeA
     // Prepare the vector order for the pyJac version by alternating the T order in Rcq
     const label nSpecie = chemistry_.nSpecie() - 1; // Note the pyJac indexing
 
-    scalarField Rphiqs(chemistry_.nSpecie()+2);
+    scalarField Rphiqs(nSpecie + 1);
     for (label i=0; i<nSpecie; i++)
     {
         Rphiqs[i+1] = Rphiq[i];
     }
     Rphiqs[0] = Rphiq[Rphiq.size() - 3]; // Temperature
-    Rphiqs[nSpecie + 1] = Rphiq[Rphiq.size() - 2]; // Pressure
-    Rphiqs[nSpecie + 2] = Rphiq[Rphiq.size() - 1]; // deltaT
 
     // Aaa is computed implicitly,
     // A is given by A = C(psi0, t0+dt), where C is obtained through solving
@@ -387,8 +385,8 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::computeA
     // C(psi0,t0+dt)*(I-dt*J(psi(t0+dt))) = C(psi0, t0)
     // A = C(psi0,t0)/(I-dt*J(psi(t0+dt)))
     // where C(psi0,t0) = I
-    scalarField dYTpdt(nSpecie + 2, Zero);
-    chemistry_.jacobian(runTime_.value(), Rphiqs, li, dYTpdt, A);
+    scalarField dYTdt(nSpecie + 1, Zero);
+    chemistry_.jacobian(runTime_.value(), Rphiqs, li, dYTdt, A);
 
     // We need to take the pyJac-ordered Jacobian, and re-structure it back to the stock Jacobian,
     // so that we don't need to touch the retrieval part of the code
@@ -406,19 +404,8 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::computeA
     {
         A_tmp(nSpecie,i) = A(0,i+1);
         A_tmp(i,nSpecie) = A(i+1,0);
-
-        A_tmp(nSpecie+1,i) = A(nSpecie+1,i+1);
-        A_tmp(i,nSpecie + 1) = A(i+1,nSpecie+1);
     }
     A_tmp(nSpecie, nSpecie) = A(0,0);
-    A_tmp(nSpecie, nSpecie + 1) = A(nSpecie+1,0);
-    A_tmp(nSpecie+1,nSpecie) = A(0,nSpecie+1);
-
-    for (label i=0; i<ASize; i++)
-    {
-        A_tmp(ASize-1,i) = 0.0;
-        A_tmp(i,ASize-1) = 0.0;
-    }
 
     for (label i=0; i<ASize; i++)
     {
@@ -429,25 +416,30 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::computeA
     }
 
     // Inverse of I - dt*J(psi(t0 + dt))
-    for (label i=0; i<nSpecie + 2 ; i++)
+    for (label i=0; i<nSpecie + 1; i++)
     {
-        for (label j=0; j<nSpecie + 2; j++)
+        for (label j=0; j<nSpecie + 1; j++)
         {
             A(i, j) *= -dt;
         }
         A(i, i) += 1;
     }
+
+    // p diagonal
+    A(nSpecie + 1, nSpecie + 1) = 1;
+
+    // deltaT diagonal
     A(nSpecie + 2, nSpecie + 2) = 1;
+
     LUscalarMatrix LUA(A);
     LUA.inv(A);
 
-    // After inversion, lines of p and T are set to 0 except diagonal.  This
-    // avoid skewness of the ellipsoid of accuracy and potential issues in the
+    // After inversion, line of T is set to 0 except diagonal.  This avoids
+    // skewness of the ellipsoid of accuracy and potential issues in the
     // binary tree.
     for (label i=0; i<nSpecie; i++)
     {
         A(nSpecie, i) = 0;
-        A(nSpecie + 1, i) = 0;
     }
 }
 
