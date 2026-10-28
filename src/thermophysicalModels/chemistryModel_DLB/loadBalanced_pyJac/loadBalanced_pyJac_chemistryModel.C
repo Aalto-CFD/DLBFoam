@@ -36,6 +36,8 @@ template <class ThermoType>
 loadBalanced_pyJac<ThermoType>::loadBalanced_pyJac(
     const fluidMulticomponentThermo& thermo)
     : loadBalanced<ThermoType>(thermo),
+    Tlow_(this->template lookupOrDefault<scalar>("Tlow", 0)),
+    Thigh_(this->template lookupOrDefault<scalar>("Thigh", great)),
     Y_(this->nSpecie()),
     sp_enth_form(this->nSpecie()) {
 
@@ -87,12 +89,7 @@ void loadBalanced_pyJac<ThermoType>::jacobian(
     J = Zero;
     dTYdt = Zero;
 
-    yToPyJac[0] = maxMin
-    (
-        TY[0],
-        Reaction<ThermoType>::TlowDefault,
-        Reaction<ThermoType>::ThighDefault
-    );
+    yToPyJac[0] = maxMin(TY[0], Tlow_, Thigh_);
     for (label i = 1; i < this->nSpecie(); i++) {
         yToPyJac[i] = max(TY[i], 0);
     }
@@ -112,12 +109,7 @@ void loadBalanced_pyJac<ThermoType>::derivatives(
 
     scalarField yToPyJac(this->nSpecie(), 0.0);
 
-    yToPyJac[0] = maxMin
-    (
-        TY[0],
-        Reaction<ThermoType>::TlowDefault,
-        Reaction<ThermoType>::ThighDefault
-    );
+    yToPyJac[0] = maxMin(TY[0], Tlow_, Thigh_);
     for (label i = 1; i < this->nSpecie(); i++) {
         yToPyJac[i] = max(TY[i], 0);
     }

@@ -120,6 +120,9 @@ public:
 
 
 private:
+    //- Temperature limits of the reaction scheme, as read by ReactionList
+    const scalar Tlow_, Thigh_;
+
     //- Temporary concentration field
     mutable scalarField Y_;
 
