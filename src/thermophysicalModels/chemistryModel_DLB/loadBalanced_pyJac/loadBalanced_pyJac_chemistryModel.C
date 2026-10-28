@@ -88,7 +88,12 @@ void loadBalanced_pyJac<ThermoType>::jacobian(
     dTYdt = Zero;
     const scalar p = TYp[this->nSpecie()];
 
-    yToPyJac[0] = TYp[0];
+    yToPyJac[0] = maxMin
+    (
+        TYp[0],
+        Reaction<ThermoType>::TlowDefault,
+        Reaction<ThermoType>::ThighDefault
+    );
     for (label i = 1; i < this->nSpecie(); i++) {
         yToPyJac[i] = max(TYp[i], 0);
     }
@@ -110,7 +115,12 @@ void loadBalanced_pyJac<ThermoType>::derivatives(
 
     const scalar p = TYp[this->nSpecie()];
 
-    yToPyJac[0] = TYp[0];
+    yToPyJac[0] = maxMin
+    (
+        TYp[0],
+        Reaction<ThermoType>::TlowDefault,
+        Reaction<ThermoType>::ThighDefault
+    );
     for (label i = 1; i < this->nSpecie(); i++) {
         yToPyJac[i] = max(TYp[i], 0);
     }
