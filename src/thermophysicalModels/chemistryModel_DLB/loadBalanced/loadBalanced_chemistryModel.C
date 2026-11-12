@@ -122,13 +122,9 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
                 }
             }
         }
+        this->thermo().syncSpeciesActive();
     }
-    else
-    {
-        resetSkipSpecies_ = true;
-    }
-
-    if (resetSkipSpecies_ && chemistryActive)
+    else if (resetSkipSpecies_ && chemistryActive)
     {
         for(label i = 0; i < this->nSpecie(); i++)
         {
@@ -139,8 +135,12 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
             }
         }
         resetSkipSpecies_ = false;
+        this->thermo().syncSpeciesActive();
     }
-    this->thermo().syncSpeciesActive();
+    else
+    {
+        resetSkipSpecies_ = true;
+    }
 
     if(!this->chemistry())
     {
