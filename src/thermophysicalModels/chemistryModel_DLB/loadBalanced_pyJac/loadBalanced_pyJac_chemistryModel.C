@@ -41,18 +41,11 @@ loadBalanced_pyJac<ThermoType>::loadBalanced_pyJac(
     Y_(this->nSpecie()),
     sp_enth_form(this->nSpecie()) {
 
-    if (this->chemistry_) {
-        // TODO: prevent symbol look-up error in case of ill mechanism library compilation or wrong path
-        // 1) Instead of providing libc_pyjac.so in controlDict, it should be given in chemistryProperties as a lib() argument (similar to functionObjects).
-        // 2) Read the new lib() as dictionary path variable here in the constructor.
-        // 3) Implement here "is_pyjac_lib_available(pyjac_lib_path)":
-        //      - utilise dlopen for the test, see e.g. https://stackoverflow.com/questions/56747328/loading-shared-library-dynamically-using-dlopen
-        // 4) If library is not available, safe exit and print out "check your libc_pyjac.so path in chemistryProperties."
-
-        //- Enthalpy of formation is taken from pyJac at T-standard
-        std::vector<scalar> sp_enth_form_(this->nSpecie(), 0.0);
-        eval_h(298.15, sp_enth_form_.data());
-        for (label i = 0; i < this->nSpecie(); i++) { sp_enth_form[i] = sp_enth_form_[i]; }
+    if (this->reduced())
+    {
+        FatalErrorInFunction
+            << "Mechanism reduction is not supported by loadBalanced_pyJac"
+            << exit(FatalError);
     }
 
     Info << "Overriding chemistryModel by loadBalanced_pyJac:" << endl;
@@ -70,6 +63,20 @@ loadBalanced_pyJac<ThermoType>::loadBalanced_pyJac(
             "loadBalanced_pyJac::New"
         )   << "\nInconsistent definition of number of species between thermophysicalProperties (Nsp = " << this->nSpecie() << ") and pyJac library (Nsp = " << PYJAC_NSP() << ")"
             << exit(FatalError);
+    }
+
+    if (this->chemistry_) {
+        // TODO: prevent symbol look-up error in case of ill mechanism library compilation or wrong path
+        // 1) Instead of providing libc_pyjac.so in controlDict, it should be given in chemistryProperties as a lib() argument (similar to functionObjects).
+        // 2) Read the new lib() as dictionary path variable here in the constructor.
+        // 3) Implement here "is_pyjac_lib_available(pyjac_lib_path)":
+        //      - utilise dlopen for the test, see e.g. https://stackoverflow.com/questions/56747328/loading-shared-library-dynamically-using-dlopen
+        // 4) If library is not available, safe exit and print out "check your libc_pyjac.so path in chemistryProperties."
+
+        //- Enthalpy of formation is taken from pyJac at T-standard
+        std::vector<scalar> sp_enth_form_(this->nSpecie(), 0.0);
+        eval_h(298.15, sp_enth_form_.data());
+        for (label i = 0; i < this->nSpecie(); i++) { sp_enth_form[i] = sp_enth_form_[i]; }
     }
 }
 

@@ -143,6 +143,8 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
         return great;
     }
 
+    reactionEvaluationScope reactionScope(this->reactions());
+
     // Set non-zone cells to zero when a zone restriction is active.
     if (!this->zone_.all())
     {
@@ -203,7 +205,13 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
         );
     }
 
+    this->reduction_.update();
     tabulation_.update();
+
+    if (this->reduced_)
+    {
+        this->thermo().syncActiveSpecies();
+    }
 
     return updateReactionRates(incomingSolutions);
 }
@@ -293,7 +301,7 @@ template <class ThermoType>
 void Foam::chemistryModels::loadBalanced<ThermoType>::solveSingle
 (
     ChemistryProblem& problem, ChemistrySolution& solution
-) const
+)
 {
     scalar timeLeft = problem.deltaT;
     scalarField Y0 = problem.Y;
@@ -305,51 +313,83 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::solveSingle
     // Timer begins
     clockTime time;
     time.timeIncrement();
-    if(problem.procNo == Pstream::myProcNo())
+    const bool localProblem = problem.procNo == Pstream::myProcNo();
+    scalarField phiq;
+    scalarField Rphiq;
+    solution.retrieved = false;
+    if (localProblem)
     {
         // Composition vector (Yi, T, p, deltaT)
-        scalarField phiq(this->nEqns() + 2);
-        scalarField Rphiq(this->nEqns() + 2);
+        phiq.setSize(this->nEqns() + 2);
+        Rphiq.setSize(this->nEqns() + 2);
         solution.retrieved = retrieveProblem(problem, phiq, Rphiq);
-        if(!solution.retrieved)
+    }
+
+    if (!solution.retrieved)
+    {
+        if (this->reduced_)
         {
-            // Calculate the chemical source terms
-            while(timeLeft > small)
+            this->Y_ = problem.Y;
+            forAll(problem.Y, i)
             {
-                scalar dt = timeLeft;
-                this->solve(
+                this->s_.c[i] = problem.rhoi*problem.Y[i]/this->specieWs_[i];
+            }
+            this->s_.reset(problem.pi, problem.Ti, problem.cellid);
+            this->reduction_.reduceMechanism(this->s_, this->c2s_, this->sToc_);
+            this->sY_.setSize(this->nSpecie());
+            forAll(this->sY_, i)
+            {
+                this->sY_[i] = problem.Y[this->sToc(i)];
+            }
+        }
+
+        // Calculate the chemical source terms
+        while(timeLeft > small)
+        {
+            scalar dt = timeLeft;
+            if (this->reduced_)
+            {
+                this->solve
+                (
+                    problem.pi,
+                    problem.Ti,
+                    this->sY_,
+                    problem.cellid,
+                    dt,
+                    problem.deltaTChem
+                );
+                forAll(this->sY_, i)
+                {
+                    problem.Y[this->sToc(i)] = this->sY_[i];
+                }
+            }
+            else
+            {
+                this->solve
+                (
                     problem.pi,
                     problem.Ti,
                     problem.Y,
                     problem.cellid,
                     dt,
-                    problem.deltaTChem);
-                timeLeft -= dt;
+                    problem.deltaTChem
+                );
             }
-            tabulateProblem(problem, phiq, Rphiq);
-            solution.deltaTChem = problem.deltaTChem;
+            timeLeft -= dt;
         }
-        else
+        if (localProblem)
         {
-            solution.deltaTChem = this->deltaTChem_[solution.cellid];
+            tabulateProblem(problem, phiq, Rphiq);
         }
+        if (this->reduced_)
+        {
+            this->setNSpecie(this->reduction_.nSpecie());
+        }
+        solution.deltaTChem = problem.deltaTChem;
     }
     else
     {
-        // Calculate the chemical source terms
-        while(timeLeft > small)
-        {
-            scalar dt = timeLeft;
-            this->solve(
-                problem.pi,
-                problem.Ti,
-                problem.Y,
-                problem.cellid,
-                dt,
-                problem.deltaTChem);
-            timeLeft -= dt;
-        }
-        solution.deltaTChem = problem.deltaTChem;
+        solution.deltaTChem = this->deltaTChem_[solution.cellid];
     }
     solution.rr = (problem.Y - Y0) * problem.rhoi / problem.deltaT;
     // Timer ends
@@ -447,7 +487,7 @@ Foam::RecvBuffer<Foam::ChemistrySolution>
 Foam::chemistryModels::loadBalanced<ThermoType>::solveBuffer
 (
     RecvBuffer<ChemistryProblem>& problems
-) const
+)
 {
     // allocate the solutions buffer
     RecvBuffer<ChemistrySolution> solutions;
@@ -465,7 +505,7 @@ Foam::DynamicList<Foam::ChemistrySolution>
 Foam::chemistryModels::loadBalanced<ThermoType>::solveList
 (
     UList<ChemistryProblem>& problems
-) const
+)
 {
     DynamicList<ChemistrySolution> solutions(
         problems.size(), ChemistrySolution(this->nSpecie()));
@@ -629,7 +669,8 @@ bool Foam::chemistryModels::loadBalanced<ThermoType>::retrieveProblem
     ChemistryProblem& problem, scalarField& phiq, scalarField& Rphiq
 ) const
 {
-    for (label i=0; i<this->nEqns()-1; i++)
+    const label nTabulatedSpecies = Rphiq.size() - 3;
+    for (label i=0; i<nTabulatedSpecies; i++)
     {
         phiq[i] = problem.Y[i];
     }
@@ -679,8 +720,8 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::tabulateProblem
 {
     if (tabulation_.tabulates())
     {
-
-        for (label i=0; i<this->nEqns()-1; i++)
+        const label nTabulatedSpecies = Rphiq.size() - 3;
+        for (label i=0; i<nTabulatedSpecies; i++)
         {
             Rphiq[i] = problem.Y[i];
         }
@@ -692,7 +733,7 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::tabulateProblem
         (
             phiq,
             Rphiq,
-            this->nEqns()-1,   // TODO: What should be the value here, when we have the pyJac array Nsp-1+T+p???
+            this->reduced_ ? this->reduction_.nActiveSpecies() : nTabulatedSpecies,
             problem.cellid,
             problem.deltaT
         );

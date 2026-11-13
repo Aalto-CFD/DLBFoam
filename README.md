@@ -155,6 +155,10 @@ abs(T<sub>cell</sub>-T<sub>ref</sub>)<deltaT.
 
 * (Optional) In-situ adaptive tabulation (ISAT) is compatible with DLBFoam since OpenFOAM 12. Check commented out section in [chemistryProperties](tutorials/multicomponentFluid/shearlayer_DLB_pyJac/constant/chemistryProperties) of `shearlayer_DLB_pyJac` tutorial for an example.
 
+* Mechanism reduction is supported by `loadBalanced`, but not by `loadBalanced_pyJac`.
+
+* Disable load balancing (`loadbalancing { active false; }`) for reaction rates that depend on local mesh fields, such as `fluxLimitedLangmuirHinshelwood`. Offloaded problems do not transfer those fields to the receiving rank.
+
 * Run the case normally with OpenFOAM's reactive solvers.
 
 For a working example, check the tutorials given in tutorials folder.
