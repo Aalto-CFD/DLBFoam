@@ -122,7 +122,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
                 }
             }
         }
-        this->thermo().syncSpeciesActive();
+        this->thermo().syncActiveSpecies();
     }
     else if (resetSkipSpecies_ && chemistryActive)
     {
@@ -135,7 +135,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
             }
         }
         resetSkipSpecies_ = false;
-        this->thermo().syncSpeciesActive();
+        this->thermo().syncActiveSpecies();
     }
     else
     {
@@ -654,6 +654,20 @@ bool Foam::chemistryModels::loadBalanced<ThermoType>::retrieveProblem
         {
             problem.Y[this->nSpecie()-1] = 1.0-Ysum;
         }
+        else
+        {
+            if (Ysum <= small)
+            {
+                FatalErrorInFunction
+                    << "Cannot normalise retrieved mass fractions: sum is "
+                    << Ysum << exit(FatalError);
+            }
+            forAll(problem.Y, i)
+            {
+                problem.Y[i] /= Ysum;
+            }
+        }
+        problem.Ti = Rphiq[Rphiq.size()-3];
         return true;
     }
     else

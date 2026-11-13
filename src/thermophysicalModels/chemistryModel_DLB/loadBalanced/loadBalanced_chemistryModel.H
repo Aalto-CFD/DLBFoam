@@ -245,11 +245,6 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Opts this model into the Standard reaction and reduction registrations of the
-// chemistryModel dynamic code template, which tests
-// "#if <type>_chemistryModel == Standard_chemistryModel"
-#define loadBalanced_chemistryModel 1
-
 #endif
 
 // ************************************************************************* //

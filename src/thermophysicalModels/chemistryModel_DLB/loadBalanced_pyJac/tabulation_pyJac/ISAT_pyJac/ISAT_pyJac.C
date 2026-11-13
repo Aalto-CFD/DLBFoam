@@ -121,7 +121,7 @@ Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
     // ),
     cleaningRequired_(false)
 {
-    if (chemistry_.reduction()) {
+    if (chemistry_.reduced()) {
         FatalErrorInFunction
             << "Reduction is not implemented"
             << exit(FatalError);

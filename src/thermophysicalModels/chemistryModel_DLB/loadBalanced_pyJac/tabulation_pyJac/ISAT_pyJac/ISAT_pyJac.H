@@ -241,7 +241,7 @@ public:
 
         //- Return true if reduction is applied to the state variables
 
-        bool reduction() const
+        bool reduced() const
         {
             // Not implemented
             return false;
