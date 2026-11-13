@@ -122,6 +122,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
                 }
             }
         }
+        resetSkipSpecies_ = true;
         this->thermo().syncActiveSpecies();
     }
     else if (resetSkipSpecies_ && chemistryActive)
@@ -137,11 +138,6 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
         resetSkipSpecies_ = false;
         this->thermo().syncActiveSpecies();
     }
-    else
-    {
-        resetSkipSpecies_ = true;
-    }
-
     if(!this->chemistry())
     {
         return great;
