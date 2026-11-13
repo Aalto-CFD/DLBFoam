@@ -63,7 +63,6 @@ Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
     chemisTree_(*this, coeffsDict_),
     scaleFactor_(chemistry.nSpecie()+2, 1), // Change the scalefactor for Nsp-1 + T + p + deltaT
     runTime_(chemistry.time()),
-    timeSteps_(0),
     chPMaxLifeTime_
     (
         coeffsDict_.lookupOrDefault("chPMaxLifeTime", INT_MAX)
@@ -698,8 +697,7 @@ void Foam::chemistryTabulationMethods::ISAT_pyJac::writePerformance()
 
 void Foam::chemistryTabulationMethods::ISAT_pyJac::reset()
 {
-    // Increment counter of time-step
-    timeSteps_++;
+    ISAT::reset();
 
     forAll(tabulationResults_, i)
     {
