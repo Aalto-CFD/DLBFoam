@@ -64,9 +64,7 @@ Foam::chemistryModels::loadBalanced<ThermoType>::
             ),
             this->mesh(),
             scalar(0.0)
-        ),
-        tabulationPtr_(chemistryTabulationMethod::New(*this, *this)),
-        tabulation_(*tabulationPtr_)
+        )
     {
         if(balancer_.log())
         {
@@ -98,7 +96,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
         returnReduce(this->zone_.nCells(), sumOp());
     const bool chemistryActive =
         this->chemistry() && nGlobalZoneCells > 0;
-    tabulation_.reset();
+    this->tabulation_.reset();
     // CPU time analysis
     clockTime timer;
     scalar t_getProblems(0);
@@ -206,7 +204,7 @@ Foam::scalar Foam::chemistryModels::loadBalanced<ThermoType>::solve
     }
 
     this->reduction_.update();
-    tabulation_.update();
+    this->tabulation_.update();
 
     if (this->reduced_)
     {
@@ -678,7 +676,7 @@ bool Foam::chemistryModels::loadBalanced<ThermoType>::retrieveProblem
     phiq[phiq.size()-2] = problem.pi;
     phiq[phiq.size()-1] = problem.deltaT;
 
-    if(tabulation_.retrieve(phiq,Rphiq))
+    if(this->tabulation_.retrieve(phiq,Rphiq))
     {
         // Retrieved solution stored in Rphiq
         scalar Ysum = 0.0;
@@ -718,7 +716,7 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::tabulateProblem
     ChemistryProblem& problem, scalarField& phiq, scalarField& Rphiq
 ) const
 {
-    if (tabulation_.tabulates())
+    if (this->tabulation_.tabulates())
     {
         const label nTabulatedSpecies = Rphiq.size() - 3;
         for (label i=0; i<nTabulatedSpecies; i++)
@@ -729,7 +727,7 @@ void Foam::chemistryModels::loadBalanced<ThermoType>::tabulateProblem
         Rphiq[Rphiq.size()-2] = problem.pi;
         Rphiq[Rphiq.size()-1] = problem.deltaT;
 
-        tabulation_.add
+        this->tabulation_.add
         (
             phiq,
             Rphiq,
