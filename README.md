@@ -1,5 +1,5 @@
 # DLBFoam: Dynamic load balancing for fast reactive simulations
-![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM--dev-20260907-brightgreen)
+![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM--dev-20261113-brightgreen)
 
 [<img src="https://img.shields.io/badge/-YouTube_Video_Tutorials-red?style=for-the-badge&logo=youtube&logoColor=white"/>](https://www.youtube.com/playlist?list=PLXqVaOXSsv1SBnfyGRa_C-E0X--FIT27P)
 
