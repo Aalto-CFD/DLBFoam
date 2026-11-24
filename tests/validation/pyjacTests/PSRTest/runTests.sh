@@ -1,51 +1,75 @@
+#!/usr/bin/env bash
+set -e
+set -o pipefail
+
 RED='\e[1;31m'
 NC='\e[0m' # No Color
 GREEN='\e[1;32m'
 YELLOW='\e[1;33m'
 DARKGRAY='\e[1;30m'
+status=0
+
+backupDir=$(mktemp -d)
+cleanup()
+{
+    if [ -f "$backupDir/physicalProperties" ]; then
+        cp "$backupDir/physicalProperties" testCase/constant/physicalProperties
+    fi
+    if [ -f "$backupDir/chemistryProperties" ]; then
+        cp "$backupDir/chemistryProperties" testCase/constant/chemistryProperties
+    fi
+    rm -f "$backupDir/physicalProperties" "$backupDir/chemistryProperties"
+    rmdir "$backupDir"
+}
+trap cleanup EXIT
+cp testCase/constant/physicalProperties "$backupDir/physicalProperties"
+cp testCase/constant/chemistryProperties "$backupDir/chemistryProperties"
 
 echo
 echo -e "${YELLOW}Validate pyJac chemistry module against reference data on perfectly stirred reactor:${DARKGRAY}"
 echo
 
 
-./PSRTest.bin -case testCase | tee testCase/log.orig
-
-if [ $? -eq 0 ]; then
+if ./PSRTest.bin -case testCase | tee testCase/log.orig; then
     echo
     echo -e "${GREEN}Validation checks PASSED.${NC}"
 else
     echo
     echo -e "${RED}Validation FAILED.${NC}"
     echo -e "${RED}See output above for further information.${NC}"
+    status=1
 fi
 
 
 
 echo
 echo -e "${YELLOW}Test error control on mechanism consistency in loadBalanced_pyJacChemistryModel:${DARKGRAY}"
-cp testCase/constant/physicalProperties testCase/constant/physicalProperties.orig
 cp testCase/constant/physicalProperties.illdefined testCase/constant/physicalProperties
-./PSRTest.bin -case testCase > testCase/log.illdefined 2>&1
-if [ $? -eq 1 ]; then
-    echo -e "${GREEN}PASSED.${NC}"
+if ./PSRTest.bin -case testCase > testCase/log.illdefined 2>&1; then
+    echo -e "${RED}FAILED. The species mismatch was not detected.${NC}"
+    status=1
 else
-    echo -e "${RED}FAILED. loadBalanced_pyJacChemistryModel.C did not catch the species mismatch error.${NC}"
+    result=$?
+    if [ "$result" -eq 1 ]; then
+        echo -e "${GREEN}PASSED.${NC}"
+    else
+        echo -e "${RED}FAILED. The mismatch test exited with status $result.${NC}"
+        status=1
+    fi
 fi
 
 echo
 echo -e "${YELLOW}Test dynamic compilation of loadBalanced_pyJacChemistryModel:${DARKGRAY}"
-cp testCase/constant/physicalProperties.orig testCase/constant/physicalProperties
+cp "$backupDir/physicalProperties" testCase/constant/physicalProperties
 foamDictionary -entry thermoType/transport -set logPolynomial testCase/constant/physicalProperties > /dev/null
-./PSRTest.bin -case testCase > testCase/log.dynamicCode 2>&1
-if [ $? -eq 0 ]; then
+if ./PSRTest.bin -case testCase > testCase/log.dynamicCode 2>&1; then
     echo -e "${GREEN}PASSED.${NC}"
 else
     echo -e "${RED}FAILED. See tests/validation/pyjacTests/PSRTest/testCase/log.dynamicCode for further information.${NC}"
     echo -e "${RED}You may still use DLBFoam with thermo properties that are precompiled in OpenFOAM.${NC}"
+    status=1
 fi
 
-cp testCase/constant/chemistryProperties testCase/constant/chemistryProperties.orig
 foamDictionary  testCase/constant/chemistryProperties -entry '#includeEtc' -add '"caseDicts/solvers/chemistry/TDAC/chemistryProperties.cfg"'
 foamDictionary  testCase/constant/chemistryProperties -entry tabulation -add '{}'
 foamDictionary  testCase/constant/chemistryProperties -entry reduction -add '{}'
@@ -53,17 +77,12 @@ foamDictionary  testCase/constant/chemistryProperties -entry reduction -add '{}'
 echo -e "${YELLOW}Test ISAT_pyJac compilation for DLBFoam-ISAT coupling:${DARKGRAY}"
 foamDictionary -entry tabulation/method -add ISAT_pyJac testCase/constant/chemistryProperties > /dev/null
 foamDictionary -entry reduction/method -add none testCase/constant/chemistryProperties > /dev/null
-./PSRTest.bin -case testCase > testCase/log.dynamicCode 2>&1
-if [ $? -eq 0 ]; then
+if ./PSRTest.bin -case testCase > testCase/log.dynamicCode 2>&1; then
     echo -e "${GREEN}PASSED.${NC}"
 else
     echo -e "${RED}FAILED. Check ISAT_pyJac compilation.${NC}"
     echo -e "${RED}You may still use DLBFoam without tabulation.${NC}"
+    status=1
 fi
 
-
-cp testCase/constant/physicalProperties.orig testCase/constant/physicalProperties
-rm testCase/constant/physicalProperties.orig
-
-cp testCase/constant/chemistryProperties.orig testCase/constant/chemistryProperties
-rm testCase/constant/chemistryProperties.orig
+exit "$status"
