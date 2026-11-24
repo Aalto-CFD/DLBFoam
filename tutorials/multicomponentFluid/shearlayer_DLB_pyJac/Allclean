@@ -7,6 +7,6 @@ cd "${0%/*}" || exit 1
 . "$WM_PROJECT_DIR/bin/tools/RunFunctions"
 . "$WM_PROJECT_DIR/bin/tools/CleanFunctions"
 
-cleanCase && rm -rf 0/ loadBal/ constant/foam/
-runApplication foamUnMergeCase ../shearlayer_DLB
+cleanCase && rm -rf 0/ loadBal/ constant/foam/ pyJac/lib/build/
+runApplication foamUnMergeCase ../shearlayer_DLB && rm -f log.foamUnMergeCase
 

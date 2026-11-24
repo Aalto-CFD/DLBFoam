@@ -64,6 +64,30 @@ class loadBalanced
 {
 
 private:
+    class reactionEvaluationScope
+    {
+        const PtrList<reaction>& reactions_;
+
+    public:
+        explicit reactionEvaluationScope(const PtrList<reaction>& reactions)
+        :
+            reactions_(reactions)
+        {
+            forAll(reactions_, i)
+            {
+                reactions_[i].preEvaluate();
+            }
+        }
+
+        ~reactionEvaluationScope()
+        {
+            forAll(reactions_, i)
+            {
+                reactions_[i].postEvaluate();
+            }
+        }
+    };
+
     // Private member data
 
         // Skip species flag
@@ -96,12 +120,6 @@ private:
         autoPtr<OFstream> solveBufferFile_;
         autoPtr<OFstream> unbalanceFile_;
 
-        //- Tabulation method
-        autoPtr<chemistryTabulationMethod> tabulationPtr_;
-
-        //- Tabulation method reference
-        chemistryTabulationMethod& tabulation_;
-
 
     // Private Member Functions
 
@@ -111,11 +129,11 @@ private:
 
         //- Solve a list of chemistry problems and return a list of solutions
         DynamicList<ChemistrySolution>
-        solveList(UList<ChemistryProblem>& problems) const;
+        solveList(UList<ChemistryProblem>& problems);
 
         //- Solve the problem buffer coming from the balancer
         RecvBuffer<ChemistrySolution>
-        solveBuffer(RecvBuffer<ChemistryProblem>& problems) const;
+        solveBuffer(RecvBuffer<ChemistryProblem>& problems);
 
         //- Update the reaction rate of cell i
         void updateReactionRate(const ChemistrySolution& solution, const label& i);
@@ -178,7 +196,7 @@ public:
     // Member Functions
 
         //- Solve a single ChemistryProblem and put the solution to ChemistrySolution
-        void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution) const;
+        void solveSingle(ChemistryProblem& problem, ChemistrySolution& solution);
 
         // Chemistry model functions (overriding functions in
         // chemistryModel to use the private solve function)
@@ -244,11 +262,6 @@ public:
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// Opts this model into the Standard reaction and reduction registrations of the
-// chemistryModel dynamic code template, which tests
-// "#if <type>_chemistryModel == Standard_chemistryModel"
-#define loadBalanced_chemistryModel 1
 
 #endif
 

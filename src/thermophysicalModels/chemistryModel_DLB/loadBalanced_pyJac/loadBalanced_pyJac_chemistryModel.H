@@ -86,18 +86,18 @@ public:
     virtual void jacobian
     (
         const scalar t,
-        const scalarField& TYp,
+        const scalarField& TY,
         const label li,
-        scalarField& dTYpdt,
+        scalarField& dTYdt,
         scalarSquareMatrix& J
     ) const override;
 
     virtual void derivatives
     (
         const scalar t,
-        const scalarField& TYp,
+        const scalarField& TY,
         const label li,
-        scalarField& dTYpdt
+        scalarField& dTYdt
     ) const override;
 
     //- Solve the ODE system
@@ -120,6 +120,9 @@ public:
 
 
 private:
+    //- Temperature limits of the reaction scheme, as read by ReactionList
+    const scalar Tlow_, Thigh_;
+
     //- Temporary concentration field
     mutable scalarField Y_;
 
@@ -147,11 +150,6 @@ private:
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// Opts this model into the Standard reaction and reduction registrations of the
-// chemistryModel dynamic code template, which tests
-// "#if <type>_chemistryModel == Standard_chemistryModel"
-#define loadBalanced_pyJac_chemistryModel 1
 
 #endif
 

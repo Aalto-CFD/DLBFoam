@@ -83,8 +83,6 @@ class ISAT_pyJac
 
         const Time& runTime_;
 
-        label timeSteps_;
-
         //- Lifetime (number of time steps) of a stored point
         label chPMaxLifeTime_;
 
@@ -241,7 +239,7 @@ public:
 
         //- Return true if reduction is applied to the state variables
 
-        bool reduction() const
+        bool reduced() const
         {
             // Not implemented
             return false;
@@ -260,12 +258,6 @@ public:
         inline const scalarField& scaleFactor() const
         {
             return scaleFactor_;
-        }
-
-        //- Return the number of chemistry evaluations
-        inline label timeSteps() const
-        {
-            return timeSteps_;
         }
 
         virtual void writePerformance();

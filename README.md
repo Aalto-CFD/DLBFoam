@@ -1,5 +1,5 @@
 # DLBFoam: Dynamic load balancing for fast reactive simulations
-![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM--dev-20260907-brightgreen)
+![OpenFOAM dev](https://img.shields.io/badge/OpenFOAM--dev-20261113-brightgreen)
 
 [<img src="https://img.shields.io/badge/-YouTube_Video_Tutorials-red?style=for-the-badge&logo=youtube&logoColor=white"/>](https://www.youtube.com/playlist?list=PLXqVaOXSsv1SBnfyGRa_C-E0X--FIT27P)
 
@@ -154,6 +154,10 @@ between reference solution and other reference cells and ensures:
 abs(T<sub>cell</sub>-T<sub>ref</sub>)<deltaT.
 
 * (Optional) In-situ adaptive tabulation (ISAT) is compatible with DLBFoam since OpenFOAM 12. Check commented out section in [chemistryProperties](tutorials/multicomponentFluid/shearlayer_DLB_pyJac/constant/chemistryProperties) of `shearlayer_DLB_pyJac` tutorial for an example.
+
+* Mechanism reduction is supported by `loadBalanced`, but not by `loadBalanced_pyJac`.
+
+* Disable load balancing (`loadbalancing { active false; }`) for reaction rates that depend on local mesh fields, such as `fluxLimitedLangmuirHinshelwood`. Offloaded problems do not transfer those fields to the receiving rank.
 
 * Run the case normally with OpenFOAM's reactive solvers.
 
