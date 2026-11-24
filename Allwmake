@@ -85,17 +85,22 @@ check_openfoam
 check_cmake
 
 DLB_ETC_DC=codeTemplates/dynamicCode
+DLB_CASE_DICTS=caseDicts/functions
 if [ "$WM_BUILD" == "site" ]; then
     if [ -n "$WM_PROJECT_SITE" ]
     then
         FOAM_ETC_DC=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/etc/$DLB_ETC_DC
+        FOAM_CASE_DICTS=$WM_PROJECT_SITE/$WM_PROJECT_VERSION/etc/$DLB_CASE_DICTS
     else
         FOAM_ETC_DC=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/etc/$DLB_ETC_DC
+        FOAM_CASE_DICTS=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/etc/$DLB_CASE_DICTS   
     fi
 elif [ "$WM_BUILD" == "core" ]; then
     FOAM_ETC_DC=$WM_PROJECT_DIR/etc/$DLB_ETC_DC
+    FOAM_CASE_DICTS=$WM_PROJECT_DIR/etc/$DLB_CASE_DICTS
 else
     FOAM_ETC_DC="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/$DLB_ETC_DC"
+    FOAM_CASE_DICTS="${HOME}/.OpenFOAM/${WM_PROJECT_VERSION}/$DLB_CASE_DICTS"
 fi
 
 if [ "$PLATFORM" == "MKL" ]; then
@@ -127,6 +132,8 @@ DLB_REPO_ROOT=$(pwd)
 mkdir --parents "$FOAM_ETC_DC"
 sed "s|@DLBFOAM_ROOT@|$DLB_REPO_ROOT|g" "etc/$DLB_ETC_DC/chemistryModel" > "$FOAM_ETC_DC/chemistryModel"
 cp "etc/$DLB_ETC_DC/chemistryModelTemplate.C" "$FOAM_ETC_DC"
+mkdir --parents "$FOAM_CASE_DICTS"
+cp etc/$DLB_CASE_DICTS/mixtureFraction "$FOAM_CASE_DICTS"
 
 cp -r utilities/mechanisms/yao tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac
 cp utilities/CMakeLists.txt tutorials/multicomponentFluid/shearlayer_DLB_pyJac/pyJac/lib/
