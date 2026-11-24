@@ -36,27 +36,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Configure OpenFOAM repository
-        run: |
-          sudo sed -i "s/^\(deb\).*\(http\)/\1 [arch=amd64] \2/" /etc/apt/sources.list.d/*dl_openfoam_org*list
-          
+      # Install OpenFOAM-dev and LAPACK
       - name: Install OpenFOAM-dev and LAPACK
         run: |
           wget -qO- https://dl.openfoam.org/gpg.key \
             | sudo tee /etc/apt/trusted.gpg.d/openfoam.asc > /dev/null
 
-          sudo add-apt-repository -y \
+          sudo add-apt-repository --no-update -y \
             "http://dl.openfoam.org/ubuntu main dev"
 
-          sudo sed -i \
-            "s/^\(deb\).*\(http:\/\/dl\.openfoam\.org\/ubuntu\)/\1 [arch=amd64] \2/" \
-            /etc/apt/sources.list.d/*dl_openfoam_org*list
+          # Locate the OpenFOAM repository file
+          REPO_FILE=$(sudo grep -rlF \
+            "dl.openfoam.org/ubuntu" \
+            /etc/apt/sources.list.d/ \
+            --include="*.list" | head -n1)
 
+          if [ -z "$REPO_FILE" ]; then
+            echo "::error::OpenFOAM repository file not found"
+            exit 1
+          fi
+
+          echo "Configuring OpenFOAM repository: $REPO_FILE"
+
+          # Force amd64 architecture instead of amd64v3
+          sudo sed -i -E \
+            's|^deb[[:space:]]+|deb [arch=amd64] |' \
+            "$REPO_FILE"
+
+          echo "OpenFOAM repository configuration:"
+          cat "$REPO_FILE"
+
+          # Update package lists and install dependencies
           sudo apt-get update
+
           sudo apt-get install -y \
             openfoam-dev \
             liblapacke-dev
 
+      # Detect installed OpenFOAM-dev version
       - name: Detect OpenFOAM-dev version
         id: openfoam-version
         run: |
@@ -76,6 +93,7 @@ jobs:
 
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
 
+      # Verify OpenFOAM environment
       - name: Show OpenFOAM environment
         run: |
           source /opt/openfoam-dev/etc/bashrc
@@ -87,6 +105,7 @@ jobs:
           which wmake
           wmake -help >/dev/null
 
+      # Compile DLBFoam
       - name: Compile DLBFoam
         run: |
           source /opt/openfoam-dev/etc/bashrc
@@ -94,6 +113,7 @@ jobs:
           chmod +x Allwmake
           ./Allwmake --platform STANDALONE
 
+      # Verify generated libraries
       - name: Show compiled libraries
         run: |
           source /opt/openfoam-dev/etc/bashrc
@@ -112,6 +132,7 @@ jobs:
             -name '*.so' \
             -print
 
+  # Update README badge after successful compilation
   update-badge:
     name: Update OpenFOAM-dev badge
     needs: compile
