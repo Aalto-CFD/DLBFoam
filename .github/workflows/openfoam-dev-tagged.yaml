@@ -36,6 +36,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Configure OpenFOAM repository
+        run: |
+          sudo sed -i "s/^\(deb\).*\(http\)/\1 [arch=amd64] \2/" /etc/apt/sources.list.d/*dl_openfoam_org*list
+          
       - name: Install OpenFOAM-dev and LAPACK
         run: |
           wget -qO- https://dl.openfoam.org/gpg.key \
