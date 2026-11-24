@@ -120,12 +120,6 @@ private:
         autoPtr<OFstream> solveBufferFile_;
         autoPtr<OFstream> unbalanceFile_;
 
-        //- Tabulation method
-        autoPtr<chemistryTabulationMethod> tabulationPtr_;
-
-        //- Tabulation method reference
-        chemistryTabulationMethod& tabulation_;
-
 
     // Private Member Functions
 
