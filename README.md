@@ -122,6 +122,8 @@ ode
     relTol          1e-05;
 }
 ```
+Optional ```Tmin``` and ```Tmax``` entries in the same dictionary set the accepted temperature range (defaults 200 and 5000). Do not set ```Tmin``` below the thermo ```Tlow```, or pyJac will extrapolate the NASA polynomials.
+
 * (Optional) Set the refmapping as active in chemistryProperties file if you want to
     use the reference mapping method:
 

@@ -70,8 +70,8 @@ Foam::seulex_LAPACK::seulex_LAPACK(const ODESystem& ode, const dictionary& dict)
     dy_(n_),
     yTemp_(n_),
     dydx_(n_),
-  	NASAP_mintemp(200),
-	NASAP_maxtemp(5000)
+    NASAP_mintemp(dict.lookupOrDefault<scalar>("Tmin", 200)),
+    NASAP_maxtemp(dict.lookupOrDefault<scalar>("Tmax", 5000))
 
 {
     // The CPU time factors for the major parts of the algorithm
@@ -394,10 +394,19 @@ void Foam::seulex_LAPACK::solve
         firstk = false;
         step.reject = false;
 
-        if (mag(dx) <= mag(x)*sqr(SMALL))
+        if (mag(dx) <= max(mag(x), mag(step.dxTry))*sqr(SMALL))
         {
-             WarningInFunction
-                    << "step size underflow :"  << dx << endl;
+            FatalErrorInFunction
+                << "step size underflow : " << dx << nl
+                << "    First element of the state vector: " << y0_[0]
+                << ", accepted temperature range: (" << NASAP_mintemp
+                << ", " << NASAP_maxtemp << "]" << nl
+                << "    Cell " << li << " (index on the originating rank)" << nl
+                << "    seulex_LAPACK requires the temperature to be the"
+                << " first element of the state vector (loadBalanced_pyJac)."
+                << nl << "    Set Tmin and Tmax in the ode dictionary if the"
+                << " temperature range of the case is wider."
+                << exit(FatalError);
         }
 
         scalar errOld = 0;
