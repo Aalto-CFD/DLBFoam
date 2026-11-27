@@ -107,19 +107,25 @@ Foam::chemistryTabulationMethods::ISAT_pyJac::ISAT_pyJac
             chemistry.time().name(),
             chemistry.mesh(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::AUTO_WRITE,
+            false
         ),
         chemistry.mesh(),
         scalar(0)
     ),
-    // tabulationResults_( // Idea: take it from parent class (reuse=True)
-    //     chemistry.mesh().lookupObject<volInternalScalarField>(
-    //         "TabulationResults"
-    //     ),
-    //     true
-    // ),
     cleaningRequired_(false)
 {
+    {
+        regIOobject& baseTabulationResults =
+            chemistry.mesh().lookupObjectRef<regIOobject>
+            (
+                tabulationResults_.name()
+            );
+
+        baseTabulationResults.checkOut();
+        tabulationResults_.checkIn();
+    }
+
     if (chemistry_.reduced()) {
         FatalErrorInFunction
             << "Reduction is not implemented"
